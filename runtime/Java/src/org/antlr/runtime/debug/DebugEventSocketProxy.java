@@ -270,7 +270,7 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 
 	public void errorNode(Object t) {
 		int ID = adaptor.getUniqueID(t);
-		String text = adaptor.getText(t);
+		String text = t.toString();
 		StringBuffer buf = new StringBuffer(50);
 		buf.append("errorNode ");
 		buf.append(ID);

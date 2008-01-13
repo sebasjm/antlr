@@ -27,6 +27,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+
 public class TestAutoAST extends BaseTest {
 	protected boolean debug = false;
 
@@ -559,8 +564,8 @@ public class TestAutoAST extends BaseTest {
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a : x+=b x+=b {" +
-				"Tree t=(Tree)$x.get(1);" +
-				"System.out.print(\"2nd x=\"+t.toStringTree()+';');} ;\n" +
+			"Tree t=(Tree)$x.get(1);" +
+			"System.out.print(\"2nd x=\"+t.toStringTree()+';');} ;\n" +
 			"b : ID;\n" +
 			"ID : 'a'..'z'+ ;\n" +
 			"INT : '0'..'9'+;\n" +
@@ -720,6 +725,33 @@ public class TestAutoAST extends BaseTest {
 		// ref to rule b (start of c). It then matches 34 in c.
 		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
+
+	static class MyAdaptor extends CommonTreeAdaptor {
+		public Object errorNode(TokenStream input, Token start, Token stop,
+								RecognitionException e)
+		{
+			return null;
+		}
+	}
+
+	public void testNoErrorNode() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : b c ;\n" +
+			"b : ID ;\n" +
+			"c : INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "a", "34", debug);
+		// finds an error at the first token, 34, and re-syncs.
+		// re-synchronizing does not consume a token because 34 follows
+		// ref to rule b (start of c). It then matches 34 in c.
+		assertEquals("<missing type: 4> 34\n", found);
+	}
+
 
 	// S U P P O R T
 

@@ -36,7 +36,9 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 							RecognitionException e)
 	{
 		Object node = adaptor.errorNode(input, start, stop, e);
-		dbg.errorNode(node);
+		if ( node!=null ) {
+			dbg.errorNode(node);
+		}
 		return node;
 	}
 
