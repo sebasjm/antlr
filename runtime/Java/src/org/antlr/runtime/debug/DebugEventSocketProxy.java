@@ -268,6 +268,18 @@ public class DebugEventSocketProxy extends BlankDebugEventListener {
 		transmit("nilNode "+ID);
 	}
 
+	public void errorNode(Object t) {
+		int ID = adaptor.getUniqueID(t);
+		String text = adaptor.getText(t);
+		StringBuffer buf = new StringBuffer(50);
+		buf.append("errorNode ");
+		buf.append(ID);
+		buf.append(" ");
+		buf.append(Token.INVALID_TOKEN_TYPE);
+		serializeText(buf, text);
+		transmit(buf.toString());
+	}
+
 	public void createNode(Object t) {
 		int ID = adaptor.getUniqueID(t);
 		String text = adaptor.getText(t);

@@ -387,6 +387,15 @@ public class RemoteDebugEventSocketListener implements Runnable {
 			ProxyTree node = new ProxyTree(ID);
 			listener.nilNode(node);
 		}
+		else if ( elements[0].equals("errorNode") ) {
+			// TODO: do we need a special tree here?
+			int ID = Integer.parseInt(elements[1]);
+			int type = Integer.parseInt(elements[2]);
+			String text = elements[3];
+			text = unEscapeNewlines(text);
+			ProxyTree node = new ProxyTree(ID, type, -1, -1, -1, text);
+			listener.errorNode(node);
+		}
 		else if ( elements[0].equals("becomeRoot") ) {
 			int newRootID = Integer.parseInt(elements[1]);
 			int oldRootID = Integer.parseInt(elements[2]);
