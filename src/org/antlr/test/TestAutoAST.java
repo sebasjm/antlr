@@ -726,32 +726,6 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
 
-	static class MyAdaptor extends CommonTreeAdaptor {
-		public Object errorNode(TokenStream input, Token start, Token stop,
-								RecognitionException e)
-		{
-			return null;
-		}
-	}
-
-	public void testNoErrorNode() throws Exception {
-		String grammar =
-			"grammar foo;\n" +
-			"options {output=AST;}\n" +
-			"a : b c ;\n" +
-			"b : ID ;\n" +
-			"c : INT ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
-								  "a", "34", debug);
-		// finds an error at the first token, 34, and re-syncs.
-		// re-synchronizing does not consume a token because 34 follows
-		// ref to rule b (start of c). It then matches 34 in c.
-		assertEquals("<missing type: 4> 34\n", found);
-	}
-
 
 	// S U P P O R T
 
