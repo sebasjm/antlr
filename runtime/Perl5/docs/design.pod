@@ -22,6 +22,15 @@ good match for those features most other things should fall into place.
 
 C<ANTLR::Runtime> uses C<Object::InsideOut> for OO modelling.
 
+=head3 Packages
+
+The Java package C<org.antlr.runtime> maps to the Perl 5 package
+C<ANTLR::Runtime>.
+
+=head3 Classes
+
+Each Java class maps to a Perl 5 class with the same name.
+
 =head2 Exceptions
 
 C<Exception::Class> should meet our needs and is used by C<Object::InsideOut>
