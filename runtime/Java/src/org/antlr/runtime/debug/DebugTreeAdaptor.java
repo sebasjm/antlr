@@ -1,6 +1,8 @@
 package org.antlr.runtime.debug;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 /** A TreeAdaptor proxy that fires debugging events to a DebugEventListener
@@ -27,6 +29,14 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	public Object create(Token payload) {
 		Object node = adaptor.create(payload);
 		dbg.createNode(node, payload);
+		return node;
+	}
+
+	public Object errorNode(TokenStream input, Token start, Token stop,
+							RecognitionException e)
+	{
+		Object node = adaptor.errorNode(input, start, stop, e);
+		dbg.errorNode(node);
 		return node;
 	}
 

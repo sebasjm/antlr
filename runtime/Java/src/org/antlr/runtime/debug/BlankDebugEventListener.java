@@ -66,7 +66,7 @@ public class BlankDebugEventListener implements DebugEventListener {
 	// AST Stuff
 
 	public void nilNode(Object t) {}
-	//public void setSubTreeRoot(String name, int ID) {}
+	public void errorNode(Object t) {}
 	public void createNode(Object t) {}
 	public void createNode(Object node, Token token) {}
 	public void becomeRoot(Object newRoot, Object oldRoot) {}

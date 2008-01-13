@@ -643,6 +643,84 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 34 d\n", found);
 	}
 
+	public void testMissingTokenGivesErrorNode() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "a", "abc", debug);
+		assertEquals("<mismatched token: [@-1,0:0='<no text>',<-1>,0:-1], resync=abc>\n", found);
+	}
+
+	public void testExtraTokenGivesErrorNode() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : b c ;\n" +
+			"b : ID ;\n" +
+			"c : INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "a", "abc ick 34", debug);
+		assertEquals("abc <extraneous: [@2,4:6='ick',<4>,1:4], resync=ick 34>\n", found);
+	}
+
+	public void testMissingFirstTokenGivesErrorNode() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "a", "34", debug);
+		assertEquals("<missing type: 4>\n", found);
+	}
+
+	public void testMissingFirstTokenGivesErrorNode2() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : b c ;\n" +
+			"b : ID ;\n" +
+			"c : INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "a", "34", debug);
+		// finds an error at the first token, 34, and re-syncs.
+		// re-synchronizing does not consume a token because 34 follows
+		// ref to rule b (start of c). It then matches 34 in c.
+		assertEquals("<missing type: 4> 34\n", found);
+	}
+
+	public void testNoViableAltGivesErrorNode() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"a : b | c ;\n" +
+			"b : ID ;\n" +
+			"c : INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"S : '*' ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "a", "*", debug);
+		// finds an error at the first token, 34, and re-syncs.
+		// re-synchronizing does not consume a token because 34 follows
+		// ref to rule b (start of c). It then matches 34 in c.
+		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
+	}
+
 	// S U P P O R T
 
 	public void _test() throws Exception {

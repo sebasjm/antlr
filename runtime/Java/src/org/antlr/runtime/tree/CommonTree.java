@@ -77,7 +77,7 @@ public class CommonTree extends BaseTree {
 
 	public int getType() {
 		if ( token==null ) {
-			return 0;
+			return Token.INVALID_TOKEN_TYPE;
 		}
 		return token.getType();
 	}
@@ -150,6 +150,12 @@ public class CommonTree extends BaseTree {
 	public String toString() {
 		if ( isNil() ) {
 			return "nil";
+		}
+		if ( getType()==Token.INVALID_TOKEN_TYPE ) {
+			return "<errornode>";
+		}
+		if ( token==null ) {
+			return null;
 		}
 		return token.getText();
 	}

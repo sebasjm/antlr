@@ -265,6 +265,12 @@ public interface DebugEventListener {
 	 */
 	public void nilNode(Object t);
 
+	/** Upon syntax error, recognizers bracket the error with an error node
+	 *  if they are building ASTs.
+	 * @param t
+	 */
+	public void errorNode(Object t);
+
 	/** Announce a new node built from token elements such as type etc...
 	 * 
 	 *  If you are receiving this event over a socket via

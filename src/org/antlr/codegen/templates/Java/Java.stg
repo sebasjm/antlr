@@ -348,6 +348,7 @@ public final <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterS
     catch (RecognitionException re) {
         reportError(re);
         recover(input,re);
+	<@setErrorReturnValue()>
     }<\n>
 <endif>
 <endif>
@@ -684,15 +685,17 @@ if ( <s> ) {
 }
 else {
     <ruleBacktrackFailure()>
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
+    MismatchedSetException mse = new MismatchedSetException(null,input);
     <@mismatchedSetException()>
 <if(LEXER)>
     recover(mse);
-<else>
-    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
-<endif>
     throw mse;
+<else>
+    throw mse;
+    <! use following code to make it recover inline; remove throw mse;
+    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    !>
+<endif>
 }<\n>
 >>
 

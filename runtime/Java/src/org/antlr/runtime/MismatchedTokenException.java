@@ -27,6 +27,7 @@
 */
 package org.antlr.runtime;
 
+/** A mismatched char or Token or tree node */
 public class MismatchedTokenException extends RecognitionException {
 	public int expecting;
 

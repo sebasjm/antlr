@@ -221,6 +221,13 @@ public class DebugEventHub implements DebugEventListener {
 		}
 	}
 
+	public void errorNode(Object t) {
+		for (int i = 0; i < listeners.size(); i++) {
+			DebugEventListener listener = (DebugEventListener)listeners.get(i);
+			listener.errorNode(t);
+		}
+	}
+
 	public void createNode(Object t) {
 		for (int i = 0; i < listeners.size(); i++) {
 			DebugEventListener listener = (DebugEventListener)listeners.get(i);

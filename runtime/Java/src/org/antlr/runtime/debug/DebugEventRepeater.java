@@ -10,7 +10,7 @@ import org.antlr.runtime.RecognitionException;
  *  the method in this class so the event will continue on to the original
  *  recipient.
  *
- *  @see also DebugEventHub
+ *  @see DebugEventHub
  */
 public class DebugEventRepeater implements DebugEventListener {
 	protected DebugEventListener listener;
@@ -50,6 +50,7 @@ public class DebugEventRepeater implements DebugEventListener {
 	// AST Stuff
 
 	public void nilNode(Object t) { listener.nilNode(t); }
+	public void errorNode(Object t) { listener.errorNode(t); }
 	public void createNode(Object t) { listener.createNode(t); }
 	public void createNode(Object node, Token token) { listener.createNode(node, token); }
 	public void becomeRoot(Object newRoot, Object oldRoot) { listener.becomeRoot(newRoot, oldRoot); }

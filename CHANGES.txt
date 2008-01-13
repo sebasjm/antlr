@@ -8,6 +8,64 @@ University of San Francisco
 
 CHANGES
 
+January 12, 2007
+
+* Copy ctor not copying start and stop for common token. Fixes ANTLR-212
+
+* Removed single token insertion and deletion for tokens, sets.
+  Required a change to the code generation for matchSet() template
+  and a tweak inside the BaseRecognizer.  To engage this again is easy,
+  just override mismatch() to call mismatchRecover(). I changed it to simply
+  throw an exception.
+
+* Added syntaxError recognizer state var so you can easily tell if
+  a recognizer failed.  Added getNumberOfSyntaxErrors() to recognizers.
+
+* Added doc for the error node stuff:
+  http://www.antlr.org/wiki/display/ANTLR3/Tree+construction
+
+* Fixed ANTLR-193
+
+* Added recognizer methods to answer questions about current mismatched
+  token error.  Useful now since i don't automatically recover inline
+  to such errors (I throw exception):
+	mismatchIsUnwantedToken(IntStream input, int ttype) 
+	mismatchIsMissingToken(IntStream input, BitSet follow)
+
+* Added UnwantedTokenException and MissingTokenException to make
+  match() problems more precise in case you want to catch differently.
+  Updated getErrorMessage() to be more precise.  Says:
+
+	line 2:9 missing EQ at '0'
+
+  now instead of
+
+	line 2:9 mismatched input '0' expecting EQ
+
+  Input "x=9 9;" gives
+
+	line 3:8 extraneous input '9' expecting ';'
+
+  When very confused, "x=9 for;", you still get old mismatched message:
+
+	line 3:8 extraneous input 'for' expecting ';'
+	line 3:11 mismatched input ';' expecting '('
+
+* Added unit tests to TestAutoAST and copied to TestRewriteAST with
+  suitable rewrites to ensure basic error node insertion works.
+
+January 11, 2007
+
+* Adding errorNode to TreeAdaptor and various debug
+  events/listeners.  Had to add new class runtime.tree.CommonErrorNode
+  to hold all the goodies: input stream, start/stop objects.
+
+* Tweaked CommonTree.getType() to return INVALID_TOKEN_TYPE
+  instead of literal 0 (same thing at moment though).
+
+* Updated ANTLRWorks to show error nodes in tree as much as I could; Jean
+  will get to rest of it.
+
 January 9-10, 2007
 
 * Continued work on debugging/profiling composite grammars.

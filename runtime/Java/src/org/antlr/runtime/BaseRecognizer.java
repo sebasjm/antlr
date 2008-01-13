@@ -52,6 +52,7 @@ public abstract class BaseRecognizer {
 		state.errorRecovery = false;
 		state.lastErrorIndex = -1;
 		state.failed = false;
+		state.syntaxErrors = 0;
 		// wack everything related to backtracking and memoization
 		state.backtracking = 0;
 		for (int i = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) { // wipe cache
@@ -59,15 +60,20 @@ public abstract class BaseRecognizer {
 		}
 	}
 
-	/** Match current input symbol against ttype.  Upon error, do one token
-	 *  insertion or deletion if possible.  You can override to not recover
-	 *  here and bail out of the current production to the normal error
+	/** Match current input symbol against ttype.  Throw exception upon
+	 *  error, bailing out of the current production to the normal error
 	 *  exception catch (at the end of the method) by just throwing
-	 *  MismatchedTokenException upon input.LA(1)!=ttype.
+	 *  MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
+	 *  by resynchronize into the set of symbols the can follow.
+	 *
+	 *  Prior to v3.1, this method used to do one token
+	 *  insertion or deletion if possible.  You can override mismatch()
+	 *  to recover here if you want.
 	 */
 	public void match(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
 	{
+		//System.out.println("match "+((TokenStream)input).LT(1));
 		if ( input.LA(1)==ttype ) {
 			input.consume();
 			state.errorRecovery = false;
@@ -82,18 +88,58 @@ public abstract class BaseRecognizer {
 		return;
 	}
 
+	/** Match the wildcard: in a symbol */
 	public void matchAny(IntStream input) {
 		state.errorRecovery = false;
 		state.failed = false;
 		input.consume();
 	}
 
+	public boolean mismatchIsUnwantedToken(IntStream input, int ttype) {
+		return input.LA(2)==ttype;
+	}
+
+	public boolean mismatchIsMissingToken(IntStream input, BitSet follow) {
+		if ( follow==null ) {
+			// we have no information about the follow; we can only consume
+			// a single token and hope for the best
+			return false;
+		}
+		// compute what can follow this grammar element reference
+		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
+			BitSet viableTokensFollowingThisRule =
+				computeContextSensitiveRuleFOLLOW();
+			follow = follow.or(viableTokensFollowingThisRule);
+			follow.remove(Token.EOR_TOKEN_TYPE);
+		}
+		// if current token is consistent with what could come after set
+		// then we know we're missing a token; error recovery is free to
+		// "insert" the missing token
+		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
+		if ( follow.member(input.LA(1)) ) {
+			//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
+			return true;
+		}
+		return false;
+	}
+
 	/** factor out what to do upon token mismatch so tree parsers can behave
-	 *  differently.  Override this method in your parser to do things
-	 *  like bailing out after the first error; just throw the mte object
-	 *  instead of calling the recovery method.
+	 *  differently.  Override and call mismatchRecover(input, ttype, follow)
+	 *  to get single token insertion and deletion.
 	 */
 	protected void mismatch(IntStream input, int ttype, BitSet follow)
+		throws RecognitionException
+	{
+		if ( mismatchIsUnwantedToken(input, ttype) ) {
+			throw new UnwantedTokenException(ttype, input);
+		}
+		else if ( mismatchIsMissingToken(input, follow) ) {
+			throw new MissingTokenException(ttype, input);
+		}
+		throw new MismatchedTokenException(ttype, input);
+	}
+
+	protected void mismatchRecover(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
 	{
 		MismatchedTokenException mte =
@@ -113,6 +159,8 @@ public abstract class BaseRecognizer {
 	 * 		3. consume until token found in resynch set
 	 * 		4. try to resume parsing
 	 * 		5. next match() will reset errorRecovery mode
+	 *
+	 *  If you override, make sure to update syntaxErrors if you care about that.
 	 */
 	public void reportError(RecognitionException e) {
 		// if we've already reported an error and have not matched a token
@@ -121,6 +169,7 @@ public abstract class BaseRecognizer {
 			//System.err.print("[SPURIOUS] ");
 			return;
 		}
+		state.syntaxErrors++; // don't count spurious
 		state.errorRecovery = true;
 
 		displayRecognitionError(this.getTokenNames(), e);
@@ -158,7 +207,30 @@ public abstract class BaseRecognizer {
 	 */
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
 		String msg = null;
-		if ( e instanceof MismatchedTokenException ) {
+		if ( e instanceof UnwantedTokenException ) {
+			UnwantedTokenException ute = (UnwantedTokenException)e;
+			String tokenName="<unknown>";
+			if ( ute.expecting== Token.EOF ) {
+				tokenName = "EOF";
+			}
+			else {
+				tokenName = tokenNames[ute.expecting];
+			}
+			msg = "extraneous input "+getTokenErrorDisplay(ute.getUnexpectedToken())+
+				" expecting "+tokenName;
+		}
+		else if ( e instanceof MissingTokenException ) {
+			MissingTokenException mte = (MissingTokenException)e;
+			String tokenName="<unknown>";
+			if ( mte.expecting== Token.EOF ) {
+				tokenName = "EOF";
+			}
+			else {
+				tokenName = tokenNames[mte.expecting];
+			}
+			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.token);
+		}
+		else if ( e instanceof MismatchedTokenException ) {
 			MismatchedTokenException mte = (MismatchedTokenException)e;
 			String tokenName="<unknown>";
 			if ( mte.expecting== Token.EOF ) {
@@ -213,6 +285,17 @@ public abstract class BaseRecognizer {
 		return msg;
 	}
 
+	/** Get number of recognition errors (lexer, parser, tree parser).  Each
+	 *  recognizer tracks its own number.  So parser and lexer each have
+	 *  separate count.  Does not count the spurious errors found between
+	 *  an error and next valid token match
+	 *
+	 *  See also reportError()
+	 */
+	public int getNumberOfSyntaxErrors() {
+		return state.syntaxErrors;
+	}
+
 	/** What is the error header, normally line/character position information? */
 	public String getErrorHeader(RecognitionException e) {
 		return "line "+e.line+":"+e.charPositionInLine;
@@ -247,9 +330,11 @@ public abstract class BaseRecognizer {
 		System.err.println(msg);
 	}
 
-	/** Recover from an error found on the input stream.  Mostly this is
-	 *  NoViableAlt exceptions, but could be a mismatched token that
-	 *  the match() routine could not recover from.
+	/** Recover from an error found on the input stream.  This is
+	 *  for NoViableAlt and mismatched symbol exceptions.  If you enable
+	 *  single token insertion and deletion, this will usually not
+	 *  handle mismatched symbol exceptions but there could be a mismatched
+	 *  token that the match() routine could not recover from.
 	 */
 	public void recover(IntStream input, RecognitionException re) {
 		if ( state.lastErrorIndex==input.index() ) {
@@ -480,7 +565,7 @@ public abstract class BaseRecognizer {
 		throws RecognitionException
 	{
 		// if next token is what we are looking for then "delete" this token
-		if ( input.LA(2)==ttype ) {
+		if ( mismatchIsUnwantedToken(input, ttype) ) {
 			reportError(e);
 			/*
 			System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
@@ -492,7 +577,7 @@ public abstract class BaseRecognizer {
 			input.consume(); // move past ttype token as if all were ok
 			return;
 		}
-		if ( !recoverFromMismatchedElement(input,e,follow) ) {
+		if ( !recoverFromMissingElement(input,e,follow) ) {
 			throw e;
 		}
 	}
@@ -503,7 +588,7 @@ public abstract class BaseRecognizer {
 		throws RecognitionException
 	{
 		// TODO do single token deletion like above for Token mismatch
-		if ( !recoverFromMismatchedElement(input,e,follow) ) {
+		if ( !recoverFromMissingElement(input,e,follow) ) {
 			throw e;
 		}
 	}
@@ -513,28 +598,11 @@ public abstract class BaseRecognizer {
 	 *  both.  No tokens are consumed to recover from insertions.  Return
 	 *  true if recovery was possible else return false.
 	 */
-	protected boolean recoverFromMismatchedElement(IntStream input,
-												   RecognitionException e,
-												   BitSet follow)
+	protected boolean recoverFromMissingElement(IntStream input,
+												RecognitionException e,
+												BitSet follow)
 	{
-		if ( follow==null ) {
-			// we have no information about the follow; we can only consume
-			// a single token and hope for the best
-			return false;
-		}
-		//System.out.println("recoverFromMismatchedElement");
-		// compute what can follow this grammar element reference
-		if ( follow.member(Token.EOR_TOKEN_TYPE) ) {
-			BitSet viableTokensFollowingThisRule =
-				computeContextSensitiveRuleFOLLOW();
-			follow = follow.or(viableTokensFollowingThisRule);
-			follow.remove(Token.EOR_TOKEN_TYPE);
-		}
-		// if current token is consistent with what could come after set
-		// then it is ok to "insert" the missing token, else throw exception
-		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
-		if ( follow.member(input.LA(1)) ) {
-			//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
+		if ( mismatchIsMissingToken(input, follow) ) {
 			reportError(e);
 			return true;
 		}

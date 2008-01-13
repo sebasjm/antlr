@@ -28,6 +28,8 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.RecognitionException;
 
 /** How to create and navigate trees.  Rather than have a separate factory
  *  and adaptor, I've merged them.  Makes sense to encapsulate.
@@ -44,7 +46,7 @@ public interface TreeAdaptor {
 	/** Create a tree node from Token object; for CommonTree type trees,
 	 *  then the token just becomes the payload.  This is the most
 	 *  common create call.
-     */
+	 */
 	public Object create(Token payload);
 
 	/** Duplicate tree recursively, using dupNode() for each node */
@@ -59,7 +61,23 @@ public interface TreeAdaptor {
 	 */
 	public Object nil();
 
-	/** Is tree considered a nil node used to make lists of child nodes? */ 
+	/** Return a tree node representing an error.  This node records the
+	 *  tokens consumed during error recovery.  The start token indicates the
+	 *  input symbol at which the error was detected.  The stop token indicates
+	 *  the last symbol consumed during recovery.
+	 *
+	 *  You must specify the input stream so that the erroneous text can
+	 *  be packaged up in the error node.  The exception could be useful
+	 *  to some applications; default implementation stores ptr to it in
+	 *  the CommonErrorNode.
+	 *
+	 *  This only makes sense during token parsing, not tree parsing.
+	 *  Tree parsing should happen only when parsing and tree construction
+	 *  succeed.
+	 */
+	public Object errorNode(TokenStream input, Token start, Token stop, RecognitionException e);
+
+	/** Is tree considered a nil node used to make lists of child nodes? */
 	public boolean isNil(Object tree);
 
 	/** Add a child to the tree t.  If child is a flat tree (a list), make all
@@ -237,5 +255,5 @@ public interface TreeAdaptor {
 	 *  If parent is null, don't do anything; must be at root of overall tree.
 	 *  Can't replace whatever points to the parent externally.  Do nothing.
 	 */
-	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t);	
+	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t);
 }

@@ -1,13 +1,15 @@
 package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.RecognitionException;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /** A TreeAdaptor that works with any Tree implementation. */
 public abstract class BaseTreeAdaptor implements TreeAdaptor {
-	/** System.identityHashCode() is not always unique due to GC; we have to
+	/** System.identityHashCode() is not always unique; we have to
 	 *  track ourselves.  That's ok, it's only for debugging, though it's
 	 *  expensive: we have to create a hashtable with all tree nodes in it.
 	 */
@@ -16,6 +18,22 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 
 	public Object nil() {
 		return create(null);
+	}
+
+	/** create tree node that holds the start and stop tokens associated
+	 *  with an error.
+	 *
+	 *  If you specify your own kind of tree nodes, you will likely have to
+	 *  override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
+	 *  if no token payload but you might have to set token type for diff
+	 *  node type.
+	 */
+	public Object errorNode(TokenStream input, Token start, Token stop,
+							RecognitionException e)
+	{
+		CommonErrorNode t = new CommonErrorNode(input, start, stop, e);
+		//System.out.println("returning error node '"+t+"' @index="+input.index());
+		return t;
 	}
 
 	public boolean isNil(Object tree) {
