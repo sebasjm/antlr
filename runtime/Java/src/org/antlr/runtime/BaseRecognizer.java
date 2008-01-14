@@ -142,8 +142,16 @@ public abstract class BaseRecognizer {
 	protected void mismatchRecover(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
 	{
-		MismatchedTokenException mte =
-			new MismatchedTokenException(ttype, input);
+		MismatchedTokenException mte = null;
+		if ( mismatchIsUnwantedToken(input, ttype) ) {
+			mte = new UnwantedTokenException(ttype, input);
+		}
+		else if ( mismatchIsMissingToken(input, follow) ) {
+			mte = new MissingTokenException(ttype, input);
+		}
+		else {
+			mte = new MismatchedTokenException(ttype, input);
+		}
 		recoverFromMismatchedToken(input, mte, ttype, follow);
 	}
 
