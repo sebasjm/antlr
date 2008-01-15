@@ -1,22 +1,24 @@
-Early Access ANTLR v3
-ANTLR 3.0b6/2.0b7
-January 31, 2007
+ANTLR v3.0.1 C Runtime
+ANTLR 3.0.1
+January 1, 2008
 
 At the moment, the use of the C runtime engine for the parser is not generally
 for the inexperienced C programmer. However this is mainly because of the lack
-of examples and documentation, which will be corrected shortly. The C runtime
+of documentation on use, which will be corrected shortly. The C runtime
 code itself is however well documented with doxygen style comments and a 
-reasonably experienced C programmer should be able to piece it together.
+reasonably experienced C programmer should be able to piece it together. You
+can visit the documentation at: http://www.antlr.org/api/C/index.html
 
-The geenral make up is that everything is implemented as a pseudo class/object
-initialized with pointers to its memebr functions and data. All objects are 
+The general make up is that everything is implemented as a pseudo class/object
+initialized with pointers to its 'member' functions and data. All objects are 
 (usually) created by factories, which auto manage the memory allocation and
-release and generally make life easier. If you rememebr this rule, everything
-shodl fall in to place.
+release and generally make life easier. If you remember this rule, everything
+should fall in to place.
 
-Jim Idle - Portland Oregon, March 2007
+Jim Idle - Portland Oregon, Jan 2008
 jimi     idle ws
 
+===============================================================================
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
