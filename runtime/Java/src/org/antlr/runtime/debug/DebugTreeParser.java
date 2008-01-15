@@ -51,11 +51,11 @@ public class DebugTreeParser extends TreeParser {
 	}
 
 	public DebugTreeParser(TreeNodeStream input, RecognizerSharedState state) {
-		super(input, state);
+		super(input instanceof DebugTreeNodeStream?input:new DebugTreeNodeStream(input,null), state);
 	}
 
 	public DebugTreeParser(TreeNodeStream input, DebugEventListener dbg) {
-		this(input, dbg, null);
+		this(input instanceof DebugTreeNodeStream?input:new DebugTreeNodeStream(input,dbg), dbg, null);
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the

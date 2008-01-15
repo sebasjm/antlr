@@ -49,11 +49,11 @@ public class DebugParser extends Parser {
 	}
 
 	public DebugParser(TokenStream input, RecognizerSharedState state) {
-		super(input, state);
+		super(input instanceof DebugTokenStream?input:new DebugTokenStream(input,null), state);
 	}
 
 	public DebugParser(TokenStream input, DebugEventListener dbg) {
-		this(input, dbg, null);
+		this(input instanceof DebugTokenStream?input:new DebugTokenStream(input,dbg), dbg, null);
 	}
 
 	/** Provide a new debug event listener for this parser.  Notify the
