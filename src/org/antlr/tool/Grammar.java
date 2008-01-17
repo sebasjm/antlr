@@ -231,7 +231,7 @@ public class Grammar {
 	/** The NFA that represents the grammar with edges labelled with tokens
 	 *  or epsilon.  It is more suitable to analysis than an AST representation.
 	 */
-	protected NFA nfa;
+	public NFA nfa;
 
 	protected NFAFactory factory;
 
