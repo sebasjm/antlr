@@ -8,6 +8,11 @@ University of San Francisco
 
 CHANGES
 
+January 17, 2007
+
+* Interpreter throws FailedPredicateException now when it sees a predicate;
+  before it was silently failing.  I'll make it work one of these days. ;)
+
 January 12, 2007
 
 * Copy ctor not copying start and stop for common token. Fixes ANTLR-212
