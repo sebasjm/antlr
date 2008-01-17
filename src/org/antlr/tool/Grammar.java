@@ -780,6 +780,9 @@ public class Grammar {
 	 *  done already. Works ONLY for single noncomposite grammars.
 	 */
 	public void createNFAAndBuildRuleStartAndStopNFAStates() {
+		if ( nfa!=null ) {
+			return;
+		}
 		nfa = new NFA(this);
 		factory = new NFAFactory(nfa);
 

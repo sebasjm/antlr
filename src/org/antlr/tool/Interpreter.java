@@ -61,7 +61,7 @@ public class Interpreter implements TokenSource {
 		public LexerActionGetTokenType(Grammar g) {
 			this.g = g;
 		}
-		public void exitRule(String ruleName) {
+		public void exitRule(String grammarFileName, String ruleName) {
 			if ( !ruleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ){
 				int type = g.getTokenType(ruleName);
 				int channel = Token.DEFAULT_CHANNEL;
