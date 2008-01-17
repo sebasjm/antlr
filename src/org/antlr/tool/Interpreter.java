@@ -290,6 +290,16 @@ public class Interpreter implements TokenSource {
 
 			Transition trans = s.transition[0];
 			Label label = trans.label;
+			if ( label.isSemanticPredicate() ) {
+				FailedPredicateException fpe =
+					new FailedPredicateException(input,
+												 s.enclosingRule.name,
+												 "can't deal with predicates yet");
+				if ( actions!=null ) {
+					actions.recognitionException(fpe);
+				}
+			}
+
 			// CASE 3: epsilon transition
 			if ( label.isEpsilon() ) {
 				// CASE 3a: rule invocation state
