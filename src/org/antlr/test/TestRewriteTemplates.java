@@ -213,7 +213,6 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("|abc|\n", found);
 	}
 
-	/** tree parsing with output=template and rewrite=true */
 	public void testSingleNodeRewriteMode() throws Exception {
 		String grammar =
 			"grammar T;\n" +
