@@ -55,14 +55,16 @@ public class ParseTreeBuilder extends BlankDebugEventListener {
 		return new ParseTree(payload);
 	}
 
-	public void enterRule(String ruleName) {
+    @Override
+    public void enterRule(String filename, String ruleName) {
 		ParseTree parentRuleNode = (ParseTree)callStack.peek();
 		ParseTree ruleNode = create(ruleName);
 		parentRuleNode.addChild(ruleNode);
 		callStack.push(ruleNode);
 	}
 
-	public void exitRule(String ruleName) {
+    @Override
+	public void exitRule(String filename, String ruleName) {
 		callStack.pop();
 	}
 
