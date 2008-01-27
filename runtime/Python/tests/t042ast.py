@@ -4,13 +4,13 @@ import antlr3
 import testbase
 
 class t042ast(testbase.ANTLRTest):
-    def lexerClass(self, base):
-        class TLexer(base):
-            def recover(self, input, re):
-                # no error recovery yet, just crash!
-                raise
+##     def lexerClass(self, base):
+##         class TLexer(base):
+##             def reportError(self, re):
+##                 # no error recovery yet, just crash!
+##                 raise re
 
-        return TLexer
+##         return TLexer
     
 
     def parserClass(self, base):

@@ -15,9 +15,9 @@ class t022scopes(testbase.ANTLRTest):
                 # report errors to /dev/null
                 pass
 
-            def recover(self, input, re):
+            def reportError(self, re):
                 # no error recovery yet, just crash!
-                raise
+                raise re
 
         return TParser
 
@@ -118,45 +118,6 @@ class t022scopes(testbase.ANTLRTest):
             symbols,
             set(['i', 'j'])
             )
-
-
-    def testd2(self):
-        cStream = antlr3.StringStream(
-            textwrap.dedent('''\
-            {
-                {
-                    int x;
-                }
-                x = 5
-            }
-            '''))
-
-        lexer = self.getLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
-        parser = self.getParser(tStream)
-
-        try:
-            parser.d()
-            self.fail()
-        except RuntimeError, exc:
-            self.failUnlessEqual(exc.args[0], 'x')
-            
-        
-    def testd3(self):
-        cStream = antlr3.StringStream(
-            textwrap.dedent('''\
-            {
-                int x;
-                {
-                    x = 5
-                }
-            }
-            '''))
-
-        lexer = self.getLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
-        parser = self.getParser(tStream)
-        parser.d()
 
 
     def teste1(self):

@@ -13,7 +13,7 @@ class t010lexer(testbase.ANTLRTest):
                 # report errors to /dev/null
                 pass
 
-            def recover(self, re):
+            def reportError(self, re):
                 # no error recovery yet, just crash!
                 raise re
 

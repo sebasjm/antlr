@@ -292,6 +292,26 @@ class TreeAdaptor(object):
         raise NotImplementedError
 
 
+    def errorNode(self, input, start, stop, exc):
+        """
+        Return a tree node representing an error.  This node records the
+        tokens consumed during error recovery.  The start token indicates the
+        input symbol at which the error was detected.  The stop token indicates
+        the last symbol consumed during recovery.
+
+        You must specify the input stream so that the erroneous text can
+        be packaged up in the error node.  The exception could be useful
+        to some applications; default implementation stores ptr to it in
+        the CommonErrorNode.
+
+        This only makes sense during token parsing, not tree parsing.
+        Tree parsing should happen only when parsing and tree construction
+        succeed.
+        """
+
+        raise NotImplementedError
+
+
     def isNil(self, tree):
         """Is tree considered a nil node used to make lists of child nodes?"""
 
@@ -558,11 +578,11 @@ class TreeAdaptor(object):
 
         if len(args) == 1 and isinstance(args[0], Token):
             # Object create(Token payload);
-            warnings.warn(
-                "Using create() is deprecated, use createWithPayload()",
-                DeprecationWarning,
-                stacklevel=2
-                )
+##             warnings.warn(
+##                 "Using create() is deprecated, use createWithPayload()",
+##                 DeprecationWarning,
+##                 stacklevel=2
+##                 )
             return self.createWithPayload(args[0])
 
         if (len(args) == 2
@@ -570,11 +590,11 @@ class TreeAdaptor(object):
             and isinstance(args[1], Token)
             ):
             # Object create(int tokenType, Token fromToken);
-            warnings.warn(
-                "Using create() is deprecated, use createFromToken()",
-                DeprecationWarning,
-                stacklevel=2
-                )
+##             warnings.warn(
+##                 "Using create() is deprecated, use createFromToken()",
+##                 DeprecationWarning,
+##                 stacklevel=2
+##                 )
             return self.createFromToken(args[0], args[1])
 
         if (len(args) == 3
@@ -583,11 +603,11 @@ class TreeAdaptor(object):
             and isinstance(args[2], basestring)
             ):
             # Object create(int tokenType, Token fromToken, String text);
-            warnings.warn(
-                "Using create() is deprecated, use createFromToken()",
-                DeprecationWarning,
-                stacklevel=2
-                )
+##             warnings.warn(
+##                 "Using create() is deprecated, use createFromToken()",
+##                 DeprecationWarning,
+##                 stacklevel=2
+##                 )
             return self.createFromToken(args[0], args[1], args[2])
 
         if (len(args) == 2
@@ -595,11 +615,11 @@ class TreeAdaptor(object):
             and isinstance(args[1], basestring)
             ):
             # Object create(int tokenType, String text);
-            warnings.warn(
-                "Using create() is deprecated, use createFromType()",
-                DeprecationWarning,
-                stacklevel=2
-                )
+##             warnings.warn(
+##                 "Using create() is deprecated, use createFromType()",
+##                 DeprecationWarning,
+##                 stacklevel=2
+##                 )
             return self.createFromType(args[0], args[1])
 
         raise TypeError(
@@ -891,6 +911,20 @@ class BaseTreeAdaptor(TreeAdaptor):
         return self.createWithPayload(None)
 
 
+    def errorNode(self, input, start, stop, exc):
+        """
+        create tree node that holds the start and stop tokens associated
+        with an error.
+
+        If you specify your own kind of tree nodes, you will likely have to
+        override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
+        if no token payload but you might have to set token type for diff
+        node type.
+        """
+        
+        return CommonErrorNode(input, start, stop, exc)
+    
+
     def isNil(self, tree):
         return tree.isNil()
 
@@ -1010,6 +1044,10 @@ class BaseTreeAdaptor(TreeAdaptor):
 
 
     def createFromToken(self, tokenType, fromToken, text=None):
+        assert isinstance(tokenType, (int, long)), type(tokenType).__name__
+        assert isinstance(fromToken, Token), type(fromToken).__name__
+        assert text is None or isinstance(text, basestring), type(text).__name__
+
         fromToken = self.createToken(fromToken)
         fromToken.type = tokenType
         if text is not None:
@@ -1019,6 +1057,9 @@ class BaseTreeAdaptor(TreeAdaptor):
 
 
     def createFromType(self, tokenType, text):
+        assert isinstance(tokenType, (int, long)), type(tokenType).__name__
+        assert isinstance(text, basestring), type(text).__name__
+                          
         fromToken = self.createToken(tokenType=tokenType, text=text)
         t = self.createWithPayload(fromToken)
         return t
@@ -1081,6 +1122,7 @@ class BaseTreeAdaptor(TreeAdaptor):
 # Tree
 # \- BaseTree
 #    \- CommonTree
+#       \- CommonErrorNode
 #
 # TreeAdaptor
 # \- BaseTreeAdaptor
@@ -1142,7 +1184,7 @@ class CommonTree(BaseTree):
 
     def getType(self):
         if self.token is None:
-            return 0
+            return INVALID_TOKEN_TYPE
 
         return self.token.getType()
 
@@ -1231,8 +1273,10 @@ class CommonTree(BaseTree):
         if self.isNil():
             return "nil"
 
-        else:
-            return self.token.text
+        if self.getType() == INVALID_TOKEN_TYPE:
+            return "<errornode>"
+
+        return self.token.text
 
     __str__ = toString   
 
@@ -1240,11 +1284,11 @@ class CommonTree(BaseTree):
 
     def toStringTree(self):
         if not self.children:
-            return str(self)
+            return self.toString()
 
         ret = ''
         if not self.isNil():
-            ret += '(%s ' % (str(self))
+            ret += '(%s ' % (self.toString())
         
         ret += ' '.join([child.toStringTree() for child in self.children])
 
@@ -1255,6 +1299,71 @@ class CommonTree(BaseTree):
 
 
 INVALID_NODE = CommonTree(INVALID_TOKEN)
+
+
+class CommonErrorNode(CommonTree):
+    """A node representing erroneous token range in token stream"""
+
+    def __init__(self, input, start, stop, exc):
+        if (stop is None or
+            (stop.getTokenIndex() < start.getTokenIndex() and
+             stop.getType()!=Token.EOF
+             )
+            ):
+            # sometimes resync does not consume a token (when LT(1) is
+            # in follow set.  So, stop will be 1 to left to start. adjust.
+            # Also handle case where start is the first token and no token
+            # is consumed during recovery; LT(-1) will return null.
+            stop = start
+
+        self.input = input
+        self.start = start
+        self.stop = stop
+        self.trappedException = exc
+
+
+    def isNil(self):
+        return False
+
+
+    def getType(self):
+        return INVALID_TOKEN_TYPE
+
+
+    def getText(self):
+        if isinstance(self.start, Token):
+            i = self.start.getTokenIndex()
+            j = self.stop.getTokenIndex()
+            if self.stop.getType() == EOF:
+                j = self.input.size()
+
+            badText = input.toString(i, j)
+
+        elif isinstance(self.start, Tree):
+            badText = self.input.toString(start, stop)
+
+        else:
+            # people should subclass if they alter the tree type so this
+            # next one is for sure correct.
+            badText = "<unknown>"
+
+        return badText
+
+
+    def toString(self):
+        if isinstance(self.trappedException, MissingTokenException):
+            return "<missing type: "+ self.trappedException.getMissingType()+ ">"
+
+        elif isinstance(self.trappedException, UnwantedTokenException):
+            return "<extraneous: "+ self.trappedException.getUnexpectedToken() +", resync="+self.getText()+">"
+
+        elif isinstance(self.trappedException, MismatchedTokenException):
+            return "<mismatched token: "+self.trappedException.token+", resync="+self.getText()+">"
+
+        elif isinstance(self.trappedException, NoViableAltException):
+            return "<unexpected: "+self.trappedException.token+", resync="+getText()+">"
+
+        return "<error: "+self.getText()+">"
 
 
 class CommonTreeAdaptor(BaseTreeAdaptor):

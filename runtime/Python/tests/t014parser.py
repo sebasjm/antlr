@@ -34,8 +34,7 @@ class t014parser(testbase.ANTLRTest):
         # FIXME: currently strings with formatted errors are collected
         # can't check error locations yet
         assert len(parser.reportedErrors) == 1, parser.reportedErrors
-        # FIXME: shouldn't this be ('call', 'foo')???
-        assert parser.events == [], parser.events
+        assert parser.events == [('call', 'foo')], parser.events
 
 
     def testMalformedInput2(self):
@@ -66,7 +65,6 @@ class t014parser(testbase.ANTLRTest):
         # can't check error locations yet
         assert len(parser.reportedErrors) == 1, parser.reportedErrors
         assert parser.events == [
-            ('call', 'gnarz'),
             ('call', 'flupp'),
             ], parser.events
             

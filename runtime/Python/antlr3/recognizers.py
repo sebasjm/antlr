@@ -39,7 +39,7 @@ from antlr3.exceptions import RecognitionException, MismatchedTokenException, \
      MismatchedRangeException, MismatchedTreeNodeException, \
      NoViableAltException, EarlyExitException, MismatchedSetException, \
      MismatchedNotSetException, FailedPredicateException, \
-     BacktrackingFailed
+     BacktrackingFailed, UnwantedTokenException, MissingTokenException
 from antlr3.tokens import CommonToken, EOF_TOKEN, SKIP_TOKEN
 from antlr3.compat import set, frozenset, reversed
 
@@ -82,6 +82,9 @@ class RecognizerSharedState(object):
         #
         # This is only used if rule memoization is on (which it is by default).
         self.ruleMemo = None
+
+        ## Did the recognizer encounter a syntax error?  Track how many.
+        self.syntaxErrors = 0
 
 
         # LEXER FIELDS (must be in same state object to avoid casting
@@ -150,10 +153,9 @@ class BaseRecognizer(object):
         # have one grammar import others and share same error variables
         # and other state variables.  It's a kind of explicit multiple
         # inheritance via delegation of methods and shared state.
-        if state is not None:
-            self._state = state
-        else:
-            self._state = RecognizerSharedState()
+        if state is None:
+            state = RecognizerSharedState()
+        self._state = state
 
 
     # this one only exists to shut up pylint :(
@@ -167,9 +169,14 @@ class BaseRecognizer(object):
         """
         
         # wack everything related to error recovery
+        if self._state is None:
+            # no shared state work to do
+            return
+        
         self._state.following = []
         self._state.errorRecovery = False
         self._state.lastErrorIndex = -1
+        self._state.syntaxErrors = 0
         # wack everything related to backtracking and memoization
         self._state.backtracking = 0
         if self._state.ruleMemo is not None:
@@ -178,11 +185,15 @@ class BaseRecognizer(object):
 
     def match(self, input, ttype, follow):
         """
-        Match current input symbol against ttype.  Upon error, do one token
-        insertion or deletion if possible.  You can override to not recover
-        here and bail out of the current production to the normal error
+        Match current input symbol against ttype.  Throw exception upon
+        error, bailing out of the current production to the normal error
         exception catch (at the end of the method) by just throwing
-        MismatchedTokenException upon input.LA(1)!=ttype.
+        MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
+        by resynchronize into the set of symbols the can follow.
+
+        Prior to v3.1, this method used to do one token
+        insertion or deletion if possible.  You can override mismatch()
+        to recover here if you want.
         """
         
         if self.input.LA(1) == ttype:
@@ -198,19 +209,63 @@ class BaseRecognizer(object):
 
 
     def matchAny(self, input):
+        """Match the wildcard: in a symbol"""
+
         self._state.errorRecovery = False
         self.input.consume()
+
+
+    def mismatchIsUnwantedToken(self, input, ttype):
+        return input.LA(2) == ttype
+
+
+    def mismatchIsMissingToken(self, input, follow):
+        if follow is None:
+            # we have no information about the follow; we can only consume
+            # a single token and hope for the best
+            return False
+        
+        # compute what can follow this grammar element reference
+        if EOR_TOKEN_TYPE in follow:
+            viableTokensFollowingThisRule = self.computeContextSensitiveRuleFOLLOW()
+            follow = follow | viableTokensFollowingThisRule
+            follow = follow - set([EOR_TOKEN_TYPE])
+
+        # if current token is consistent with what could come after set
+        # then we know we're missing a token; error recovery is free to
+        # "insert" the missing token
+        if input.LA(1) in follow:
+            return True
+
+        return False
 
 
     def mismatch(self, input, ttype, follow):
         """
         factor out what to do upon token mismatch so tree parsers can behave
-        differently.  Override this method in your parser to do things
-        like bailing out after the first error; just throw the mte object
-        instead of calling the recovery method.
+        differently.  Override and call mismatchRecover(input, ttype, follow)
+        to get single token insertion and deletion.
         """
-        
-        mte = MismatchedTokenException(ttype, input)
+
+        if self.mismatchIsUnwantedToken(input, ttype):
+            raise UnwantedTokenException(ttype, input)
+
+        elif self.mismatchIsMissingToken(input, follow):
+            raise MissingTokenException(ttype, input)
+
+        raise MismatchedTokenException(ttype, input)
+
+
+    def mismatchRecover(self, input, ttype, follow):
+        if self.mismatchIsUnwantedToken(input, ttype):
+            mte = UnwantedTokenException(ttype, input)
+
+        elif self.mismatchIsMissingToken(input, follow):
+            mte = MissingTokenException(ttype, input)
+
+        else:
+            mte = MismatchedTokenException(ttype, input)
+
         self.recoverFromMismatchedToken(input, mte, ttype, follow)
 
 
@@ -222,12 +277,14 @@ class BaseRecognizer(object):
         To get out of recovery mode, the parser must successfully match
         a token (after a resync).  So it will go:
 
-        -# error occurs
-        -# enter recovery mode, report error
-        -# consume until token found in resynch set
-        -# try to resume parsing
-        -# next match() will reset errorRecovery mode
-        .
+        1. error occurs
+        2. enter recovery mode, report error
+        3. consume until token found in resynch set
+        4. try to resume parsing
+        5. next match() will reset errorRecovery mode
+
+        If you override, make sure to update syntaxErrors if you care about
+        that.
         
         """
         
@@ -236,6 +293,7 @@ class BaseRecognizer(object):
         if self._state.errorRecovery:
             return
 
+        self._state.syntaxErrors += 1 # don't count spurious
         self._state.errorRecovery = True
 
         self.displayRecognitionError(self.tokenNames, e)
@@ -273,7 +331,32 @@ class BaseRecognizer(object):
         """
 
         msg = None
-        if isinstance(e, MismatchedTokenException):
+        if isinstance(e, UnwantedTokenException):
+            tokenName = "<unknown>"
+            if e.expecting == EOF:
+                tokenName = "EOF"
+
+            else:
+                tokenName = self.tokenNames[e.expecting]
+
+            msg = "extraneous input %s expecting %s" % (
+                self.getTokenErrorDisplay(e.getUnexpectedToken()),
+                tokenName
+                )
+
+        elif isinstance(e, MissingTokenException):
+            tokenName = "<unknown>"
+            if e.expecting == EOF:
+                tokenName = "EOF"
+
+            else:
+                tokenName = self.tokenNames[e.expecting]
+
+                msg = "missing %s at %s" % (
+                    tokenName, self.getTokenErrorDisplay(e.token)
+                    )
+
+        elif isinstance(e, MismatchedTokenException):
             tokenName = "<unknown>"
             if e.expecting == EOF:
                 tokenName = "EOF"
@@ -326,6 +409,18 @@ class BaseRecognizer(object):
         return msg
     
 
+    def getNumberOfSyntaxErrors(self):
+	"""
+        Get number of recognition errors (lexer, parser, tree parser).  Each
+        recognizer tracks its own number.  So parser and lexer each have
+        separate count.  Does not count the spurious errors found between
+        an error and next valid token match
+
+        See also reportError()
+	"""
+        return self._state.syntaxErrors
+
+
     def getErrorHeader(self, e):
         """
         What is the error header, normally line/character position information?
@@ -362,9 +457,11 @@ class BaseRecognizer(object):
 
     def recover(self, input, re):
         """
-        Recover from an error found on the input stream.  Mostly this is
-        NoViableAlt exceptions, but could be a mismatched token that
-        the match() routine could not recover from.
+        Recover from an error found on the input stream.  This is
+        for NoViableAlt and mismatched symbol exceptions.  If you enable
+        single token insertion and deletion, this will usually not
+        handle mismatched symbol exceptions but there could be a mismatched
+        token that the match() routine could not recover from.
         """
         
         # PROBLEM? what if input stream is not the same as last time
@@ -600,7 +697,7 @@ class BaseRecognizer(object):
         """
                                          
         # if next token is what we are looking for then "delete" this token
-        if input.LA(2) == ttype:
+        if self. mismatchIsUnwantedToken(input, ttype):
             self.reportError(e)
 
             self.beginResync()
@@ -609,18 +706,18 @@ class BaseRecognizer(object):
             input.consume()  # move past ttype token as if all were ok
             return
 
-        if not self.recoverFromMismatchedElement(input, e, follow):
+        if not self.recoverFromMissingElement(input, e, follow):
             raise e
 
 
 
     def recoverFromMismatchedSet(self, input, e, follow):
         # TODO do single token deletion like above for Token mismatch
-        if not self.recoverFromMismatchedElement(input, e, follow):
+        if not self.recoverFromMissingElement(input, e, follow):
             raise e
 
 
-    def recoverFromMismatchedElement(self, input, e, follow):
+    def recoverFromMissingElement(self, input, e, follow):
         """
         This code is factored out from mismatched token and mismatched set
         recovery.  It handles "single token insertion" error recovery for
@@ -628,22 +725,7 @@ class BaseRecognizer(object):
         true if recovery was possible else return false.
         """
         
-        if follow is None:
-            # we have no information about the follow; we can only consume
-            # a single token and hope for the best
-            return False
-
-        # compute what can follow this grammar element reference
-        if EOR_TOKEN_TYPE in follow:
-            viableTokensFollowingThisRule = \
-                self.computeContextSensitiveRuleFOLLOW()
-            
-            follow = (follow | viableTokensFollowingThisRule) \
-                     - set([EOR_TOKEN_TYPE])
-
-        # if current token is consistent with what could come after set
-        # then it is ok to "insert" the missing token, else throw exception
-        if input.LA(1) in follow:
+        if self.mismatchIsMissingToken(input, follow):
             self.reportError(e)
             return True
 
@@ -900,8 +982,8 @@ class Lexer(BaseRecognizer, TokenSource):
     of speed.
     """
 
-    def __init__(self, input):
-        BaseRecognizer.__init__(self)
+    def __init__(self, input, state=None):
+        BaseRecognizer.__init__(self, state)
         TokenSource.__init__(self)
         
         # Where is the lexer drawing characters from?
@@ -911,6 +993,14 @@ class Lexer(BaseRecognizer, TokenSource):
     def reset(self):
         BaseRecognizer.reset(self) # reset all recognizer state variables
 
+        if self.input is not None:
+            # rewind the input
+            self.input.seek(0)
+
+        if self._state is None:
+            # no shared state work to do
+            return
+        
         # wack Lexer state variables
         self._state.token = None
         self._state.type = INVALID_TOKEN_TYPE
@@ -919,8 +1009,6 @@ class Lexer(BaseRecognizer, TokenSource):
         self._state.tokenStartLine = -1
         self._state.tokenStartCharPositionInLine = -1
         self._state.text = None
-        if self.input is not None:
-            self.input.seek(0) # rewind the input
 
 
     def nextToken(self):
@@ -950,9 +1038,13 @@ class Lexer(BaseRecognizer, TokenSource):
 
                 return self._state.token
 
+            except NoViableAltException, re:
+                self.reportError(re)
+                self.recover(re) # throw out current char and try again
+
             except RecognitionException, re:
                 self.reportError(re)
-                self.recover(re)
+                # match() routine has already called recover()
 
 
     def skip(self):
@@ -1025,7 +1117,7 @@ class Lexer(BaseRecognizer, TokenSource):
                     raise BacktrackingFailed
 
                 mte = MismatchedTokenException(unichr(s), self.input)
-                self.recover(mte)
+                self.recover(mte) # don't really recover; just consume in lexer
                 raise mte
         
             self.input.consume()

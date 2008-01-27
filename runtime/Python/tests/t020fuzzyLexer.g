@@ -1,4 +1,4 @@
-lexer grammar t020fuzzy;
+lexer grammar t020fuzzyLexer;
 options {
     language=Python;
     filter=true;

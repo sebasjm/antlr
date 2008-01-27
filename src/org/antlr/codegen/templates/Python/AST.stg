@@ -77,18 +77,6 @@ ruleLabelDefs() ::= <<
     :{stream_<it> = RewriteRuleSubtreeStream(self.adaptor, "rule <it>")}; separator="\n">
 >>
 
-ruleCleanUp() ::= <<
-<super.ruleCleanUp()>
-<if(ruleDescriptor.hasMultipleReturnValues)>
-<finishedBacktracking({
-retval.tree = self.adaptor.rulePostProcessing(root_0)
-<if(!TREE_PARSER)>
-self.adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop)
-<endif>
-})>
-<endif>
->>
-
 /** When doing auto AST construction, we must define some variables;
  *  These should be turned off if doing rewrites.  This must be a "mode"
  *  as a rule could have both rewrite and AST within the same alternative
@@ -97,8 +85,9 @@ self.adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop)
 @alt.declarations() ::= <<
 <if(autoAST)>
 <if(outerAlt)>
+<if(!rewriteMode)>
 root_0 = self.adaptor.nil()<\n>
-<else>
+<endif>
 <endif>
 <endif>
 >>
@@ -107,27 +96,27 @@ root_0 = self.adaptor.nil()<\n>
 // // T r a c k i n g  R u l e  E l e m e n t s
 
 /** ID and track it for use in a rewrite rule */
-tokenRefTrack(token,label,elementIndex) ::= <<
-<super.tokenRef(...)>
+tokenRefTrack(token,label,elementIndex,hetero) ::= <<
+<tokenRefBang(...)> <! Track implies no auto AST construction!>
 <finishedBacktracking({stream_<token>.add(<label>)})>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
  *  to the tracking list stream_ID for use in the rewrite.
  */
-tokenRefTrackAndListLabel(token,label,elementIndex) ::= <<
+tokenRefTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefTrack(...)>
 <listLabel(elem=label,...)>
 >>
 
 /** ^(ID ...) track for rewrite */
-tokenRefRuleRootTrack(token,label,elementIndex) ::= <<
-<super.tokenRef(...)>
+tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
+<tokenRefBang(...)>
 <finishedBacktracking({stream_<token>.add(<label>)})>
 >>
 
 /** Match ^(label+=TOKEN ...) track for rewrite */
-tokenRefRuleRootTrackAndListLabel(token,label,elementIndex) ::= <<
+tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefRuleRootTrack(...)>
 <listLabel(elem=label,...)>
 >>
@@ -146,7 +135,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
-<super.ruleRefRuleRoot(...)>
+<ruleRefRuleRoot(...)>
 <finishedBacktracking({stream_<rule.name>.add(<label>.tree)})>
 >>
 
@@ -183,14 +172,16 @@ root_0 = self.adaptor.nil()
 
 <if(rewriteMode)>
 <if(TREE_PARSER)>
+<prevRuleRootRef()>.tree = self.adaptor.rulePostProcessing(root_0)
 self.input.replaceChildren(
     self.adaptor.getParent(retval.start),
     self.adaptor.getChildIndex(retval.start),
-    self.adaptor.getChildIndex(self.input.LT(1))-1,
+    self.adaptor.getChildIndex(_last),
     retval.tree
-    )
+    )<\n>
 <endif>
 <endif>
+<prevRuleRootRef()>.tree = root_0 <! set result root !>
 })>
 >>
 
@@ -394,15 +385,20 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <! new MethodNode(IDLabel, args) !>
 <hetero>(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
-<! need to call different adaptor.create*() methods depending of argument count !>
 <if (!args)>self.adaptor.createFromType(<tokenType>, "<tokenType>")
-<else><if (!rest(args))>self.adaptor.createFromToken(<tokenType>, <first(args)>)
-<else><if (!rest(rest(args)))>self.adaptor.createFromToken(<tokenType>, <first(args)>, <first(rest(args))>)
-<endif>
-<endif>
+<else>self.adaptor.create(<tokenType>, <args; separator=", ">)
 <endif>
 <endif>
 >>
+
+//<! need to call different adaptor.create*() methods depending of argument count !>
+//<if (!args)>self.adaptor.createFromType(<tokenType>, "<tokenType>")
+//<else><if (!rest(args))>self.adaptor.createFromType(<tokenType>, <first(args)>)
+//<else><if (!rest(rest(args)))>self.adaptor.createFromToken(<tokenType>, <first(args)>, <first(rest(args))>)
+//<endif>
+//<endif>
+//<endif>
+
 
 createRewriteNodeFromElement(token,hetero,args) ::= <<
 <if(hetero)>

@@ -9,6 +9,15 @@ import sys
 from StringIO import StringIO
 
 class T(testbase.ANTLRTest):
+    def setUp(self):
+        self.oldPath = sys.path[:]
+        sys.path.insert(0, self.baseDir)
+
+
+    def tearDown(self):
+        sys.path = self.oldPath
+
+
     def testOverrideMain(self):
         grammar = textwrap.dedent(
             r"""lexer grammar T3;

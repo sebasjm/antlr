@@ -6,6 +6,15 @@ import testbase
 import sys
 
 class T(testbase.ANTLRTest):
+    def setUp(self):
+        self.oldPath = sys.path[:]
+        sys.path.insert(0, self.baseDir)
+
+
+    def tearDown(self):
+        sys.path = self.oldPath
+
+
     def parserClass(self, base):
         class TParser(base):
             def __init__(self, *args, **kwargs):
@@ -109,13 +118,13 @@ class T(testbase.ANTLRTest):
     def testDelegatorInvokesDelegateRule(self):
         slave = textwrap.dedent(
         r'''
-        parser grammar S;
+        parser grammar S1;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM1.capture(t)
 
         }
         
@@ -124,11 +133,11 @@ class T(testbase.ANTLRTest):
 
         master = textwrap.dedent(
         r'''
-        grammar M;
+        grammar M1;
         options {
             language=Python;
         }
-        import S;
+        import S1;
         s : a ;
         B : 'b' ; // defines B from inherited token space
         WS : (' '|'\n') {self.skip()} ;
@@ -146,24 +155,24 @@ class T(testbase.ANTLRTest):
     def testDelegatorInvokesDelegateRuleWithArgs(self):
         slave = textwrap.dedent(
         r'''
-        parser grammar S;
+        parser grammar S2;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM2.capture(t)
         }
         a[x] returns [y] : B {self.capture("S.a"); $y="1000";} ;
         ''')
 
         master = textwrap.dedent(
         r'''
-        grammar M;
+        grammar M2;
         options {
             language=Python;
         }
-        import S;
+        import S2;
         s : label=a[3] {self.capture($label.y);} ;
         B : 'b' ; // defines B from inherited token space
         WS : (' '|'\n') {self.skip()} ;
@@ -181,13 +190,13 @@ class T(testbase.ANTLRTest):
     def testDelegatorAccessesDelegateMembers(self):
         slave = textwrap.dedent(
         r'''
-        parser grammar S;
+        parser grammar S3;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM3.capture(t)
 
             def foo(self):
                 self.capture("foo")
@@ -197,12 +206,12 @@ class T(testbase.ANTLRTest):
 
         master = textwrap.dedent(
         r'''
-        grammar M;        // uses no rules from the import
+        grammar M3;        // uses no rules from the import
         options {
             language=Python;
         }
-        import S;
-        s : 'b' {self.gS.foo();} ; // gS is import pointer
+        import S3;
+        s : 'b' {self.gS3.foo();} ; // gS is import pointer
         WS : (' '|'\n') {self.skip()} ;
         ''')
 
@@ -218,13 +227,13 @@ class T(testbase.ANTLRTest):
     def testDelegatorInvokesFirstVersionOfDelegateRule(self):
         slave = textwrap.dedent(
         r'''
-        parser grammar S;
+        parser grammar S4;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM4.capture(t)
         }
         a : b {self.capture("S.a");} ;
         b : B ;
@@ -232,24 +241,24 @@ class T(testbase.ANTLRTest):
 
         slave2 = textwrap.dedent(
         r'''
-        parser grammar T;
+        parser grammar T4;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM4.capture(t)
         }
         a : B {self.capture("T.a");} ; // hidden by S.a
         ''')
 
         master = textwrap.dedent(
         r'''
-        grammar M;
+        grammar M4;
         options {
             language=Python;
         }
-        import S,T;
+        import S4,T4;
         s : a ;
         B : 'b' ;
         WS : (' '|'\n') {self.skip()} ;
@@ -267,39 +276,39 @@ class T(testbase.ANTLRTest):
     def testDelegatesSeeSameTokenType(self):
         slave = textwrap.dedent(
         r'''
-        parser grammar S; // A, B, C token type order
+        parser grammar S5; // A, B, C token type order
         options {
             language=Python;
         }
         tokens { A; B; C; }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM5.capture(t)
         }
         x : A {self.capture("S.x ");} ;
         ''')
 
         slave2 = textwrap.dedent(
         r'''
-        parser grammar T;
+        parser grammar T5;
         options {
             language=Python;
         }
         tokens { C; B; A; } /// reverse order
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM5.capture(t)
         }
         y : A {self.capture("T.y");} ;
         ''')
 
         master = textwrap.dedent(
         r'''
-        grammar M;
+        grammar M5;
         options {
             language=Python;
         }
-        import S,T;
+        import S5,T5;
         s : x y ; // matches AA, which should be "aa"
         B : 'b' ; // another order: B, A, C
         A : 'a' ;
@@ -319,13 +328,13 @@ class T(testbase.ANTLRTest):
     def testDelegatorRuleOverridesDelegate(self):
         slave = textwrap.dedent(
         r'''
-        parser grammar S;
+        parser grammar S6;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM6.capture(t)
         }
         a : b {self.capture("S.a");} ;
         b : B ;
@@ -333,11 +342,11 @@ class T(testbase.ANTLRTest):
 
         master = textwrap.dedent(
         r'''
-        grammar M;
+        grammar M6;
         options {
             language=Python;
         }
-        import S;
+        import S6;
         b : 'b'|'c' ;
         WS : (' '|'\n') {self.skip()} ;
         ''')
@@ -356,13 +365,13 @@ class T(testbase.ANTLRTest):
     def testLexerDelegatorInvokesDelegateRule(self):
         slave = textwrap.dedent(
         r'''
-        lexer grammar S;
+        lexer grammar S7;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM7.capture(t)
         }
         A : 'a' {self.capture("S.A ");} ;
         C : 'c' ;
@@ -370,11 +379,11 @@ class T(testbase.ANTLRTest):
 
         master = textwrap.dedent(
         r'''
-        lexer grammar M;
+        lexer grammar M7;
         options {
             language=Python;
         }
-        import S;
+        import S7;
         B : 'b' ;
         WS : (' '|'\n') {self.skip()} ;
         ''')
@@ -391,24 +400,24 @@ class T(testbase.ANTLRTest):
     def testLexerDelegatorRuleOverridesDelegate(self):
         slave = textwrap.dedent(
         r'''
-        lexer grammar S;
+        lexer grammar S8;
         options {
             language=Python;
         }
         @members {
             def capture(self, t):
-                self.gM.capture(t)
+                self.gM8.capture(t)
         }
-        A : 'a' {self.capture("S.A");} ;
+        A : 'a' {self.capture("S.A")} ;
         ''')
 
         master = textwrap.dedent(
         r'''
-        lexer grammar M;
+        lexer grammar M8;
         options {
             language=Python;
         }
-        import S;
+        import S8;
         A : 'a' {self.capture("M.A ");} ;
         WS : (' '|'\n') {self.skip()} ;
         ''')

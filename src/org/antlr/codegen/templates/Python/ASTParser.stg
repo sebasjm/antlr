@@ -48,10 +48,14 @@ if self._state.backtracking == 0:
 <endif>
 >>
 
+@rule.setErrorReturnValue() ::= <<
+retval.tree = self.adaptor.errorNode(self.input, retval.start, self.input.LT(-1), re)
+>>
+
 // TOKEN AST STUFF
 
 /** ID and output=AST */
-tokenRef(token,label,hetero,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <finishedBacktracking({
 <label>_tree = <createNodeFromToken(...)>
@@ -63,7 +67,7 @@ self.adaptor.addChild(root_0, <label>_tree)
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRuleRoot(token,label,hetero,elementIndex) ::= <<
+tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <finishedBacktracking({
 <label>_tree = <createNodeFromToken(...)>
@@ -72,13 +76,13 @@ root_0 = self.adaptor.becomeRoot(<label>_tree, root_0)
 >>
 
 /** ids+=ID! and output=AST */
-tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
+tokenRefBangAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
 <listLabel(elem=label,...)>
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
-tokenRefAndListLabel(token,label,hetero,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -175,5 +179,15 @@ createNodeFromToken(label,hetero) ::= <<
 <hetero>(<label>) <! new MethodNode(IDLabel) !>
 <else>
 self.adaptor.createWithPayload(<label>)
+<endif>
+>>
+
+ruleCleanUp() ::= <<
+<super.ruleCleanUp()>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<finishedBacktracking({
+retval.tree = self.adaptor.rulePostProcessing(root_0)
+self.adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop)
+})>
 <endif>
 >>

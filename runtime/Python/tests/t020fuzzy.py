@@ -8,7 +8,7 @@ import difflib
 
 class t020fuzzy(testbase.ANTLRTest):
     def setUp(self):
-        self.compileGrammar()
+        self.compileGrammar('t020fuzzyLexer.g')
         
 
     def testValid(self):

@@ -11,6 +11,10 @@ from antlr3 import CommonToken, UP, DOWN, EOF
 class TestTreeNodeStream(unittest.TestCase):
     """Test case for the TreeNodeStream class."""
 
+    def setUp(self):
+        self.adaptor = CommonTreeAdaptor()
+
+
     def newStream(self, t):
         """Build new stream; let's us override to test other streams."""
         return CommonTreeNodeStream(t)
@@ -27,6 +31,38 @@ class TestTreeNodeStream(unittest.TestCase):
         expecting = "101"
         found = str(stream)
         self.failUnlessEqual(expecting, found)
+
+
+    def testTwoChildrenOfNilRoot(self):
+        class V(CommonTree):
+            def __init__(self, token=None, ttype=None, x=None):
+                if x is not None:
+                    self.x = x
+
+                if ttype is not None and token is None:
+                    self.token = CommonToken(type=ttype)
+
+                if token is not None:
+                    self.token = token
+
+            def __str__(self):
+                if self.token is not None:
+                    txt = self.token.text
+                else:
+                    txt = ""
+
+                txt += "<V>"
+                return txt
+
+        root_0 = self.adaptor.nil();
+        t = V(ttype=101, x=2)
+        u = V(token=CommonToken(type=102, text="102"))
+        self.adaptor.addChild(root_0, t)
+        self.adaptor.addChild(root_0, u)
+        self.assert_(root_0.parent is None)
+        self.assertEquals(-1, root_0.childIndex)
+        self.assertEquals(0, t.childIndex)
+        self.assertEquals(1, u.childIndex)
 
 
     def test4Nodes(self):

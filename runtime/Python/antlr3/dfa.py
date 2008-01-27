@@ -78,6 +78,9 @@ class DFA(object):
                 if specialState >= 0:
                     #print "is special"
                     s = self.specialStateTransition(specialState, input)
+                    if s == -1:
+                        self.noViableAlt(s, input)
+                        return 0
                     input.consume()
                     continue
 
@@ -88,7 +91,7 @@ class DFA(object):
                 # look for a normal char transition
                 c = input.LA(1)
 
-                #print "LA = %d (%r)" % (c, unichr(c))
+                #print "LA = %d (%r)" % (c, unichr(c) if c >= 0 else 'EOF')
                 #print "range = %d..%d" % (self.min[s], self.max[s])
 
                 if c >= self.min[s] and c <= self.max[s]:
@@ -174,8 +177,8 @@ class DFA(object):
         return "n/a"
 
 
-    def specialTransition(self, state, symbol):
-        return 0
+##     def specialTransition(self, state, symbol):
+##         return 0
 
 
     def unpack(cls, string):

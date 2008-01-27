@@ -94,7 +94,7 @@ if __name__ == '__main__':
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
 <grammar.directDelegates:
- {g|from <g.name>Lexer import <g.name>Lexer}; separator="\n">
+ {g|from <g.recognizerName> import <g.recognizerName>}; separator="\n">
 
 class <name>(Lexer):
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
@@ -102,13 +102,17 @@ class <name>(Lexer):
     grammarFileName = "<fileName>"
 
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input=None, state=None):
-        Lexer.__init__(self, input)
-<if(backtracking)>
+        if state is None:
+            state = RecognizerSharedState()
+        Lexer.__init__(self, input, state)
+<if(memoize)>
+<if(grammar.grammarIsRoot)>
         self._state.ruleMemo = {}
+<endif>
 <endif>
 
         <grammar.directDelegates:
-         {g|self.<g:delegateName()> = <g.name>Lexer(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self._state)}; separator="\n">
+         {g|self.<g:delegateName()> = <g.recognizerName>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state)}; separator="\n">
         <grammar.delegators:
          {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
 
@@ -198,16 +202,19 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members, rewriteElementType, 
               init) ::= <<
-<grammar.directDelegates:
- {g|from <g.name><superClass> import <g.name><superClass>}; separator="\n">
-
+<if(grammar.grammarIsRoot)>
 # token names
 tokenNames = [
     "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", 
     <tokenNames; wrap, separator=", ">
-]
-
+]<\n>
+<else>
+from <grammar.composite.rootGrammar.recognizerName> import tokenNames<\n>
+<endif>
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeClass(scope=it)><endif>}>
+
+<grammar.directDelegates:
+ {g|from <g.recognizerName> import <g.recognizerName>}; separator="\n">
 
 <rules:{<ruleAttributeScopeClass(scope=it.ruleDescriptor.ruleScope)>}>
 
@@ -216,10 +223,17 @@ class <name>(<superClass>):
     tokenNames = tokenNames
 
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state=None):
+        if state is None:
+            state = RecognizerSharedState()
+
         <superClass>.__init__(self, input, state)
+
 <if(memoize)>
+<if(grammar.grammarIsRoot)>
         self._state.ruleMemo = {}
 <endif>
+<endif>
+
         <grammar.delegators:
          {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
 
@@ -231,7 +245,7 @@ class <name>(<superClass>):
         <init>
 
         <grammar.directDelegates:
-         {g|self.<g:delegateName()> = <g.name><superClass>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, self._state)}; separator="\n">
+         {g|self.<g:delegateName()> = <g.recognizerName>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state)}; separator="\n">
 
         <@init>
         <@end>
@@ -264,7 +278,7 @@ def <ruleDescriptor.name>(self, <ruleDescriptor.parameterScope:parameterScope(sc
 
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType="object", superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", rewriteElementType="Token", init={<actions.parser.init>}, ...)>
 >>
 
@@ -389,6 +403,7 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         except RecognitionException, re:
             self.reportError(re)
             self.recover(self.input, re)
+            <@setErrorReturnValue()>
 
 <endif>
 <else>
@@ -676,6 +691,11 @@ alt(elements,altNum,description,autoAST,outerAlt, treeLevel) ::= <<
 <@cleanup()>
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
+
 // E L E M E N T S
 
 /** Dump the elements one per line */
@@ -685,7 +705,7 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <if(label)>
 <label> = self.input.LT(1)<\n>
 <endif>
@@ -693,7 +713,7 @@ self.match(self.input, <token>, self.FOLLOW_<token>_in_<ruleName><elementIndex>)
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -737,13 +757,16 @@ else:
     mse = MismatchedSetException(None, self.input)
     <@mismatchedSetException()>
 <if(LEXER)>
-    self.recover(mse)<\n>
+    self.recover(mse)
+    raise mse
 <else>
+    raise mse
+    <! use following code to make it recover inline; remove throw mse;
     self.recoverFromMismatchedSet(
         self.input, mse, self.FOLLOW_set_in_<ruleName><elementIndex>
-        )<\n>
+        )
+    !>
 <endif>
-    raise mse
 <\n>
 >>
 
@@ -1173,13 +1196,15 @@ ruleLabelDef(label) ::= <<
 <label.label.text> = None<\n>
 >>
 
+returnStructName() ::= "<it.name>_return"
+
 /** Define a return struct for a rule if the code needs to access its
  *  start/stop tokens, tree stuff, attributes, ...  Leave a hole for
  *  subgroups to stick in members.
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-class <ruleDescriptor.name>_return(object):
+class <ruleDescriptor:returnStructName()>(object):
     def __init__(self):
         self.start = None
         self.stop = None
@@ -1230,17 +1255,18 @@ self.<scope>_stack[-1].<attr.name>
 */
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-<if(negIndex)>
-<!FIXME: this seems not to be used by ActionTranslator...!>
-self.<scope>_stack[-<negIndex>].<attr.name> = <expr>
-<else>
-<if(index)>
-<!FIXME: this seems not to be used by ActionTranslator...!>
-self.<scope>_stack[<index>].<attr.name> = <expr>
-<else>
-self.<scope>_stack[-1].<attr.name> = <expr>
-<endif>
-<endif>
+if len(self.<scope>_stack) > 0:
+    <if(negIndex)>
+    <!FIXME: this seems not to be used by ActionTranslator...!>
+    self.<scope>_stack[-<negIndex>].<attr.name> = <expr>
+    <else>
+    <if(index)>
+    <!FIXME: this seems not to be used by ActionTranslator...!>
+    self.<scope>_stack[<index>].<attr.name> = <expr>
+    <else>
+    self.<scope>_stack[-1].<attr.name> = <expr>
+    <endif>
+    <endif>
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
@@ -1310,12 +1336,13 @@ ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> is not None) and [<scope>.st]
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "((<scope> is not None) and [<scope>.type] or [None])[0]"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "((<scope> is not None) and [<scope>.line] or [None])[0]"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "((<scope> is not None) and [<scope>.charPositionInLine] or [None])[0]"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "((<scope> is not None) and [<scope>.channel] or [None])[0]"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "((<scope> is not None) and [<scope>.index] or [None])[0]"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "((<scope> is not None) and [<scope>.type] or [0])[0]"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "((<scope> is not None) and [<scope>.line] or [0])[0]"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "((<scope> is not None) and [<scope>.charPositionInLine] or [0])[0]"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "((<scope> is not None) and [<scope>.channel] or [0])[0]"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "((<scope> is not None) and [<scope>.index] or [0])[0]"
 lexerRuleLabelPropertyRef_text(scope,attr) ::= "((<scope> is not None) and [<scope>.text] or [None])[0]"
+lexerRuleLabelPropertyRef_int(scope,attr) ::= "((<scope> is not None) and [int(<scope>.text)] or [0])[0]"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "retval.start"
@@ -1332,6 +1359,7 @@ lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexe
 lexerRulePropertyRef_channel(scope,attr) ::= "self._state.channel"
 lexerRulePropertyRef_start(scope,attr) ::= "self._state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
+lexerRulePropertyRef_int(scope,attr) ::= "int(<scope>.text)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

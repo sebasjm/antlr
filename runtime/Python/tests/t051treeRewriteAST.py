@@ -9,7 +9,7 @@ class T(testbase.ANTLRTest):
         class TWalker(base):
             def __init__(self, *args, **kwargs):
                 base.__init__(self, *args, **kwargs)
-
+                self.buf = ""
 
             def traceIn(self, ruleName, ruleIndex):
                 self.traces.append('>'+ruleName)
@@ -49,7 +49,7 @@ class T(testbase.ANTLRTest):
     def testFlatList(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T1;
         options {
             language=Python;
             output=AST;
@@ -62,12 +62,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP1;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T1;
         }
         
         a : ID INT -> INT ID;
@@ -85,7 +85,7 @@ class T(testbase.ANTLRTest):
     def testSimpleTree(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T2;
         options {
             language=Python;
             output=AST;
@@ -98,12 +98,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP2;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T2;
         }
         a : ^(ID INT) -> ^(INT ID);
         ''')
@@ -120,7 +120,7 @@ class T(testbase.ANTLRTest):
     def testCombinedRewriteAndAuto(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T3;
         options {
             language=Python;
             output=AST;
@@ -133,12 +133,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP3;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T3;
         }
         a : ^(ID INT) -> ^(INT ID) | INT;
         ''')
@@ -164,7 +164,7 @@ class T(testbase.ANTLRTest):
     def testAvoidDup(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T4;
         options {
             language=Python;
             output=AST;
@@ -177,12 +177,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP4;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T4;
         }
         a : ID -> ^(ID ID);
         ''')
@@ -199,7 +199,7 @@ class T(testbase.ANTLRTest):
     def testLoop(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T5;
         options {
             language=Python;
             output=AST;
@@ -212,12 +212,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP5;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T5;
         }
         a : (^(ID INT))+ -> INT+ ID+;
         ''')
@@ -234,7 +234,7 @@ class T(testbase.ANTLRTest):
     def testAutoDup(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T6;
         options {
             language=Python;
             output=AST;
@@ -247,12 +247,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP6;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T6;
         }
         a : ID;
         ''')
@@ -269,7 +269,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupRule(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T7;
         options {
             language=Python;
             output=AST;
@@ -282,12 +282,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP7;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T7;
         }
         a : b c ;
         b : ID ;
@@ -306,7 +306,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupMultiple(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T8;
         options {
             language=Python;
             output=AST;
@@ -319,12 +319,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP8;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T8;
         }
         a : ID ID INT
           ;
@@ -342,7 +342,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupTree(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T9;
         options {
             language=Python;
             output=AST;
@@ -355,12 +355,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP9;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T9;
         }
         a : ^(ID INT)
           ;
@@ -378,7 +378,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupTreeWithLabels(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T10;
         options {
             language=Python;
             output=AST;
@@ -391,12 +391,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP10;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T10;
         }
         a : ^(x=ID y=INT)
           ;
@@ -414,7 +414,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupTreeWithListLabels(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T11;
         options {
             language=Python;
             output=AST;
@@ -427,12 +427,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP11;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T11;
         }
         a : ^(x+=ID y+=INT)
           ;
@@ -450,7 +450,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupTreeWithRuleRoot(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T12;
         options {
             language=Python;
             output=AST;
@@ -463,12 +463,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP12;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T12;
         }
         a : ^(b INT) ;
         b : ID ;
@@ -486,7 +486,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupTreeWithRuleRootAndLabels(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T13;
         options {
             language=Python;
             output=AST;
@@ -499,12 +499,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP13;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T13;
         }
         a : ^(x=b INT) ;
         b : ID ;
@@ -522,7 +522,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupTreeWithRuleRootAndListLabels(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T14;
         options {
             language=Python;
             output=AST;
@@ -535,12 +535,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP14;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T14;
         }
         a : ^(x+=b y+=c) ;
         b : ID ;
@@ -559,7 +559,7 @@ class T(testbase.ANTLRTest):
     def testAutoDupNestedTree(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T15;
         options {
             language=Python;
             output=AST;
@@ -572,12 +572,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP15;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T15;
         }
         a : ^(ID ^(ID INT))
           ;
@@ -595,7 +595,7 @@ class T(testbase.ANTLRTest):
     def testDelete(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T16;
         options {
             language=Python;
             output=AST;
@@ -608,12 +608,12 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP16;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T16;
         }
         a : ID -> 
           ;
@@ -633,7 +633,7 @@ class T(testbase.ANTLRTest):
     def testRewriteModeCombinedRewriteAndAuto(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T17;
         options {
             language=Python;
             output=AST;
@@ -646,15 +646,16 @@ class T(testbase.ANTLRTest):
         
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP17;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T17;
             rewrite=true;
         }
-        a : ^(ID INT) -> ^(INT ID) | INT
+        a : ^(ID INT) -> ^(ID["ick"] INT)
+          | INT // leaves it alone, returning $a.start
           ;
         ''')
 
@@ -664,7 +665,7 @@ class T(testbase.ANTLRTest):
             "abc 34"
             )
 
-        self.failUnlessEqual("(34 abc)", found)
+        self.failUnlessEqual("(ick 34)", found)
 
 
         found = self.execTreeParser(
@@ -673,10 +674,85 @@ class T(testbase.ANTLRTest):
             "34"
             )
 
-        self.failUnlessEqual("", found)
+        self.failUnlessEqual("34", found)
 
 
+    def testRewriteModeFlatTree(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T18;
+            options {
+              language=Python;
+              output=AST;
+            }
+            a : ID INT -> ID INT | INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
         
+        # just checking that crash happens.  Can't replace child of flat tree
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP18;
+            options {
+              language=Python;
+              output=AST;
+              ASTLabelType=CommonTree;
+              tokenVocab=T18;
+              rewrite=true;
+            }
+            s : ID a ;
+            a : INT -> INT["1"]
+              ;
+            ''')
+        
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34"
+            )
+        self.assertEquals("abc", found)
+
+
+    def testRewriteModeWithPredicatedRewrites(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T19;
+            options {
+              language=Python;
+              output=AST;
+            }
+            a : ID INT -> ^(ID["root"] ^(ID INT)) | INT -> ^(ID["root"] INT) ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP19;
+            options {
+              language=Python;
+              output=AST;
+              ASTLabelType=CommonTree;
+              tokenVocab=T19;
+              rewrite=true;
+            }
+            s : ^(ID a) { self.buf += $s.start.toStringTree() };
+            a : ^(ID INT) -> {True}? ^(ID["ick"] INT)
+                          -> INT
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34"
+            )
+        
+        self.assertEquals("(root (ick 34))", found)
+
 
 if __name__ == '__main__':
     unittest.main()

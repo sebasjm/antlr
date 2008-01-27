@@ -66,15 +66,15 @@ class T(testbase.ANTLRTest):
 
         self.failUnlessEqual(
             lexer.traces,
-            [ '>T6', '<T6', '>WS', '<WS', '>INT', '<INT', '>WS', '<WS',
-              '>T8', '<T8', '>WS', '<WS', '>INT', '<INT', '>WS', '<WS',
-              '>T8', '<T8', '>WS', '<WS', '>INT', '<INT', '>WS', '<WS',
-              '>T7', '<T7']
+            [ '>T__6', '<T__6', '>WS', '<WS', '>INT', '<INT', '>WS', '<WS',
+              '>T__8', '<T__8', '>WS', '<WS', '>INT', '<INT', '>WS', '<WS',
+              '>T__8', '<T__8', '>WS', '<WS', '>INT', '<INT', '>WS', '<WS',
+              '>T__7', '<T__7']
             )
 
         self.failUnlessEqual(
             parser.traces,
-            [ '>a', '>synpred1_fragment', '<synpred1_fragment', '>b', '>c',
+            [ '>a', '>synpred1_t044trace_fragment', '<synpred1_t044trace_fragment', '>b', '>c',
               '<c', '>c', '<c', '>c', '<c', '<b', '<a' ]
             )
     

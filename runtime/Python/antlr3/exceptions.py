@@ -192,7 +192,7 @@ class RecognitionException(Exception):
     
 
 class MismatchedTokenException(RecognitionException):
-    """@brief The next token does not match the expected type."""
+    """@brief A mismatched char or Token or tree node."""
     
     def __init__(self, expecting, input):
         RecognitionException.__init__(self, input)
@@ -205,7 +205,36 @@ class MismatchedTokenException(RecognitionException):
             self.getUnexpectedType(), self.expecting
             )
     __repr__ = __str__
+
+
+class UnwantedTokenException(MismatchedTokenException):
+    """An extra token while parsing a TokenStream"""
+
+    def getUnexpectedToken(self):
+        return self.token
+
+
+    def __str__(self):
+        return "UnwantedTokenException(found=%s, expected %s)" % (
+            self.token.getText(), self.expecting
+            )
+    __repr__ = __str__
+
+
+class MissingTokenException(MismatchedTokenException):
+    """
+    We were expecting a token but it's not found.  The current token
+    is actually what we wanted next.
+    """
     
+    def getMissingType(self):
+        return self.expecting
+
+
+    def __str__(self):
+        return "MissingTokenException(expected %s)" % self.expecting
+    __repr__ = __str__
+
 
 class MismatchedRangeException(RecognitionException):
     """@brief The next token does not match a range of expected types."""
@@ -297,7 +326,8 @@ class FailedPredicateException(RecognitionException):
 
     def __str__(self):
         return "FailedPredicateException("+self.ruleName+",{"+self.predicateText+"}?)"
-
+    __repr__ = __str__
+    
 
 class MismatchedTreeNodeException(RecognitionException):
     """@brief The next tree mode does not match the expected type."""

@@ -100,7 +100,7 @@ class T(testbase.ANTLRTest):
     def testToken(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T1;
         options {
             language=Python;
             output=AST;
@@ -128,7 +128,7 @@ class T(testbase.ANTLRTest):
     def testTokenWithLabel(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T2;
         options {
             language=Python;
             output=AST;
@@ -156,7 +156,7 @@ class T(testbase.ANTLRTest):
     def testTokenWithListLabel(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T3;
         options {
             language=Python;
             output=AST;
@@ -184,7 +184,7 @@ class T(testbase.ANTLRTest):
     def testTokenRoot(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T4;
         options {
             language=Python;
             output=AST;
@@ -212,7 +212,7 @@ class T(testbase.ANTLRTest):
     def testTokenRootWithListLabel(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T5;
         options {
             language=Python;
             output=AST;
@@ -240,7 +240,7 @@ class T(testbase.ANTLRTest):
     def testString(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T6;
         options {
             language=Python;
             output=AST;
@@ -268,7 +268,7 @@ class T(testbase.ANTLRTest):
     def testStringRoot(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T7;
         options {
             language=Python;
             output=AST;
@@ -298,7 +298,7 @@ class T(testbase.ANTLRTest):
     def testRewriteToken(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T8;
         options {
             language=Python;
             output=AST;
@@ -326,23 +326,40 @@ class T(testbase.ANTLRTest):
     def testRewriteTokenWithArgs(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T9;
         options {
             language=Python;
             output=AST;
         }
         @header {
         class V(CommonTree):
-            def __init__(self, t, x):
-                CommonTree.__init__(self, t)
+            def __init__(self, *args):
+                if len(args) == 2:
+                    ttype = args[0]
+                    x = args[1]
+                    token = CommonToken(type=ttype, text="")
+
+                elif len(args) == 3:
+                    ttype = args[0]
+                    token = args[1]
+                    x = args[2]
+
+                else:
+                    raise TypeError("Invalid args \%r" \% (args,))
+
+                CommonTree.__init__(self, token)
                 self.x = x
                 
             def toString(self):
-                return self.token.text + "<V>;" + str(self.x)
+                txt = ""
+                if self.token is not None:
+                    txt += self.token.text
+                txt +="<V>;" + str(self.x)
+                return txt
             __str__ = toString
 
         }
-        a : ID -> ID<V>[42] ;
+        a : ID -> ID<V>[42] ID<V>[$ID,99];
         ID : 'a'..'z'+ ;
         WS : (' '|'\n') {$channel=HIDDEN;} ;
         ''')
@@ -352,13 +369,13 @@ class T(testbase.ANTLRTest):
             input="a"
             )
 
-        self.failUnlessEqual("a<V>;42", found)
+        self.failUnlessEqual("<V>;42 a<V>;99", found)
 
 
     def testRewriteTokenRoot(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T10;
         options {
             language=Python;
             output=AST;
@@ -387,7 +404,7 @@ class T(testbase.ANTLRTest):
     def testRewriteString(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T11;
         options {
             language=Python;
             output=AST;
@@ -415,7 +432,7 @@ class T(testbase.ANTLRTest):
     def testRewriteStringRoot(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T12;
         options {
             language=Python;
             output=AST;
@@ -446,7 +463,7 @@ class T(testbase.ANTLRTest):
     def testTreeParserRewriteFlatList(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T13;
         options {
             language=Python;
             output=AST;
@@ -459,12 +476,12 @@ class T(testbase.ANTLRTest):
 
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP13;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T13;
         }
         @header {
         class V(CommonTree):
@@ -494,7 +511,7 @@ class T(testbase.ANTLRTest):
     def testTreeParserRewriteTree(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T14;
         options {
             language=Python;
             output=AST;
@@ -507,12 +524,12 @@ class T(testbase.ANTLRTest):
 
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP14;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T14;
         }
         @header {
         class V(CommonTree):
@@ -542,7 +559,7 @@ class T(testbase.ANTLRTest):
     def testTreeParserRewriteImaginary(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T15;
         options {
             language=Python;
             output=AST;
@@ -555,12 +572,12 @@ class T(testbase.ANTLRTest):
 
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP15;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T15;
         }
         tokens { ROOT; }
         @header {
@@ -590,7 +607,7 @@ class T(testbase.ANTLRTest):
     def testTreeParserRewriteImaginaryWithArgs(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T16;
         options {
             language=Python;
             output=AST;
@@ -603,12 +620,12 @@ class T(testbase.ANTLRTest):
 
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP16;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T16;
         }
         tokens { ROOT; }
         @header {
@@ -638,7 +655,7 @@ class T(testbase.ANTLRTest):
     def testTreeParserRewriteImaginaryRoot(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T17;
         options {
             language=Python;
             output=AST;
@@ -651,12 +668,12 @@ class T(testbase.ANTLRTest):
 
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP17;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T17;
         }
         tokens { ROOT; }
         @header {
@@ -685,7 +702,7 @@ class T(testbase.ANTLRTest):
     def testTreeParserRewriteImaginaryFromReal(self):
         grammar = textwrap.dedent(
         r'''
-        grammar T;
+        grammar T18;
         options {
             language=Python;
             output=AST;
@@ -698,12 +715,12 @@ class T(testbase.ANTLRTest):
 
         treeGrammar = textwrap.dedent(
         r'''
-        tree grammar TP;
+        tree grammar TP18;
         options {
             language=Python;
             output=AST;
             ASTLabelType=CommonTree;
-            tokenVocab=T;
+            tokenVocab=T18;
         }
         tokens { ROOT; }
         @header {

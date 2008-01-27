@@ -169,9 +169,10 @@ class CommonToken(Token):
             self.channel = oldToken.channel
             self.index = oldToken.index
             self._text = oldToken._text
-            self.input = oldToken.input
-            self.start = oldToken.start
-            self.stop = oldToken.stop
+            if isinstance(oldToken, CommonToken):
+                self.input = oldToken.input
+                self.start = oldToken.start
+                self.stop = oldToken.stop
             
         else:
             self.type = type
@@ -266,7 +267,7 @@ class CommonToken(Token):
         else:
             txt = "<no text>"
 
-        return "[@%s,%s:%s=%r,<%s>%s,%s:%s]" % (
+        return "[@%d,%d:%d=%r,<%d>%s,%d:%d]" % (
             self.index,
             self.start, self.stop,
             txt,

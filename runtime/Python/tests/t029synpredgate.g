@@ -4,13 +4,13 @@ options {
 }
 
 FOO
-    : A
-    | B
+    : ('ab')=> A
+    | ('ac')=> B
     ;
 
 fragment
-A: ('ab')=> 'a';
+A: 'a';
 
 fragment
-B: ('ac')=> 'a';
+B: 'a';
 

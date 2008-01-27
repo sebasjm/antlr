@@ -9,7 +9,7 @@ import textwrap
 
 class t012lexerXML(testbase.ANTLRTest):
     def setUp(self):
-        self.compileGrammar()
+        self.compileGrammar('t012lexerXMLLexer.g')
         
         
     def lexerClass(self, base):
@@ -18,7 +18,7 @@ class t012lexerXML(testbase.ANTLRTest):
                 # report errors to /dev/null
                 pass
 
-            def recover(self, re):
+            def reportError(self, re):
                 # no error recovery yet, just crash!
                 raise re
 
