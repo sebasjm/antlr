@@ -33,21 +33,23 @@ package org.antlr.runtime {
 		public var state:RecognizerSharedState;  // Note - this is public due ActionScript access rules -- GMS
 	
 		public function BaseRecognizer(state:RecognizerSharedState = null) {
-			if ( state!=null ) { // don't ever let us have a null state
-				this.state = state;
+			if ( state == null ) { // don't ever let us have a null state
+				state = new RecognizerSharedState();
 			}
-			else {
-				this.state = new RecognizerSharedState();			
-			}
+			this.state = state;			
 		}
 	
 		/** reset the parser's state; subclasses must rewinds the input stream */
 		public function reset():void {
 			// wack everything related to error recovery
+			if (state == null) {
+			    return;
+			}
 			state._fsp = -1;
 			state.errorRecovery = false;
 			state.lastErrorIndex = -1;
 			state.failed = false;
+			state.syntaxErrors = 0;
 			// wack everything related to backtracking and memoization
 			state.backtracking = 0;
 			for (var i:int = 0; state.ruleMemo!=null && i < state.ruleMemo.length; i++) { // wipe cache
@@ -55,14 +57,16 @@ package org.antlr.runtime {
 			}
 		}
 	
-		/** Match current input symbol against ttype.  Upon error, do one token
-		 *  insertion or deletion if possible.  You can override to not recover
-		 *  here and bail out of the current production to the normal error
-		 *  exception catch (at the end of the method) by just throwing
-		 *  MismatchedTokenException upon input.LA(1)!=ttype.
-		 * 
-		 * GMS - renamed matchStream from match
-		 */
+    	/** Match current input symbol against ttype.  Throw exception upon
+    	 *  error, bailing out of the current production to the normal error
+    	 *  exception catch (at the end of the method) by just throwing
+    	 *  MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
+    	 *  by resynchronize into the set of symbols the can follow.
+    	 *
+    	 *  Prior to v3.1, this method used to do one token
+    	 *  insertion or deletion if possible.  You can override mismatch()
+    	 *  to recover here if you want.
+    	 */
 		public function matchStream(input:IntStream, ttype:int, follow:BitSet):void
 		{
 			if ( input.LA(1)==ttype ) {
@@ -80,37 +84,86 @@ package org.antlr.runtime {
 		}
 	
 		// GMS - renamed from matchAny to matchAnyStream
+		/** Match the wildcard: in a symbol */
 		public function matchAnyStream(input:IntStream):void {
 			state.errorRecovery = false;
 			state.failed = false;
 			input.consume();
 		}
+
+    	public function mismatchIsUnwantedToken(input:IntStream, ttype:int):Boolean {
+    		return input.LA(2)==ttype;
+    	}
 	
-		/** factor out what to do upon token mismatch so tree parsers can behave
-		 *  differently.  Override this method in your parser to do things
-		 *  like bailing out after the first error; just throw the mte object
-		 *  instead of calling the recovery method.
-		 */
+    	public function mismatchIsMissingToken(input:IntStream, follow:BitSet):Boolean {
+    		if ( follow==null ) {
+    			// we have no information about the follow; we can only consume
+    			// a single token and hope for the best
+    			return false;
+    		}
+    		// compute what can follow this grammar element reference
+    		if ( follow.member(TokenConstants.EOR_TOKEN_TYPE) ) {
+    			var viableTokensFollowingThisRule:BitSet =
+    				computeContextSensitiveRuleFOLLOW();
+    			follow = follow.or(viableTokensFollowingThisRule);
+    			follow.remove(TokenConstants.EOR_TOKEN_TYPE);
+    		}
+    		// if current token is consistent with what could come after set
+    		// then we know we're missing a token; error recovery is free to
+    		// "insert" the missing token
+    		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
+    		if ( follow.member(input.LA(1)) ) {
+    			//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
+    			return true;
+    		}
+    		return false;
+    	}
+    
+    	/** factor out what to do upon token mismatch so tree parsers can behave
+    	 *  differently.  Override and call mismatchRecover(input, ttype, follow)
+    	 *  to get single token insertion and deletion.
+    	 */
 		protected function mismatch(input:IntStream, ttype:int, follow:BitSet):void
 		{
-			var mte:MismatchedTokenException =
-				new MismatchedTokenException(ttype, input);
-			recoverFromMismatchedToken(input, mte, ttype, follow);
+    		if ( mismatchIsUnwantedToken(input, ttype) ) {
+    			throw new UnwantedTokenException(ttype, input);
+    		}
+    		else if ( mismatchIsMissingToken(input, follow) ) {
+    			throw new MissingTokenException(ttype, input);
+    		}
+    		throw new MismatchedTokenException(ttype, input);
 		}
+
+    	protected function mismatchRecover(input:IntStream, ttype:int, follow:BitSet):void
+    	{
+    		var mte:MismatchedTokenException = null;
+    		if ( mismatchIsUnwantedToken(input, ttype) ) {
+    			mte = new UnwantedTokenException(ttype, input);
+    		}
+    		else if ( mismatchIsMissingToken(input, follow) ) {
+    			mte = new MissingTokenException(ttype, input);
+    		}
+    		else {
+    			mte = new MismatchedTokenException(ttype, input);
+    		}
+    		recoverFromMismatchedToken(input, mte, ttype, follow);
+    	}
 	
-		/** Report a recognition problem.
-		 *
-		 *  This method sets errorRecovery to indicate the parser is recovering
-		 *  not parsing.  Once in recovery mode, no errors are generated.
-		 *  To get out of recovery mode, the parser must successfully match
-		 *  a token (after a resync).  So it will go:
-		 *
-		 * 		1. error occurs
-		 * 		2. enter recovery mode, report error
-		 * 		3. consume until token found in resynch set
-		 * 		4. try to resume parsing
-		 * 		5. next match() will reset errorRecovery mode
-		 */
+    	/** Report a recognition problem.
+    	 *
+    	 *  This method sets errorRecovery to indicate the parser is recovering
+    	 *  not parsing.  Once in recovery mode, no errors are generated.
+    	 *  To get out of recovery mode, the parser must successfully match
+    	 *  a token (after a resync).  So it will go:
+    	 *
+    	 * 		1. error occurs
+    	 * 		2. enter recovery mode, report error
+    	 * 		3. consume until token found in resynch set
+    	 * 		4. try to resume parsing
+    	 * 		5. next match() will reset errorRecovery mode
+    	 *
+    	 *  If you override, make sure to update syntaxErrors if you care about that.
+    	 */
 		public function reportError(e:RecognitionException):void {
 			// if we've already reported an error and have not matched a token
 			// yet successfully, don't report any errors.
@@ -118,6 +171,7 @@ package org.antlr.runtime {
 				//System.err.print("[SPURIOUS] ");
 				return;
 			}
+	    	state.syntaxErrors++; // don't count spurious
 			state.errorRecovery = true;
 	
 			displayRecognitionError(this.tokenNames, e);
@@ -156,7 +210,30 @@ package org.antlr.runtime {
 		public function getErrorMessage(e:RecognitionException, tokenNames:Array):String {
 			var msg:String = null;
 			var tokenName:String = null;
-			if ( e is MismatchedTokenException ) {
+    		if ( e is UnwantedTokenException ) {
+    			var ute:UnwantedTokenException = UnwantedTokenException(e);
+    			tokenName="<unknown>";
+    			if ( ute.expecting== TokenConstants.EOF ) {
+    				tokenName = "EOF";
+    			}
+    			else {
+    				tokenName = tokenNames[ute.expecting];
+    			}
+    			msg = "extraneous input "+getTokenErrorDisplay(ute.unexpectedToken)+
+    				" expecting "+tokenName;
+    		}
+    		else if ( e is MissingTokenException ) {
+    			var mite:MissingTokenException = MissingTokenException(e);
+    			tokenName="<unknown>";
+    			if ( mite.expecting == TokenConstants.EOF ) {
+    				tokenName = "EOF";
+    			}
+    			else {
+    				tokenName = tokenNames[mite.expecting];
+    			}
+    			msg = "missing "+tokenName+" at "+getTokenErrorDisplay(e.token);
+    		}  			
+			else if ( e is MismatchedTokenException ) {
 				var mte:MismatchedTokenException = MismatchedTokenException(e);
 				tokenName="<unknown>";
 				if ( mte.expecting== TokenConstants.EOF ) {
@@ -210,6 +287,17 @@ package org.antlr.runtime {
 			}
 			return msg;
 		}
+
+    	/** Get number of recognition errors (lexer, parser, tree parser).  Each
+    	 *  recognizer tracks its own number.  So parser and lexer each have
+    	 *  separate count.  Does not count the spurious errors found between
+    	 *  an error and next valid token match
+    	 *
+    	 *  See also reportError()
+    	 */
+    	public function get numberOfSyntaxErrors():int {
+    		return state.syntaxErrors;
+    	}
 	
 		/** What is the error header, normally line/character position information? */
 		public function getErrorHeader(e:RecognitionException):String {
@@ -234,10 +322,9 @@ package org.antlr.runtime {
 					s = "<"+t.type+">";
 				}
 			}
-			// GMS TODO - fix this
-			//s = s.replaceAll("\n","\\\\n");
-			//s = s.replaceAll("\r","\\\\r");
-			//s = s.replaceAll("\t","\\\\t");
+			s = s.replace("\n","\\\\n");
+			s = s.replace("\r","\\\\r");
+			s = s.replace("\t","\\\\t");
 			return "'"+s+"'";
 		}
 	
@@ -251,13 +338,14 @@ package org.antlr.runtime {
 			}
 		}
 	
-		/** Recover from an error found on the input stream.  Mostly this is
-		 *  NoViableAlt exceptions, but could be a mismatched token that
-		 *  the match() routine could not recover from.
-		 * 
-		 * GMS - renamed to recoverStream from recover()
-		 */
+    	/** Recover from an error found on the input stream.  This is
+    	 *  for NoViableAlt and mismatched symbol exceptions.  If you enable
+    	 *  single token insertion and deletion, this will usually not
+    	 *  handle mismatched symbol exceptions but there could be a mismatched
+    	 *  token that the match() routine could not recover from.
+    	 */
 		public function recoverStream(input:IntStream, re:RecognitionException):void {
+		    // GMS - renamed from recover()
 			if ( state.lastErrorIndex==input.index) {
 				// uh oh, another error at same token index; must be a case
 				// where LT(1) is in the recovery token set so nothing is
@@ -479,68 +567,53 @@ package org.antlr.runtime {
 											   e:RecognitionException,
 											   ttype:int,
 											   follow:BitSet):void {	
-			// if next token is what we are looking for then "delete" this token
-			if ( input.LA(2)==ttype ) {
-				reportError(e);
-				beginResync();
-				input.consume(); // simply delete extra token
-				endResync();
-				input.consume(); // move past ttype token as if all were ok
-				return;
-			}
-			if ( !recoverFromMismatchedElement(input,e,follow) ) {
-				throw e;
-			}
+    		// if next token is what we are looking for then "delete" this token
+    		if ( mismatchIsUnwantedToken(input, ttype) ) {
+    			reportError(e);
+    			/*
+    			System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
+    							   " since "+input.LT(2)+" is what we want");
+    			*/
+    			beginResync();
+    			input.consume(); // simply delete extra token
+    			endResync();
+    			input.consume(); // move past ttype token as if all were ok
+    			return;
+    		}
+    		if ( !recoverFromMissingElement(input,e,follow) ) {
+    			throw e;
+    		}
 		}
 	
 		public function recoverFromMismatchedSet(input:IntStream,
 											 e:RecognitionException,
 											 follow:BitSet):RecognitionException
 		{
-			// TODO do single token deletion like above for Token mismatch
-			if ( !recoverFromMismatchedElement(input,e,follow) ) {
-				throw e;
-			}
-			else {
-			    // Return the exception back so it can be throws by caller, avoid exception
-			    // declaration variable and compiler warnings.
-			    return e;
-			}
+    		// TODO do single token deletion like above for Token mismatch
+    		if ( !recoverFromMissingElement(input,e,follow) ) {
+    			throw e;
+    		}
+            else {
+                return e;
+            }
 		}
 	
-		/** This code is factored out from mismatched token and mismatched set
-		 *  recovery.  It handles "single token insertion" error recovery for
-		 *  both.  No tokens are consumed to recover from insertions.  Return
-		 *  true if recovery was possible else return false.
-		 */
-		protected function recoverFromMismatchedElement(input:IntStream,
-													   e:RecognitionException,
-													   follow:BitSet):Boolean
-		{
-			if ( follow==null ) {
-				// we have no information about the follow; we can only consume
-				// a single token and hope for the best
-				return false;
-			}
-			//System.out.println("recoverFromMismatchedElement");
-			// compute what can follow this grammar element reference
-			if ( follow.member(TokenConstants.EOR_TOKEN_TYPE) ) {
-				var viableTokensFollowingThisRule:BitSet =
-					computeContextSensitiveRuleFOLLOW();
-				follow = follow.or(viableTokensFollowingThisRule);
-				follow.remove(TokenConstants.EOR_TOKEN_TYPE);
-			}
-			// if current token is consistent with what could come after set
-			// then it is ok to "insert" the missing token, else throw exception
-			//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
-			if ( follow.member(input.LA(1)) ) {
-				//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
-				reportError(e);
-				return true;
-			}
-			//System.err.println("nothing to do; throw exception");
-			return false;
-		}
+    	/** This code is factored out from mismatched token and mismatched set
+    	 *  recovery.  It handles "single token insertion" error recovery for
+    	 *  both.  No tokens are consumed to recover from insertions.  Return
+    	 *  true if recovery was possible else return false.
+    	 */
+    	protected function recoverFromMissingElement(input:IntStream,
+    												e:RecognitionException,
+    												follow:BitSet):Boolean
+    	{
+    		if ( mismatchIsMissingToken(input, follow) ) {
+    			reportError(e);
+    			return true;
+    		}
+    		//System.err.println("nothing to do; throw exception");
+    		return false;
+    	}
 	
 		// GMS: Renamed from consumeUntil to consumeUntilToken
 		public function consumeUntilToken(input:IntStream, tokenType:int):void {
@@ -656,6 +729,13 @@ package org.antlr.runtime {
 							ruleStartIndex:int):void
 		{
 			var stopTokenIndex:int = state.failed ? MEMO_RULE_FAILED : input.index - 1;
+			if ( state.ruleMemo==null ) {
+    			trace("!!!!!!!!! memo array is null for "+ grammarFileName);
+    		}
+    		if ( ruleIndex >= state.ruleMemo.length ) {
+    			trace("!!!!!!!!! memo size is "+state.ruleMemo.length+", but rule index is "+ruleIndex);
+    		}
+
 			if ( state.ruleMemo[ruleIndex]!=null ) {
 				state.ruleMemo[ruleIndex][new String(ruleStartIndex)] = new String(stopTokenIndex);
 				state.ruleMemo[ruleIndex].length++;

@@ -47,28 +47,23 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   scopes, superClass, literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
-<if(actions.(actionScope).package)>
-package <actions.(actionScope).package> {
-<endif>
-<actions.(actionScope).header>
-
-<@imports>
+package<if(actions.(actionScope).package)> <actions.(actionScope).package><endif> {
+    <actions.(actionScope).header>
+    <@imports>
 import org.antlr.runtime.*;
 <if(TREE_PARSER)>
-import org.antlr.runtime.tree.*;
+    import org.antlr.runtime.tree.*;
 <endif>
-<@end>
+    <@end>
 
-<docComment>
-<recognizer>
-<if(actions.(actionScope).package)>
+    <docComment>
+    <recognizer>
 }
-<endif>
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
-<if(actions.(actionScope).package)>public <endif>class <name> extends Lexer {
+public class <name> extends Lexer {
     <tokens:{public static const <it.name>:int=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
@@ -80,11 +75,13 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
     <grammar.delegators:
          {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
 
-    public function <name>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>) {
-        super(input);
+    public function <name>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
+        super(input, state);
         <cyclicDFAs:cyclicDFACtor()>
-<if(backtracking)>
+<if(memoize)>
+<if(grammar.grammarIsRoot)>
         this.state.ruleMemo = new Array(<numRules>+1);<\n> <! index from 1..n !>
+<endif>
 <endif>
         <grammar.directDelegates:
          {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
@@ -168,10 +165,12 @@ filteringActionGate() ::= "this.state.backtracking==1"
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members, rewriteElementType) ::= <<
-<if(actions.(actionScope).package)>public <endif>class <name> extends <@superClassName><superClass><@end> {
+public class <name> extends <@superClassName><superClass><@end> {
+<if(grammar.grammarIsRoot)>
     public static const tokenNames:Array = [
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
-    ];
+    ];<\n>
+<endif>
     <tokens:{public static const <it.name>:int=<it.type>;}; separator="\n">
 
     // delegates
@@ -194,7 +193,7 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
     }
     <@end>
 
-    public override function get tokenNames():Array { return <name>.tokenNames; }
+    public override function get tokenNames():Array { return <grammar.composite.rootGrammar.recognizerName>.tokenNames; }
     public override function get grammarFileName():String { return "<fileName>"; }
 
     <members>
@@ -218,13 +217,15 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
 
 parserCtorBody() ::= <<
 <if(memoize)>
-this.state.ruleMemo = new Array(<numRules>+1);<\n> <! index from 1..n !>
+<if(grammar.grammarIsRoot)>
+this.state.ruleMemo = new Array(<length(grammar.allImportedRules)>+1);<\n> <! index from 1..n !>
+<endif>
 <endif>
 <grammar.delegators:
  {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType, superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType="Object", superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", rewriteElementType="Token", ...)>
 >>
 
@@ -330,6 +331,7 @@ public final function <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     catch (re:RecognitionException) {
         reportError(re);
         recoverStream(input,re);
+        <@setErrorReturnValue()>
     }<\n>
 <endif>
 <endif>
@@ -597,6 +599,11 @@ alt(elements,altNum,description,autoAST,outerAlt,treeLevel) ::= <<
 }
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
+
 // E L E M E N T S
 
 /** Dump the elements one per line */
@@ -606,7 +613,7 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <if(label)>
 <label>=<labelType>(input.LT(1));<\n>
 <endif>
@@ -614,7 +621,7 @@ matchStream(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRul
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -659,11 +666,14 @@ if ( <s> ) {
 }
 else {
     <ruleBacktrackFailure()>
-    <! Need to add debug hook for mismatchedSetException !>
+    <@mismatchedSetException()>
 <if(LEXER)>
     throw recover(new MismatchedSetException(null,input));<\n>
 <else>
-    throw recoverFromMismatchedSet(input,new MismatchedSetException(null,input),FOLLOW_set_in_<ruleName><elementIndex>);<\n>
+    throw new MismatchedSetException(null,input);
+    <! use following code to make it recover inline; remove throw mse;
+    recoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    !>
 <endif>
 }<\n>
 >>
@@ -938,7 +948,16 @@ private const DFA<dfa.decisionNumber>_transition:Array = [
         <dfa.javaCompressedTransition:{s|DFA.unpackEncodedString("<s; wrap="\"+\n\"">")}; separator=",\n">
 ];
 <if(dfa.specialStateSTs)>
-private function DFA<dfa.decisionNumber>_specialStateTransition(dfa:DFA, s:int, input:IntStream):int {
+    private function DFA<dfa.decisionNumber>_specialStateTransition(dfa:DFA, s:int, _input:IntStream):int {
+        <if(LEXER)>
+        var input:IntStream = _input;
+        <endif>
+        <if(PARSER)>
+        var input:TokenStream = TokenStream(_input);
+        <endif>
+        <if(TREE_PARSER)>
+        var input:TreeNodeStream = TreeNodeStream(_input);
+        <endif>
     	var _s:int = s;
         switch ( s ) {
         <dfa.specialStateSTs:{state |
@@ -1036,9 +1055,11 @@ protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
+returnStructName() ::= "<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope"
+
 returnType() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope
+<returnStructName()>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>
@@ -1053,7 +1074,7 @@ void
  */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope
+<returnStructName()>
 <else>
 <if(referencedRule.hasSingleReturnValue)>
 <referencedRule.singleValueReturnType>
@@ -1100,20 +1121,19 @@ parameterAttributeRef(attr) ::= "<attr.name>"
 parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
-if ( <scope>_stack.size()>0 ) {
  <if(negIndex)>
- ((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:null)
+ ((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:<initValue(attr.type)>)
  <else>
  <if(index)>
- ((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:null)
+ ((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:<initValue(attr.type)>)
  <else>
- ((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:null)
+ ((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:<initValue(attr.type)>)
  <endif>
  <endif>
-}
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
+if ( <scope>_stack.length>0 ) {
 <if(negIndex)>
 ((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
 <else>
@@ -1123,6 +1143,7 @@ scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 ((<scope>_scope)<scope>_stack.peek()).<attr.name> =<expr>;
 <endif>
 <endif>
+}
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
@@ -1134,7 +1155,7 @@ isolatedDynamicScopeRef(scope) ::= "<scope>_stack"
 /** reference an attribute of rule; might only have single return value */
 ruleLabelRef(referencedRule,scope,attr) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-(<scope>!=null?<scope>.values.<attr.name>:null)
+(<scope>!=null?<scope>.values.<attr.name>:<initValue(attr.type)>)
 <else>
 <scope>
 <endif>
@@ -1166,12 +1187,13 @@ listLabelRef(label) ::= "list_<label>"
 // not sure the next are the right approach
 
 tokenLabelPropertyRef_text(scope,attr) ::= "(<scope>!=null?<scope>.text:null)"
-tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>!=null?<scope>.type:null)"
-tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.line:null)"
-tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.charPositionInLine:null)"
-tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.channel:null)"
-tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.tokenIndex:null)"
+tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>!=null?<scope>.type:0)"
+tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>!=null?<scope>.line:0)"
+tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>!=null?<scope>.charPositionInLine:0)"
+tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>!=null?<scope>.channel:0)"
+tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.tokenIndex:0)"
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
+tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int(<scope>.text):0)"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.start):null)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.stop):null)"
@@ -1192,17 +1214,19 @@ ruleLabelPropertyRef_st(scope,attr) ::= "(<scope>!=null?<scope>.st:null)"
 lexerRuleLabel(label) ::= "<label>"
 
 lexerRuleLabelPropertyRef_type(scope,attr) ::=
-    "(<scope>!=null?<scope>.getType():null)"
+    "(<scope>!=null?<scope>.getType():0)"
 lexerRuleLabelPropertyRef_line(scope,attr) ::=
-    "(<scope>!=null?<scope>.getLine():null)"
+    "(<scope>!=null?<scope>.getLine():0)"
 lexerRuleLabelPropertyRef_pos(scope,attr) ::=
-    "(<scope>!=null?<scope>.getCharPositionInLine():null)"
+    "(<scope>!=null?<scope>.getCharPositionInLine():0)"
 lexerRuleLabelPropertyRef_channel(scope,attr) ::=
-    "(<scope>!=null?<scope>.getChannel():null)"
+    "(<scope>!=null?<scope>.getChannel():0)"
 lexerRuleLabelPropertyRef_index(scope,attr) ::=
-    "(<scope>!=null?<scope>.getTokenIndex():null)"
+    "(<scope>!=null?<scope>.getTokenIndex():0)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::=
     "(<scope>!=null?<scope>.getText():null)"
+lexerRuleLabelPropertyRef_int(scope,attr) ::=
+    "(<scope>!=null?int(<scope>.text):0)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "(<labelType>(retval.start))"
@@ -1219,7 +1243,7 @@ input.toString(retval.start,input.LT(-1))
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
-lexerRulePropertyRef_text(scope,attr) ::= "getText()"
+lexerRulePropertyRef_text(scope,attr) ::= "text"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "state.tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "state.tokenStartCharPositionInLine"
@@ -1227,6 +1251,7 @@ lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexe
 lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
+lexerRulePropertyRef_int(scope,attr) ::= "int(<scope>.text)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error

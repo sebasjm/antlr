@@ -36,23 +36,27 @@ package org.antlr.runtime {
 		/** Where is the lexer drawing characters from? */
 	    protected var input:CharStream;
 	
-		public function Lexer(input:CharStream = null) {
+		public function Lexer(input:CharStream = null, state:RecognizerSharedState = null) {
+		    super(state);
 			this.input = input;
 		}
 		
 		public override function reset():void {
 			super.reset(); // reset all recognizer state variables
-			// wack Lexer state variables
-			state.token = null;
-			state.type = TokenConstants.INVALID_TOKEN_TYPE;
-			state.channel = TokenConstants.DEFAULT_CHANNEL;
-			state.tokenStartCharIndex = -1;
-			state.tokenStartCharPositionInLine = -1;
-			state.tokenStartLine = -1;
-			state.text = null;
-			if ( input!=null ) {
-				input.seek(0); // rewind the input
-			}
+    		// wack Lexer state variables
+    		if ( input!=null ) {
+    			input.seek(0); // rewind the input
+    		}
+    		if ( state==null ) {
+    			return; // no shared state work to do
+    		}
+    		state.token = null;
+    		state.type = TokenConstants.INVALID_TOKEN_TYPE;
+    		state.channel = TokenConstants.DEFAULT_CHANNEL;
+    		state.tokenStartCharIndex = -1;
+    		state.tokenStartCharPositionInLine = -1;
+    		state.tokenStartLine = -1;
+    		state.text = null;
 		}
 	
 		/** Return a token from this source; i.e., match a token on the char
@@ -79,11 +83,14 @@ package org.antlr.runtime {
 					}
 					return state.token;
 				}
-	            catch (re:RecognitionException) {
-	                reportError(re);
-	                recover(re);
-	                continue;
-	            }
+	            catch (nva:NoViableAltException) {
+    				reportError(nva);
+    				recover(nva); // throw out current char and try again
+    			}
+    			catch (re:RecognitionException) {
+    				reportError(re);
+    				// match() routine has already called recover()
+    			}
 	        }
 	        // Can't happen, but will quiet complier error
 	        return null;
@@ -173,7 +180,7 @@ package org.antlr.runtime {
 				}
 				var mte:MismatchedTokenException =
 					new MismatchedTokenException(c, input);
-				recover(mte);
+				recover(mte);  // don't really recover; just consume in lexer
 				throw mte;
 	        }
 	        input.consume();

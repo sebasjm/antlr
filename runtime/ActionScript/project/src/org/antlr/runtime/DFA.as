@@ -59,6 +59,10 @@ package org.antlr.runtime {
 		 *  an exception upon error.
 		 */
 		public function predict(input:IntStream):int	{
+    		if ( debug ) {
+    			trace("Enter DFA.predict for decision "+decisionNumber);
+    		}
+
 			var mark:int = input.mark(); // remember where decision started in input
 			var s:int = 0; // we always start at s0
 			try {

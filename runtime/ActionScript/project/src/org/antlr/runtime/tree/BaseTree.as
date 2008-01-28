@@ -265,12 +265,12 @@ package org.antlr.runtime.tree {
 		/** Print out a whole tree not just a node */
 	    public function toStringTree():String {
 			if ( _children==null || _children.length==0 ) {
-				return this.toString();
+				return String(this);
 			}
 			var buf:String = "";
 			if ( !isNil ) {
 				buf += "(";
-				buf += this.toString();
+				buf += String(this);
 				buf += ' ';
 			}
 			for (var i:int = 0; _children!=null && i < _children.length; i++) {
@@ -298,35 +298,32 @@ package org.antlr.runtime.tree {
 		// Since no abstract classes in actionscript
 		 
 		public function dupNode():Tree {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
 		public function get type():int {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
 		public function get text():String {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
 		public function get tokenStartIndex():int {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
 		public function set tokenStartIndex(index:int):void {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
 		public function get tokenStopIndex():int {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
 		public function set tokenStopIndex(index:int):void {
-			throw Error("Not implemented");
+			throw new Error("Not implemented");
 		}
 	
-		public function toString():String {
-			throw Error("Not implemented");
-		}
 	}
 }

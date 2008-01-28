@@ -25,21 +25,14 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime {
-
-    /** A mismatched char or Token or tree node */
-	public class MismatchedTokenException extends RecognitionException {
-		public var expecting:int;
-
-		public function MismatchedTokenException(expecting:int, input:IntStream) {
-			super(input);
-			this.expecting = expecting;
-		}
-	
-		public function toString():String {
-			return "MismatchedTokenException("+getUnexpectedType()+"!="+expecting+")";
-		}
-	}
-
-	
+package org.antlr.runtime.tree {
+    
+    /** No elements within a (...)+ in a rewrite rule */
+    public class RewriteEarlyExitException extends RewriteCardinalityException {
+        
+        public function RewriteEarlyExitException(elementDescription:String = null) {
+            super(elementDescription);
+        }
+        
+    }
 }

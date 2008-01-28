@@ -27,6 +27,7 @@
 */
 package org.antlr.runtime.tree {
 	import org.antlr.runtime.Token;
+	import org.antlr.runtime.TokenConstants;
 	
 	/** A tree node that is wrapper for a Token object.  After 3.0 release
 	 *  while building tree rewrite stuff, it became clear that computing
@@ -78,7 +79,7 @@ package org.antlr.runtime.tree {
 	
 		public override function get type():int {
 			if ( _token==null ) {
-				return 0;
+				return TokenConstants.INVALID_TOKEN_TYPE;
 			}
 			return _token.type;
 		}
@@ -148,10 +149,16 @@ package org.antlr.runtime.tree {
 			this._childIndex = index;
 		}
 
-		public override function toString():String {
+		public function toString():String {
 			if ( isNil ) {
 				return "nil";
 			}
+			if ( type==TokenConstants.INVALID_TOKEN_TYPE ) {
+    			return "<errornode>";
+    		}
+    		if ( token==null ) {
+    			return null;
+    		}
 			return _token.text;
 		}
 	}

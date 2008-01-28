@@ -25,21 +25,25 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime {
+package org.antlr.runtime.tree {
+    /** Base class for all exceptions thrown during AST rewrite construction.
+     *  This signifies a case where the cardinality of two or more elements
+     *  in a subrule are different: (ID INT)+ where |ID|!=|INT|
+     */
+    public class RewriteCardinalityException extends Error {
+        
+        public var elementDescription:String;
 
-    /** A mismatched char or Token or tree node */
-	public class MismatchedTokenException extends RecognitionException {
-		public var expecting:int;
-
-		public function MismatchedTokenException(expecting:int, input:IntStream) {
-			super(input);
-			this.expecting = expecting;
-		}
-	
-		public function toString():String {
-			return "MismatchedTokenException("+getUnexpectedType()+"!="+expecting+")";
-		}
-	}
-
-	
+    	public function RewriteCardinalityException(elementDescription:String) {
+    	    super(elementDescription);
+    		this.elementDescription = elementDescription;
+    	}
+    
+    	public function getMessage():String {
+    		if ( elementDescription!=null ) {
+    			return elementDescription;
+    		}
+    		return null;
+    	}
+    }
 }

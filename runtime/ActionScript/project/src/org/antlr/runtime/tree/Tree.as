@@ -78,8 +78,7 @@ package org.antlr.runtime.tree {
 		function get charPositionInLine():int;
 	
 		function toStringTree():String;
-	
-		function toString():String;
+
 	}
 
 }

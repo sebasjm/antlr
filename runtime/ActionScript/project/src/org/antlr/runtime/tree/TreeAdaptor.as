@@ -27,7 +27,7 @@
 */
 package org.antlr.runtime.tree {
 	
-	import org.antlr.runtime.Token;
+	import org.antlr.runtime.*;
 	
 	/** How to create and navigate trees.  Rather than have a separate factory
 	 *  and adaptor, I've merged them.  Makes sense to encapsulate.
@@ -59,6 +59,22 @@ package org.antlr.runtime.tree {
 		 */
 		function nil():Object;
 	
+    	/** Return a tree node representing an error.  This node records the
+    	 *  tokens consumed during error recovery.  The start token indicates the
+    	 *  input symbol at which the error was detected.  The stop token indicates
+    	 *  the last symbol consumed during recovery.
+    	 *
+    	 *  You must specify the input stream so that the erroneous text can
+    	 *  be packaged up in the error node.  The exception could be useful
+    	 *  to some applications; default implementation stores ptr to it in
+    	 *  the CommonErrorNode.
+    	 *
+    	 *  This only makes sense during token parsing, not tree parsing.
+    	 *  Tree parsing should happen only when parsing and tree construction
+    	 *  succeed.
+    	 */
+    	function errorNode(input:TokenStream, start:Token, stop:Token, e:RecognitionException):Object;
+
 		/** Is tree considered a nil node used to make lists of child nodes? */ 
 		function isNil(tree:Object):Boolean;
 	

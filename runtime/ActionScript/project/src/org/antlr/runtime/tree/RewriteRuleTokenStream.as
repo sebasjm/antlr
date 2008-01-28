@@ -25,21 +25,36 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.runtime {
-
-    /** A mismatched char or Token or tree node */
-	public class MismatchedTokenException extends RecognitionException {
-		public var expecting:int;
-
-		public function MismatchedTokenException(expecting:int, input:IntStream) {
-			super(input);
-			this.expecting = expecting;
-		}
-	
-		public function toString():String {
-			return "MismatchedTokenException("+getUnexpectedType()+"!="+expecting+")";
-		}
-	}
-
-	
+package org.antlr.runtime.tree {
+    import org.antlr.runtime.Token;
+    
+    
+    public class RewriteRuleTokenStream extends RewriteRuleElementStream {
+        
+        public function RewriteRuleTokenStream(adaptor:TreeAdaptor, elementDescription:String, element:Object=null) {
+            super(adaptor, elementDescription, element);
+        }
+        
+    	/** Get next token from stream and make a node for it */
+    	public function nextNode():Object {
+    		var t:Token = Token(_next());
+    		return adaptor.create(t);
+    	}
+    
+    	public function nextToken():Token {
+    		return Token(_next());
+    	}
+    
+    	/** Don't convert to a tree unless they explicitly call nextTree.
+    	 *  This way we can do hetero tree nodes in rewrite.
+    	 */
+    	protected override function toTree(el:Object):Object {
+    		return el;
+    	}
+    
+    	protected override function dup(el:Object):Object {
+    		throw new Error("dup can't be called for a token stream.");
+    	}
+        
+    }
 }

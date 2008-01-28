@@ -334,6 +334,20 @@ package org.antlr.runtime.tree {
 			return buf.toString();
 		}
 	
+    	/** Debugging */
+    	public function toTokenString(start:int, stop:int):String {
+    		if ( p==-1 ) {
+    			fillBuffer();
+    		}
+    		var buf:String = "";
+    		for (var i:int = start; i < nodes.size() && i <= stop; i++) {
+    			var t:Object = nodes[i];
+    			buf += " ";
+    			buf += adaptor.getToken(t);
+    		}
+    		return buf;
+    	}
+	
 		public function toStringRange(start:Object, stop:Object):String {
 			if ( start==null || stop==null ) {
 				return null;

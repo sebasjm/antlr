@@ -33,6 +33,9 @@ package org.antlr.runtime {
 		 *  has failed to match.  Reset to false upon valid token match.
 		 */
 		public var failed:Boolean = false;
+
+        /** Did the recognizer encounter a syntax error?  Track how many. */
+    	public var syntaxErrors:int = 0;
 	
 		/** If 0, no backtracking is going on.  Safe to exec actions etc...
 		 *  If >0 then it's the level of backtracking.

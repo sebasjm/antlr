@@ -39,10 +39,15 @@
  */
 group ASTParser;
 
+@rule.setErrorReturnValue() ::= <<
+retval.tree = <ASTLabelType>(adaptor.errorNode(input, retval.start, input.LT(-1), re));
+<! trace("<ruleName> returns "+((CommonTree)retval.tree).toStringTree()); !>
+>>
+
 // TOKEN AST STUFF
 
 /** ID and output=AST */
-tokenRef(token,label,hetero,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
@@ -54,7 +59,7 @@ adaptor.addChild(root_0, <label>_tree);
 tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 
 /** ID^ and output=AST */
-tokenRefRuleRoot(token,label,hetero,elementIndex) ::= <<
+tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
@@ -63,13 +68,13 @@ root_0 = <ASTLabelType>(adaptor.becomeRoot(<label>_tree, root_0));
 >>
 
 /** ids+=ID! and output=AST */
-tokenRefBangAndListLabel(token,label,elementIndex) ::= <<
+tokenRefBangAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
 <listLabel(elem=label,...)>
 >>
 
 /** label+=TOKEN when output=AST but not rewrite alt */
-tokenRefAndListLabel(token,label,hetero,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
@@ -166,5 +171,15 @@ createNodeFromToken(label,hetero) ::= <<
 new <hetero>(<label>) <! new MethodNode(IDLabel) !>
 <else>
 <ASTLabelType>(adaptor.create(<label>))
+<endif>
+>>
+
+ruleCleanUp() ::= <<
+<super.ruleCleanUp()>
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<if(backtracking)>if ( state.backtracking==0 ) {<\n><endif>
+retval.tree = <ASTLabelType>(adaptor.rulePostProcessing(root_0));
+adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+<if(backtracking)>}<endif>
 <endif>
 >>

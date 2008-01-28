@@ -56,10 +56,13 @@ package org.antlr.runtime {
 		/** Track the last mark() call result value for use in rewind(). */
 		protected var lastMarker:int;
 	
+	    protected var _lineDelimiter:String;
+	    
 		/** Copy data in string to a local char array */
-		public function ANTLRStringStream(input:String) {
+		public function ANTLRStringStream(input:String, lineDelimiter:String = "\n") {
 			this.data = input;
 			this.n = input.length;
+			this._lineDelimiter = lineDelimiter;
 		}
 	
 		/** Reset the stream so that it's in the same state it was
@@ -76,7 +79,7 @@ package org.antlr.runtime {
 	    public function consume():void {
 	        if ( p < n ) {
 				_charPositionInLine++;
-				if ( data.charAt(p)=='\n' ) {
+				if ( data.charAt(p)==_lineDelimiter ) {
 					_line++;
 					_charPositionInLine=0;
 				}

@@ -70,6 +70,10 @@ public class CommonToken implements Token {
 		token._index = oldToken.tokenIndex;
 		token._charPositionInLine = oldToken.charPositionInLine;
 		token._channel = oldToken.channel;
+		if ( oldToken is CommonToken ) {
+			token._start = CommonToken(oldToken).startIndex;
+			token._stop = CommonToken(oldToken).stopIndex;
+		}
 		return token;
 	}
 
