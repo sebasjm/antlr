@@ -369,8 +369,8 @@ var <ruleDescriptor.name>_StartIndex:int = input.index;
 >>
 
 ruleScopeSetUp() ::= <<
-<ruleDescriptor.useScopes:{<it>_stack.push(new <it>_scope());}; separator="\n">
-<ruleDescriptor.ruleScope:{<it.name>_stack.push(new <it.name>_scope());}; separator="\n">
+<ruleDescriptor.useScopes:{<it>_stack.push(new Object());}; separator="\n">
+<ruleDescriptor.ruleScope:{<it.name>_stack.push(new Object());}; separator="\n">
 >>
 
 ruleScopeCleanUp() ::= <<
@@ -1039,19 +1039,13 @@ setTest(ranges) ::= "<ranges; separator=\"||\">"
 
 globalAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
+protected var <scope.name>_stack:Array = new Array();<\n>
 <endif>
 >>
 
 ruleAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-protected static class <scope.name>_scope {
-    <scope.attributes:{<it.decl>;}; separator="\n">
-}
-protected Stack <scope.name>_stack = new Stack();<\n>
+protected var <scope.name>_stack:Array = new Array();<\n>
 <endif>
 >>
 
@@ -1122,12 +1116,12 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
  <if(negIndex)>
- ((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:<initValue(attr.type)>)
+ ((<scope>_stack.length-<negIndex>-1)>=0?<scope>_stack[<scope>_stack.length-<negIndex>-1].<attr.name>:<initValue(attr.type)>)
  <else>
  <if(index)>
- ((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:<initValue(attr.type)>)
+ ((<index>\<<scope>_stack.length)?<scope>_stack[<index>].<attr.name>:<initValue(attr.type)>)
  <else>
- ((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:<initValue(attr.type)>)
+ ((<scope>_stack.length>0)?<scope>_stack[<scope>_stack.length-1].<attr.name>:<initValue(attr.type)>)
  <endif>
  <endif>
 >>
@@ -1135,12 +1129,12 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 if ( <scope>_stack.length>0 ) {
 <if(negIndex)>
-((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
+<scope>_stack[<scope>_stack.length-<negIndex>-1].<attr.name> =<expr>;
 <else>
 <if(index)>
-((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name> =<expr>;
+<scope>_stack[<index>].<attr.name> =<expr>;
 <else>
-((<scope>_scope)<scope>_stack.peek()).<attr.name> =<expr>;
+<scope>_stack[<scope>_stack.length-1].<attr.name> =<expr>;
 <endif>
 <endif>
 }
