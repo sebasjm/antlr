@@ -1189,9 +1189,9 @@ tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>!=null?<scope>.tokenIndex:0
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int(<scope>.text):0)"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.start):null)"
-ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?((<labelType>)<scope>.stop):null)"
-ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>!=null?((<ASTLabelType>)<scope>.tree):null)"
+ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>!=null?(<labelType>(<scope>.start)):null)"
+ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?(<labelType>(<scope>.stop)):null)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>!=null?(<ASTLabelType>(<scope>.tree)):null)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 (<scope>!=null?(input.getTokenStream().toString(
