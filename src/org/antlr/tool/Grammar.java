@@ -2155,7 +2155,9 @@ outer:
 
 			if ( index<composite.typeToTokenList.size() ) {
 				tokenName = (String)composite.typeToTokenList.get(index);
-				if ( tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) ) {
+				if ( tokenName!=null &&
+					 tokenName.startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX) )
+				{
 					tokenName = composite.typeToStringLiteralList.get(ttype);
 				}
 			}
