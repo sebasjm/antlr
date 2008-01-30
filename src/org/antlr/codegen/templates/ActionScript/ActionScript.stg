@@ -686,9 +686,9 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-var <label>Start:int = getCharIndex();
+var <label>Start:int = charIndex;
 matchString(<string>); <checkRuleBacktrackFailure()>
-<label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, charIndex-1);
 <else>
 matchString(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -747,9 +747,9 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
  */
 lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
-var <label>Start<elementIndex>:int = getCharIndex();
+var <label>Start<elementIndex>:int = charIndex;
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-<label> = new CommonToken(input, TokenConstants.INVALID_TOKEN_TYPE, TokenConstants.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+<label> = new CommonToken(input, TokenConstants.INVALID_TOKEN_TYPE, TokenConstants.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
 <else>
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
@@ -764,9 +764,9 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 /** EOF in the lexer */
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
-var <label>Start<elementIndex>:int = getCharIndex();
+var <label>Start<elementIndex>:int = charIndex;
 match(EOF); <checkRuleBacktrackFailure()>
-var <label>:<labelType> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+var <label>:<labelType> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
 <else>
 match(EOF); <checkRuleBacktrackFailure()>
 <endif>
@@ -1194,9 +1194,9 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?(<labelType>(<scope>.s
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>!=null?(<ASTLabelType>(<scope>.tree)):null)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(<scope>!=null?(input.getTokenStream().toString(
-  input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
-  input.getTreeAdaptor().getTokenStopIndex(<scope>.start))):null)
+(<scope>!=null?(input.tokenStream.toString(
+  input.treeAdaptor.getTokenStartIndex(<scope>.start),
+  input.treeAdaptor.getTokenStopIndex(<scope>.start))):null)
 <else>
 (<scope>!=null?input.toString(<scope>.start,<scope>.stop):null)
 <endif>
@@ -1208,17 +1208,17 @@ ruleLabelPropertyRef_st(scope,attr) ::= "(<scope>!=null?<scope>.st:null)"
 lexerRuleLabel(label) ::= "<label>"
 
 lexerRuleLabelPropertyRef_type(scope,attr) ::=
-    "(<scope>!=null?<scope>.getType():0)"
+    "(<scope>!=null?<scope>.type:0)"
 lexerRuleLabelPropertyRef_line(scope,attr) ::=
-    "(<scope>!=null?<scope>.getLine():0)"
+    "(<scope>!=null?<scope>.lien:0)"
 lexerRuleLabelPropertyRef_pos(scope,attr) ::=
-    "(<scope>!=null?<scope>.getCharPositionInLine():0)"
+    "(<scope>!=null?<scope>.charPositionInLine:0)"
 lexerRuleLabelPropertyRef_channel(scope,attr) ::=
-    "(<scope>!=null?<scope>.getChannel():0)"
+    "(<scope>!=null?<scope>.channel:0)"
 lexerRuleLabelPropertyRef_index(scope,attr) ::=
-    "(<scope>!=null?<scope>.getTokenIndex():0)"
+    "(<scope>!=null?<scope>.tokenIndex:0)"
 lexerRuleLabelPropertyRef_text(scope,attr) ::=
-    "(<scope>!=null?<scope>.getText():null)"
+    "(<scope>!=null?<scope>.text:null)"
 lexerRuleLabelPropertyRef_int(scope,attr) ::=
     "(<scope>!=null?int(<scope>.text):0)"
 
@@ -1228,9 +1228,9 @@ rulePropertyRef_stop(scope,attr) ::= "(<labelType>(retval.stop))"
 rulePropertyRef_tree(scope,attr) ::= "(<ASTLabelType>(retval.tree))"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-input.getTokenStream().toString(
-  input.getTreeAdaptor().getTokenStartIndex(retval.start),
-  input.getTreeAdaptor().getTokenStopIndex(retval.start))
+input.tokenStream.toString(
+  input.treeAdaptor.getTokenStartIndex(retval.start),
+  input.treeAdaptor.getTokenStopIndex(retval.start))
 <else>
 input.toString(retval.start,input.LT(-1))
 <endif>
@@ -1244,7 +1244,7 @@ lexerRulePropertyRef_pos(scope,attr) ::= "state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
-lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
+lexerRulePropertyRef_stop(scope,attr) ::= "(charIndex-1)"
 lexerRulePropertyRef_int(scope,attr) ::= "int(<scope>.text)"
 
 // setting $st and $tree is allowed in local rule. everything else
