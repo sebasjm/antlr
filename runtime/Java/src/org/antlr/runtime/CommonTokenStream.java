@@ -341,6 +341,10 @@ public class CommonTokenStream implements TokenStream {
 		return tokenSource;
 	}
 
+	public String getSourceName() {
+		return getTokenSource().getSourceName();
+	}
+
 	public String toString() {
 		if ( p == -1 ) {
 			fillBuffer();

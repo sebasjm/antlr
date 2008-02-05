@@ -709,6 +709,8 @@ public abstract class BaseRecognizer {
 		return null;
 	}
 
+	public abstract String getSourceName();
+
 	/** A convenience method for use most often with template rewrites.
 	 *  Convert a List<Token> to List<String>
 	 */

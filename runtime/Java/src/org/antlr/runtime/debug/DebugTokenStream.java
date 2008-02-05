@@ -132,6 +132,10 @@ public class DebugTokenStream implements TokenStream {
 		return input.getTokenSource();
 	}
 
+	public String getSourceName() {
+		return getTokenSource().getSourceName();
+	}
+
 	public String toString() {
 		return input.toString();
 	}

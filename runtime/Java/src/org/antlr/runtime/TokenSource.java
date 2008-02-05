@@ -46,4 +46,9 @@ public interface TokenSource {
 	 *  until you get a good one; errors are not passed through to the parser.
 	 */
 	public Token nextToken();
+
+	/** Where are you getting tokens from? normally the implication will simply
+	 *  ask lexers input stream.
+	 */
+	public String getSourceName();
 }

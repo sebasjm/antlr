@@ -126,6 +126,10 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		return input;
 	}
 
+	public String getSourceName() {
+		return getTokenStream().getSourceName();
+	}
+
 	public TokenStream getTokenStream() {
 		return input.getTokenStream();
 	}

@@ -125,6 +125,10 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 		return this.input;
 	}
 
+	public String getSourceName() {
+		return input.getSourceName();
+	}
+
 	/** Currently does not support multiple emits per nextToken invocation
 	 *  for efficiency reasons.  Subclass and override this method and
 	 *  nextToken (to push tokens into a list and pull from that list rather

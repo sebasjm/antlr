@@ -8,12 +8,19 @@ University of San Francisco
 
 CHANGES
 
-January 17, 2007
+February 4, 2008
+
+* BACKWARD INCOMPATIBILITY
+  Added getSourceName to IntStream and TokenSource interfaces and also the
+  BaseRecognizer.  Have to know where char come from for error messages.
+  Widespread change, but a trivial one. 
+
+January 17, 2008
 
 * Interpreter throws FailedPredicateException now when it sees a predicate;
   before it was silently failing.  I'll make it work one of these days. ;)
 
-January 12, 2007
+January 12, 2008
 
 * Copy ctor not copying start and stop for common token. Fixes ANTLR-212
 
@@ -59,7 +66,7 @@ January 12, 2007
 * Added unit tests to TestAutoAST and copied to TestRewriteAST with
   suitable rewrites to ensure basic error node insertion works.
 
-January 11, 2007
+January 11, 2008
 
 * Adding errorNode to TreeAdaptor and various debug
   events/listeners.  Had to add new class runtime.tree.CommonErrorNode
@@ -71,7 +78,7 @@ January 11, 2007
 * Updated ANTLRWorks to show error nodes in tree as much as I could; Jean
   will get to rest of it.
 
-January 9-10, 2007
+January 9-10, 2008
 
 * Continued work on debugging/profiling composite grammars.
 
@@ -85,7 +92,7 @@ January 9-10, 2007
   http://www.antlr.org/wiki/pages/viewpage.action?pageId=5341230
   http://www.antlr.org/wiki/pages/viewpage.action?pageId=5341217
 
-January 1-8, 2007
+January 1-8, 2008
 
 * Making debugging/profiling work with composite grammars.
 

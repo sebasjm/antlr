@@ -113,4 +113,10 @@ public interface IntStream {
 	 *  value includes a single EOF.
 	 */
 	int size();
+
+	/** Where are you getting symbols from?  Normally, implementations will
+	 *  pass the buck all the way to the lexer who can ask its input stream
+	 *  for the file name or whatever.
+	 */
+	public String getSourceName();
 }

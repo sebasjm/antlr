@@ -63,6 +63,9 @@ public class ANTLRStringStream implements CharStream {
 	/** Track the last mark() call result value for use in rewind(). */
 	protected int lastMarker;
 
+	/** What is name or source of this char stream? */
+	public String name;
+
 	public ANTLRStringStream() {
 	}
 
@@ -217,5 +220,9 @@ public class ANTLRStringStream implements CharStream {
 
 	public void setCharPositionInLine(int pos) {
 		this.charPositionInLine = pos;
+	}
+
+	public String getSourceName() {
+		return name;
 	}
 }

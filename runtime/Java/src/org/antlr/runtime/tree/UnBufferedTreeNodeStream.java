@@ -197,6 +197,10 @@ public class UnBufferedTreeNodeStream implements TreeNodeStream {
 		return root;
 	}
 
+	public String getSourceName() {
+		return getTokenStream().getSourceName();
+	}
+
 	public TokenStream getTokenStream() {
 		return tokens;
 	}

@@ -65,6 +65,10 @@ public class TreeParser extends BaseRecognizer {
 		return input;
 	}
 
+	public String getSourceName() {
+		return input.getSourceName();
+	}
+
 	/** Match '.' in tree parser has special meaning.  Skip node or
 	 *  entire tree if node has children.  If children, scan until
 	 *  corresponding UP node.

@@ -61,6 +61,10 @@ public class Parser extends BaseRecognizer {
 		return input;
 	}
 
+	public String getSourceName() {
+		return input.getSourceName();
+	}
+	
 	public void traceIn(String ruleName, int ruleIndex)  {
 		super.traceIn(ruleName, ruleIndex, input.LT(1));
 	}
