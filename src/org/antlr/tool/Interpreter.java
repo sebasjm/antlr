@@ -432,4 +432,9 @@ public class Interpreter implements TokenSource {
 		System.err.println("problem matching token at "+
 			cs.getLine()+":"+cs.getCharPositionInLine()+" "+re.getClass().getName());
 	}
+
+	public String getSourceName() {
+		return input.getSourceName();
+	}
+
 }
