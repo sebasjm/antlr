@@ -60,7 +60,7 @@ public class Tool {
 
 	public static boolean internalOption_PrintGrammarTree = false;
 	public static boolean internalOption_PrintDFA = false;
-	public static boolean internalOption_ShowNFConfigsInDFA = false;
+	public static boolean internalOption_ShowNFAConfigsInDFA = false;
 	public static boolean internalOption_watchNFAConversion = false;
 
 	public static void main(String[] args) {
@@ -185,7 +185,7 @@ public class Tool {
 				DFAOptimizer.MERGE_STOP_STATES = false;
 			}
 			else if (args[i].equals("-Xdfaverbose")) {
-				internalOption_ShowNFConfigsInDFA = true;
+				internalOption_ShowNFAConfigsInDFA = true;
 			}
 			else if (args[i].equals("-Xwatchconversion")) {
 				internalOption_watchNFAConversion = true;

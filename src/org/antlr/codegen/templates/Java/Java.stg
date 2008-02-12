@@ -699,6 +699,8 @@ else {
 }<\n>
 >>
 
+matchRuleBlockSet ::= matchSet
+
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
 <listLabel(elem=label,...)>

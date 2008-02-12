@@ -380,6 +380,67 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("", found);
 	}
 
+	public void testSetMatchNoRewrite() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : b INT\n" +
+			"  ;\n" +
+			"b : ID | INT ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+		assertEquals("abc 34\n", found);
+	}
+
+
+	public void testSetMatchNoRewriteLevel2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=ID INT -> ^($x INT);\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : ^(ID (ID | INT) ) ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+		assertEquals("(abc 34)\n", found);
+	}
+
+	public void testSetMatchNoRewriteLevel2Root() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : x=ID INT -> ^($x INT);\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : ^((ID | INT) INT) ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+		assertEquals("(abc 34)\n", found);
+	}
+
+
 	// REWRITE MODE
 
 	public void testRewriteModeCombinedRewriteAndAuto() throws Exception {

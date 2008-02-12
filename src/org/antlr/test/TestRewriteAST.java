@@ -969,6 +969,34 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("2 34 a de\n", found);
 	}
 
+	public void testSet2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options { output = AST; } \n" +
+			"a: (INT|ID) -> INT? ID? ;\n" +
+			"INT: '0'..'9'+;\n" +
+			"ID : 'a'..'z'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "2", debug);
+		assertEquals("2\n", found);
+	}
+
+	public void testSetWithLabel() throws Exception {
+		// FAILS. The should probably generate a warning from antlr
+		// See http://www.antlr.org:8888/browse/ANTLR-162
+		String grammar =
+			"grammar T;\n" +
+			"options { output = AST; } \n" +
+			"a : x=(INT|ID) -> $x ;\n" +
+			"INT: '0'..'9'+;\n" +
+			"ID : 'a'..'z'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "2", debug);
+		assertEquals("2\n", found);
+	}
+
 	public void testRewriteAction() throws Exception {
 		String grammar =
 			"grammar T; \n" +

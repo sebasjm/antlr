@@ -76,7 +76,7 @@ public class DOTGenerator {
 			dot.setAttribute("startState",
 					Utils.integer(startState.stateNumber));
 			dot.setAttribute("useBox",
-							 Boolean.valueOf(Tool.internalOption_ShowNFConfigsInDFA));
+							 Boolean.valueOf(Tool.internalOption_ShowNFAConfigsInDFA));
 			walkCreatingDFADOT(dot, (DFAState)startState);
         }
         else {
@@ -313,7 +313,7 @@ public class DOTGenerator {
             StringBuffer buf = new StringBuffer(250);
 			buf.append('s');
 			buf.append(s.stateNumber);
-			if ( Tool.internalOption_ShowNFConfigsInDFA ) {
+			if ( Tool.internalOption_ShowNFAConfigsInDFA ) {
 				if ( s instanceof DFAState ) {
 					if ( ((DFAState)s).abortedDueToRecursionOverflow ) {
 						buf.append("\\n");

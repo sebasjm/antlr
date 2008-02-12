@@ -43,13 +43,29 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object dupTree(Object tree) {
-		// TODO: do these need to be sent to dbg?
-		return adaptor.dupTree(tree);
+		Object t = adaptor.dupTree(tree);
+		// walk the tree and emit create and add child events
+		// to simulate what dupTree has done. dupTree does not call this debug
+		// adapter so I must simulate.
+		simulateTreeConstruction(t);
+		return t;
+	}
+
+	/** ^(A B C): emit create A, create B, add child, ...*/
+	protected void simulateTreeConstruction(Object t) {
+		dbg.createNode(t);
+		int n = adaptor.getChildCount(t);
+		for (int i=0; i<n; i++) {
+			Object child = adaptor.getChild(t, i);
+			simulateTreeConstruction(child);
+			dbg.addChild(t, child);
+		}
 	}
 
 	public Object dupNode(Object treeNode) {
-		// TODO: do these need to be sent to dbg?
-		return adaptor.dupNode(treeNode);
+		Object d = adaptor.dupNode(treeNode);
+		dbg.createNode(d);
+		return d;
 	}
 
 	public Object nil() {

@@ -511,6 +511,7 @@ block[String blockTemplateName, DFA dfa]
 
 setBlock returns [StringTemplate code=null]
 {
+StringTemplate setcode = null;
 if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
     Rule r = grammar.getRule(currentRuleName);
     currentAltHasASTRewrite = r.hasRewrite(outerAltNum);
@@ -521,9 +522,13 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
 }
     :   s:BLOCK
         {
-        StringTemplate setcode =
-            getTokenElementST("matchSet", "set", #s, null, null);
         int i = ((TokenWithIndex)#s.getToken()).getIndex();
+		if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL ) {
+			setcode = getTokenElementST("matchRuleBlockSet", "set", #s, null, null);
+		}
+		else {
+			setcode = getTokenElementST("matchSet", "set", #s, null, null);
+		}
 		setcode.setAttribute("elementIndex", i);
 		if ( grammar.type!=Grammar.LEXER ) {
 			generator.generateLocalFOLLOW(#s,"set",currentRuleName,i);
