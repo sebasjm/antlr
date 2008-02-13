@@ -13,8 +13,8 @@
  */
 typedef	struct ANTLR3_PARSER_struct
 {
-    /** All superstructre implementors of this interface require a pointer to theirselves,
-     *  whcih they can refernce using the super pointer here.
+    /** All superstructure implementers of this interface require a pointer to their selves,
+     *  which they can reference using the super pointer here.
      */
     void			* super;
 
@@ -23,17 +23,23 @@ typedef	struct ANTLR3_PARSER_struct
      *  easier way than copying the interface all over the place. Macros hide this
      *  for the generated code so it is easier on the eye (though not the debugger ;-).
      */
-    pANTLR3_BASE_RECOGNIZER	rec;
+    pANTLR3_BASE_RECOGNIZER			rec;
 
     /** A provider of a tokenstream interface, for the parser to consume
      *  tokens from.
      */
-    pANTLR3_TOKEN_STREAM	tstream;
+    pANTLR3_TOKEN_STREAM			tstream;
+
+	/** A pointer to a function that installs a debugger object (it also
+	 *  installs the debugging versions of the parser methods. This means that 
+	 *  a non debug parser incurs no overhead because of the debugging stuff.
+	 */
+	void					(*setDebugListener)	(struct ANTLR3_PARSER_struct	* parser, pANTLR3_DEBUG_EVENT_LISTENER dbg);
 
     /** A pointer to a function that installs a token stream 
      * for the parser.
      */
-    void			(*setTokenStream)	(struct ANTLR3_PARSER_struct	* parser, pANTLR3_TOKEN_STREAM);
+    void					(*setTokenStream)	(struct ANTLR3_PARSER_struct	* parser, pANTLR3_TOKEN_STREAM);
 
     /** A pointer to a function that returns the token stream for this 
      *  parser.

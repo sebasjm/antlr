@@ -59,7 +59,7 @@ static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
 static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
 static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
 static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *));
-static	ANTLR3_INT32    antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
+static	ANTLR3_INT32    antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
 static	ANTLR3_UINT64   antlr3VectorSize    (pANTLR3_VECTOR vector);
 
 static  void		closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory);
@@ -959,15 +959,15 @@ antlr3StackPop	(pANTLR3_STACK	stack)
 {
     // Delete the element that is currently at the top of the stack
     //
-    stack->vector->del(stack->vector, stack->vector->count);
+    stack->vector->del(stack->vector, stack->vector->count - 1);
 
     // And get the element that is the now the top of the stack (if anything)
     // NOTE! This is not quite like a 'real' stack, which would normally return you
     // the current top of the stack, then remove it from the stack.
-    // TODO: Review this, it is correct for followsets which is waht this was done for
+    // TODO: Review this, it is correct for followsets which is what this was done for
     //       but is not as obvious when using it as a 'real'stack.
     //
-    stack->top = stack->vector->get(stack->vector, stack->vector->count);
+    stack->top = stack->vector->get(stack->vector, stack->vector->count - 1);
     return stack->top;
 }
 
@@ -993,292 +993,284 @@ antlr3StackPush	(pANTLR3_STACK stack, void * element, void (ANTLR3_CDECL *freept
 ANTLR3_API  pANTLR3_VECTOR
 antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 {
-    ANTLR3_UINT32   initialSize;
-    pANTLR3_VECTOR  vector;
+	ANTLR3_UINT32   initialSize;
+	pANTLR3_VECTOR  vector;
 
-    /* Allow vectors to be guessed by ourselves, so input size can be zero
-     */
-    if	(sizeHint > 0)
-    {
-	initialSize = sizeHint;
-    }
-    else
-    {
-	initialSize = 8;
-    }
+	// Allow vectors to be guessed by ourselves, so input size can be zero
+	//
+	if	(sizeHint > 0)
+	{
+		initialSize = sizeHint;
+	}
+	else
+	{
+		initialSize = 8;
+	}
 
-    /* Allocate memory for the vector structure itself
-     */
-    vector  = (pANTLR3_VECTOR) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR)));
+	// Allocate memory for the vector structure itself
+	//
+	vector  = (pANTLR3_VECTOR) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR)));
 
-    if	(vector == NULL)
-    {
-	return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(vector == NULL)
+	{
+		return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Now fill in the defaults
-     */
-    vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
+	// Now fill in the defaults
+	//
+	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
 
-    if	(vector->elements == NULL)
-    {
-	ANTLR3_FREE(vector);
-	return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(vector->elements == NULL)
+	{
+		ANTLR3_FREE(vector);
+		return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Memory allocated succesfully
-     */
-    vector->count	    = 0;	    /* No entries yet of course	*/
-    vector->elementsSize    = initialSize;  /* Available entries	*/
+	// Memory allocated successfully
+	//
+	vector->count			= 0;			// No entries yet of course
+	vector->elementsSize    = initialSize;  // Available entries
 
-    /* Now we can install the API
-     */
-    vector->add	    = antlr3VectorAdd;
-    vector->del	    = antlr3VectorDel;
-    vector->get	    = antlr3VectorGet;
-    vector->free    = antlr3VectorFree;
-    vector->get	    = antlr3VectorGet;
-    vector->put	    = antlr3VectorPut;
-    vector->remove  = antrl3VectorRemove;
-    vector->size    = antlr3VectorSize;
+	// Now we can install the API
+	//
+	vector->add	    = antlr3VectorAdd;
+	vector->del	    = antlr3VectorDel;
+	vector->get	    = antlr3VectorGet;
+	vector->free    = antlr3VectorFree;
+	vector->set	    = antlr3VectorSet;
+	vector->remove  = antrl3VectorRemove;
+	vector->size    = antlr3VectorSize;
 
-    /** Assume that this is not a factory made vector
-     */
-    vector->factoryMade	= ANTLR3_FALSE;
+	// Assume that this is not a factory made vector
+	//
+	vector->factoryMade	= ANTLR3_FALSE;
 
-    /* And everything is hunky dory
-     */
-    return  vector;
+	// And everything is hunky dory
+	//
+	return  vector;
 }
 
 static	
 void	ANTLR3_CDECL	antlr3VectorFree    (pANTLR3_VECTOR vector)
 {
-    ANTLR3_UINT64   entry;
+	ANTLR3_UINT64   entry;
 
-    /* We must traverse every entry in the vector and if it has
-     * a pointer to a free fucntion then we call it with the
-     * the entry pointer
-     */
-    for	(entry = 0; entry < vector->count; entry++)
-    {
-	if  (vector->elements[entry].freeptr != NULL)
+	// We must traverse every entry in the vector and if it has
+	// a pointer to a free function then we call it with the
+	// the entry pointer
+	//
+	for	(entry = 0; entry < vector->count; entry++)
 	{
-	    vector->elements[entry].freeptr(vector->elements[entry].element);
+		if  (vector->elements[entry].freeptr != NULL)
+		{
+			vector->elements[entry].freeptr(vector->elements[entry].element);
+		}
+		vector->elements[entry].freeptr    = NULL;
+		vector->elements[entry].element    = NULL;
 	}
-	vector->elements[entry].freeptr    = NULL;
-	vector->elements[entry].element    = NULL;
-    }
 
-    if	(vector->factoryMade == ANTLR3_FALSE)
-    {
-	/* The entries are freed, so free the element allocation
-	 */
-	ANTLR3_FREE(vector->elements);
-	vector->elements = NULL;
+	if	(vector->factoryMade == ANTLR3_FALSE)
+	{
+		// The entries are freed, so free the element allocation
+		//
+		ANTLR3_FREE(vector->elements);
+		vector->elements = NULL;
 
-	/* Finally, free the allocation for the vector itself
-	 */
-	ANTLR3_FREE(vector);
-    }
-
+		// Finally, free the allocation for the vector itself
+		//
+		ANTLR3_FREE(vector);
+	}
 }
 
 static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 {
-    /* Check this is a valid request first (index is 1 based!!)
-     */
-    if	(entry == 0 || entry > vector->count)
-    {
-	return;
-    }
+	// Check this is a valid request first
+	//
+	if	(entry >= vector->count)
+	{
+		return;
+	}
 
-    /* Valid request, check for free pointer and call it if present
-     */
-    
-    if	(vector->elements[entry-1].freeptr != NULL)
-    {
-	vector->elements[entry-1].freeptr(vector->elements[entry-1].element);
-	vector->elements[entry-1].freeptr    = NULL;
-    }
+	// Valid request, check for free pointer and call it if present
+	//
+	if	(vector->elements[entry].freeptr != NULL)
+	{
+		vector->elements[entry].freeptr(vector->elements[entry-1].element);
+		vector->elements[entry].freeptr    = NULL;
+	}
 
-    if	(entry == vector->count)
-    {
-	/* Ensure the pointer is never reused by accident, but othewise just 
-	 * decrement the pointer.
-	 */
-	vector->elements[entry-1].element    = NULL;
-    }
-    else
-    {
-	/* Need to shuffle trailing pointers back over the deleted entry
-	 */
-	ANTLR3_MEMMOVE(vector->elements + entry - 1, vector->elements + entry, sizeof(ANTLR3_VECTOR_ELEMENT) * (vector->count - entry));
-    }
+	if	(entry == vector->count - 1)
+	{
+		// Ensure the pointer is never reused by accident, but otherwise just 
+		// decrement the pointer.
+		//
+		vector->elements[entry].element    = NULL;
+	}
+	else
+	{
+		// Need to shuffle trailing pointers back over the deleted entry
+		//
+		ANTLR3_MEMMOVE(vector->elements + entry, vector->elements + entry + 1, sizeof(ANTLR3_VECTOR_ELEMENT) * (vector->count - entry - 1));
+	}
 
-    /* One less entry in the vector now
-     */
-    vector->count--;
+	// One less entry in the vector now
+	//
+	vector->count--;
 }
 
 static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 {
-    /* Ensure this is a valid request
-     */
-    if	(entry <= vector->count && entry > 0)
-    {
-	return	vector->elements[entry - 1].element;	/* Index is 1 based, storage is 0 based */
-    }
-    else
-    {
-	/* I know nothing, Mr. Fawlty!
-	 */
-	return	NULL;
-    }
+	// Ensure this is a valid request
+	//
+	if	(entry < vector->count)
+	{
+		return	vector->elements[entry].element;
+	}
+	else
+	{
+		// I know nothing, Mr. Fawlty!
+		//
+		return	NULL;
+	}
 }
 
-/** Remove the entry from the vector, but do not free any entry, even if it has
- * a free pointer.
- */
+/// Remove the entry from the vector, but do not free any entry, even if it has
+/// a free pointer.
+///
 static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 {
-    void * element;
+	void * element;
 
-    /* Check this is a valid request first (index is 1 based!!)
-     */
-    if	(entry == 0 || entry > vector->count)
-    {
-	return NULL;
-    }
+	// Check this is a valid request first (index is 1 based!!)
+	//
+	if	(entry >= vector->count)
+	{
+		return NULL;
+	}
 
-    /* Valid request, return the sorted pointer
-     */
+	// Valid request, return the sorted pointer
+	//
 
-    element				    = vector->elements[entry-1].element;
+	element				    = vector->elements[entry-1].element;
 
-    if	(entry == vector->count)
-    {
-	/* Ensure the pointer is never reused by accident, but otherwise just 
-	 * decrement the pointer.
-	 */
-	vector->elements[entry-1].element    = NULL;
-	vector->elements[entry-1].freeptr    = NULL;
-    }
-    else
-    {
-	/* Need to shuffle trailing pointers back over the deleted entry
-	 */
-	ANTLR3_MEMMOVE(vector->elements + entry - 1, vector->elements + entry, sizeof(ANTLR3_VECTOR_ELEMENT) * (vector->count - entry));
-    }
+	if	(entry == vector->count)
+	{
+		// Ensure the pointer is never reused by accident, but otherwise just 
+		// decrement the pointer.
+		///
+		vector->elements[entry].element    = NULL;
+		vector->elements[entry].freeptr    = NULL;
+	}
+	else
+	{
+		// Need to shuffle trailing pointers back over the deleted entry
+		//
+		ANTLR3_MEMMOVE(vector->elements + entry, vector->elements + entry + 1, sizeof(ANTLR3_VECTOR_ELEMENT) * (vector->count - entry - 1));
+	}
 
-    /* One less entry in the vector now
-     */
-    vector->count--;
+	// One less entry in the vector now
+	//
+	vector->count--;
 
-    return  element;
+	return  element;
 }
 
 static  void
 antlr3VectorResize  (pANTLR3_VECTOR vector, ANTLR3_UINT64 hint)
 {
-    	ANTLR3_UINT64	newSize;
+	ANTLR3_UINT64	newSize;
 
-	/* Need to resize the element pointers. We double the allocation
-	 * unless we have reached 1024 elements, in which case we just
-	 * add another 1024. I may tune this or make it tunable later.
-	 */
+	// Need to resize the element pointers. We double the allocation
+	// unless we have reached 1024 elements, in which case we just
+	// add another 1024. I may tune this or make it tunable later.
+	//
 	if  (vector->elementsSize > 1024)
 	{
-	    if (hint == 0)
-	    {
-		newSize = vector->elementsSize + 1024;
-	    }
-	    else
-	    {
-		newSize = hint + 1024;
-	    }
+		if (hint == 0 || hint < vector->elementsSize)
+		{
+			newSize = vector->elementsSize + 1024;
+		}
+		else
+		{
+			newSize = vector->elementsSize + hint + 1024;
+		}
 	}
 	else
 	{
-	    if (hint == 0)
-	    {
-		newSize = vector->elementsSize * 2;
-	    }
-	    else
-	    {
-		newSize = hint * 2;	// Add twice what we were asked for
-	    }
+		if (hint == 0 || hint < vector->elementsSize)
+		{
+			newSize = vector->elementsSize * 2;
+		}
+		else
+		{
+			newSize = hint * 2;
+		}
 	}
 
-	/* Use realloc so that the pointers are copied for us
-	 */
+	// Use realloc so that the pointers are copied for us
+	//
 	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_REALLOC(vector->elements, (sizeof(ANTLR3_VECTOR_ELEMENT)* newSize));
-	/* Reset new pointers etc to 0
-	 */
+
+	// Reset new pointers etc to 0
+	//
 	ANTLR3_MEMSET(vector->elements + vector->elementsSize, 0x00, (newSize - vector->elementsSize) * sizeof(ANTLR3_VECTOR_ELEMENT));
 	vector->elementsSize	= newSize;
 }
 
-/* Add the supplied pointer and freeing function pointer to the list,
- * explanding the vector if needed.
- */
+/// Add the supplied pointer and freeing function pointer to the list,
+/// explanding the vector if needed.
+///
 static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
-    /* Do we need to resize the vector table?
-     */
-    if	(vector->count == vector->elementsSize)
-    {
-	antlr3VectorResize(vector, 0);	    // Give no hint, we let it add 1024 or double it
-    }
+	// Do we need to resize the vector table?
+	//
+	if	(vector->count == vector->elementsSize)
+	{
+		antlr3VectorResize(vector, 0);	    // Give no hint, we let it add 1024 or double it
+	}
 
-    /* Insert the new entry
-     */
-    vector->elements[vector->count].element	= element;
-    vector->elements[vector->count].freeptr	= freeptr;
+	// Insert the new entry
+	//
+	vector->elements[vector->count].element	= element;
+	vector->elements[vector->count].freeptr	= freeptr;
 
-    vector->count++;	    /* One more element counted	*/
+	vector->count++;	    // One more element counted
 
-    return  (ANTLR3_UINT32)(vector->count);
+	return  (ANTLR3_UINT32)(vector->count);
 
 }
 
-/* Replace the element at the specified entry point with the supplied
- * entry.
- */
+/// Replace the element at the specified entry point with the supplied
+/// entry.
+///
 static	ANTLR3_INT32    
-antlr3VectorPut	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting)
+antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting)
 {
-    /* Validate first
-     */
-    if	(entry == 0)
-    {
-	return	-1;
-    }
 
-    /* If the vector is currently not big enough, then we expand it
-     */
-    if (entry >= vector->elementsSize)
-    {
-	antlr3VectorResize(vector, entry);	// We will get at least this many 
-    }
+	// If the vector is currently not big enough, then we expand it
+	//
+	if (entry >= vector->elementsSize)
+	{
+		antlr3VectorResize(vector, entry);	// We will get at least this many 
+	}
 
-    /* Valid request, replace the current one, freeing any preior entry if told to
-     */
-    if	(freeExisting && vector->elements[entry-1].freeptr != NULL)
-    {
-	vector->elements[entry-1].freeptr(vector->elements[entry-1].element);
-    }
+	// Valid request, replace the current one, freeing any prior entry if told to
+	//
+	if	(freeExisting && vector->elements[entry].freeptr != NULL)
+	{
+		vector->elements[entry].freeptr(vector->elements[entry].element);
+	}
 
-    /* Install the new pointers
-     */
-    vector->elements[entry-1].freeptr    = freeptr;
-    vector->elements[entry-1].element	= element;
+	// Install the new pointers
+	//
+	vector->elements[entry].freeptr	= freeptr;
+	vector->elements[entry].element	= element;
 
-    if (entry > vector->count)
-    {
-	vector->count = entry;
-    }
-    return  (ANTLR3_UINT32)(entry);	    /* Indicates the replacement was successful	*/
+	if (entry >= vector->count)
+	{
+		vector->count = entry + 1;
+	}
+	return  (ANTLR3_UINT32)(entry);	    // Indicates the replacement was successful
 
 }
 
@@ -1287,102 +1279,102 @@ static	ANTLR3_UINT64   antlr3VectorSize    (pANTLR3_VECTOR vector)
     return  vector->count;
 }
 
-/** Vector factory creation
- */
+/// Vector factory creation
+///
 ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 sizeHint)
 {
-    pANTLR3_VECTOR_FACTORY  factory;
+	pANTLR3_VECTOR_FACTORY  factory;
 
-    /* Allocate memory for the factory
-     */
-    factory = (pANTLR3_VECTOR_FACTORY)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_FACTORY)));
+	// Allocate memory for the factory
+	//
+	factory = (pANTLR3_VECTOR_FACTORY)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_FACTORY)));
 
-    if	(factory == NULL)
-    {
-	return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(factory == NULL)
+	{
+		return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Factory memory is good, so create a new vector
-     */
-    if	(sizeHint == 0)
-    {
-	sizeHint = 64;
-    }
+	// Factory memory is good, so create a new vector
+	//
+	if	(sizeHint == 0)
+	{
+		sizeHint = 64;
+	}
 
-    /* Create the vector if possible
-     */
-    factory->vectors	= antlr3VectorNew(sizeHint);
+	// Create the vector if possible
+	//
+	factory->vectors	= antlr3VectorNew(sizeHint);
 
-    if	(factory->vectors == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
-    {
-	ANTLR3_FREE(factory);
-	return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(factory->vectors == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+	{
+		ANTLR3_FREE(factory);
+		return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	}
 
-    /* Install the API
-     */
-    factory->close	= closeVectorFactory;
-    factory->newVector	= newVector;
+	// Install the API
+	//
+	factory->close		= closeVectorFactory;
+	factory->newVector	= newVector;
 
-    return  factory;
+	return  factory;
 }
 
 static  void		
 closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory)
 {
-    ANTLR3_UINT64   entry;
-    pANTLR3_VECTOR  vector;
-    pANTLR3_VECTOR  freeVector;
+	ANTLR3_UINT64   entry;
+	pANTLR3_VECTOR  vector;
+	pANTLR3_VECTOR  freeVector;
 
-    /** First we iterate the vectors in the factory and call
-     *  free on each of them. Because they are factory made only
-     *  any installed free pointers for the entries will be called
-     *  and we will be left with just those vectors that were factory made
-     *  to delete the memory allocations for. These are the elment list
-     *  itself.
-     */
-    vector  = factory->vectors;
+	// First we iterate the vectors in the factory and call
+	// free on each of them. Because they are factory made only
+	// any installed free pointers for the entries will be called
+	// and we will be left with just those vectors that were factory made
+	// to delete the memory allocations for. These are the element list
+	// itself.
+	//
+	vector  = factory->vectors;
 
-    /* We must traverse every entry in the vector and if it has
-     * a pointer to a free function then we call it with the
-     * the entry pointer
-     */
-    for	(entry = 0; entry < vector->count; entry++)
-    {
-	if  (vector->elements[entry].freeptr != NULL)
+	// We must traverse every entry in the vector and if it has
+	// a pointer to a free function then we call it with the
+	// the entry pointer
+	//
+	for	(entry = 0; entry < vector->count; entry++)
 	{
-	    vector->elements[entry].freeptr(vector->elements[entry].element);
+		if  (vector->elements[entry].freeptr != NULL)
+		{
+			vector->elements[entry].freeptr(vector->elements[entry].element);
+		}
 	}
-    }
 
-    /* Having called free on each of the vectors in the vector factory,
-     * anything that was somewhere buried in the vectors in the factory that
-     * was not factory made, is now deallocated. So, we now need only
-     * traverse each vector in the factory and free its elements, then free this
-     * factory vector.
-     */
-    for	(entry = 0; entry < vector->count; entry++)
-    {
-	freeVector  = (pANTLR3_VECTOR)(vector->elements[entry].element);
-
-	/* Anything in here should be factory made, but we do this just
-	 * to triple check.
-	 */
-	if  (freeVector->factoryMade == ANTLR3_TRUE)
+	// Having called free on each of the vectors in the vector factory,
+	// anything that was somewhere buried in the vectors in the factory that
+	// was not factory made, is now de-allocated. So, we now need only
+	// traverse each vector in the factory and free its elements, then free this
+	// factory vector.
+	//
+	for	(entry = 0; entry < vector->count; entry++)
 	{
-	    ANTLR3_FREE(freeVector->elements);
-	    ANTLR3_FREE(freeVector);
+		freeVector  = (pANTLR3_VECTOR)(vector->elements[entry].element);
+
+		// Anything in here should be factory made, but we do this just
+		// to triple check.
+		//
+		if  (freeVector->factoryMade == ANTLR3_TRUE)
+		{
+			ANTLR3_FREE(freeVector->elements);
+			ANTLR3_FREE(freeVector);
+		}
 	}
-    }
 
-    /* Free the memory for the factory vector elements, then the factory vector
-     */
-    ANTLR3_FREE(vector->elements);
-    ANTLR3_FREE(vector);
+	// Free the memory for the factory vector elements, then the factory vector
+	//
+	ANTLR3_FREE(vector->elements);
+	ANTLR3_FREE(vector);
 
-    /* Now free the memory for the factory itself
-     */
-    ANTLR3_FREE(factory);
+	// Now free the memory for the factory itself
+	//
+	ANTLR3_FREE(factory);
 }
 
 static	pANTLR3_VECTOR  
@@ -1390,8 +1382,8 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
 {
     pANTLR3_VECTOR  vector;
 
-    /* Attempt to create a new vector of default size
-     */
+    // Attempt to create a new vector of default size
+    //
     vector  = antlr3VectorNew(0);
 
     if	(vector == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
@@ -1399,9 +1391,9 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
 	return vector;
     }
 
-    /* Now add this vector to the factory vector, which will
-     * track it and release any entries in it when we close the factory.
-     */
+    // Now add this vector to the factory vector, which will
+    // track it and release any entries in it when we close the factory.
+    //
     vector->factoryMade	= ANTLR3_TRUE;
     factory->vectors->add(factory->vectors, (void *)vector, (void (ANTLR3_CDECL *)(void *))(vector->free));
 

@@ -342,7 +342,7 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
      */
     input->markDepth++;
 
-    /* See if we are revisiting a mark as we can just reuse the hashtable
+    /* See if we are revisiting a mark as we can just reuse the vector
      * entry if we are, otherwise, we need a new one
      */
     if	(input->markDepth > input->markers->count)
@@ -355,7 +355,7 @@ antlr3AsciiMark	(pANTLR3_INT_STREAM is)
     }
     else
     {
-	state	= (pANTLR3_LEX_STATE)input->markers->get(input->markers, input->markDepth);
+	state	= (pANTLR3_LEX_STATE)input->markers->get(input->markers, input->markDepth - 1);
 
 	/* Assume no errors for speed, it will just blow up if the table failed
 	 * for some reasons, hence lots of unit tests on the tables ;-)
@@ -410,7 +410,7 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 
     /* Find the supplied mark state 
      */
-    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, mark);
+    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, mark - 1);
 
     /* Seek input pointer to the requested point (note we supply the void *pointer
      * to whatever is implementing the int stream to seek).

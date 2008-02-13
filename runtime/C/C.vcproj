@@ -767,6 +767,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\antlr3convertutf.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\antlr3cyclicdfa.c"
 				>
 			</File>
@@ -873,6 +877,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\antlr3convertutf.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\antlr3cyclicdfa.h"
 				>
 			</File>
@@ -926,6 +934,10 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3parsetree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\antlr3recognizersharedstate.h"
 				>
 			</File>
 			<File

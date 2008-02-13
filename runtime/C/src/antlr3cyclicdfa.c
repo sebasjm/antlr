@@ -22,15 +22,15 @@
 static void
 noViableAlt(pANTLR3_BASE_RECOGNIZER rec, pANTLR3_CYCLIC_DFA cdfa, ANTLR3_UINT32	s)
 {
-    if	(rec->backtracking > 0)
+    if	(rec->state->backtracking > 0)
     {
-	rec->failed = ANTLR3_TRUE;
+		rec->state->failed = ANTLR3_TRUE;
     }
     rec->exConstruct(rec);
-    rec->exception->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-    rec->exception->message      = cdfa->description;
-    rec->exception->decisionNum  = cdfa->decisionNumber;
-    rec->exception->state        = s;
+    rec->state->exception->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+    rec->state->exception->message      = cdfa->description;
+    rec->state->exception->decisionNum  = cdfa->decisionNumber;
+    rec->state->exception->state        = s;
 }
 
 /** From the input stream, predict what alternative will succeed
@@ -68,7 +68,7 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
 				// If the predicate/rule raised an exception then we leave it
 				// in tact, else we have an NVA.
 				//
-				if	(rec->error != ANTLR3_TRUE)
+				if	(rec->state->error != ANTLR3_TRUE)
 				{
 					noViableAlt(rec,cdfa, s);
 				}

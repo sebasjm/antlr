@@ -53,8 +53,10 @@ static    pANTLR3_STRING    subString8	(pANTLR3_STRING string, ANTLR3_UINT32 sta
 static    pANTLR3_STRING    subString16	(pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 endIndex);
 static	  ANTLR3_INT32	    toInt32_8	(pANTLR3_STRING string);
 static	  ANTLR3_INT32	    toInt32_16  (pANTLR3_STRING string);
-static	  pANTLR3_STRING    to8_8	(pANTLR3_STRING string);
-static	  pANTLR3_STRING    to8_16	(pANTLR3_STRING string);
+static	  pANTLR3_STRING    to8_8		(pANTLR3_STRING string);
+static	  pANTLR3_STRING    to8_16		(pANTLR3_STRING string);
+static	pANTLR3_STRING		toUTF8_8	(pANTLR3_STRING string);
+static	pANTLR3_STRING		toUTF8_16	(pANTLR3_STRING string);
 
 /* Local helpers
  */
@@ -79,7 +81,7 @@ antlr3StringFactoryNew()
     /* Now we make a new list to track the strings.
      */
     factory->strings	= antlr3VectorNew(0);
-    factory->index	= 1;
+    factory->index	= 0;
 
     if	(factory->strings == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
@@ -104,7 +106,7 @@ antlr3StringFactoryNew()
     return  factory;
 }
 
-/** Create a string factory that is UCS2 (16 bit) encodingn based
+/** Create a string factory that is UCS2 (16 bit) encoding based
  */
 ANTLR3_API pANTLR3_STRING_FACTORY 
 antlr3UCS2StringFactoryNew()
@@ -163,7 +165,7 @@ newRaw8	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree), ANTLR3_TRUE);
+    factory->strings->set(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree), ANTLR3_TRUE);
     string->index   = factory->index++;
 
     return string;
@@ -192,7 +194,7 @@ newRaw16	(pANTLR3_STRING_FACTORY factory)
 
     /* Add the string into the allocated list
      */
-    factory->strings->put(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree), ANTLR3_TRUE);
+    factory->strings->set(factory->strings, factory->index, (void *) string, (void (ANTLR3_CDECL *)(void *))(stringFree), ANTLR3_TRUE);
     string->index   = factory->index++;
 
     return string;
@@ -243,7 +245,7 @@ stringInit8  (pANTLR3_STRING string)
     string->subString	= subString8;
     string->toInt32	= toInt32_8;
     string->to8		= to8_8;
-
+	string->toUTF8	= toUTF8_8;
     string->compareS	= compareS;
     string->setS	= setS;
     string->appendS	= appendS;
@@ -280,6 +282,7 @@ stringInit16  (pANTLR3_STRING string)
     string->subString	= subString16;
     string->toInt32	= toInt32_16;
     string->to8		= to8_16;
+	string->toUTF8	= toUTF8_16;
 
     string->compareS	= compareS;
     string->setS	= setS;
@@ -303,10 +306,78 @@ stringInitUTF8  (pANTLR3_STRING string)
 
 }
 
+// Convert an 8 bit string into a UTF8 representation, which is in fact just the string itself
+// a memcpy as we make no assumptions about the 8 bit encoding.
+//
+static	pANTLR3_STRING		
+toUTF8_8	(pANTLR3_STRING string)
+{
+	return string->factory->newPtr(string->factory, (pANTLR3_UINT8)(string->chars), string->len);
+}
+
+// Convert a 16 bit (UCS2) string into a UTF8 representation using the Unicode.org
+// supplied C algorithms, which are now contained within the ANTLR3 C runtime
+// as permitted by the Unicode license (within the source code antlr3convertutf.c/.h
+// UCS2 has the same encoding as UTF16 so we can use UTF16 converter.
+//
+static	pANTLR3_STRING	
+toUTF8_16	(pANTLR3_STRING string)
+{
+	
+	UTF8				* outputEnd;	
+	UTF16				* inputEnd;
+	pANTLR3_STRING		utf8String;
+
+	ConversionResult	cResult;
+
+	// Allocate the output buffer, which needs to accommodate potentially
+	// 3X (in bytes) the input size (in chars).
+	//
+	utf8String	= string->factory->newStr8(string->factory, (pANTLR3_UINT8)"");
+
+	if	(utf8String != NULL)
+	{
+		// Free existing allocation
+		//
+		ANTLR3_FREE(utf8String->chars);
+
+		// Reallocate according to maximum expected size
+		//
+		utf8String->size	= string->len *3;
+		utf8String->chars	= (pANTLR3_UINT8)ANTLR3_MALLOC(utf8String->size +1);
+
+		if	(utf8String->chars != NULL)
+		{
+			inputEnd  = (UTF16 *)	(string->chars);
+			outputEnd = (UTF8 *)	(utf8String->chars);
+
+			// Call the Unicode converter
+			//
+			cResult =  ConvertUTF16toUTF8
+							(
+								(const UTF16**)&inputEnd, 
+								((const UTF16 *)(string->chars)) + string->len, 
+								&outputEnd, 
+								outputEnd + utf8String->size - 1,
+								lenientConversion
+							);
+
+			// We don't really care if things failed or not here, we just converted
+			// everything that was vaguely possible and stopped when it wasn't. It is
+			// up to the grammar programmer to verify that the input is sensible.
+			//
+			utf8String->len = ((pANTLR3_UINT8)outputEnd) - utf8String->chars;
+
+			*(outputEnd+1) = '\0';		// Always null terminate
+		}
+	}
+	return utf8String;
+}
+
 /**
  * Creates a new string with enough capacity for size 8 bit characters plus a terminator.
  *
- * \param[in] factory - Poitner to the string factory that owns strings
+ * \param[in] factory - Pointer to the string factory that owns strings
  * \param[in] size - In characters
  * \return pointer to the new string.
  */
@@ -1100,11 +1171,11 @@ charAt8	    (pANTLR3_STRING string, ANTLR3_UINT32 offset)
 {
     if	(offset > string->len)
     {
-	return (ANTLR3_UCHAR)'\0';
+		return (ANTLR3_UCHAR)'\0';
     }
     else
     {
-	return  (ANTLR3_UCHAR)(*(string->chars + offset));
+		return  (ANTLR3_UCHAR)(*(string->chars + offset));
     }
 }
 

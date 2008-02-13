@@ -50,6 +50,17 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	///
 	ANTLR3_BOOLEAN		initialized;
 
+	/// Used to serialize the values of any particular token we need to
+	/// send back to the debugger.
+	///
+	pANTLR3_STRING		tokenString;
+
+
+	/// Allows the debug event system to access the adapter in use
+	/// by the recognizer, if this is a tree parser of some sort.
+	///
+	pANTLR3_BASE_TREE_ADAPTOR	adaptor;
+
 	/// Wait for a connection from the debugger and initiate the
 	/// debugging session.
 	///
@@ -59,7 +70,7 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	 *  which alt is predicted.  This is fired AFTER init actions have been
 	 *  executed.  Attributes are defined and available etc...
 	 */
-	void			(*enterRule)		(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * ruleName);
+	void			(*enterRule)		(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * grammarFileName, const char * ruleName);
 
 	/** Because rules can have lots of alternatives, it is very useful to
 	 *  know which alt you are entering.  This is 1..n for n alts.
@@ -71,7 +82,7 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	 *  error reporting and recovery have occurred (unless the exception is
 	 *  not caught in this rule).  This implies an "exitAlt" event.
 	 */
-	void			(*exitRule)			(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * ruleName);
+	void			(*exitRule)			(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * grammarFileName, const char * ruleName);
 
 	/** Track entry into any (...) subrule other EBNF construct 
 	 */
@@ -237,6 +248,11 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	 */
 	void			(*terminate)			(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 
+	/// Retrieve acknowledge response from the debugger. in fact this
+	/// response is never used at the moment. So we just read whatever
+	/// is in the socket buffer and throw it away.
+	///
+	void			(*ack)					(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 
 	// T r e e  P a r s i n g
 
@@ -277,6 +293,12 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	 *  RemoteDebugEventSocketListener then only t.ID is set.
 	 */
 	void			(*nilNode)				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t);
+
+	/** If a syntax error occurs, recognizers bracket the error
+	 *  with an error node if they are building ASTs. This event
+	 *  notifies the listener that this is the case
+	 */
+	void			(*errorNode)			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t);
 
 	/** Announce a new node built from token elements such as type etc...
 	 * 

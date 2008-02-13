@@ -1,8 +1,8 @@
 /** \file
- * This is the standard tree daptor used by the C runtime unless the grammar
+ * This is the standard tree adaptor used by the C runtime unless the grammar
  * source file says to use anything different. It embeds a BASE_TREE to which
- * it adds its own implementaion of anything that the abase tree is not 
- * good enough for, plus a number of methods that any other adaptor type
+ * it adds its own implementation of anything that the base tree is not 
+ * good for, plus a number of methods that any other adaptor type
  * needs to implement too.
  */
 
@@ -13,19 +13,23 @@
 #endif
 
 /* BASE_TREE_ADAPTOR overrides... */
-static	pANTLR3_BASE_TREE		dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode);
-static	pANTLR3_BASE_TREE		create		(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
-static	pANTLR3_BASE_TREE		dbgCreate	(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
-static	pANTLR3_COMMON_TOKEN	createToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
+static	pANTLR3_BASE_TREE		dupNode					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode);
+static	pANTLR3_BASE_TREE		create					(pANTLR3_BASE_TREE_ADAPTOR adpator, pANTLR3_COMMON_TOKEN payload);
+static	pANTLR3_BASE_TREE		dbgCreate				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN payload);
+static	pANTLR3_COMMON_TOKEN	createToken				(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
 static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fromToken);
-static	pANTLR3_STRING			getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_UINT32			getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_COMMON_TOKEN    getToken				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_STRING			getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT32			getType					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void					replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
+static	void					setDebugEventListener	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
 /* Methods specific to each tree adaptor
  */
-static	void		setTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
-static	ANTLR3_UINT64   getTokenStartIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static  ANTLR3_UINT64   getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void			setTokenBoundaries		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
+static	void			dbgSetTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
+static	ANTLR3_UINT64   getTokenStartIndex		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static  ANTLR3_UINT64   getTokenStopIndex		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 static	void		ctaFree			(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 
@@ -68,6 +72,9 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 	cta->baseAdaptor.getText				=  getText;
 	cta->baseAdaptor.getType				=  getType;
 	cta->baseAdaptor.free					=  ctaFree;
+	cta->baseAdaptor.setDebugEventListener	=  setDebugEventListener;
+
+	cta->replaceChildren					=  replaceChildren;
 
 	// Install the super class pointer
 	//
@@ -92,13 +99,15 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 	return  &(cta->baseAdaptor);
 }
 
-/// Debugging version of the tree adaptor
+/// Debugging version of the tree adaptor (not normally called as generated code
+/// calls setDebugEventListener instead which changes a normal token stream to
+/// a debugging stream and means that a user's instantiation code does not need
+/// to be changed just to debug with AW.
 ///
 ANTLR3_API pANTLR3_BASE_TREE_ADAPTOR
 ANTLR3_TREE_ADAPTORDebugNew(pANTLR3_STRING_FACTORY strFactory, pANTLR3_DEBUG_EVENT_LISTENER	debugger)
 {
 	pANTLR3_BASE_TREE_ADAPTOR	ta;
-	pANTLR3_COMMON_TREE_ADAPTOR	cta;
 
 	// Create a normal one first
 	//
@@ -111,11 +120,24 @@ ANTLR3_TREE_ADAPTORDebugNew(pANTLR3_STRING_FACTORY strFactory, pANTLR3_DEBUG_EVE
 		antlr3BaseTreeAdaptorInit(ta, debugger);
 	}
 
-	cta		= ta->super;
-
-	ta->create		= dbgCreate;
+	ta->create				= dbgCreate;
+	ta->setTokenBoundaries	= dbgSetTokenBoundaries;
 
 	return	ta;
+}
+
+/// Causes an existing common tree adaptor to become a debug version
+///
+static	void
+setDebugEventListener	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger)
+{
+	// Reinitialize as a debug version
+	//
+	antlr3BaseTreeAdaptorInit(adaptor, debugger);
+
+	adaptor->create				= dbgCreate;
+	adaptor->setTokenBoundaries	= dbgSetTokenBoundaries;
+
 }
 
 static void
@@ -290,6 +312,16 @@ setTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANT
     ct->stopIndex   = stop;
 
 }
+static	void
+dbgSetTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken)
+{
+	setTokenBoundaries(adaptor, t, startToken, stopToken);
+
+	if	(t != NULL && startToken != NULL && stopToken != NULL)
+	{
+		adaptor->debugger->setTokenBoundaries(adaptor->debugger, t, startToken->getTokenIndex(startToken), stopToken->getTokenIndex(stopToken));
+	}
+}
 
 static	ANTLR3_UINT64   
 getTokenStartIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
@@ -313,4 +345,19 @@ static	ANTLR3_UINT32
 getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  t->getType(t);
+}
+
+static	pANTLR3_COMMON_TOKEN    
+getToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+{
+	return t->getToken(t);
+}
+
+static	void					
+replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t)
+{
+	if	(parent != NULL)
+	{
+		parent->replaceChildren(parent, startChildIndex, stopChildIndex, t);
+	}
 }

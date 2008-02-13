@@ -1,7 +1,7 @@
 /**
  * Contains the default implementation of the common token used within
  * java. Custom tokens should create this structure and then append to it using the 
- * custom pointer to install their own strcuture and API.
+ * custom pointer to install their own structure and API.
  */
 #include    <antlr3.h>
 

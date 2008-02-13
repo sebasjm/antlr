@@ -18,7 +18,7 @@ static pANTLR3_COMMON_TREE_NODE_STREAM
 static void			freeParser		    (pANTLR3_TREE_PARSER parser);    
     
 ANTLR3_API pANTLR3_TREE_PARSER
-antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream)
+antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
     pANTLR3_TREE_PARSER	    parser;
 
@@ -33,7 +33,7 @@ antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREA
 
     /* Create and install a base recognizer which does most of the work for us
      */
-    parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint);
+    parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint, state);
 
     if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
@@ -83,8 +83,8 @@ antlr3MTNExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 
     /* Now update it to indicate this is a Mismatched token exception
      */
-    recognizer->exception->name		= ANTLR3_MISMATCHED_TREE_NODE_NAME;
-    recognizer->exception->type		= ANTLR3_MISMATCHED_TREE_NODE_EXCEPTION;
+    recognizer->state->exception->name		= ANTLR3_MISMATCHED_TREE_NODE_NAME;
+    recognizer->state->exception->type		= ANTLR3_MISMATCHED_TREE_NODE_EXCEPTION;
 
     return;
 }
@@ -95,10 +95,10 @@ freeParser	(pANTLR3_TREE_PARSER parser)
 {
     if	(parser->rec != NULL)
     {
-	    if	(parser->rec->following != NULL)
+	    if	(parser->rec->state->following != NULL)
 	    {
-		parser->rec->following->free(parser->rec->following);
-		parser->rec->following = NULL;
+		parser->rec->state->following->free(parser->rec->state->following);
+		parser->rec->state->following = NULL;
 	    }
 	    parser->rec->free(parser->rec);
 	    parser->rec	= NULL;

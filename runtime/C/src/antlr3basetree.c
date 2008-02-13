@@ -4,46 +4,49 @@
 #pragma warning( disable : 4100 )
 #endif
 
-static void    *	getChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
-static ANTLR3_UINT64	getChildCount	(pANTLR3_BASE_TREE tree);
-static ANTLR3_UINT32	getCharPositionInLine
-					(pANTLR3_BASE_TREE tree);
-static ANTLR3_UINT64	getLine		(pANTLR3_BASE_TREE tree);
+static void				*	getChild			(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
+static ANTLR3_UINT64		getChildCount		(pANTLR3_BASE_TREE tree);
+static ANTLR3_UINT32		getCharPositionInLine
+												(pANTLR3_BASE_TREE tree);
+static ANTLR3_UINT64		getLine				(pANTLR3_BASE_TREE tree);
 static pANTLR3_BASE_TREE    
-			getFirstChildWithType
-					(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 type);
-static void		addChild	(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child);
-static void		addChildren	(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids);
-static void		createChildrenList
-					(pANTLR3_BASE_TREE tree);
+							getFirstChildWithType
+												(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 type);
+static void					addChild			(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child);
+static void					addChildren			(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids);
+static void					createChildrenList	(pANTLR3_BASE_TREE tree);
+static void					replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
 
-static void		setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child);
-static void    *	deleteChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
-static void    *	dupTree		(pANTLR3_BASE_TREE tree);
-static pANTLR3_STRING	toStringTree	(pANTLR3_BASE_TREE tree);
+static	void				freshenPACIndexesAll(pANTLR3_BASE_TREE tree);
+static	void				freshenPACIndexes	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 offset);
+
+static void					setChild			(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child);
+static void				*	deleteChild			(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
+static void				*	dupTree				(pANTLR3_BASE_TREE tree);
+static pANTLR3_STRING		toStringTree		(pANTLR3_BASE_TREE tree);
 
 
 ANTLR3_API pANTLR3_BASE_TREE
 antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
 {
     /* api */
-    tree->getChild	    =  getChild;
+    tree->getChild			=  getChild;
     tree->getChildCount	    =  getChildCount;
-    tree->addChild	    =  (void (*)(pANTLR3_BASE_TREE, void *))(addChild);
+    tree->addChild			=  (void (*)(pANTLR3_BASE_TREE, void *))(addChild);
     tree->addChildren	    =  addChildren;
-    tree->setChild	    =  setChild;
+    tree->setChild			=  setChild;
     tree->deleteChild	    =  deleteChild;
-    tree->dupTree	    =  dupTree;
+    tree->dupTree			=  dupTree;
     tree->toStringTree	    =  toStringTree;
-    tree->createChildrenList=  createChildrenList;
-    
+    tree->createChildrenList
+							=  createChildrenList;
     tree->getCharPositionInLine
-			    =  getCharPositionInLine;
-    tree->getLine	    =  getLine;
-
+							=  getCharPositionInLine;
+    tree->getLine			=  getLine;
+	tree->replaceChildren	=  replaceChildren;
     tree->getFirstChildWithType
-			    =  (void *(*)(pANTLR3_BASE_TREE, ANTLR3_UINT32))(getFirstChildWithType);
-    tree->children	    = NULL;
+							=  (void *(*)(pANTLR3_BASE_TREE, ANTLR3_UINT32))(getFirstChildWithType);
+    tree->children			= NULL;
 
     /* Rest must be filled in by caller.
      */
@@ -73,7 +76,7 @@ getFirstChildWithType	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 type)
 	cs	= tree->children->size(tree->children);
 	for	(i = 0; i < cs; i++)
 	{
-	    t = (pANTLR3_BASE_TREE) (tree->children->get(tree->children, i+1));
+	    t = (pANTLR3_BASE_TREE) (tree->children->get(tree->children, i));
 	    if  (tree->getType(t) == type)
 	    {
 		return  (pANTLR3_BASE_TREE)t;
@@ -93,7 +96,7 @@ getChild		(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
     {
 	return NULL;
     }
-    return  tree->children->get(tree->children, i+1);
+    return  tree->children->get(tree->children, i);
 }
 
 
@@ -146,7 +149,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 	    for (i = 0; i<n; i++)
 	    {
 		void	* entry;
-		entry	= child->children->get(child->children, i + 1);
+		entry	= child->children->get(child->children, i);
 
 		/* ANTLR3 lists can be sparse, unlike Array Lists
 		 */
@@ -202,8 +205,7 @@ setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i, void * child)
     {
 	tree->createChildrenList(tree);
     }
-    tree->children->remove(tree->children, i + 1);	/* remove any existing node at that position */
-    tree->children->put(tree->children, i+1, child, NULL, ANTLR3_FALSE);
+    tree->children->set(tree->children, i, child, NULL, ANTLR3_FALSE);
 }
 
 static void    *
@@ -213,10 +215,8 @@ deleteChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
     {
 	return	NULL;
     }
-    /* NB: this makes the list sparse (with a gap at i)
-     * unlike Java so be careful to cater for this elsewhere
-     */
-    return  tree->children->remove(tree->children, i+1);
+
+    return  tree->children->remove(tree->children, i);
 }
 
 static void    *
@@ -236,7 +236,7 @@ dupTree		(pANTLR3_BASE_TREE tree)
 	    pANTLR3_BASE_TREE    t;
 	    pANTLR3_BASE_TREE    newNode;
 
-	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i+1);
+	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i);
     	
 	    if  (t!= NULL)
 	    {
@@ -278,7 +278,7 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 
 	for	(i = 0; i < n; i++)
 	{   
-	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i + 1);
+	    t   = (pANTLR3_BASE_TREE) tree->children->get(tree->children, i);
     	
 	    if  (i > 0)
 	    {
@@ -293,4 +293,161 @@ toStringTree	(pANTLR3_BASE_TREE tree)
     }
 
     return  string;
+}
+
+/// Delete children from start to stop and replace with t even if t is
+/// a list (nil-root tree). Num of children can increase or decrease.
+/// For huge child lists, inserting children can force walking rest of
+/// children to set their child index; could be slow.
+///
+static void					
+replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE newTree)
+{
+	ANTLR3_INT32	replacingHowMany;		// How many nodes will go away
+	ANTLR3_INT32	replacingWithHowMany;	// How many nodes will replace them
+	ANTLR3_INT32	numNewChildren;			// Tracking variable
+	ANTLR3_INT32	delta;					// Difference in new vs existing count
+
+	ANTLR3_UINT32	i;
+	ANTLR3_INT32	j;
+
+	pANTLR3_VECTOR	newChildren;			// Iterator for whatever we are going to add in
+	ANTLR3_BOOLEAN	freeNewChildren;		// Whether we created the iterator locally or reused it
+
+	if	(parent->children == NULL)
+	{
+		fprintf(stderr, "replaceChildren call: Indexes are invalid; no children in list for %s", parent->getText(parent));
+		return;
+	}
+
+	// Either use the existing list of children in the supplied nil node, or build a vector of the
+	// tree we were given if it is not a nil node, then we treat both situations exactly the same
+	//
+	if	(newTree->isNil(newTree))
+	{
+		newChildren = newTree->children;
+		freeNewChildren = ANTLR3_FALSE;		// We must NO free this memory
+	}
+	else
+	{
+		newChildren = antlr3VectorNew(1);
+		if	(newChildren == NULL)
+		{
+			fprintf(stderr, "replaceChildren: out of memory!!");
+			exit(1);
+		}
+		newChildren->add(newChildren, (void *)newTree, NULL);
+
+		freeNewChildren = ANTLR3_TRUE;		// We must free this memory
+	}
+
+	// Initialize
+	//
+	replacingHowMany		= stopChildIndex - startChildIndex + 1;
+	replacingWithHowMany	= newChildren->size(newChildren);
+	delta					= replacingHowMany - replacingWithHowMany;
+	numNewChildren			= newChildren->size(newChildren);
+
+	// If it is the same number of nodes, then do a direct replacement
+	//
+	if	(delta == 0)
+	{
+		pANTLR3_BASE_TREE	child;
+
+		// Same number of nodes
+		//
+		j	= 0;
+		for	(i = startChildIndex; i <= stopChildIndex; i++)
+		{
+			child = (pANTLR3_BASE_TREE) newChildren->get(newChildren, j);
+			parent->children->set(parent->children, i, child, NULL, ANTLR3_FALSE);
+			child->setParent(child, parent);
+			child->setChildIndex(child, i);
+		}
+	}
+	else if (delta > 0)
+	{
+		ANTLR3_UINT32	indexToDelete;
+
+		// Less nodes than there were before
+		// reuse what we have then delete the rest
+		//
+		for	(j = 0; j < numNewChildren; j++)
+		{
+			parent->children->set(parent->children, startChildIndex + j, newChildren->get(newChildren, j), NULL, ANTLR3_FALSE);
+		}
+
+		// We just delete the same index position until done
+		//
+		indexToDelete = startChildIndex + numNewChildren;
+
+		for	(j = indexToDelete; j <= (ANTLR3_INT32)stopChildIndex; j++)
+		{
+			parent->children->remove(parent->children, indexToDelete);
+		}
+
+		parent->freshenPACIndexes(parent, startChildIndex);
+	}
+	else
+	{
+		ANTLR3_UINT32 numToInsert;
+
+		// More nodes than there were before
+		// Use what we can, then start adding
+		//
+		for	(j = 0; j < replacingHowMany; j++)
+		{
+			parent->children->set(parent->children, startChildIndex + j, newChildren->get(newChildren, j), NULL, ANTLR3_FALSE);
+		}
+
+		numToInsert = replacingWithHowMany - replacingHowMany;
+
+		for	(j = replacingHowMany; j < replacingWithHowMany; j++)
+		{
+			parent->children->add(parent->children, newChildren->get(newChildren, j), NULL);
+		}
+
+		parent->freshenPACIndexes(parent, startChildIndex);
+	}
+
+	if	(freeNewChildren == ANTLR3_TRUE)
+	{
+		ANTLR3_FREE(newChildren->elements);
+		newChildren->elements = NULL;
+		newChildren->size = 0;
+		ANTLR3_FREE(newChildren);		// Will not free the nodes
+	}
+}
+
+/// Set the parent and child indexes for all children of the
+/// supplied tree.
+///
+static	void
+freshenPACIndexesAll(pANTLR3_BASE_TREE tree)
+{
+	tree->freshenPACIndexes(tree, 0);
+}
+
+/// Set the parent and child indexes for some of the children of the
+/// supplied tree, starting with the child at the supplied index.
+///
+static	void
+freshenPACIndexes	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 offset)
+{
+	ANTLR3_UINT32	count;
+	ANTLR3_UINT32	c;
+
+	count	= tree->getChildCount(tree);		// How many children do we have 
+
+	// Loop from the supplied index and set the indexes and parent
+	//
+	for	(c = offset; c < count; c++)
+	{
+		pANTLR3_BASE_TREE	child;
+
+		child = tree->getChild(tree, c);
+
+		child->setChildIndex(child, c);
+		child->setParent(child, tree);
+	}
 }

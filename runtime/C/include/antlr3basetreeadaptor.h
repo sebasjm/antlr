@@ -40,6 +40,7 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 
     pANTLR3_BASE_TREE	    (*nil)					(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor);
 
+
     pANTLR3_BASE_TREE	    (*dupTree)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE tree);
 
     void					(*addChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
@@ -75,12 +76,15 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 
     pANTLR3_COMMON_TOKEN    (*createToken)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);
     pANTLR3_COMMON_TOKEN    (*createTokenFromToken)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_COMMON_TOKEN fromToken);
+    pANTLR3_COMMON_TOKEN    (*getToken)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);  
 
     void					(*setTokenBoundaries)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
 
     ANTLR3_UINT64			(*getTokenStartIndex)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
 
     ANTLR3_UINT64			(*getTokenStopIndex)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
+
+	void					(*setDebugEventListener)(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
     void					(*free)					(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor);
 

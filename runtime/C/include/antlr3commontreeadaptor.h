@@ -27,6 +27,14 @@ typedef	struct ANTLR3_COMMON_TREE_ADAPTOR_struct
      */
     pANTLR3_ARBORETUM	arboretum;
 
+	/// Replace from start to stop child index of parent with t, which might
+	/// be a list.  Number of children may be different
+	/// after this call.  
+	///
+	/// If parent is null, don't do anything; must be at root of overall tree.
+	/// Can't replace whatever points to the parent externally.  Do nothing.
+	///
+	void						(*replaceChildren)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
 }
     ANTLR3_COMMON_TREE_ADAPTOR;
 

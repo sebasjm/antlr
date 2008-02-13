@@ -12,6 +12,7 @@
 #include    <antlr3commontoken.h>
 #include    <antlr3commontreenodestream.h>
 #include	<antlr3debugeventlistener.h>
+#include	<antlr3recognizersharedstate.h>
 
 /** Type indicator for a lexer recognizer
  */
@@ -30,105 +31,30 @@
  */
 typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 {
-    /** Whatever super structure is providing this interface needs a pointer to itself
-     *  so that this can be passed back to it whenever the api functions
-     *  are called back from here.
-     */
+    /// Whatever super structure is providing this interface needs a pointer to itself
+    /// so that this can be passed back to it whenever the api functions
+    /// are called back from here.
+    ///
     void	      * super;
-
-    /** Indicates the type of recognizer that we are an instance of.
-     *  The programmer may set this to anything of course, but the default 
-     *  implementations of the interface only really understand the built in
-     *  types, so new error handlers etc would probably be required too.
-     *
-     *  Valid types are:
-     *
-     *    - #ANTLR3_LEXER  
-     *	  - #ANTLR3_PARSER
-     *    - #ANTLR3_TREEPARSER
-     */
+    
+	/// Indicates the type of recognizer that we are an instance of.
+    ///  The programmer may set this to anything of course, but the default 
+    /// implementations of the interface only really understand the built in
+    ///  types, so new error handlers etc would probably be required too.
+    /// 
+    ///  Valid types are:
+    ///
+    ///   - #ANTLR3_LEXER  
+	///	  - #ANTLR3_PARSER
+    ///   - #ANTLR3_TREEPARSER
+    ///
     ANTLR3_UINT32	type;
 
-    /** If set to ANTLR3_TRUE then the recognizer has an exception
-     * condition (this is tested by the generated code for the rules of
-     * the grammar).
-     */
-    ANTLR3_BOOLEAN	    error;
-
-    /** Points to the first in a possible chain of exceptions that the
-     *  recognizer has discovered.
-     */
-    pANTLR3_EXCEPTION	    exception;
-
-    /** Track around a hint from the creator of the recognizer as to how big this
-     *  thing is going to get, as the actress said to the bishop. This allows us
-     *  to tune hash tables accordingly. This might not be the best place for this
-     *  in the end but we will see.
-     */
-    ANTLR3_UINT32	sizeHint;
-
-    /** Track the set of token types that can follow any rule invocation.
-     *  Stack structure, to support: List<BitSet>.
-     */
-    pANTLR3_STACK	following;
-
-    /** Following stack tracker saves time by knowing which follow set we are
-     *  using.
-     */
-    ANTLR3_INT64	_fsp;
-
-    /** This is true when we see an error and before having successfully
-     *  matched a token.  Prevents generation of more than one error message
-     *  per error.
-     */
-    ANTLR3_BOOLEAN	errorRecovery;
-    
-    /** The index into the input stream where the last error occurred.
-     * 	This is used to prevent infinite loops where an error is found
-     *  but no token is consumed during recovery...another error is found,
-     *  ad nauseam.  This is a failsafe mechanism to guarantee that at least
-     *  one token/tree node is consumed for two errors.
-     */
-    ANTLR3_INT64	lastErrorIndex;
-
-    /** In lieu of a return value, this indicates that a rule or token
-     *  has failed to match.  Reset to false upon valid token match.
-     */
-    ANTLR3_BOOLEAN	failed;
-
-    /** When the recognizer terminates, the error handling functions
-     *  will have incremented this value if any error occurred (that was displayed). It can then be
-     *  used by the grammar programmer without having to use static globals.
-     */
-    ANTLR3_UINT32	errorCount;
-
-    /** If 0, no backtracking is going on.  Safe to exec actions etc...
-     *  If >0 then it's the level of backtracking.
-     */
-    ANTLR3_INT32	backtracking;
-
-    /** ANTLR3_VECTOR of ANTLR3_LIST for rule memoizing.
-     *  Tracks  the stop token index for each rule.  ruleMemo[ruleIndex] is
-     *  the memoization table for ruleIndex.  For key ruleStartIndex, you
-     *  get back the stop token for associated rule or MEMO_RULE_FAILED.
-     *
-     *  This is only used if rule memoization is on.
-     */
-    pANTLR3_INT_TRIE	ruleMemo;
-
-    /** Pointer to an array of token names
-     *  that are generally useful in error reporting. The generated parsers install
-     *  this pointer. The table it points to is statically allocated as 8 bit ascii
-     *  at parser compile time - grammar token names are thus restricted in character
-     *  sets, which does not seem to terrible.
-     */
-    pANTLR3_UINT8	* tokenNames;
-
-    /** User programmable pointer that can be used for instance as a place to
-     *  store some tracking structure specific to the grammar that would not normally
-     *  be available to the error handling functions.
-     */
-    void		* userp;
+	/// A pointer to the shared recognizer state, such that multiple
+	/// recognizers can use the same inputs streams and so on (in
+	/// the case of grammar inheritance for instance.
+	///
+	pANTLR3_RECOGNIZER_SHARED_STATE	state;
 
 	/// If set to something other than NULL, then this structure is
 	/// points to an instance of the debugger interface. In general, the
@@ -209,6 +135,16 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  This is mainly used by the debug parser to send events to the listener.
      */
     void		(*endResync)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer);
+
+	/** Pointer to a function that is a hook to listen to token consumption during error recovery.
+     *  This is mainly used by the debug parser to send events to the listener.
+     */
+    void		(*beginBacktrack)		(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, ANTLR3_UINT32 level);
+
+    /** Pointer to a function that is a hook to listen to token consumption during error recovery.
+     *  This is mainly used by the debug parser to send events to the listener.
+     */
+    void		(*endBacktrack)		    (struct ANTLR3_BASE_RECOGNIZER_struct * recognizer, ANTLR3_UINT32 level, ANTLR3_BOOLEAN successful);
 
     /** Pointer to a function to computer the error recovery set for the current rule.
      *  \see antlr3ComputeErrorRecoverySet() for details.

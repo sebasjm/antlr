@@ -12,23 +12,33 @@
 typedef struct ANTLR3_COMMON_TREE_struct
 {
 
-   /* Not used by ANTLR, but if a super structure is created above
-     * this structure, it can be used to point to the start of the super
-     * structure, where additional data and function pointers can be stored.
-     */
+	/// Not used by ANTLR, but if a super structure is created above
+    /// this structure, it can be used to point to the start of the super
+    /// structure, where additional data and function pointers can be stored.
+    ///
     void	* super;
 
-    /** Start token index that encases this tree
-     */
+    /// Start token index that encases this tree
+    ///
     ANTLR3_UINT64   startIndex;
 
-    /** End token that encases this tree
-     */
+    /// End token that encases this tree
+    ///
     ANTLR3_UINT64   stopIndex;
 
-    /** A single token, this is the payload for the tree
-     */
+    /// A single token, this is the payload for the tree
+    ///
     pANTLR3_COMMON_TOKEN    token;
+
+	/// Points to the node that has this node as a child.
+	/// If this is NULL, then this is the root node.
+	///
+	pANTLR3_COMMON_TREE		parent;
+
+	/// What index is this particular node in the child list it
+	/// belongs to?
+	///
+	ANTLR3_INT32			childIndex;
 
     /** Indicates whether this token was created by the Arboretum or
      *  is a stand alone structure that we must free.
@@ -59,8 +69,7 @@ typedef struct ANTLR3_COMMON_TREE_struct
      * 
      */
     ANTLR3_BASE_TREE	    baseTree;
-
-    pANTLR3_COMMON_TOKEN    (*getToken)			(pANTLR3_BASE_TREE base);       
+     
  
 }
     ANTLR3_COMMON_TREE;

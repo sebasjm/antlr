@@ -71,67 +71,6 @@ typedef	struct ANTLR3_LEXER_struct
      */
     pANTLR3_BASE_RECOGNIZER	rec;
 
-    /** The goal of all lexer rules/methods is to create a token object.
-     *  This is an instance variable as multiple rules may collaborate to
-     *  create a single token.  For example, NUM : INT | FLOAT ;
-     *  In this case, you want the INT or FLOAT rule to set token and not
-     *  have it reset to a NUM token in rule NUM.
-     */
-    pANTLR3_COMMON_TOKEN	token;
-
-    /** The goal of all lexer rules being to create a token, then a lexer
-     *  needs to build a token factory to create them.
-     */
-    pANTLR3_TOKEN_FACTORY	tokFactory;
-
-    /** A lexer is a source of tokens, produced by all the generated (or
-     *  hand crafted if you like) matching rules. As such it needs to provide
-     *  a token source interface implementation.
-     */
-    pANTLR3_TOKEN_SOURCE	tokSource;
-
-    /** The channel number for the current token
-     */
-    ANTLR3_UINT32		channel;
-
-    /** The token type for the current token
-     */
-    ANTLR3_UINT32		type;
-    
-    /** The input line (where it makes sense) on which the first character of the current
-     *  token resides.
-     */
-    ANTLR3_INT64		tokenStartLine;
-
-    /** The character position of the first character of the current token
-     *  within the line specified by tokenStartLine
-     */
-    ANTLR3_INT32		tokenStartCharPositionInLine;
-
-    /** What character index in the stream did the current token start at?
-     *  Needed, for example, to get the text for current token.  Set at
-     *  the start of nextToken.
-     */
-    ANTLR3_INT64		tokenStartCharIndex;
-
-    /** Text for the current token. This can be overridden by setting this 
-     *  variable directly or by using the SETTEXT() macro (preffered) in your
-     *  lexer rules.
-     */
-    pANTLR3_STRING		text;
-
-	/** User controlled variables tha twill be installed in a newly created
-	 * token.
-	 */
-	ANTLR3_UINT32		user1, user2, user3;
-	void				* custom;
-
-    /** Input stream stack, which allows the C programmer to switch input streams 
-     *  easily and allow the standard nextToken() implementation to deal with it
-     *  as this is a common requirement.
-     */
-    pANTLR3_STACK		streams;
-
     /** Pointer to a function that sets the charstream source for the lexer and
      *  causes it to  be reset.
      */

@@ -130,6 +130,11 @@ typedef	struct ANTLR3_TOKEN_STREAM_struct
      */
     pANTLR3_STRING	    (*toStringTT)	(struct ANTLR3_TOKEN_STREAM_struct * tokenStream, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
 
+
+	/** Function that sets the token stream into debugging mode
+	 */
+	void				(*setDebugListener)	    (struct ANTLR3_TOKEN_STREAM_struct * tokenStream, pANTLR3_DEBUG_EVENT_LISTENER debugger);
+
     /** Function that knows how to free the memory for an ANTLR3_TOKEN_STREAM
      */
     void		    (*free)		(struct ANTLR3_TOKEN_STREAM_struct * tokenStream);
@@ -233,6 +238,7 @@ typedef	struct	ANTLR3_COMMON_TOKEN_STREAM_struct
      */
     pANTLR3_LIST	    (*getTokensType)	    (struct ANTLR3_COMMON_TOKEN_STREAM_struct * tokenStream, 
 							ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
+
 
     /** Function that knows how to free an ANTLR3_COMMON_TOKEN_STREAM
      */

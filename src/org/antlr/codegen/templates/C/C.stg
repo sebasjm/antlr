@@ -205,28 +205,28 @@ outputFile( LEXER,
 
 #define	    LEXER					ctx->pLexer
 #define	    RECOGNIZER			    LEXER->rec
-#define	    RULEMEMO				RECOGNIZER->ruleMemo
+#define		LEXSTATE				RECOGNIZER->state
 #define	    GETCHARINDEX()			LEXER->getCharIndex(LEXER)
 #define	    GETLINE()				LEXER->getLine(LEXER)
 #define	    GETTEXT()				LEXER->getText(LEXER)
 #define	    GETCHARPOSITIONINLINE() LEXER->getCharPositionInLine(LEXER)
-#define	    EMIT()					LEXER->type = _type; LEXER->emit(LEXER)
+#define	    EMIT()					LEXSTATE->type = _type; LEXER->emit(LEXER)
 #define	    EMITNEW(t)				LEXER->emitNew(LEXER, t)
 #define	    MATCHC(c)				LEXER->matchc(LEXER, c)
 #define	    MATCHS(s)				LEXER->matchs(LEXER, s)
 #define	    MATCHRANGE(c1,c2)	    LEXER->matchRange(LEXER, c1, c2)
 #define	    MATCHANY()				LEXER->matchAny(LEXER)
-#define	    LTOKEN  				LEXER->token
-#define	    HASFAILED()				(RECOGNIZER->failed == ANTLR3_TRUE)
-#define	    BACKTRACKING			RECOGNIZER->backtracking
-#define	    FAILEDFLAG				RECOGNIZER->failed
+#define	    LTOKEN  				LEXSTATE->token
+#define	    HASFAILED()				(recognizer->state->failed == ANTLR3_TRUE)
+#define	    BACKTRACKING			recognizer->state->backtracking
+#define	    FAILEDFLAG				recognizer->state->failed
 #define	    INPUT					LEXER->input
 #define	    STRSTREAM				INPUT
 #define		INDEX()					INPUT->istream->index(INPUT->istream)
 #define		SEEK(n)					INPUT->istream->seek(INPUT->istream, n)
-#define	    EOF_TOKEN				&(LEXER->tokSource->eofToken)
-#define	    HASEXCEPTION()			(RECOGNIZER->error == ANTLR3_TRUE)
-#define	    EXCEPTION				RECOGNIZER->exception
+#define	    EOF_TOKEN				&(LEXSTATE->tokSource->eofToken)
+#define	    HASEXCEPTION()			(LEXSTATE->error == ANTLR3_TRUE)
+#define	    EXCEPTION				LEXSTATE->exception
 #define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
 #define	    LRECOVER()				LEXER->recover(LEXER)
 #define	    MARK()					INPUT->istream->mark(INPUT->istream)
@@ -236,11 +236,11 @@ outputFile( LEXER,
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define		PUSHSTREAM(str)			LEXER->pushCharStream(LEXER, str)
 #define		POPSTREAM()				LEXER->popCharStream(LEXER)
-#define		SETTEXT(str)			LEXER->text = str
-#define		USER1					LEXER->user1
-#define		USER2					LEXER->user2
-#define		USER3					LEXER->user3
-#define		CUSTOM					LEXER->custom
+#define		SETTEXT(str)			LEXSTATE->text = str
+#define		USER1					LEXSTATE->user1
+#define		USER2					LEXSTATE->user2
+#define		USER3					LEXSTATE->user3
+#define		CUSTOM					LEXSTATE->custom
 
 /* If we have been told we can rely on the standard 8 bit or 16 bit input
  * stream, then we can define our macros to use the direct pointers
@@ -328,16 +328,17 @@ outputFile( LEXER,
 
 #define	    PARSER							ctx->pParser  
 #define	    RECOGNIZER						PARSER->rec
+#define		PSRSTATE						RECOGNIZER->state
 #define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define		MEMOIZE(ri,si)					RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define	    INPUT							PARSER->tstream
 #define	    STRSTREAM						INPUT
 #define		INDEX()							INPUT->istream->index(INPUT->istream)
-#define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
-#define	    EXCEPTION						RECOGNIZER->exception
+#define	    HASEXCEPTION()					(PSRSTATE->error == ANTLR3_TRUE)
+#define	    EXCEPTION						PSRSTATE->exception
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
-#define	    FOLLOWSTACK					    RECOGNIZER->following
+#define	    FOLLOWSTACK					    PSRSTATE->following
 #define	    FOLLOWPUSH(x)					FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
 #define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
@@ -350,11 +351,11 @@ outputFile( LEXER,
 #define	    REWIND(m)						INPUT->istream->rewind(INPUT->istream, m)
 #define	    REWINDLAST()					INPUT->istream->rewindLast(INPUT->istream)
 #define		SEEK(n)							INPUT->istream->seek(INPUT->istream, n)
-#define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
-#define	    _fsp							RECOGNIZER->_fsp
-#define	    FAILEDFLAG						RECOGNIZER->failed
+#define	    PERRORRECOVERY					PSRSTATE->errorRecovery
+#define	    _fsp							PSRSTATE->_fsp
+#define	    FAILEDFLAG						PSRSTATE->failed
 #define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
-#define	    BACKTRACKING					RECOGNIZER->backtracking
+#define	    BACKTRACKING					recognizer->state->backtracking
 #define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 #define     ADAPTOR                         ctx->adaptor
@@ -395,14 +396,15 @@ outputFile( LEXER,
 
 #define	    PARSER							ctx->pTreeParser  
 #define	    RECOGNIZER						PARSER->rec
+#define		PSRSTATE						RECOGNIZER->state
 #define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define	    INPUT							PARSER->ctnstream
 #define	    STRSTREAM						INPUT->tnstream
-#define	    HASEXCEPTION()					(RECOGNIZER->error == ANTLR3_TRUE)
-#define	    EXCEPTION						RECOGNIZER->exception
+#define	    HASEXCEPTION()					(PSRSTATE->error == ANTLR3_TRUE)
+#define	    EXCEPTION						PSRSTATE->exception
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
-#define	    FOLLOWSTACK					    RECOGNIZER->following
+#define	    FOLLOWSTACK					    PSRSTATE->following
 #define	    FOLLOWPUSH(x)					FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
 #define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
@@ -414,11 +416,11 @@ outputFile( LEXER,
 #define	    MARK()							INPUT->tnstream->istream->mark(INPUT->tnstream->istream)
 #define	    REWIND(m)						INPUT->tnstream->istream->rewind(INPUT->tnstream->istream, m)
 #define	    REWINDLAST(m)					INPUT->tnstream->istream->rewindLast(INPUT->tnstream->istream)
-#define	    PERRORRECOVERY					RECOGNIZER->errorRecovery
-#define	    _fsp							RECOGNIZER->_fsp
-#define	    FAILEDFLAG						RECOGNIZER->failed
+#define	    PERRORRECOVERY					PSRSTATE->errorRecovery
+#define	    _fsp							PSRSTATE->_fsp
+#define	    FAILEDFLAG						PSRSTATE->failed
 #define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
-#define	    BACKTRACKING					RECOGNIZER->backtracking
+#define	    BACKTRACKING					PSRSTATE->backtracking
 #define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 #define     ADAPTOR                         INPUT->adaptor
@@ -775,7 +777,7 @@ static unsigned char * getGrammarFileName()
  *     - Success p<name> initialized for the lex start
  *     - Fail (p<name>)(ANTLR3_ERR_NOMEM)
  */
-ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
+ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
     p<name> lexCtx; /* Context structure we will build and return   */
 
@@ -789,7 +791,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 
     /* -------------------------------------------------------------------
      * Memory for basic structure is allocated, now to fill in
-     * in base ANTLR3 structures. We intialize the function pointers
+     * in base ANTLR3 structures. We initialize the function pointers
      * for the standard ANTLR3 lexer function set, but upon return
      * from here, the programmer may set the pointers to provide custom
      * implementations of each function. 
@@ -800,7 +802,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
     
     /* Create a base lexer, using the supplied input stream
      */
-    lexCtx->pLexer	= antlr3LexerNewStream(ANTLR3_SIZE_HINT, instream);
+    lexCtx->pLexer	= antlr3LexerNewStream(ANTLR3_SIZE_HINT, instream, state);
 
     /* Check that we allocated the memory correctly
      */
@@ -835,7 +837,7 @@ ANTLR3_API p<name> <name>New         (pANTLR3_INPUT_STREAM     instream)
 <if(filterMode)>
     /* We have filter mode turned on, so install the filtering nextToken function
      */
-    lexCtx->pLexer->tokSource->nextToken = <name>NextToken;
+    LEXSTATE->tokSource->nextToken = <name>NextToken;
 <endif>
 
 	 <actions.lexer.apifuncs>
@@ -908,10 +910,10 @@ static pANTLR3_COMMON_TOKEN
 
     /* Record the start of the token in our input stream.
      */
-    lexer->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);
-    lexer->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
-    lexer->tokenStartLine				= lexer->input->getLine(lexer->input);
-    lexer->text							= NULL;
+    LEXSTATE->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);
+    LEXSTATE->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
+    LEXSTATE->tokenStartLine				= lexer->input->getLine(lexer->input);
+    LEXSTATE->text							= NULL;
 
     /* Now call the matching rules and see if we can generate a new token
      */
@@ -929,25 +931,25 @@ static pANTLR3_COMMON_TOKEN
 			return  teof;
 		}
 		
-		lexer->token		= NULL;
-		lexer->rec->error	= ANTLR3_FALSE;	    /* Start out without an exception	*/
+		LEXSTATE->token		= NULL;
+		LEXSTATE->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
 		
 		{
 			ANTLR3_UINT64   m;
 		    
 			m							= lexer->input->istream->mark(lexer->input->istream);
-			lexer->rec->backtracking	= 1;				/* No exceptions */
-			lexer->rec->failed			= ANTLR3_FALSE;
+			LEXSTATE->backtracking		= 1;				/* No exceptions */
+			LEXSTATE->failed			= ANTLR3_FALSE;
 		 
 			/* Call the generated lexer, see if it can get a new token together.
 			 */
 			lexer->mTokens(lexer->ctx);   
-    		lexer->rec->backtracking	= 0;
+    		LEXSTATE->backtracking	= 0;
 	    	    
     		<! mTokens backtracks with synpred at BACKTRACKING==2
 				and we set the synpredgate to allow actions at level 1. !>
 	               
-			if	(lexer->rec->failed == ANTLR3_TRUE)
+			if	(LEXSTATE->failed == ANTLR3_TRUE)
 			{
 				lexer->input->istream->rewind(lexer->input->istream, m);
 				lexer->input->istream->consume(lexer->input->istream); <! advance one char and try again !>
@@ -955,7 +957,7 @@ static pANTLR3_COMMON_TOKEN
 			else
 			{
 				lexer->emit(lexer);					/* Assemble the token and emit it to the stream */
-				return	lexer->token;
+				return	LEXSTATE->token;
 			}	
 		}
     }
@@ -1024,14 +1026,14 @@ static unsigned char * getGrammarFileName()
 {
 	return fileName;
 }
-/** \brief Create a new <name> parser and retrun a context for it.
+/** \brief Create a new <name> parser and return a context for it.
  *
  * \param[in] instream Pointer to an input stream interface.
  *
  * \return Pointer to new parser context upon success.
  */
 ANTLR3_API p<name>
-<name>New   (<inputStreamType> instream)
+<name>New   (<inputStreamType> instream, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
     p<name> ctx;	    /* Context structure we will build and return   */
     
@@ -1045,7 +1047,7 @@ ANTLR3_API p<name>
     
     /* -------------------------------------------------------------------
      * Memory for basic structure is allocated, now to fill in
-     * the base ANTLR3 structures. We intialize the function pointers
+     * the base ANTLR3 structures. We initialize the function pointers
      * for the standard ANTLR3 parser function set, but upon return
      * from here, the programmer may set the pointers to provide custom
      * implementations of each function. 
@@ -1057,12 +1059,12 @@ ANTLR3_API p<name>
 <if(PARSER)>
     /* Create a base parser/recognizer, using the supplied token stream
      */
-    ctx->pParser	    = antlr3ParserNewStream(ANTLR3_SIZE_HINT, instream->tstream);
+    ctx->pParser	    = antlr3ParserNewStream(ANTLR3_SIZE_HINT, instream->tstream, state);
 <endif>
 <if(TREE_PARSER)>
     /* Create a base Tree parser/recognizer, using the supplied tree node stream
      */
-    ctx->pTreeParser		= antlr3TreeParserNewStream(ANTLR3_SIZE_HINT, instream);
+    ctx->pTreeParser		= antlr3TreeParserNewStream(ANTLR3_SIZE_HINT, instream, state);
 <endif>
 
     /* Install the implementation of our <name> interface
@@ -1089,15 +1091,11 @@ ANTLR3_API p<name>
 <if(memoize)>
     /* Create a LIST for recording rule memos.
      */
-<if(TREE_PARSER)>
-    ctx->pTreeParser->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
-<else>
-    ctx->pParser->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
-<endif>
+     PSRSTATE->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
 <endif>	
     /* Install the token table
      */
-    RECOGNIZER->tokenNames   = <name>TokenNames;
+    PSRSTATE->tokenNames   = <name>TokenNames;
     
     /* Initialize the follow bit sets
      */
@@ -1562,7 +1560,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <ruleDescriptor.actions.init>
     
     <block>
-	LEXER->type = _type;
+	LEXSTATE->type = _type;
 <endif>
     <if(trace)> fprintf(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
     <ruleCleanUp()>
@@ -1851,7 +1849,7 @@ lexerStringRef(string,label) ::= <<
 int <label>Start = GETCHARINDEX();
 MATCHS(<string>); 
 <checkRuleBacktrackFailure()>
-<labelType> <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
+<labelType> <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
 <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
 <label>->setStartIndex(<label>, <label>Start);
 <label>->setStopIndex(<label>, GETCHARINDEX()-1);
@@ -1921,7 +1919,7 @@ lexerRuleRef(rule,label,args,elementIndex) ::= <<
     ANTLR3_UINT64 <label>Start<elementIndex> = GETCHARINDEX();
     m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
     <checkRuleBacktrackFailure()>
-    <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
+    <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
     <label>->setType(<label>, ANTLR3_TOKEN_INVALID);
     <label>->setStartIndex(<label>, <label>Start<elementIndex>);
     <label>->setStopIndex(<label>, GETCHARINDEX()-1);
@@ -1948,7 +1946,7 @@ lexerMatchEOF(label,elementIndex) ::= <<
     <label>Start<elementIndex> = GETCHARINDEX();
     MATCHC(ANTLR3_CHARSTREAM_EOF); 
     <checkRuleBacktrackFailure()>
-    <label> = LEXER->tokFactory->newToken(LEXER->tokFactory);
+    <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
     <label>->setType(<label>, ANTLR3_TOKEN_EOF);
     <label>->setStartIndex(<label>, <label>Start<elementIndex>);
     <label>->setStopIndex(<label>, GETCHARINDEX()-1);
@@ -2807,10 +2805,10 @@ rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "LEXER->getText(LEXER)"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "LEXER->tokenStartLine"
-lexerRulePropertyRef_pos(scope,attr) ::= "LEXER->tokenStartCharPositionInLine"
-lexerRulePropertyRef_channel(scope,attr) ::= "LEXER->channel"
-lexerRulePropertyRef_start(scope,attr) ::= "LEXER->tokenStartCharIndex"
+lexerRulePropertyRef_line(scope,attr) ::= "LEXSTATE->tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "LEXSTATE->tokenStartCharPositionInLine"
+lexerRulePropertyRef_channel(scope,attr) ::= "LEXSTATE->channel"
+lexerRulePropertyRef_start(scope,attr) ::= "LEXSTATE->tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(LEXER->getCharIndex(LEXER)-1)"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 

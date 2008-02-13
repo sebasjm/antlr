@@ -26,6 +26,7 @@ static void					setTokenSource		(pANTLR3_TOKEN_STREAM ts, pANTLR3_TOKEN_SOURCE t
 static pANTLR3_STRING	    toString			(pANTLR3_TOKEN_STREAM ts);
 static pANTLR3_STRING	    toStringSS			(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop);
 static pANTLR3_STRING	    toStringTT			(pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
+static void					setDebugListener	(pANTLR3_TOKEN_STREAM ts, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
 /* INT STREAM API */
 static void					consume						(pANTLR3_INT_STREAM is);
@@ -238,6 +239,29 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     return  stream;
 }
 
+// Install a debug listener adn switch to debug mode methods
+//
+static void					
+setDebugListener	(pANTLR3_TOKEN_STREAM ts, pANTLR3_DEBUG_EVENT_LISTENER debugger)
+{
+		// Install the debugger object
+	//
+	ts->debugger = debugger;
+
+	// Override standard token stream methods with debugging versions
+	//
+	ts->initialStreamState	= ANTLR3_FALSE;
+
+	ts->_LT				= dbgTokLT;
+
+	ts->istream->consume		= dbgConsume;
+	ts->istream->_LA			= dbgLA;
+	ts->istream->mark			= dbgMark;
+	ts->istream->rewind		= dbgRewindStream;
+	ts->istream->rewindLast	= dbgRewindLast;
+	ts->istream->seek			= dbgSeek;
+}
+
 /** Get the ith token from the current position 1..n where k=1 is the
  *  first symbol of lookahead.
  */
@@ -293,7 +317,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k)
 	    return  teof;
     }
 
-    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i+1);
+    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
 }
 
 /// Debug only method to flag consumption of initial off-channel
@@ -374,7 +398,7 @@ LB  (pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT64 k)
 	return	NULL;
     }
 
-    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i+1);
+    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
 }
 
 static pANTLR3_COMMON_TOKEN 
@@ -384,7 +408,7 @@ get (pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i)
 
     cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
 
-    return  (pANTLR3_COMMON_TOKEN)(cts->tokens->get(cts->tokens, i+1));  /* Token index is zero based but vectors are 1 based */
+    return  (pANTLR3_COMMON_TOKEN)(cts->tokens->get(cts->tokens, i));  /* Token index is zero based but vectors are 1 based */
 }
 
 static pANTLR3_TOKEN_SOURCE 
