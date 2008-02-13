@@ -3,7 +3,7 @@
 /// tree node stream used by ANTLR.
 ///
 
-#include    <antlr3commontreenodestream.h>
+#include    <antlr3unbufferedtreenodestream.h>
 
 #ifdef	WIN32
 #pragma warning( disable : 4100 )
@@ -51,29 +51,8 @@ static	ANTLR3_UINT64				size						(pANTLR3_INT_STREAM is);
 
 
 static	void						antlr3TreeNodeStreamFree			(pANTLR3_TREE_NODE_STREAM tns);
-static	void						antlr3CommonTreeNodeStreamFree		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	void						antlr3UnbufTreeNodeStreamFree		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 
-ANTLR3_API pANTLR3_TREE_NODE_STREAM
-antlr3TreeNodeStreamNew()
-{
-    pANTLR3_TREE_NODE_STREAM stream;
-
-    // Memory for the interface structure
-    //
-    stream  = (pANTLR3_TREE_NODE_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_TREE_NODE_STREAM));
-
-    if	(stream == NULL)
-    {
-		return	(pANTLR3_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
-
-    // Install basic API 
-    //
-	stream->replaceChildren = replaceChildren;
-    stream->free			= antlr3TreeNodeStreamFree;
-    
-    return stream;
-}
 
 static void
 antlr3TreeNodeStreamFree(pANTLR3_TREE_NODE_STREAM stream)
@@ -82,11 +61,11 @@ antlr3TreeNodeStreamFree(pANTLR3_TREE_NODE_STREAM stream)
 }
 
 ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
-antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
+antlr3UnbufTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
 {
 	pANTLR3_COMMON_TREE_NODE_STREAM stream;
 
-	stream = antlr3CommonTreeNodeStreamNew(tree->strFactory, hint);
+	stream = antlr3UnbufTreeNodeStreamNew(tree->strFactory, hint);
 
 	if	(stream == (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
 	{
@@ -98,7 +77,7 @@ antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
 }
 
 ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
-antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hint)
+antlr3UnbufTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hint)
 {
 	pANTLR3_COMMON_TREE_NODE_STREAM stream;
 	pANTLR3_COMMON_TOKEN			token;
@@ -166,7 +145,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	stream->walkBackToMostRecentNodeWithUnvisitedChildren
 										=  walkBackToMostRecentNodeWithUnvisitedChildren;
 
-	stream->free			    =  antlr3CommonTreeNodeStreamFree;
+	stream->free			    =  antlr3UnbufTreeNodeStreamFree;
 
 	// Install the tree node stream API
 	//
@@ -234,7 +213,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	return  stream;
 }
 
-static	void			    antlr3CommonTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+static	void			    antlr3UnbufTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
     ctns->adaptor			->free  (ctns->adaptor);
     ctns->tnstream->istream ->free  (ctns->tnstream->istream);

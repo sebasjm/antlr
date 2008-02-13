@@ -830,6 +830,10 @@
 				RelativePath=".\src\antlr3ucs2inputstream.c"
 				>
 			</File>
+			<File
+				RelativePath=".\src\antlr3unbufferedtreenodestream.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -958,6 +962,10 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3treeparser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\antlr3unbufferedtreenodestream.h"
 				>
 			</File>
 		</Filter>
