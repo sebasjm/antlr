@@ -244,7 +244,7 @@ the decision cannot distinguish between alternative(s) <danglingAlts; separator=
 >>
 
 UNREACHABLE_ALTS(alts) ::= <<
-The following alternatives are unreachable: <alts; separator=","><\n>
+The following alternatives can never be matched: <alts; separator=","><\n>
 >>
 
 INSUFFICIENT_PREDICATES(alts) ::= <<
@@ -267,7 +267,7 @@ Alternative <alt> discovers infinite left-recursion <targetRules,callSiteStates:
 >>
 
 UNREACHABLE_TOKENS(tokens) ::= <<
-The following token definitions are unreachable: <tokens; separator=",">
+The following token definitions can never be matched because prior tokens match the same input: <tokens; separator=",">
 >>
 
 TOKEN_NONDETERMINISM(input,conflictingTokens,paths,disabled) ::=

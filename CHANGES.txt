@@ -8,9 +8,13 @@ University of San Francisco
 
 CHANGES
 
+February 13, 2008
+
+* Improved error msgs for unreachable alts and tokens.
+
 February 11-12, 2008
 
-* Fixes ANTLR-219.
+* Fixed ANTLR-219.
   It looks like the AST construction code for sets was totally messed up.
   This was for not only the new tree parser AST construction, but also
   the regular tree construction for parsers. I had to introduce templates
@@ -21,7 +25,7 @@ February 11-12, 2008
   to differentiate between a regular set in one that is an entire rule.
   If it is an entire rule, it has to set the return value, retval.tree.
 
-* Fixes ANTLR-220.
+* Fixed ANTLR-220.
   Made TreeAdaptor dupNode and dupTree events emit debugging events
   so AW could see tree node duplications.
 
