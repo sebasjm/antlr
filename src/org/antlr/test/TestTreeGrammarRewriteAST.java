@@ -381,6 +381,28 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a (b 3))\n", found);
 	}
 
+	public void testAutoDupTreeWithSubruleInside() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"tokens {OP;}\n" +
+			"a : (x=ID|x=INT) -> ^(OP $x) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"a : ^(OP (b|c)) ;\n" +
+			"b : ID ;\n" +
+			"c : INT ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "a", "a");
+		assertEquals("(OP a)\n", found);
+	}
+
 	public void testDelete() throws Exception {
 		String grammar =
 			"grammar T;\n" +

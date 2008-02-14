@@ -597,7 +597,7 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
 String description = grammar.grammarTreeToString(#alternative, false);
 description = generator.target.getTargetStringLiteralFromString(description);
 code.setAttribute("description", description);
-code.setAttribute("treeLevel", "0");
+code.setAttribute("treeLevel", rewriteTreeNestingLevel);
 if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
 	code.setAttribute("autoAST", Boolean.valueOf(true));
 }
