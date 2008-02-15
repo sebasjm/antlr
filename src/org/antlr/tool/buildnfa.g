@@ -41,7 +41,6 @@ options {
 }
 
 {
-public static GrammarAST ASTNULL = new GrammarAST();
 
 /** Factory used to create nodes and submachines */
 protected NFAFactory factory = null;
