@@ -154,7 +154,7 @@
 	///
 	/// A source file that provides the default implementations of functions will usually
 	/// also supply the public (exported from the .DLL or code library) 'constructor' functions
-	/// that create and initialize the typedef structure that they implement. Forinstance,
+	/// that create and initialize the typedef structure that they implement. For instance,
 	/// in the antlr3baserecognizer.c file, you will find the function antlr3BaseRecognizerNew()
 	///
 
@@ -166,6 +166,10 @@
 		///
 		/// \defgroup pANTLR3_RECOGNIZER_SHARED_STATE pANTLR3_RECOGNIZER_SHARED_STATE - Recognizer Shared State Implementation
 		/// \ingroup apiimplementations
+		///
+		/// The recognizer shared state class does not have an implementation because it contains only
+		/// data fields, documented at #ANTLR3_RECOGNIZER_SHARED_STATE
+		///
 		/// \defgroup pANTLR3_BITSET pANTLR3_BITSET - Bitset Implementation
 		/// \ingroup apiimplementations
 		/// \defgroup pANTLR3_TOKEN_FACTORY pANTLR3_TOKEN_FACTORY - Token Factory Implementation
