@@ -6,4 +6,10 @@ use Test::More tests => 1;
 
 my $file = 'lib/ANTLR/Runtime.pm';
 
-like(MM->parse_version($file), qr/^\d+\.\d{2,}(_\d{2,})?$/);
+my $version = MM->parse_version($file);
+
+# classic CPAN
+#like($version, qr/^\d+\.\d{2,}(_\d{2,})?$/);
+
+# version.pm
+like($version, qr/^\d+\.\d+\.\d+(?:_\d+)?$/);
