@@ -63,7 +63,7 @@ sub g_test_output_is {
     chdir $tmpdir;
 
     # compile grammar
-    my $g_result = run_program([ File::Spec->catfile($cwd, 'antlr'), $grammar_file ]);
+    my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', 'antlr'), $grammar_file ]);
 
     # run test program
     my $test_result = run_program([ 'perl', "-Mblib=$cwd", 'test.pl']);
