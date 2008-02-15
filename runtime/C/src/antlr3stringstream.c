@@ -37,7 +37,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
 
     if	(input == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
     
     /* Structure was allocated correctly, now we can install the pointer.
@@ -51,7 +51,8 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
 
     /* Now we can set up the file name
      */
-    input->fileName = input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
+	input->istream->streamName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
+    input->fileName				= input->istream->streamName;
 
     return  input;
 }
@@ -105,8 +106,10 @@ antlr3NewUCS2StringInPlaceStream   (pANTLR3_UINT16 inString, ANTLR3_UINT64 size,
      */
     antlr3UCS2SetupStream   (input, ANTLR3_CHARSTREAM);
     
-    input->fileName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)defaultName : (pANTLR3_UINT8)name);
-    
+	input->istream->streamName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)defaultName : (pANTLR3_UINT8)name);
+	input->fileName				= input->istream->streamName;
+
+
     return  input;
 }
 
@@ -163,7 +166,9 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
      */
     antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
-    input->fileName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
+    
+	input->istream->streamName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
+	input->fileName				= input->istream->streamName;
 
     return  input;
 }

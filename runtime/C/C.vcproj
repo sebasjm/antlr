@@ -1012,6 +1012,38 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Doxygen"
+			>
+			<File
+				RelativePath=".\doxygen\atsections.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\build.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\buildrec.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\doxygengroups.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\generate.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\mainpage.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\using.dox"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

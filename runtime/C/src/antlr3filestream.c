@@ -58,8 +58,9 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 	antlr3AsciiSetupStream(input, ANTLR3_CHARSTREAM);
 
 	// Now we can set up the file name
-	//
-	input->fileName = input->strFactory->newStr(input->strFactory, fileName);
+	//	
+	input->istream->streamName	= input->strFactory->newStr(input->strFactory, fileName);
+	input->fileName				= input->istream->streamName;
 
 	if	(status != ANTLR3_SUCCESS)
 	{

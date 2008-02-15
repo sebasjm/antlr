@@ -1,0 +1,52 @@
+/// \page atsections Using Sections Within Grammar Files
+///
+/// \section intro Introduction
+///
+/// A C targeted grammar can make use of special annotations within a grammar
+/// file, which are prefixed with the <b>\@</b> character. These sections cause the 
+/// the placement of their contents within the generated code at defined points
+/// such as within the generated C header file.
+///
+/// The general form of these annotations is:
+///
+/// \code
+/// section
+///   : '@' (( 'parser' | 'lexer' ) '::')? SECTIONNAME '{' yourcode '}'
+///   ;
+/// \endcode
+///
+/// If the 'parser' or lexer keywords are left out of the specification, then the
+/// ANTLR tool assumes a lexer target for a lexer grammar, a parser target for a parser
+/// or tree parser grammar, and a parser target for a combined lexer/parser grammar. You
+/// are advised as a matter of course to include the parser or lexer target keyword.
+///
+/// Documentation regarding the \@sections available for a grammar targeted at C now
+/// follows.
+///
+/// \subsection psrheader \@header
+///
+/// The <code>@parser::header</code> or <code>@lexer::header</code> annotations cause the code the encapsulate
+/// to be placed in the generated .h file. Here you could for instance place a #include
+/// statement to cause your grammar code to include some standard definitions. Because you
+/// may use multiple parsers and lexers in your solution, you should probably not place
+/// #define statements here, but in the <code>@preincludes</code> or <code>@postincludes</code> section. Then you
+/// may have different #defines for different recognizers. 
+///
+/// Here is an example:
+////
+/// \code
+/// @lexer::header
+/// {
+///   #include "myprojectcommondefs.h"
+/// }
+///
+/// @parser::header
+/// {
+///   #include "myprojectcommondefs.h"
+/// }
+/// \endcode
+///
+/// You should note that putting even #include statements here is perhaps not as useful
+/// as placing them in the <code>@postincludes</code> section, but you may find uses in changing
+/// elements of the generated include files via #undef/@define pairs.
+///

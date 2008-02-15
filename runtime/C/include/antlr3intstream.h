@@ -1,7 +1,7 @@
 /** \file
  * Defines the the class interface for an antlr3 INTSTREAM.
  * 
- * Certain funcitonality (such as DFAs for instance) abstract the stream of tokens
+ * Certain functionality (such as DFAs for instance) abstract the stream of tokens
  * or characters in to a steam of integers. Hence this structure should be included
  * in any stream that is able to provide the output as a stream of integers (which is anything
  * basically.
@@ -78,6 +78,10 @@ typedef	struct ANTLR3_INT_STREAM_struct
     /** Last marker position allocated
      */
     ANTLR3_UINT64	    lastMarker;
+
+	// Return a string that identifies the input source
+	//
+	pANTLR3_STRING		(*getSourceName)	(struct ANTLR3_INT_STREAM_struct * intStream);
 
     /** Consume the next 'ANTR3_UINT32' in the stream
      */

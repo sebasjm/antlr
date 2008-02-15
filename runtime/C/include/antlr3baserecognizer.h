@@ -1,6 +1,8 @@
 /** \file
  * Defines the basic structure to support recognizing by either a lexer,
  * parser, or tree parser.
+ * \addtogroup ANTLR3_BASE_RECOGNIZER
+ * @{
  */
 #ifndef	_ANTLR3_BASERECOGNIZER_H
 #define	_ANTLR3_BASERECOGNIZER_H
@@ -38,15 +40,15 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
     void	      * super;
     
 	/// Indicates the type of recognizer that we are an instance of.
-    ///  The programmer may set this to anything of course, but the default 
+    /// The programmer may set this to anything of course, but the default 
     /// implementations of the interface only really understand the built in
-    ///  types, so new error handlers etc would probably be required too.
+    /// types, so new error handlers etc would probably be required to as well.
     /// 
     ///  Valid types are:
     ///
-    ///   - #ANTLR3_LEXER  
-	///	  - #ANTLR3_PARSER
-    ///   - #ANTLR3_TREEPARSER
+    ///   - #ANTLR3_TYPE_LEXER  
+	///	  - #ANTLR3_TYPE_PARSER
+    ///   - #ANTLR3_TYPE_TREE_PARSER
     ///
     ANTLR3_UINT32	type;
 
@@ -262,6 +264,9 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 #include    <antlr3lexer.h>
 #include    <antlr3parser.h>
 #include    <antlr3treeparser.h>
+
+/// @}
+///
 
 #endif	    /* _ANTLR3_BASERECOGNIZER_H	*/
 

@@ -1,12 +1,14 @@
-/** \file Default implementaation of CommonTokenStream
- */
+/// \file 
+/// Default implementation of CommonTokenStream
+///
 #include    <antlr3tokenstream.h>
 
 #ifdef	WIN32
 #pragma warning( disable : 4100 )
 #endif
 
-/* COMMON_TOKEN_STREAM API */
+// COMMON_TOKEN_STREAM API
+//
 static void					setTokenTypeChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT32 ttype, ANTLR3_UINT32 channel);
 static void					discardTokenType	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 ttype);
 static void					discardOffChannel	(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_BOOLEAN discard);
@@ -16,8 +18,8 @@ static pANTLR3_LIST			getTokensSet		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UIN
 static pANTLR3_LIST			getTokensList		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, pANTLR3_LIST list);
 static pANTLR3_LIST			getTokensType		(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_UINT64 start, ANTLR3_UINT64 stop, ANTLR3_UINT32 type);
 
-/* TOKEN_STREAM API 
- */
+// TOKEN_STREAM API 
+//
 static pANTLR3_COMMON_TOKEN tokLT				(pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k);
 static pANTLR3_COMMON_TOKEN dbgTokLT			(pANTLR3_TOKEN_STREAM ts, ANTLR3_INT64 k);
 static pANTLR3_COMMON_TOKEN get					(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 i);
@@ -28,7 +30,8 @@ static pANTLR3_STRING	    toStringSS			(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT64 s
 static pANTLR3_STRING	    toStringTT			(pANTLR3_TOKEN_STREAM ts, pANTLR3_COMMON_TOKEN start, pANTLR3_COMMON_TOKEN stop);
 static void					setDebugListener	(pANTLR3_TOKEN_STREAM ts, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
-/* INT STREAM API */
+// INT STREAM API
+//
 static void					consume						(pANTLR3_INT_STREAM is);
 static void					dbgConsume					(pANTLR3_INT_STREAM is);
 static ANTLR3_UINT32	    _LA							(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
@@ -44,11 +47,12 @@ static void					rewindLast					(pANTLR3_INT_STREAM is);
 static void					dbgRewindLast				(pANTLR3_INT_STREAM is);
 static void					seek						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
 static void					dbgSeek						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
-
+static pANTLR3_STRING		getSourceName				(pANTLR3_INT_STREAM is);
 static void					antlr3TokenStreamFree		(pANTLR3_TOKEN_STREAM	    stream);
 static void					antlr3CTSFree				(pANTLR3_COMMON_TOKEN_STREAM    stream);
 
-/* Helpers */
+// Helpers
+//
 static void					fillBuffer					(pANTLR3_COMMON_TOKEN_STREAM tokenStream);
 static ANTLR3_UINT64	    skipOffTokenChannels		(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
 static ANTLR3_UINT64	    skipOffTokenChannelsReverse	(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT64 i);
@@ -59,17 +63,17 @@ antlr3TokenStreamNew()
 {
     pANTLR3_TOKEN_STREAM stream;
 
-    /* Memory for the interface structure
-     */
+    // Memory for the interface structure
+    //
     stream  = (pANTLR3_TOKEN_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_TOKEN_STREAM));
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_TOKEN_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	(pANTLR3_TOKEN_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
     }
 
-    /* Install basic API 
-     */
+    // Install basic API 
+    //
     stream->free    =  antlr3TokenStreamFree;
 
     
@@ -85,41 +89,40 @@ antlr3TokenStreamFree(pANTLR3_TOKEN_STREAM stream)
 static void		    
 antlr3CTSFree	    (pANTLR3_COMMON_TOKEN_STREAM stream)
 {
-   /* We only free up our subordinate interfaces if they belong
-    * to us, otherwise we let whoever owns them deal with them.
-    */
-    if	(stream->tstream->super == stream)
-    {
-	if	(stream->tstream->istream->super == stream->tstream)
+	// We only free up our subordinate interfaces if they belong
+	// to us, otherwise we let whoever owns them deal with them.
+	//
+	if	(stream->tstream->super == stream)
 	{
-	    stream->tstream->istream->free(stream->tstream->istream);
-	    stream->tstream->istream = NULL;
+		if	(stream->tstream->istream->super == stream->tstream)
+		{
+			stream->tstream->istream->free(stream->tstream->istream);
+			stream->tstream->istream = NULL;
+		}
+		stream->tstream->free(stream->tstream);
 	}
 
-	stream->tstream->free(stream->tstream);
-    }
+	// Now we free our own resources
+	//
+	if	(stream->tokens != NULL)
+	{
+		stream->tokens->free(stream->tokens);
+		stream->tokens	= NULL;
+	}
+	if	(stream->discardSet != NULL)
+	{
+		stream->discardSet->free(stream->discardSet);
+		stream->discardSet  = NULL;
+	}
+	if	(stream->channelOverrides != NULL)
+	{
+		stream->channelOverrides->free(stream->channelOverrides);
+		stream->channelOverrides = NULL;
+	}
 
-    /* Now we free our own resources
-     */
-    if	(stream->tokens != NULL)
-    {
-	stream->tokens->free(stream->tokens);
-	stream->tokens	= NULL;
-    }
-    if	(stream->discardSet != NULL)
-    {
-	stream->discardSet->free(stream->discardSet);
-	stream->discardSet  = NULL;
-    }
-    if	(stream->channelOverrides != NULL)
-    {
-	stream->channelOverrides->free(stream->channelOverrides);
-	stream->channelOverrides = NULL;
-    }
-
-    /* Free our memory now
-     */
-    ANTLR3_FREE(stream);
+	// Free our memory now
+	//
+	ANTLR3_FREE(stream);
 }
 
 ANTLR3_API pANTLR3_COMMON_TOKEN_STREAM
@@ -235,6 +238,7 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
     stream->tstream->istream->rewindLast=  rewindLast;
     stream->tstream->istream->seek	=  seek;
     stream->tstream->istream->consume	=  consume;
+	stream->tstream->istream->getSourceName = getSourceName;
 
     return  stream;
 }
@@ -975,4 +979,22 @@ skipOffTokenChannelsReverse(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT6
 	}
     }
     return x;
+}
+
+/// Return a string that represents the name assoicated with the input source
+///
+/// /param[in] is The ANTLR3_INT_STREAM interface that is representing this token stream.
+///
+/// /returns 
+/// /implements ANTLR3_INT_STREAM_struct::getSourceName()
+///
+static pANTLR3_STRING		
+getSourceName				(pANTLR3_INT_STREAM is)
+{
+	// Slightly convoluted as we must trace back to the lexer's input source
+	// via the token source. The streamName that is here is not initialized
+	// because this is a token stream, not a file or string stream, which are the
+	// only things that have a context for a source name.
+	//
+	return ((pANTLR3_TOKEN_STREAM)(is->super))->tokenSource->fileName;
 }

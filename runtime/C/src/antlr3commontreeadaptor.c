@@ -21,6 +21,8 @@ static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adap
 static	pANTLR3_COMMON_TOKEN    getToken				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	pANTLR3_STRING			getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32			getType					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE		getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
+static	pANTLR3_UINT64			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void					replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
 static	void					setDebugEventListener	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
 
@@ -71,6 +73,8 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 	cta->baseAdaptor.getTokenStopIndex	    =  getTokenStopIndex;
 	cta->baseAdaptor.getText				=  getText;
 	cta->baseAdaptor.getType				=  getType;
+	cta->baseAdaptor.getChild				=  getChild;
+	cta->baseAdaptor.getChildCount			=  getChildCount;
 	cta->baseAdaptor.free					=  ctaFree;
 	cta->baseAdaptor.setDebugEventListener	=  setDebugEventListener;
 
@@ -360,4 +364,13 @@ replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, 
 	{
 		parent->replaceChildren(parent, startChildIndex, stopChildIndex, t);
 	}
+}
+static	pANTLR3_BASE_TREE		getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+{
+	return t->getChild(t, i);
+}
+
+static	pANTLR3_UINT64			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+{
+	return t->getChildCount(t);
 }

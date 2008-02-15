@@ -46,6 +46,8 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
     void					(*addChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
     void					(*addChildToken)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child);
 
+	ANTLR3_BOOLEAN			(*isNil)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
+
     pANTLR3_BASE_TREE	    (*becomeRoot)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE newRoot, pANTLR3_BASE_TREE oldRoot);
 
     pANTLR3_BASE_TREE	    (*rulePostProcessing)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE root);
@@ -68,7 +70,7 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
     void					(*setText)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_STRING t);
     void					(*setText8)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_UINT8 t);
 
-    pANTLR3_BASE_TREE	    (*getChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, ANTLR3_UINT64 i);
+    pANTLR3_BASE_TREE	    (*getChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
 
     pANTLR3_UINT64			(*getChildCount)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE);
 

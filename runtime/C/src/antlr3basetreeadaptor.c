@@ -34,9 +34,10 @@ static	void				setType					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE
 static	pANTLR3_STRING		getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void				setText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t);
 static	void				setText8				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
-static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i);
+static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
 static	pANTLR3_UINT64		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT64		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_BOOLEAN		isNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 
 /** Given a pointer to a base tree adaptor structure (which is usually embedded in the
@@ -82,6 +83,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 	adaptor->getChild				=  getChild;
 	adaptor->getChildCount			=  getChildCount;
 	adaptor->getUniqueID			=  getUniqueID;
+	adaptor->isNil					=  isNil;
 
 	
 	/* Remaining functions filled in by the caller.
@@ -412,7 +414,7 @@ setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
 }
 
 static	pANTLR3_BASE_TREE	
-   getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT64 i)
+   getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
 	return NULL;
@@ -432,4 +434,10 @@ static	ANTLR3_UINT64
    getUniqueID		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE node)
 {
 	return	ANTLR3_UINT64_CAST(node);
+}
+
+static	ANTLR3_BOOLEAN
+isNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+{
+	return t->isNil(t);
 }

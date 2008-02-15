@@ -1,0 +1,94 @@
+// Definitions of documentation groups so we can organize the API and
+// usage documentation nicely.
+
+/// \defgroup apiclasses API Classes
+///
+/// The API classes are divided into the typdefs (and their underlying structs)
+/// that are the containers for each 'object' within the ANTLR3C runtime, and
+/// their implementations (the functions that are installed by default in to
+/// these structures when you create them.)
+///
+/// The typedefs contain data and function pointers, which together define
+/// the object. The implementation functions are the default implementations
+/// of the 'methds' encapsulated by the typdef structures.You may override 
+/// any of the methods once their objects are created by installing a pointer to 
+/// your own function. Some of these methods create other 'objects' (instances of
+/// typedef structures), which allows you install your own method and create your
+/// own implementation of these.
+///
+
+	/// \defgroup apistructures API Typedefs and Structs
+	/// \ingroup apiclasses
+	///
+	/// These structures (and the typedefs that you use to reference them
+	/// and their pointers) are the C equivalent of objects. They correspond
+	/// (roughly) to the Java runtime system classes and contain all the
+	/// data elements for a particular interface as well as all the pointers
+	/// to functions that implement these interfaces.
+	///
+	/// There are constructor functions exported from the C runtime, which you
+	/// use to create a default implementation of one of these 'classes'. You can
+	/// then override any part of the implementation by installing your own
+	/// function pointers, before using the interface 'object' you have created.
+	///
+	/// For instance, you can override the default error message reporting function
+	/// by replacing the standard (example) implementation of this function with
+	/// your own. In your grammar, you would place the following
+	///
+	/// \code
+	/// @parser::apifuncs
+	/// {
+	///    // Install custom error message display
+	///    //
+	///    RECOGNIZER->displayRecognitionError = produceError;
+	/// }
+	/// \endcode
+	///
+	/// The special section @parser::apiFuncs is guaranteed to be generated after
+	/// the RECONGIZER 'object' has already be created and initialized, so you may
+	/// install your own implementations of the #ANTLR3_BASE_RECOGNIZER interface
+	/// functions. The error display function is likely to be the only one you are
+	/// interested in replacing.
+	///
+	/// Some typedef structures contain either pointers to 'inherited' objects (usual)
+	/// or embedded structures/typedefs (unusual). In some cases, the pointers passed
+	/// around by the paresr or tree parser are actually the pointers to these embedded
+	/// structures (such as #pANTLR3_BASE_TREE), and these embedded 'objects' contain
+	/// pointers to their encapsulating objects. This is the equivalent of passing
+	/// interface objects around in object oriented languages.
+	///
+	
+		/// \defgroup ANTLR3_BASE_RECOGNIZER Base Recognizer Definition
+		/// \ingroup apistructures
+		///
+		/// This is the definition of the base recognizer interface, instantiations
+		/// of which are referred to via #pANTLR3_BASE_RECOGNIZER.
+		///
+		/// In general you will not refer to one of these structures directly as a
+		/// a  #pANTLR3_BASE_RECOGNIZER will be embedded within a higher level
+		/// object such as #pANTLR3_PARSER
+		///
+
+	/// \defgroup apiimplementations API Implementation functions
+	/// \ingroup apiclasses
+	///
+	/// API implementation functions are the default implementation of each of the
+	/// methods in a particular typedef structure. 
+	///
+	/// They are generally grouped together in the same source code file. 
+	/// For instance the default implementations of the
+	/// methods contained by a #pANTLR3_BASE_RECOGNIZER will be found in the file
+	/// antlr3baserecognizer.c
+	///
+	/// A source file that provides the default implementations of functions will usually
+	/// also supply the public (exported from the .DLL or code library) 'constructor' functions
+	/// that create and initialize the typedef structure that they implement. Forinstance,
+	/// in the antlr3baserecognizer.c file, you will find the function antlr3BaseRecognizerNew()
+	///
+
+		/// \defgroup pANTLR3_BASE_RECOGNIZER Base Recognizer Implementation
+		/// \ingroup apiimplementations
+		///
+		/// The base recognizer interface is implemented by all higher level recognizers
+		/// such as #pANTLR3_PARSER and provides methods common to all recognizers.
+		///

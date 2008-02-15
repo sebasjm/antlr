@@ -31,6 +31,7 @@ static	void						walkBackToMostRecentNodeWithUnvisitedChildren
 static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor				(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE			getTreeSource				(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE			_LT							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k);
+static	pANTLR3_BASE_TREE			get							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k);
 static	void						setUniqueNavigationNodes	(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes);
 static	pANTLR3_STRING				toString					(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_STRING				toStringSS					(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
@@ -50,6 +51,14 @@ static	void						seek						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
 static	ANTLR3_UINT64				size						(pANTLR3_INT_STREAM is);
 
 
+// Helper functions
+//
+static	void						fillBuffer					(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t);
+static	void						fillBufferRoot				(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	ANTLR3_INT32				getNodeIndex				(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t);
+
+// Constructors
+//
 static	void						antlr3TreeNodeStreamFree			(pANTLR3_TREE_NODE_STREAM tns);
 static	void						antlr3CommonTreeNodeStreamFree		(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 
@@ -177,6 +186,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	stream->tnstream->toString					=  toString;
 	stream->tnstream->toStringSS				=  toStringSS;
 	stream->tnstream->toStringWork				=  toStringWork;
+	stream->tnstream->get						=  get;
 
 	// Install INT_STREAM interface
 	//
@@ -203,10 +213,15 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	//
 	stream->super					= NULL;
 	stream->uniqueNavigationNodes	= ANTLR3_FALSE;
-	stream->nodeStack				= antlr3StackNew(hint);
-	stream->lookAheadLength			= INITIAL_LOOKAHEAD_BUFFER_SIZE;
-	stream->lookAhead				= (pANTLR3_BASE_TREE *) ANTLR3_MALLOC( INITIAL_LOOKAHEAD_BUFFER_SIZE * sizeof(pANTLR3_BASE_TREE) );
 	stream->markers					= NULL;
+	// Create the node list map
+	//
+	if	(hint == 0)
+	{
+		hint = DEFAULT_INITIAL_BUFFER_SIZE;
+	}
+	stream->nodes	= antlr3VectorNew(hint);
+	stream->p		= -1;
 
 	// Install the navigation nodes     
 	//
@@ -231,6 +246,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	token->text					= stream->stringFactory->newPtr(stream->stringFactory, (pANTLR3_UINT8)"INVALID", 2);
 	stream->INVALID_NODE.token	= token;
 
+
 	return  stream;
 }
 
@@ -239,15 +255,118 @@ static	void			    antlr3CommonTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STRE
     ctns->adaptor			->free  (ctns->adaptor);
     ctns->tnstream->istream ->free  (ctns->tnstream->istream);
     ctns->tnstream			->free  (ctns->tnstream);
-    ctns->nodeStack			->free  (ctns->nodeStack);
+
+	if	(ctns->nodes != NULL)
+	{
+		ctns->nodes				->free  (ctns->nodes);
+	}
     
     ANTLR3_FREE(ctns->INVALID_NODE.token);
     ANTLR3_FREE(ctns->EOF_NODE.token);
     ANTLR3_FREE(ctns->DOWN.token);
     ANTLR3_FREE(ctns->UP.token);
-    ANTLR3_FREE(ctns->lookAhead);
     ANTLR3_FREE(ctns);
 }
+
+// ------------------------------------------------------------------------------
+// Local helpers
+//
+
+/// Walk and fill the tree node buffer from the root tree
+///
+static void
+fillBufferRoot(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
+{
+	// Call the generic buffer routine with the root as the
+	// argument
+	//
+	fillBuffer(ctns, ctns->root);
+	ctns->p = 0;					// Indicate we are at buffer start
+}
+
+/// Walk tree with depth-first-search and fill nodes buffer.
+/// Don't add in DOWN, UP nodes if the supplied tree is a list (t is isNil)
+// such as the root tree is.
+///
+static void
+fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
+{
+	ANTLR3_BOOLEAN	nil;
+	ANTLR3_UINT32	nCount;
+	ANTLR3_UINT32	c;
+
+	nil = ctns->adaptor->isNil(ctns->adaptor, t);
+
+	// If the supplied node is not a nil (list) node then we
+	// add in the node itself to the vector
+	//
+	if	(nil == ANTLR3_FALSE)
+	{
+		ctns->nodes->add(ctns->nodes, t, NULL);	
+	}
+
+	// Only add a DOWN node if the tree is not a nil tree and
+	// the tree does have children.
+	//
+	nCount = t->getChildCount(t);
+
+	if	(nil != ANTLR3_FALSE && nCount>0)
+	{
+		ctns->addNavigationNode(ctns, ANTLR3_TOKEN_DOWN);
+	}
+
+	// We always add any children the tree contains, which is
+	// a recursive call to this function, which will cause similar
+	// recursion and implement a depth first addition
+	//
+	for	(c = 0; c < nCount; c++)
+	{
+		fillBuffer(ctns, ctns->adaptor->getChild(ctns->adaptor, t, c));
+	}
+
+	// If the tree had children and was not a nil (list) node, then we
+	// we need to add an UP node here to match the DOWN node
+	//
+	if	(nil == ANTLR3_FALSE && nCount > 0)
+	{
+		ctns->addNavigationNode(ctns, ANTLR3_TOKEN_UP);
+	}
+}
+
+/// Determine the stream index for a particular node.
+/// NB: This uses internal knowledge of the Antlr3 Vector for the
+/// sake of efficiency. Don't do this in application code. 
+/// This seems to be just an internal debugging type interface so does not need to be improved.
+///
+static ANTLR3_INT32
+getNodeIndex(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
+{
+	ANTLR3_UINT32	i;
+	ANTLR3_UINT32	j;
+	pANTLR3_VECTOR_ELEMENT	elements;
+
+	if	(ctns->p == -1)
+	{
+		fillBufferRoot(ctns);
+	}
+
+	j	= ctns->nodes->count;
+
+	elements = ctns->nodes->elements;
+
+	for	(i = 0; i < j; i++)
+	{
+		if	(t == elements[i].element)
+		{
+			return i;
+		}
+	}
+}
+
+
+// ------------------------------------------------------------------------------
+// Interface functions
+//
 
 /// Reset the input stream to the start of the input nodes.
 ///
@@ -260,6 +379,23 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
     ctns->absoluteNodeIndex	= -1;
     ctns->head				= 0;
     ctns->tail				= 0;
+}
+
+
+static pANTLR3_BASE_TREE
+LB(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
+{
+	if	( k==0)
+	{
+		return	&(tns->ctns->INVALID_NODE.baseTree);
+	}
+
+	if	( (tns->ctns->p - k) < 0)
+	{
+		return	&(tns->ctns->INVALID_NODE.baseTree);
+	}
+
+	return tns->ctns->nodes->get(tns->ctns, tns->ctns->p - k);
 }
 
 /// Get tree node at current input pointer + i ahead where i=1 is next node.
@@ -275,29 +411,28 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 static	pANTLR3_BASE_TREE	    
 _LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
 {
-	if	(k == -1)
+	if	(tns->ctns->p == -1)
 	{
-		return	tns->ctns->previousNode;
+		fillBufferRoot(tns->ctns);
 	}
-	else if	(k < 0)
+
+	if	(k < 0)
 	{
-		fprintf(stderr, "Tree node streams may not look back more than 1 node!\n");
-		return NULL;
+		return LB(-k);
 	}
 	else if	(k == 0)
 	{
 		return	&(tns->ctns->INVALID_NODE.baseTree);
 	}
 
-	// k was a legitimate request, so we need to ensure we have at least
-	// k nodes in the look ahead buffer.
+	// k was a legitimate request, 
 	//
-	tns->ctns->fill(tns->ctns, k);
+	if	(( tns->ctns->p + k - 1) >= tns->ctns->nodes->count)
+	{
+		return &(tns->ctns->EOF_NODE.baseTree);
+	}
 
-	// Return k tokens in front of the current head token, allowing for the fact
-	// that k could wrap around the circular buffer.
-	//
-	return  *(tns->ctns->lookAhead + ((tns->ctns->head + k - 1) % tns->ctns->lookAheadLength));
+	return	tns->ctns->nodes(tns->ctns, tns->ctns->p + k - 1);
 }
 
 /// Where is this stream pulling nodes from?  This is not the name, but
@@ -377,19 +512,11 @@ consume	(pANTLR3_INT_STREAM is)
     tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
     ctns    = tns->ctns;
 
-    // Make sure that we have at least one node to consume in the lookahead
-    // buffer by calling fill, which might call next.
-    //
-    ctns->fill(ctns, 1);
-    ctns->absoluteNodeIndex++;
-
-    // Track the previous node in case of LT(-1)
-    //
-    ctns->previousNode		= *(ctns->lookAhead + ctns->head);
-
-    // Advance past this node now
-    //
-    ctns->head	= (ctns->head + 1) % ctns->lookAheadLength;
+	if	(ctns->p == -1)
+	{
+		fillBufferRoot(ctns);
+	}
+	ctns->p++;
 }
 
 static	ANTLR3_UINT32	    
@@ -400,7 +527,6 @@ _LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 	pANTLR3_BASE_TREE				t;
 
 	tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
-	ctns    = tns->ctns;
 
 	// Ask LT for the 'token' at that position
 	//
@@ -411,7 +537,7 @@ _LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 		return	ANTLR3_TOKEN_INVALID;
 	}
 
-	// Token node was so return the type of it
+	// Token node was there so return the type of it
 	//
 	return  t->getType(t);
 }
@@ -443,61 +569,26 @@ mark	(pANTLR3_INT_STREAM is)
 {
 	pANTLR3_TREE_NODE_STREAM		tns;
 	pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
-	pANTLR3_TREE_WALK_STATE		state;
+	pANTLR3_TREE_WALK_STATE			state;
 
 	tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
 	ctns    = tns->ctns;
 
-
-	if	(ctns->markers == NULL)
+	if	(tns->ctns->p == -1)
 	{
-		ctns->markers = antlr3VectorNew(0);
+		fillBufferRoot(tns->ctns);
 	}
-
-	state = (pANTLR3_TREE_WALK_STATE)ANTLR3_MALLOC(sizeof(ANTLR3_TREE_WALK_STATE));
-
-	if	(state == NULL)
-	{
-		// TODO: Create exception for this
-		//
-		fprintf(stderr, "Out of memory trying to create a mark state in tree parsing\n");
-		return 0;
-	}
-
-	// Now we need to populate the structure
-	//
-	state->absoluteNodeIndex	= ctns->absoluteNodeIndex;
-	state->currentChildIndex	= ctns->currentChildIndex;
-	state->currentNode			= ctns->currentNode;
-	state->previousNode			= ctns->previousNode;
-	state->nodeStackSize		= ctns->nodeStack->size(ctns->nodeStack);
-
-	// Snap shot the look ahead buffer next
-	//
-	state->lookAhead		= (pANTLR3_BASE_TREE *)ANTLR3_MALLOC(sizeof(pANTLR3_BASE_TREE) * ctns->lookAheadLength);
-	memcpy((void *)state->lookAhead, (const void *)ctns->lookAhead, (sizeof(pANTLR3_BASE_TREE) * ctns->lookAheadLength));
-
-	state->lookAheadLength	= ctns->lookAheadLength;
-	state->head				= ctns->head;
-	state->tail				= ctns->tail;
-
-	// Add the walk state information, with a custom free routine that knows how to 
-	// give back the memory we just used. When we reinstate this, we will first just use
-	// the top pointer so copy it back to the current state, then pop it, which 
-	// will cause the memory used to be freed up.
-	//
-	ctns->markers->add(ctns->markers, (void *)state, markFree);
 
 	// Return the current mark point
 	//
-	ctns->lastMarker = ctns->markers->count;
+	ctns->lastMarker = ctns->tnstream->istream->index(ctns->tnstream->istream);
+
 	return ctns->lastMarker;
 }
 
 static	void		    
 release	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 {
-    fprintf(stderr, "Cannot release a tree parse\n");
 }
 
 /// Rewind the current state of the tree walk to the state it
@@ -509,61 +600,13 @@ release	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 static	void		    
 rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 {
-	pANTLR3_TREE_NODE_STREAM		tns;
-	pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
-	pANTLR3_TREE_WALK_STATE		state;
-	ANTLR3_UINT64			m;
-
-	tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
-	ctns    = tns->ctns;
-
-	if	(ctns->markers == NULL || ctns->markers->count < marker)
-	{
-		return;	    // No such marker - do nothing
-	}
-
-	// Retrieve the marker at the specified mark
-	//
-	state   = (pANTLR3_TREE_WALK_STATE) ctns->markers->get(ctns->markers, marker-1);
-
-	// Now reset the current state
-	//
-	ctns->absoluteNodeIndex	= state->absoluteNodeIndex;
-	ctns->currentChildIndex	= state->currentChildIndex;
-	ctns->currentNode		= state->currentNode;
-	ctns->previousNode		= state->previousNode;
-
-	// Drop the current node stack back to the size it was when 
-	// we set the mark.
-	//
-	for	(m = ctns->nodeStack->size(ctns->nodeStack); m > state->nodeStackSize; m--)
-	{
-		ctns->nodeStack->pop(ctns->nodeStack);
-	}
-
-	// Now we can throw away the current look ahead stack (because we allocated a new one
-	// when we mark()ed this, and reinstate the one we saved.
-	//
-	ANTLR3_FREE(ctns->lookAhead);
-	ctns->lookAheadLength   = state->lookAheadLength;
-	ctns->head				= state->head;
-	ctns->tail				= state->tail;
-	ctns->lookAhead			= state->lookAhead;
-
-	// We now need to remove any markers that were added after this marker and
-	// this marker itself. The remove will cause any space allocated to be returned
-	// to the system.
-	//
-	for	(m = ctns->markers->count; m >= marker; m--)
-	{
-		ctns->markers->del(ctns->markers, m-1);
-	}
+	is->seek(is, marker);
 }
 
 static	void		    
 rewindLast	(pANTLR3_INT_STREAM is)
 {
-   is->rewind(is, is->lastMarker);
+   is->seek(is, is->lastMarker);
 }
 
 /// consume() ahead until we hit index.  Can't just jump ahead--must
@@ -572,26 +615,13 @@ rewindLast	(pANTLR3_INT_STREAM is)
 static	void		    
 seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
 {
-	pANTLR3_TREE_NODE_STREAM		tns;
-	pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+    pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
 
-	tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
-	ctns    = tns->ctns;
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
+    ctns    = tns->ctns;
 
-	// Check for trying to seek in reverse
-	//
-	if	((ANTLR3_INT64)index < is->index(is))
-	{
-		fprintf(stderr, "Can't seek backwards in a node stream\n");
-	}
-
-	// Seek forwards, so we consume nodes until we arrive at the
-	// index.
-	//
-	while   (is->index(is) < (ANTLR3_INT64)index)
-	{
-		is->consume(is);
-	}
+	ctns->p = index;
 }
 
 static	ANTLR3_INT64		    
@@ -603,7 +633,7 @@ tindex	(pANTLR3_INT_STREAM is)
     tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
     ctns    = tns->ctns;
 
-    return ctns->absoluteNodeIndex + 1;
+	return ctns->p;
 }
 
 /// Expensive to compute the size of the whole tree while parsing.
@@ -619,7 +649,7 @@ size	(pANTLR3_INT_STREAM is)
     tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
     ctns    = tns->ctns;
 
-    return ctns->absoluteNodeIndex + 1;
+    return tns
 }
 
 static	ANTLR3_BOOLEAN	    
@@ -792,7 +822,7 @@ addNavigationNode	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT32 ttype
 
 	// Now add the node we decided upon.
 	//
-	ctns->addLookahead(ctns, node);
+	ctns->nodes->add(ctns->nodes, node, NULL);
 }
 
 /// Walk upwards looking for a node with more children to walk
@@ -1005,4 +1035,14 @@ replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTL
 
 		cta->replaceChildren(adaptor, parent, startChildIndex, stopChildIndex, t);
 	}
+}
+
+static	pANTLR3_BASE_TREE			get							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k)
+{
+	if	(tns->ctns->p == -1)
+	{
+		fillBufferRoot(tns->ctns);
+	}
+
+	return tns->ctns->nodes->get(tns->ctns->nodes, k);
 }

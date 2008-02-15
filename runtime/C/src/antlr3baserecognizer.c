@@ -1,8 +1,10 @@
 /** \file
- * Contains the base functions that all recognizers start out with.
+ * Contains the base functions that all recognizers require.
  * Any function can be overridden by a lexer/parser/tree parser or by the
  * ANTLR3 programmer.
  * 
+ * \addtogroup pANTLR3_BASE_RECOGNIZER
+ * @{
  */
 #include    <antlr3baserecognizer.h>
 
@@ -10,8 +12,8 @@
 #pragma warning( disable : 4100 )
 #endif
 
-/* Interface functions -stanadard implemenations cover parser and treeparser
- * almost completely but are overriden by parser or tree paresr as needed. Lexer overrides
+/* Interface functions -standard implementations cover parser and treeparser
+ * almost completely but are overridden by the parser or tree parser as needed. Lexer overrides
  * most of these functions.
  */
 static void					beginResync					(pANTLR3_BASE_RECOGNIZER recognizer);
@@ -157,7 +159,6 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 }
 
 /**
- * \brief
  * Creates a new Mismatched Token Exception and inserts in the recognizer
  * exception stack.
  * 
@@ -1774,3 +1775,6 @@ reset(pANTLR3_BASE_RECOGNIZER recognizer)
 #ifdef	WIN32
 #pragma warning( default : 4100 )
 #endif
+
+/// @}
+///

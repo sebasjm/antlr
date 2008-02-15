@@ -31,6 +31,7 @@ static	void						walkBackToMostRecentNodeWithUnvisitedChildren
 static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor				(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE			getTreeSource				(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE			_LT							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k);
+static	pANTLR3_BASE_TREE			get							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k);
 static	void						setUniqueNavigationNodes	(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes);
 static	pANTLR3_STRING				toString					(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_STRING				toStringSS					(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
@@ -156,6 +157,7 @@ antlr3UnbufTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hi
 	stream->tnstream->toString					=  toString;
 	stream->tnstream->toStringSS				=  toStringSS;
 	stream->tnstream->toStringWork				=  toStringWork;
+	stream->tnstream->get						=  get;
 
 	// Install INT_STREAM interface
 	//
@@ -984,4 +986,10 @@ replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTL
 
 		cta->replaceChildren(adaptor, parent, startChildIndex, stopChildIndex, t);
 	}
+}
+
+static	pANTLR3_BASE_TREE			get							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k)
+{
+	fprintf(stderr, "Unbuffered common token stream cannot implement get(i) and something called it!\n");
+	return NULL;
 }

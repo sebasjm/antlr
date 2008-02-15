@@ -12,11 +12,10 @@
 #include    <antlr3intstream.h>
 #include    <antlr3string.h>
 
-/// As tokens are cached in the stream for lookahead
-///  we start with a buffer of a certain size, defined here
-///  and increase the size if it overflows.
+/// Token buffer initial size settings ( will auto increase)
 ///
-#define	INITIAL_LOOKAHEAD_BUFFER_SIZE  5
+#define	DEFAULT_INITIAL_BUFFER_SIZE		100
+#define	INITIAL_CALL_STACK_SIZE			10
 
 typedef	struct ANTLR3_TREE_NODE_STREAM_struct
 {
@@ -147,6 +146,20 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
     ///
     ANTLR3_COMMON_TREE			INVALID_NODE;
 
+	/// The complete mapping from stream index to tree node.
+	/// This buffer includes pointers to DOWN, UP, and EOF nodes.
+	/// It is built upon ctor invocation.  The elements are type
+	/// Object as we don't what the trees look like.
+	///
+	/// Load upon first need of the buffer so we can set token types
+	/// of interest for reverseIndexing.  Slows us down a wee bit to
+	/// do all of the if p==-1 testing everywhere though, though in C
+	/// you won't really be able to measure this.
+	///
+	/// Must be freed when the tree node stream is torn down.
+	///
+	pANTLR3_VECTOR				nodes;
+
     /// If set to ANTLR3_TRUE then the navigation nodes UP, DOWN are
     /// duplicated rather than reused within the tree.
     ///
@@ -168,27 +181,32 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
     ///
     pANTLR3_STACK				nodeStack;
 
+	/// The current index into the nodes vector of the current tree
+	/// we are parsing and possibly rewriting.
+	///
+	ANTLR3_INT64				p;
+
     /// Track the last mark() call result value for use in rewind(). 
     ///
-    ANTLR3_UINT64		lastMarker;
+    ANTLR3_UINT64				lastMarker;
 
     /// Which node are we currently visiting?
     ///
-    pANTLR3_BASE_TREE		currentNode;
+    pANTLR3_BASE_TREE			currentNode;
 
     /// Which node did we last visit? Used for LT(-1)
     ///
-    pANTLR3_BASE_TREE		previousNode;
+    pANTLR3_BASE_TREE			previousNode;
 
     /// Which child are we currently visiting?  If -1 we have not visited
     /// this node yet; next consume() request will set currentIndex to 0.
     ///
-    ANTLR3_INT64		currentChildIndex;
+    ANTLR3_INT64				currentChildIndex;
 
     /// What node index did we just consume?  i=0..n-1 for n node trees.
     /// IntStream.next is hence 1 + this value.  Size will be same.
     ///
-    ANTLR3_INT64		absoluteNodeIndex;
+    ANTLR3_INT64				absoluteNodeIndex;
 
     /// Buffer tree node stream for use with LT(i).  This list grows
     /// to fit new lookahead depths, but consume() wraps like a circular
@@ -199,29 +217,28 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
     /// Number of elements available in the lookahead buffer at any point in
     ///  time. This is the current size of the array.
     ///
-    ANTLR3_UINT32		lookAheadLength;
+    ANTLR3_UINT32				lookAheadLength;
 
     /// lookAhead[head] is the first symbol of lookahead, LT(1). 
     ///
-    ANTLR3_UINT32		head;
+    ANTLR3_UINT32				head;
 
     /// Add new lookahead at lookahead[tail].  tail wraps around at the
     /// end of the lookahead buffer so tail could be less than head.
     ///
-    ANTLR3_UINT32		tail;
+    ANTLR3_UINT32				tail;
 
     /// Calls to mark() may be nested so we have to track a stack of
     /// them.  The marker is an index into this stack.  Index 0 is
     /// the first marker.  This is a List<TreeWalkState>
     ///
-    pANTLR3_VECTOR		markers;
+    pANTLR3_VECTOR				markers;
 
     // INTERFACE
 	//
     void				(*fill)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT64 k);
 
     void				(*addLookahead)				(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, pANTLR3_BASE_TREE node);
-
 
     ANTLR3_BOOLEAN	    (*hasNext)					(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 

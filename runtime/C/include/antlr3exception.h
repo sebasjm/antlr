@@ -63,8 +63,16 @@
  */
 typedef	struct ANTLR3_EXCEPTION_struct
 {
-    /** Set to one of the exception type #defines above.
-     */
+	/// Set to one of the exception type defines:
+	///
+	///  - #ANTLR3_RECOGNITION_EXCEPTION
+	///  - #ANTLR3_MISMATCHED_TOKEN_EXCEPTION
+	///  - #ANTLR3_NO_VIABLE_ALT_EXCEPTION
+	///  - #ANTLR3_MISMATCHED_SET_EXCEPTION
+	///  - #ANTLR3_EARLY_EXIT_EXCEPTION
+	///  - #ANTLR3_FAILED_PREDICATE_EXCEPTION
+	///  - #ANTLR3_EARLY_EXIT_EXCEPTION
+    ///
     ANTLR3_UINT32   type;
 
     /** The string name of the exception

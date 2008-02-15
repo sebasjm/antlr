@@ -14,9 +14,9 @@
 #include    <antlr3commontoken.h>
 #include    <antlr3intstream.h>
 
-/** \brief Master context structure for an ANTLR3
- *   C runtime based input stream.
- */
+/// Master context structure for an ANTLR3 C runtime based input stream.
+/// \ingroup apistructures
+///
 typedef	struct	ANTLR3_INPUT_STREAM_struct
 {
     /** Interfaces that provide streams must all provide
