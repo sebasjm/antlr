@@ -19,8 +19,9 @@ WriteMakefile(
     ABSTRACT_FROM => 'lib/ANTLR/Runtime.pm',
     AUTHOR        => 'Ronald Blaschke <ron@rblasch.org>',
     PREREQ_PM     => { 
-                      'Carp'     => '1.04',
-                      'Readonly' => '1.03',
+                      'Carp'              => '1.04',
+                      'Readonly'          => '1.03',
+                      'Object::InsideOut' => '3.35',
                      },
     test          => { TESTS => 't/class/ANTLR/Runtime/*.t t/*.t' },
 );
