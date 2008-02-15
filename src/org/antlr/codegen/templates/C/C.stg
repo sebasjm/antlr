@@ -139,16 +139,7 @@ outputFile( LEXER,
 <endif>
 
 
-/* Aids in accessing scopes for grammar programmers
- */
-#undef	SCOPE_TYPE
-#undef	SCOPE_STACK
-#undef	SCOPE_TOP
-#define	SCOPE_TYPE(scope)   p<name>_##scope##_SCOPE
-#define SCOPE_STACK(scope)  p<name>_##scope##Stack
-#define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
-#define	SCOPE_SIZE(scope)			(ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope)))
-#define SCOPE_INSTANCE(scope, i)	(ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope),i))
+
 
 /* MACROS that hide the C interface implementations from the
  * generated code, which makes it a little more understandable to the human eye.
@@ -160,8 +151,22 @@ outputFile( LEXER,
  * probably more readable than ctx->input->istream->input(snarfle0->blarg) and allows me to rejig
  * the runtime interfaces without changing the generated code too often, without
  * confusing the reader of the generated output, who may not wish to know the gory
- * details of the interface inheritence.
+ * details of the interface inheritance.
  */
+ 
+#define		CTX	ctx
+
+/* Aids in accessing scopes for grammar programmers
+ */
+#undef	SCOPE_TYPE
+#undef	SCOPE_STACK
+#undef	SCOPE_TOP
+#define	SCOPE_TYPE(scope)   p<name>_##scope##_SCOPE
+#define SCOPE_STACK(scope)  p<name>_##scope##Stack
+#define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
+#define	SCOPE_SIZE(scope)			(ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope)))
+#define SCOPE_INSTANCE(scope, i)	(ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope),i))
+
 <if(LEXER)>
  
 /* Macros for accessing things in a lexer

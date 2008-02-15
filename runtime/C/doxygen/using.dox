@@ -29,20 +29,20 @@
 /// before or after the #include statements in the .c file, within the generated header file
 /// or within the constructor for the recognizer.
 ///
-/// Many of the @sections used within a Java targeted grammar have some equivalent function within a 
+/// Many of the \@sections used within a Java targeted grammar have some equivalent function within a 
 /// C targeted grammar, but their use may well be subtly different. There are also additional sections
 /// that have meaning only within a grammar targeted for the C runtime.
 ///
 /// Detailed documentation of these sections is given here: \subpage atsections
 ///
-/// \section Interoperation Within Rule Actions
+/// \section interop Interoperation Within Rule Actions
 ///
 /// Rule actions have a limited number of elements they can access by name, independently of the
 /// target language generated. These are elements such as $line, $pos, $text and so on. Where the
 /// $xxx returns a basic type such as \c int, then you can use these in C as you would in the Java
 /// target, but where a reference returns a string, you will get a pointer to the C runtime
 /// string implementation #pANTLR3_STRING. This will give you access to things like token text
-/// but also provides some convenience methods such as substring() and toUTF8().
+/// but also provides some convenience methods such as #pANTLR3_STRING->substring() and #pANTLR3_STRING->toUTF8().
 ///
 /// The generated code provides a number of C MACROs, which make it easier to access runtime
 /// components. Always use these macros when available, to protect your action code from changes
@@ -50,7 +50,7 @@
 ///
 /// Detailed documentation of macros and rule action interoperation is given here: \subpage interop
 ///
-/// \section custom Implementing Customized Methods
+/// \section Custom Implementing Customized Methods
 ///
 /// Unless you wish to create your own tree structures using the built in ANTLR AST rewriting
 /// notation, you will rarely need to override the default implementation of runtime methods. The

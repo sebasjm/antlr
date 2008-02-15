@@ -58,17 +58,89 @@
 	/// interface objects around in object oriented languages.
 	///
 	
-		/// \defgroup ANTLR3_BASE_RECOGNIZER Base Recognizer Definition
+		/// \defgroup ANTLR3_BASE_RECOGNIZER ANTLR3_BASE_RECOGNIZER - Base Recognizer Class Definition
 		/// \ingroup apistructures
 		///
 		/// This is the definition of the base recognizer interface, instantiations
 		/// of which are referred to via #pANTLR3_BASE_RECOGNIZER.
 		///
 		/// In general you will not refer to one of these structures directly as a
-		/// a  #pANTLR3_BASE_RECOGNIZER will be embedded within a higher level
+		/// a #pANTLR3_BASE_RECOGNIZER will be embedded within a higher level
 		/// object such as #pANTLR3_PARSER
 		///
-
+		/// \defgroup ANTLR3_RECOGNIZER_SHARED_STATE ANTLR3_RECOGNIZER_SHARED_STATE Recognizer Shared State Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_BITSET	ANTLR3_BITSET - Bitset Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_TOKEN_FACTORY ANTLR3_TOKEN_FACTORY - Token Factory Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_COMMON_TOKEN ANTLR3_COMMON_TOKEN - Common Token Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_EXCEPTION ANTLR3_EXCEPTION - Exception Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_HASH_BUCKET ANTLR3_HASH_BUCKET - Hash Table Bucket Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_HASH_ENTRY ANTLR3_HASH_ENTRY - Hash Table Entry Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_HASH_ENUM ANTLR3_HASH_ENUM - Hash Table Enumerator Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_HASH_TABLE ANTLR3_HASH_TABLE - Hash Table Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_LIST ANTLR3_LIST - List Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_VECTOR_FACTORY ANTLR3_VECTOR_FACTORY - Vector Factory Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_VECTOR ANTLR3_VECTOR - Vector Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_STACK ANTLR3_STACK - Stack Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_INPUT_STREAM ANTLR3_INPUT_STREAM - Input Stream Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_LEX_STATE ANTLR3_LEX_STATE - Lexer State Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_STRING_FACTORY ANTLR3_STRING_FACTORY - String Factory Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_STRING ANTLR3_STRING - String Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_TOKEN_SOURCE ANTLR3_TOKEN_SOURCE - Token Source Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_TOKEN_STREAM ANTLR3_TOKEN_STREAM - Token Stream Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_COMMON_TOKEN_STREAM ANTLR3_COMMON_TOKEN_STREAM - Common Token Stream Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_CYCLIC_DFA ANTLR3_CYCLIC_DFA - Cyclic DFA Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_LEXER ANTLR3_LEXER - Lexer Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_PARSER ANTLR3_PARSER - Parser Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_BASE_TREE ANTLR3_BASE_TREE - Base Tree Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_COMMON_TREE ANTLR3_COMMON_TREE - Common Tree Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_ARBORETUM ANTLR3_ARBORETUM - Tree Factory Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_PARSE_TREE ANTLR3_PARSE_TREE - Parse Tree Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_TREE_NODE_STREAM ANTLR3_TREE_NODE_STREAM - Tree Node Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_COMMON_TREE_NODE_STREAM ANTLR3_COMMON_TREE_NODE_STREAM - Common Tree Node Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_TREE_WALK_STATE ANTLR3_TREE_WALK_STATE - Tree Walk State Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_BASE_TREE_ADAPTOR ANTLR3_BASE_TREE_ADAPTOR - Base Tree Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_COMMON_TREE_ADAPTOR ANTLR3_COMMON_TREE_ADAPTOR - Common Tree Adaptor Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_TREE_PARSER ANTLR3_TREE_PARSER - Tree Parser Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_INT_TRIE ANTLR3_INT_TRIE - Trie Class Definition
+		/// \ingroup apistructures
+		/// \defgroup ANTLR3_REWRITE_RULE_ELEMENT_STREAM ANTLR3_REWRITE_RULE_ELEMENT_STREAM - Token Rewrite Stream Class Definition
+		/// \ingroup apistructures
+  		/// \defgroup ANTLR3_DEBUG_EVENT_LISTENER ANTLR3_DEBUG_EVENT_LISTENER - Debugger Class Definition
+		/// \ingroup apistructures
+  
 	/// \defgroup apiimplementations API Implementation functions
 	/// \ingroup apiclasses
 	///
@@ -86,9 +158,82 @@
 	/// in the antlr3baserecognizer.c file, you will find the function antlr3BaseRecognizerNew()
 	///
 
-		/// \defgroup pANTLR3_BASE_RECOGNIZER Base Recognizer Implementation
+		/// \defgroup pANTLR3_BASE_RECOGNIZER pANTLR3_BASE_RECOGNIZER Base Recognizer Implementation
 		/// \ingroup apiimplementations
 		///
 		/// The base recognizer interface is implemented by all higher level recognizers
 		/// such as #pANTLR3_PARSER and provides methods common to all recognizers.
 		///
+		/// \defgroup pANTLR3_RECOGNIZER_SHARED_STATE pANTLR3_RECOGNIZER_SHARED_STATE - Recognizer Shared State Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_BITSET pANTLR3_BITSET - Bitset Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_TOKEN_FACTORY pANTLR3_TOKEN_FACTORY - Token Factory Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_COMMON_TOKEN pANTLR3_COMMON_TOKEN - Common Token Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_EXCEPTION	pANTLR3_EXCEPTION - Exception Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_HASH_BUCKET pANTLR3_HASH_BUCKET - Hash Table Bucket Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_HASH_ENTRY pANTLR3_HASH_ENTRY - Hash Table Entry Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_HASH_ENUM pANTLR3_HASH_ENUM - Hash Table Enumerator Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_HASH_TABLE pANTLR3_HASH_TABLE - Hash Table Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_LIST pANTLR3_LIST - List Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_VECTOR_FACTORY pANTLR3_VECTOR_FACTORY - Vector Factory Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_VECTOR pANTLR3_VECTOR - Vector Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_STACK pANTLR3_STACK - Stack Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_INPUT_STREAM pANTLR3_INPUT_STREAM - Input Stream Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_LEX_STATE pANTLR3_LEX_STATE - Lexer State Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_STRING_FACTORY pANTLR3_STRING_FACTORY - String Factory Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_STRING pANTLR3_STRING - String Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_TOKEN_SOURCE pANTLR3_TOKEN_SOURCE - Token Source Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_TOKEN_STREAM pANTLR3_TOKEN_STREAM - Token Stream Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_COMMON_TOKEN_STREAM pANTLR3_COMMON_TOKEN_STREAM - Common Token Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_CYCLIC_DFA pANTLR3_CYCLIC_DFA - Cyclic DFA Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_LEXER pANTLR3_LEXER - Lexer Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_PARSER pANTLR3_PARSER - Parser Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_BASE_TREE pANTLR3_BASE_TREE - Base Tree Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_COMMON_TREE pANTLR3_COMMON_TREE - Common Tree Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_ARBORETUM pANTLR3_ARBORETUM - Tree Factory Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_PARSE_TREE pANTLR3_PARSE_TREE - Parse Tree Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_TREE_NODE_STREAM pANTLR3_TREE_NODE_STREAM - Tree Node Stream Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_COMMON_TREE_NODE_STREAM pANTLR3_COMMON_TREE_NODE_STREAM - Common Tree Node Stream Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_TREE_WALK_STATE pANTLR3_TREE_WALK_STATE - Tree Walk State Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_BASE_TREE_ADAPTOR pANTLR3_BASE_TREE_ADAPTOR - Base Tree Adaptor Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_COMMON_TREE_ADAPTOR pANTLR3_COMMON_TREE_ADAPTOR - Common Tree Adaptor Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_TREE_PARSER pANTLR3_TREE_PARSER - Tree ParserImplementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_INT_TRIE pANTLR3_INT_TRIE - Trie Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_REWRITE_RULE_ELEMENT_STREAM pANTLR3_REWRITE_RULE_ELEMENT_STREAM - Token Rewrite Stream Implementation
+		/// \ingroup apiimplementations
+		/// \defgroup pANTLR3_DEBUG_EVENT_LISTENER pANTLR3_DEBUG_EVENT_LISTENER - Debugger Implementation
+		/// \ingroup apiimplementations
+		

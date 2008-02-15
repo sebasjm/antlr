@@ -1036,7 +1036,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\doxygen\interop.dox"
+				>
+			</File>
+			<File
 				RelativePath=".\doxygen\mainpage.dox"
+				>
+			</File>
+			<File
+				RelativePath=".\doxygen\runtime.dox"
 				>
 			</File>
 			<File
