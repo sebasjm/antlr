@@ -41,9 +41,6 @@ import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import java.io.*;
 import java.util.*;
 
-import com.sun.java_cup.internal.parser;
-import com.sun.java_cup.internal.lexer;
-
 /** Represents a grammar in memory. */
 public class Grammar {
 	public static final String SYNPRED_RULE_PREFIX = "synpred";
@@ -565,7 +562,7 @@ public class Grammar {
 										  this, null, value);
 			}
 		}
-		
+
 		grammarTree = (GrammarAST)parser.getAST();
 		setFileName(lexer.getFilename()); // the lexer #src might change name
 		if ( grammarTree==null || grammarTree.findFirstType(ANTLRParser.RULE)==null ) {
