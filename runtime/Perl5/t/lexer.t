@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use FindBin;
-use lib $FindBin::Bin;
+use lib qw( t/lib );
 
 use Test::More;
 use ANTLR::Runtime::Test;
