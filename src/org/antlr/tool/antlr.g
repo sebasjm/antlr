@@ -275,21 +275,6 @@ actionScopeName
     |   p:"parser"	{#p.setType(ID);}
 	;
 
-/*
-optionsSpec returns [Map opts=new HashMap()]
-    :   #( OPTIONS (option[opts])+ )
-    ;
-
-option[Map opts]
-{
-    String key=null;
-    Object value=null;
-}
-    :   #( ASSIGN id:ID {key=#id.getText();} value=optionValue )
-        {opts.put(key,value);}
-    ;
-*/
-
 optionsSpec returns [Map opts=new HashMap()]
 	:	OPTIONS^ (option[opts] SEMI!)+ RCURLY!
 	;
@@ -302,21 +287,6 @@ option[Map opts]
     	{
     	opts.put(#o.getText(), value);
     	}
-    	/*
-    	{
-    	if ( #o.getText().equals("filter") && #v.getText().equals("true") ) {
-    		isFilterMode = true;
-    	}
-    	else if ( #o.getText().equals("backtrack") && #v.getText().equals("true") ) {
-    		if ( currentRuleName==null ) { // must grammar level
-    			isAutoBacktrackMode = true;
-    		}
-    		else {
-    			blockAutoBacktrackMode = true;
-    		}
-    	}
-    	}
-    	*/
     ;
 
 optionValue returns [Object value=null]
@@ -914,6 +884,7 @@ options {
     public void tab() {
 		setColumn( getColumn()+1 );
     }
+    public boolean hasASTOperator = false;
 }
 
 WS	:	(	' '
@@ -988,9 +959,9 @@ REWRITE : "->" ;
 
 SEMI:	';' ;
 
-ROOT : '^' ;
+ROOT : '^' {hasASTOperator=true;} ;
 
-BANG : '!' ;
+BANG : '!' {hasASTOperator=true;} ;
 
 OR	:	'|' ;
 

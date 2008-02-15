@@ -39,7 +39,9 @@ options {
     codeGenBitsetTestThreshold=999;
 }
 
-{
+{ 
+public static GrammarAST ASTNULL = new GrammarAST();
+
 protected Grammar grammar;
 protected GrammarAST root;
 protected String currentRuleName;

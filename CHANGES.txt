@@ -13,6 +13,9 @@ February 14, 2008
 * Fixed a bug in the code generation where tree level 0 was used
   no matter what to rewrite trees in tree grammars. added unit test
 
+* Fixed ANTLR-221. exceptions were generated when using
+  AST construction operators and no output=AST option.
+
 February 13, 2008
 
 * Improved error msgs for unreachable alts and tokens.

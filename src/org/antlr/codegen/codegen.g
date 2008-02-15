@@ -55,6 +55,7 @@ options {
 }
 
 {
+public static GrammarAST ASTNULL = new GrammarAST();
 	protected static final int RULE_BLOCK_NESTING_LEVEL = 0;
 	protected static final int OUTER_REWRITE_NESTING_LEVEL = 0;
 

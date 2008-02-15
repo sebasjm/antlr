@@ -45,6 +45,8 @@ options {
 }
 
 {
+    public static GrammarAST ASTNULL = new GrammarAST();
+
 	protected Grammar grammar;
 	protected boolean showActions;
     protected StringBuffer buf = new StringBuffer(300);

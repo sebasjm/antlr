@@ -91,6 +91,7 @@ options {
 }
 
 {
+    public static GrammarAST ASTNULL = new GrammarAST();
     public void reportError(RecognitionException ex) {
 		Token token = null;
 		if ( ex instanceof MismatchedTokenException ) {

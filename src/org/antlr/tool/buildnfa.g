@@ -41,6 +41,8 @@ options {
 }
 
 {
+public static GrammarAST ASTNULL = new GrammarAST();
+
 /** Factory used to create nodes and submachines */
 protected NFAFactory factory = null;
 
@@ -556,12 +558,6 @@ atom[String scopeName] returns [StateCluster g=null]
 	;
 
 ast_suffix
-{
-if ( grammar.getOption("output")==null ) {
-	ErrorManager.grammarError(ErrorManager.MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
-							  grammar, #ast_suffix.token, currentRuleName);
-}
-}
 	:	ROOT
 	|	BANG
 	;

@@ -41,6 +41,9 @@ import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import java.io.*;
 import java.util.*;
 
+import com.sun.java_cup.internal.parser;
+import com.sun.java_cup.internal.lexer;
+
 /** Represents a grammar in memory. */
 public class Grammar {
 	public static final String SYNPRED_RULE_PREFIX = "synpred";
@@ -550,12 +553,26 @@ public class Grammar {
 			ErrorManager.internalError("unexpected parser recognition error from "+fileName, re);
 		}
 
+		if ( lexer.hasASTOperator && !buildAST() ) {
+			Object value = getOption("output");
+			if ( value == null ) {
+				ErrorManager.grammarWarning(ErrorManager.MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
+										    this, null);
+				setOption("output", "AST", null);
+			}
+			else {
+				ErrorManager.grammarError(ErrorManager.MSG_AST_OP_WITH_NON_AST_OUTPUT_OPTION,
+										  this, null, value);
+			}
+		}
+		
 		grammarTree = (GrammarAST)parser.getAST();
 		setFileName(lexer.getFilename()); // the lexer #src might change name
 		if ( grammarTree==null || grammarTree.findFirstType(ANTLRParser.RULE)==null ) {
 			ErrorManager.error(ErrorManager.MSG_NO_RULES, getFileName());
 			return;
 		}
+
 		// Get syn pred rules and add to existing tree
 		List synpredRules =
 			getArtificialRulesForSyntacticPredicates(parser,

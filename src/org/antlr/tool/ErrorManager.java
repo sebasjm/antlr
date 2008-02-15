@@ -177,6 +177,7 @@ public class ErrorManager {
 	public static final int MSG_INVALID_IMPORT = 161;
 	public static final int MSG_IMPORTED_TOKENS_RULE_EMPTY = 162;
 	public static final int MSG_IMPORT_NAME_CLASH = 163;
+	public static final int MSG_AST_OP_WITH_NON_AST_OUTPUT_OPTION = 164;
 
 
 	// GRAMMAR WARNINGS
@@ -218,6 +219,7 @@ public class ErrorManager {
 			add(MSG_UNREACHABLE_ALTS);
 			add(MSG_FILE_AND_GRAMMAR_NAME_DIFFER);
 			add(MSG_INVALID_IMPORT);
+			add(MSG_AST_OP_WITH_NON_AST_OUTPUT_OPTION);
 			// TODO: ...
 		}
 	};
