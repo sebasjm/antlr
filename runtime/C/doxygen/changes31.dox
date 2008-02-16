@@ -14,7 +14,7 @@
 /// an address of -1 for a pointer, the return address is now NULL if there was
 /// no memory available. The old macros for this mechanism have been removed which
 /// will force you to read this information. You now need only check the return
-/// address for NULL, or you could not bother doing that and join with 95% of the worlds
+/// address for NULL, or you could not bother doing that and join with 95% of the world's
 /// C code.
 ///
 /// \section trees Tree Parser Rewrites
