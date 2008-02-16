@@ -257,12 +257,15 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
     void				(*walkBackToMostRecentNodeWithUnvisitedChildren)
 													(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
-    
     ANTLR3_BOOLEAN	    (*hasUniqueNavigationNodes)	(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
     pANTLR3_STRING	    (*toNodesOnlyString)		(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
     ANTLR3_UINT32	    (*getLookaheadSize)			(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
+
+	void				(*push)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT64 index);
+
+	ANTLR3_INT64		(*pop)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
     void				(*reset)					(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
