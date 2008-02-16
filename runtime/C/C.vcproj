@@ -1028,6 +1028,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\doxygen\changes31.dox"
+				>
+			</File>
+			<File
 				RelativePath=".\doxygen\doxygengroups.dox"
 				>
 			</File>

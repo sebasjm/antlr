@@ -1,0 +1,35 @@
+/// \page changes31 Changes in 3.1 from 3.0
+///
+/// The following changes have taken place from 3.0 to 3.1. Some of
+/// them may require minor changes to your grammar files or the
+/// programs that invoke your grammar. Please take the time to read
+/// through this list as it may save you time later.
+///
+/// \section returns Constructor Return Values
+///
+/// In previous releases the return value from both the generated constructors and
+/// built in constructor functions would return a value of -1 or -2 if a problem
+/// occurred. However, the only problem that can really occur is lack of memory, 
+/// hence to avoid the remote change that some memory allocation scheme would return
+/// an address of -1 for a pointer, the return address is now NULL if there was
+/// no memory available. The old macros for this mechanism have been removed which
+/// will force you to read this information. You now need only check the return
+/// address for NULL, or you could not bother doing that and join with 95% of the worlds
+/// C code.
+///
+/// \section trees Tree Parser Rewrites
+///
+/// The 3.1 runtime now supports tree rewrites from tree parsers. See the main ANTLR
+/// documentation for more details.
+///
+/// \section debugger ANTLRWorks Debugger
+///
+/// The ANTLRWorks debugger is now fully supported by this version of the runtime. It
+/// supports remote debugging only (you cannot generate C, compile and debug it from the
+/// ANTLRWorks IDE.) However both parser and tree parser debugging is supported providing 
+/// you are using a version of ANTLRWorks that supports tree parser debugging. Generate
+/// the C code with the -debug option of the ANTLR tool, as per any other target.
+///
+/// Note that when you invoke your debugging version of the parser, it will appear to hang
+/// but is in fact waiting on a local TCP socket connection from the ANTLRWorks debugger.
+///

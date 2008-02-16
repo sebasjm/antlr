@@ -14,6 +14,8 @@
 static	pANTLR3_BASE_TREE	nil						(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 static	pANTLR3_BASE_TREE	dbgNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 static	pANTLR3_BASE_TREE	dupTree					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE	dbgDupTree				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE	dupTreeTT				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE parent);
 static	void				addChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
 static	void				dbgAddChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
 static	pANTLR3_BASE_TREE	becomeRoot				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRoot, pANTLR3_BASE_TREE oldRoot);
@@ -35,10 +37,13 @@ static	pANTLR3_STRING		getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 static	void				setText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t);
 static	void				setText8				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
 static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
-static	pANTLR3_UINT64		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT64		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT64		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_BOOLEAN		isNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-
+static  pANTLR3_BASE_TREE	setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i);
+static  pANTLR3_BASE_TREE	getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
+static  void				setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child);
+static	void				deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
 
 /** Given a pointer to a base tree adaptor structure (which is usually embedded in the
  *  super class the implements the tree adaptor used in the parse), initialize its
@@ -59,6 +64,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 		adaptor->createTypeToken		= createTypeToken;
 		adaptor->createTypeTokenText	= createTypeTokenText;
 		adaptor->createTypeText			= createTypeText;
+		adaptor->dupTree				= dupTree;
 	}
 	else
 	{
@@ -70,10 +76,11 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 		adaptor->createTypeToken		= dbgCreateTypeToken;
 		adaptor->createTypeTokenText	= dbgCreateTypeTokenText;
 		adaptor->createTypeText			= dbgCreateTypeText;
+		adaptor->dupTree				= dbgDupTree;
 		debugger->adaptor				= adaptor;
 	}
 
-	adaptor->dupTree				=  dupTree;
+	adaptor->dupTreeTT				=  dupTreeTT;
 	adaptor->rulePostProcessing		=  rulePostProcessing;
 	adaptor->getType				=  getType;
 	adaptor->setType				=  setType;
@@ -104,8 +111,8 @@ dbgNil	    (pANTLR3_BASE_TREE_ADAPTOR adaptor)
 {
 	pANTLR3_BASE_TREE t;
 
-	t = adaptor->create(adaptor, NULL);
-	adaptor->debugger->createNode(adaptor->debugger, t);
+	t = adaptor->create				(adaptor, NULL);
+	adaptor->debugger->createNode	(adaptor->debugger, t);
 
 	return	t;
 }
@@ -114,9 +121,81 @@ dbgNil	    (pANTLR3_BASE_TREE_ADAPTOR adaptor)
  *  BASE_TREE interface.)
  */
 static	pANTLR3_BASE_TREE	
-   dupTree  (pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+dupTree  (pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
-	return	t->dupTree(t);
+	return	adaptor->dupTreeTT(adaptor, t, NULL);
+}
+
+pANTLR3_BASE_TREE
+dupTreeTT			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE parent)
+{
+	pANTLR3_BASE_TREE	newTree;
+	pANTLR3_BASE_TREE	child;
+	pANTLR3_BASE_TREE	newSubTree;
+	ANTLR3_UINT32		n;
+	ANTLR3_UINT32		i;
+
+	if	(t == NULL)
+	{
+		return NULL;
+	}
+	newTree = t->dupNode(t);
+
+	// Ensure new subtree root has parent/child index set
+	//
+	adaptor->setChildIndex		(adaptor, newTree, t->getChildIndex(t));
+	adaptor->setParent			(adaptor, newTree, parent);
+	n = adaptor->getChildCount	(adaptor, t);
+
+	for	(i=0; i < n; i++)
+	{
+		child = adaptor->getChild		(adaptor, t, i);
+		newSubTree = adaptor->dupTreeTT	(adaptor, child, t);
+		adaptor->addChild				(adaptor, newTree, newSubTree);
+	}
+	return	newTree;
+}
+
+/// Sends the required debugging events for duplicating a tree
+/// to the debugger.
+///
+static void
+simulateTreeConstruction(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
+{
+	ANTLR3_UINT32		n;
+	ANTLR3_UINT32		i;
+	pANTLR3_BASE_TREE	child;
+
+	// Send the create node event
+	//
+	adaptor->debugger->createNode(adaptor->debugger, tree);
+
+	n = adaptor->getChildCount(adaptor, tree);
+	for	(i = 0; i < n; i++)
+	{
+		child = adaptor->getChild(adaptor, tree, i);
+		simulateTreeConstruction(adaptor, child);
+		adaptor->debugger->addChild(adaptor->debugger, tree, child);
+	}
+}
+
+pANTLR3_BASE_TREE
+dbgDupTree		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
+{
+	pANTLR3_BASE_TREE t;
+
+	// Call the normal dup tree mechanism first
+	//
+	t = adaptor->dupTreeTT(adaptor, tree, NULL);
+
+	// In order to tell the debugger what we have just done, we now
+	// simulate the tree building mechanism. THis will fire
+	// lots of debugging events to the client and look like we
+	// duped the tree..
+	//
+	simulateTreeConstruction(adaptor, t);
+
+	return t;
 }
 
 /** Add a child to the tree t.  If child is a flat tree (a list), make all
@@ -148,7 +227,7 @@ dbgAddChild (pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_BAS
 /** Use the adaptor implementation to add a child node with the supplied token
  */
 static	void		
-   addChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child)
+addChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child)
 {
 	if	(t != NULL && child != NULL)
 	{
@@ -171,23 +250,29 @@ dbgAddChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTL
 /** If oldRoot is a nil root, just copy or move the children to newRoot.
  *  If not a nil root, make oldRoot a child of newRoot.
  *
+ * \code
  *    old=^(nil a b c), new=r yields ^(r a b c)
  *    old=^(a b c), new=r yields ^(r ^(a b c))
+ * \endcode
  *
  *  If newRoot is a nil-rooted single child tree, use the single
  *  child as the new root node.
  *
+ * \code
  *    old=^(nil a b c), new=^(nil r) yields ^(r a b c)
  *    old=^(a b c), new=^(nil r) yields ^(r ^(a b c))
+ * \endcode
  *
  *  If oldRoot was null, it's ok, just return newRoot (even if isNil).
  *
+ * \code
  *    old=null, new=r yields r
  *    old=null, new=^(nil r) yields ^(nil r)
+ * \endcode
  *
  *  Return newRoot.  Throw an exception if newRoot is not a
  *  simple node or nil root with a single child node--it must be a root
- *  node.  If newRoot is ^(nil x) return x as newRoot.
+ *  node.  If newRoot is <code>^(nil x)</endcode> return x as newRoot.
  *
  *  Be advised that it's ok for newRoot to point at oldRoot's
  *  children; i.e., you don't have to copy the list.  We are
@@ -195,7 +280,7 @@ dbgAddChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTL
  *  efficiency.
  */
 static	pANTLR3_BASE_TREE	
-   becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
+becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
 {
 	/* Protect against tree rewrites if we are in some sort of error
 	 * state, but have tried to recover. In C we can end up with a null pointer
@@ -258,10 +343,18 @@ dbgBecomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree,
 static	pANTLR3_BASE_TREE	
    rulePostProcessing	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root)
 {
-
-	if (root != NULL && root->isNil(root) && root->getChildCount(root) == 1)
+	if (root != NULL && root->isNil(root))
 	{
-		root = root->getChild(root, 0);
+		if	(root->getChildCount(root) == 0)
+		{
+			root = NULL;
+		}
+		else if	(root->getChildCount(root) == 1)
+		{
+			root = root->getChild(root, 0);
+			root->setParent(root, NULL);
+			root->setChildIndex(root, -1);
+		}
 	}
 
 	return root;
@@ -386,7 +479,7 @@ static	ANTLR3_UINT32
 static	void		
    setType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setType()\n");
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setType()\n");
 }
 
 /** Dummy implementation - will be supplied by super class
@@ -394,7 +487,7 @@ static	void
 static	pANTLR3_STRING	
    getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getText()\n");
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getText()\n");
 	return	NULL;
 }
 
@@ -403,28 +496,38 @@ static	pANTLR3_STRING
 static	void		
    setText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }
 /** Dummy implementation - will be supplied by super class
  */
 static	void		
 setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }
 
 static	pANTLR3_BASE_TREE	
    getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
 	return NULL;
 }
+static  void
+setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child)
+{
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setChild()\n");
+}
+static	void
+deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+{
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement deleteChild()\n");
+}
 
-static	pANTLR3_UINT64	
+static	ANTLR3_UINT64	
    getChildCount	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containoing ANTLR3_TREE_ADAPTOR did not implement getChildCount()\n");
-	return NULL;
+	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChildCount()\n");
+	return 0;
 }
 
 /** Returns a uniqueID for the node. Because this is the C implementation

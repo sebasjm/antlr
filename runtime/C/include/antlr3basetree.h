@@ -65,7 +65,8 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     void    *				(*getChild)					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i);
 
-	void    				(*setChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 );
+	void    				(*setChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_INT64 );
+	ANTLR3_UINT64			(*getChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree );
 
     ANTLR3_UINT64			(*getChildCount)			(struct ANTLR3_BASE_TREE_struct * tree);
 

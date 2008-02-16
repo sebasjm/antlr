@@ -761,7 +761,7 @@ replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTL
 		adaptor	= tns->getTreeAdaptor(tns);
 		cta		= (pANTLR3_COMMON_TREE_ADAPTOR)(adaptor->super);
 
-		cta->replaceChildren(adaptor, parent, startChildIndex, stopChildIndex, t);
+		adaptor->replaceChildren(adaptor, parent, startChildIndex, stopChildIndex, t);
 	}
 }
 

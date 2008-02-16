@@ -11,6 +11,14 @@
 /// tool. While some of the documentation may well apply to prior or future versions
 /// you should consult the manuals for the correct version whenever possible.
 ///
+/// \section chchchchangeesss Changes from 3.0 to 3.1
+/// 
+/// Some changes in 3.1 may require small changes in your invoking programs or
+/// in the grammar itself. Please read about them here before emailing the user group,
+/// where you will be told to come and read about them here, unless they were missed
+/// from this list.
+///
+/// - \subpage changes31 Check here for API changes
 ///
 /// \section intro Introduction
 ///

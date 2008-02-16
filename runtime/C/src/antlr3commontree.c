@@ -18,7 +18,8 @@ static ANTLR3_UINT32	    getCharPositionInLine	(pANTLR3_BASE_TREE tree);
 static pANTLR3_STRING	    toString				(pANTLR3_BASE_TREE tree);
 static pANTLR3_BASE_TREE	getParent				(pANTLR3_BASE_TREE tree);
 static void					setParent				(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE parent);
-static void    				setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i);
+static void    				setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT64 i);
+static ANTLR3_UINT64		getChildIndex			(pANTLR3_BASE_TREE tree );
 
 static void					freeTree			(pANTLR3_BASE_TREE tree);
 
@@ -261,6 +262,7 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 	tree->baseTree.getParent				= getParent;
 	tree->baseTree.setParent				= setParent;
 	tree->baseTree.setChildIndex			= setChildIndex;
+	tree->baseTree.getChildIndex			= getChildIndex;
 
     tree->token				= NULL;	// No token as yet
     tree->startIndex		= 0;
@@ -501,7 +503,12 @@ setParent				(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE parent)
 }
 
 static void    				
-setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
+setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT64 i)
 {
 	((pANTLR3_COMMON_TREE)(tree->super))->childIndex = i;
+}
+static	ANTLR3_UINT64			
+getChildIndex			(pANTLR3_BASE_TREE tree )
+{
+	return ((pANTLR3_COMMON_TREE)(tree->super))->childIndex;
 }

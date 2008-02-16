@@ -42,9 +42,11 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 
 
     pANTLR3_BASE_TREE	    (*dupTree)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE tree);
+    pANTLR3_BASE_TREE	    (*dupTreeTT)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE tree);
 
     void					(*addChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_BASE_TREE child);
     void					(*addChildToken)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child);
+    void					(*setParent)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE child, pANTLR3_BASE_TREE parent);
 
 	ANTLR3_BOOLEAN			(*isNil)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
 
@@ -71,8 +73,12 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
     void					(*setText8)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_UINT8 t);
 
     pANTLR3_BASE_TREE	    (*getChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
+    void					(*setChild)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child);
+    void					(*deleteChild)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
+    void				    (*setChildIndex)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i);
+    ANTLR3_UINT64		    (*getChildIndex)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
 
-    pANTLR3_UINT64			(*getChildCount)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE);
+    ANTLR3_UINT64			(*getChildCount)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE);
 
     ANTLR3_UINT64			(*getUniqueID)			(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE);
 
@@ -87,6 +93,15 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
     ANTLR3_UINT64			(*getTokenStopIndex)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE t);
 
 	void					(*setDebugEventListener)(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
+
+	/// Replace from start to stop child index of parent with t, which might
+	/// be a list.  Number of children may be different
+	/// after this call.  
+	///
+	/// If parent is null, don't do anything; must be at root of overall tree.
+	/// Can't replace whatever points to the parent externally.  Do nothing.
+	///
+	void					(*replaceChildren)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
 
     void					(*free)					(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor);
 

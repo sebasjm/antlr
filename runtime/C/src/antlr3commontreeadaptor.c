@@ -4,6 +4,7 @@
  * it adds its own implementation of anything that the base tree is not 
  * good for, plus a number of methods that any other adaptor type
  * needs to implement too.
+ * \ingroup pANTLR3_COMMON_TREE_ADAPTOR
  */
 
 #include    <antlr3commontreeadaptor.h>
@@ -22,9 +23,14 @@ static	pANTLR3_COMMON_TOKEN    getToken				(pANTLR3_BASE_TREE_ADAPTOR adaptor, p
 static	pANTLR3_STRING			getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32			getType					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	pANTLR3_BASE_TREE		getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
-static	pANTLR3_UINT64			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT64			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void					replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
 static	void					setDebugEventListener	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
+static  void					setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i);
+static  ANTLR3_UINT64			getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void					setParent				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE child, pANTLR3_BASE_TREE parent);
+static  void					setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child);
+static	void					deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
 
 /* Methods specific to each tree adaptor
  */
@@ -74,11 +80,12 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 	cta->baseAdaptor.getText				=  getText;
 	cta->baseAdaptor.getType				=  getType;
 	cta->baseAdaptor.getChild				=  getChild;
+	cta->baseAdaptor.setChild				=  setChild;
+	cta->baseAdaptor.deleteChild			=  deleteChild;
 	cta->baseAdaptor.getChildCount			=  getChildCount;
 	cta->baseAdaptor.free					=  ctaFree;
 	cta->baseAdaptor.setDebugEventListener	=  setDebugEventListener;
-
-	cta->replaceChildren					=  replaceChildren;
+	cta->baseAdaptor.replaceChildren		=  replaceChildren;
 
 	// Install the super class pointer
 	//
@@ -358,19 +365,51 @@ getToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 }
 
 static	void					
-replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t)
+replaceChildren
+(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t)
 {
 	if	(parent != NULL)
 	{
 		parent->replaceChildren(parent, startChildIndex, stopChildIndex, t);
 	}
 }
-static	pANTLR3_BASE_TREE		getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+
+static	pANTLR3_BASE_TREE
+getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
 {
 	return t->getChild(t, i);
 }
+static  void
+setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child)
+{
+	t->setChild(t, i, child);
+}
 
-static	pANTLR3_UINT64			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+static	void
+deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+{
+	t->deleteChild(t, i);
+}
+
+static	ANTLR3_UINT64
+getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
 	return t->getChildCount(t);
+}
+
+static  void
+setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i)
+{
+	t->setChildIndex(t, i);
+}
+
+static  ANTLR3_UINT64
+getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+{
+	t->getChildIndex(t);
+}
+static	void
+setParent				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE child, pANTLR3_BASE_TREE parent)
+{
+	child->setParent(child, parent);
 }
