@@ -46,7 +46,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 
     if	(stream == NULL)
     {
-	return	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Populate the generic interface */
@@ -74,21 +74,21 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 static pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
 antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
 {
-    pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
+	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	/* First job is to create the memory we need.
+	*/
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_ELEMENT_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
-    {
+	if (stream == NULL)
+	{
+		return NULL;
+	}
+
+	/* Stream seems good so we need to add the supplied element
+	*/
+	stream->add(stream, oneElement, NULL);
 	return stream;
-    }
-
-    /* Stream seems good so we need to add the supplied element
-     */
-    stream->add(stream, oneElement, NULL);
-    return stream;
 }
 
 static pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
@@ -100,9 +100,9 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_ELEMENT_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if (stream == NULL)
     {
-	return stream;
+		return stream;
     }
 
     /* Stream seems good so we need to install the vector we were
@@ -119,24 +119,24 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
 antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
 {
-    pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
+	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	/* First job is to create the memory we need.
+	*/
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_TOKEN_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
-    {
+	if (stream == NULL)
+	{
+		return stream;
+	}
+
+	/* Install the token based overrides
+	*/
+	stream->dup	    = dupTok;
+	stream->toTree  = toTreeToken;
+
+	/* No nextNode implementation for a token rewrite stream */
 	return stream;
-    }
-
-    /* Install the token based overrides
-     */
-    stream->dup	    = dupTok;
-    stream->toTree  = toTreeToken;
-
-    /* No nextNode implementation for a token rewrite stream */
-    return stream;
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
@@ -186,7 +186,7 @@ antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
      */
     stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if (stream == NULL)
     {
 	return stream;
     }
@@ -209,7 +209,7 @@ antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
 
-    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if (stream == NULL)
     {
 	return stream;
     }
@@ -232,9 +232,9 @@ antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
      */
     stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
 
-    if (stream == (pANTLR3_REWRITE_RULE_SUBTREE_STREAM)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if (stream == NULL)
     {
-	return stream;
+		return NULL;
     }
 
     /* Install the token based overrides

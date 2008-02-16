@@ -35,7 +35,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 
 	if	(fileName == NULL)
 	{
-		return (pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOFILE);
+		return NULL;
 	}
 
 	// Allocate memory for the input stream structure
@@ -45,7 +45,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 
 	if	(input == NULL)
 	{
-		return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
 	}
 
 	// Structure was allocated correctly, now we can read the file.
@@ -64,9 +64,8 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 
 	if	(status != ANTLR3_SUCCESS)
 	{
-		ANTLR3_FREE(input);
-
-		return	ANTLR3_FUNC_PTR(status);
+		input->close(input);
+		return	NULL;
 	}
 
 	return  input;
@@ -75,46 +74,46 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 ANTLR3_API ANTLR3_UINT64
 antlr3readAscii(pANTLR3_INPUT_STREAM    input, pANTLR3_UINT8 fileName)
 {
-    ANTLR3_FDSC		    infile;
-    ANTLR3_UINT64	    fSize;
+	ANTLR3_FDSC		    infile;
+	ANTLR3_UINT64	    fSize;
 
-    /* Open the OS file in read binary mode
-     */
-    infile  = antlr3Fopen(fileName, "rb");
+	/* Open the OS file in read binary mode
+	*/
+	infile  = antlr3Fopen(fileName, "rb");
 
-    /* Check that it was there
-     */
-    if	(infile == NULL)
-    {
-	return	(ANTLR3_UINT64)ANTLR3_ERR_NOFILE;
-    }
+	/* Check that it was there
+	*/
+	if	(infile == NULL)
+	{
+		return	(ANTLR3_UINT64)ANTLR3_ERR_NOFILE;
+	}
 
-    /* It was there, so we can read the bytes now
-     */
-    fSize   = antlr3Fsize(fileName);	/* Size of input file	*/
+	/* It was there, so we can read the bytes now
+	*/
+	fSize   = antlr3Fsize(fileName);	/* Size of input file	*/
 
-    /* Allocate buffer for this input set   
-     */
-    input->data	    = ANTLR3_MALLOC((size_t)fSize);
-    input->sizeBuf  = fSize;
+	/* Allocate buffer for this input set   
+	*/
+	input->data	    = ANTLR3_MALLOC((size_t)fSize);
+	input->sizeBuf  = fSize;
 
-    if	(input->data == NULL)
-    {
-	return	(ANTLR3_UINT64)ANTLR3_ERR_NOMEM;
-    }
-    
-    input->isAllocated	= ANTLR3_TRUE;
+	if	(input->data == NULL)
+	{
+		return	(ANTLR3_UINT64)ANTLR3_ERR_NOMEM;
+	}
 
-    /* Now we read the file. Characters are not converted to
-     * the internal ANTLR encoding until they are read from the buffer
-     */
-    antlr3Fread(infile, fSize, input->data);
+	input->isAllocated	= ANTLR3_TRUE;
 
-    /* And close the file handle
-     */
-    antlr3Fclose(infile);
+	/* Now we read the file. Characters are not converted to
+	* the internal ANTLR encoding until they are read from the buffer
+	*/
+	antlr3Fread(infile, fSize, input->data);
 
-    return  ANTLR3_SUCCESS;
+	/* And close the file handle
+	*/
+	antlr3Fclose(infile);
+
+	return  ANTLR3_SUCCESS;
 }
 
 /** \brief Open an operating system file and return the descriptor

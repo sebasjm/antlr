@@ -53,7 +53,7 @@ antlr3DebugListenerNew()
 
 	if	(delboy == NULL)
 	{
-		return (pANTLR3_DEBUG_EVENT_LISTENER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return NULL;
 	}
 
 	// Initialize the API
@@ -102,7 +102,7 @@ antlr3DebugListenerNewPort(ANTLR3_UINT32 port)
 
 	delboy		 = antlr3DebugListenerNew();
 
-	if	(delboy != ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+	if	(delboy != NULL)
 	{
 		delboy->port = port;
 	}

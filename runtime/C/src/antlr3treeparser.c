@@ -20,49 +20,49 @@ static void			freeParser		    (pANTLR3_TREE_PARSER parser);
 ANTLR3_API pANTLR3_TREE_PARSER
 antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
-    pANTLR3_TREE_PARSER	    parser;
+	pANTLR3_TREE_PARSER	    parser;
 
-    /** Allocate tree parser memory
-    */
-    parser  =(pANTLR3_TREE_PARSER) ANTLR3_MALLOC(sizeof(ANTLR3_TREE_PARSER));
+	/** Allocate tree parser memory
+	*/
+	parser  =(pANTLR3_TREE_PARSER) ANTLR3_MALLOC(sizeof(ANTLR3_TREE_PARSER));
 
-    if	(parser == NULL)
-    {
-	return	(pANTLR3_TREE_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(parser == NULL)
+	{
+		return	NULL;
+	}
 
-    /* Create and install a base recognizer which does most of the work for us
-     */
-    parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint, state);
+	/* Create and install a base recognizer which does most of the work for us
+	*/
+	parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint, state);
 
-    if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
-    {
-	parser->free(parser);
-	return	(pANTLR3_TREE_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
-    
-    /* Ensure we can track back to the tree parser super structure
-     * from the base recognizer structure
-     */
-    parser->rec->super	= parser;
-    parser->rec->type	= ANTLR3_TYPE_TREE_PARSER;
+	if	(parser->rec == NULL)
+	{
+		parser->free(parser);
+		return	NULL;
+	}
 
-    /* Install our base recognizer overrides
-     */
-    parser->rec->mismatch	=  mismatch;
-    parser->rec->exConstruct	=  antlr3MTNExceptionNew;
+	/* Ensure we can track back to the tree parser super structure
+	* from the base recognizer structure
+	*/
+	parser->rec->super	= parser;
+	parser->rec->type	= ANTLR3_TYPE_TREE_PARSER;
 
-    /* Install tree parser API
-     */
-    parser->getTreeNodeStream	=  getTreeNodeStream;
-    parser->setTreeNodeStream	=  setTreeNodeStream;
-    parser->free		=  freeParser;
+	/* Install our base recognizer overrides
+	*/
+	parser->rec->mismatch	=  mismatch;
+	parser->rec->exConstruct	=  antlr3MTNExceptionNew;
 
-    /* Install the tree node stream
-     */
-    parser->setTreeNodeStream(parser, ctnstream);
+	/* Install tree parser API
+	*/
+	parser->getTreeNodeStream	=  getTreeNodeStream;
+	parser->setTreeNodeStream	=  setTreeNodeStream;
+	parser->free		=  freeParser;
 
-    return  parser;
+	/* Install the tree node stream
+	*/
+	parser->setTreeNodeStream(parser, ctnstream);
+
+	return  parser;
 }
 
 /**

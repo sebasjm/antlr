@@ -58,7 +58,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
     {
 		// Allocation failed
 		//
-		return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
     }
 
 	
@@ -72,7 +72,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		if	(recognizer->state == NULL)
 		{
 			ANTLR3_FREE(recognizer);
-			return	(pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+			return	NULL;
 		}
 
 		// Initialize any new recognizer state
@@ -1519,7 +1519,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 		 */
 		ruleList    = antlr3IntTrieNew(63);	/* Depth is theoretically 64 bits, but probably not ;-)	*/
 
-		if (ruleList != (pANTLR3_INT_TRIE)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+		if (ruleList != NULL)
 		{
 			recognizer->state->ruleMemo->add(recognizer->state->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_HASH_TYPE_STR, 0, ANTLR3_FUNC_PTR(ruleList), freeIntTrie);
 		}

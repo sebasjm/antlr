@@ -50,17 +50,17 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
 
     if	(lexer == NULL)
     {
-	return	(pANTLR3_LEXER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Now we need to create the base recognizer
      */
     lexer->rec	    =  antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint, state);
 
-    if	(lexer->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if	(lexer->rec == NULL)
     {
 	lexer->free(lexer);
-	return	(pANTLR3_LEXER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
     lexer->rec->super  =  lexer;
 
@@ -72,12 +72,12 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
      */
     lexer->rec->state->tokSource	= (pANTLR3_TOKEN_SOURCE)ANTLR3_MALLOC(sizeof(ANTLR3_TOKEN_SOURCE));
 
-    if	(lexer->rec->state->tokSource == (pANTLR3_TOKEN_SOURCE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM)) 
+    if	(lexer->rec->state->tokSource == NULL) 
     {
 	lexer->rec->free(lexer->rec);
 	lexer->free(lexer);
 
-	return	(pANTLR3_LEXER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
     lexer->rec->state->tokSource->super    =  lexer;
 
@@ -288,7 +288,7 @@ antlr3LexerNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_INPUT_STREAM input, pANTLR3
     //
     lexer   = antlr3LexerNew(sizeHint, state);
 
-    if	(lexer != (pANTLR3_LEXER)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM)) 
+    if	(lexer != NULL) 
     {
 		// Install the input stream and reset the lexer
 		//
@@ -461,33 +461,33 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 static void
 pushCharStream  (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
 {
-    // Do we need a new input stream stack?
-    //
-    if	(lexer->rec->state->streams == NULL)
-    {
-	// This is the first call to stack a new
-	// stream and so we must create the stack first.
+	// Do we need a new input stream stack?
 	//
-	lexer->rec->state->streams = antlr3StackNew(0);
-
-	if  (lexer->rec->state->streams == ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+	if	(lexer->rec->state->streams == NULL)
 	{
-	    // Could not do this, we just fail to push it.
-	    // TODO: Consider if this is what we want to do, but then
-	    //       any programmer can override this method to do somthing else.
-	    return;
+		// This is the first call to stack a new
+		// stream and so we must create the stack first.
+		//
+		lexer->rec->state->streams = antlr3StackNew(0);
+
+		if  (lexer->rec->state->streams == NULL)
+		{
+			// Could not do this, we just fail to push it.
+			// TODO: Consider if this is what we want to do, but then
+			//       any programmer can override this method to do something else.
+			return;
+		}
 	}
-    }
 
-    // We have a stack, so we can save the current input stream
-    // into it.
-    //
-    lexer->input->istream->mark(lexer->input->istream);
-    lexer->rec->state->streams->push(lexer->rec->state->streams, lexer->input, NULL);
+	// We have a stack, so we can save the current input stream
+	// into it.
+	//
+	lexer->input->istream->mark(lexer->input->istream);
+	lexer->rec->state->streams->push(lexer->rec->state->streams, lexer->input, NULL);
 
-    // And now we can install this new one
-    //
-    lexer->setCharStream(lexer, input);
+	// And now we can install this new one
+	//
+	lexer->setCharStream(lexer, input);
 }
 
 /*!

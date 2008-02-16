@@ -46,47 +46,47 @@ antlr3BitsetFree(pANTLR3_BITSET bitset)
 ANTLR3_API pANTLR3_BITSET
 antlr3BitsetNew(ANTLR3_UINT32 numBits)
 {
-    pANTLR3_BITSET  bitset;
+	pANTLR3_BITSET  bitset;
 
-    ANTLR3_UINT32   numelements;
+	ANTLR3_UINT32   numelements;
 
-    /* Allocate memory for the bitset structure itself
-     */
-    bitset  = (pANTLR3_BITSET) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_BITSET));
+	/* Allocate memory for the bitset structure itself
+	*/
+	bitset  = (pANTLR3_BITSET) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_BITSET));
 
-    if	(bitset == NULL)
-    {
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(bitset == NULL)
+	{
+		return	NULL;
+	}
 
-    /* Avoid memory thrashing at the up front expense of a few bytes
-     */
-    if	(numBits < (8 * ANTLR3_BITSET_BITS))
-    {
-	numBits = 8 * ANTLR3_BITSET_BITS;
-    }
+	/* Avoid memory thrashing at the up front expense of a few bytes
+	*/
+	if	(numBits < (8 * ANTLR3_BITSET_BITS))
+	{
+		numBits = 8 * ANTLR3_BITSET_BITS;
+	}
 
-    /* No we need to allocate the memory for the number of bits asked for
-     * in multiples of ANTLR3_UINT64. Note, our ANTLR3_MALLOC is acutally 
-     * calloc in disguise, so no need to memset to 0
-     */
-    numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
+	/* No we need to allocate the memory for the number of bits asked for
+	* in multiples of ANTLR3_UINT64. Note, our ANTLR3_MALLOC is actually 
+	* calloc in disguise, so no need to memset to 0
+	*/
+	numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
 
-    bitset->bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
-    bitset->length  = numelements;
+	bitset->bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
+	bitset->length  = numelements;
 
-    if	(bitset->bits	== NULL)
-    {
-	ANTLR3_FREE(bitset);
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
-    
-    antlr3BitsetSetAPI(bitset);
+	if	(bitset->bits	== NULL)
+	{
+		ANTLR3_FREE(bitset);
+		return	NULL;
+	}
+
+	antlr3BitsetSetAPI(bitset);
 
 
-    /* All seems good
-     */
-    return  bitset;
+	/* All seems good
+	*/
+	return  bitset;
 }
 ANTLR3_API void
 antlr3BitsetSetAPI(pANTLR3_BITSET bitset)
@@ -118,7 +118,7 @@ antlr3BitsetCopy(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Avoid memory thrashing at the expense of a few more bytes
@@ -137,7 +137,7 @@ antlr3BitsetCopy(pANTLR3_UINT64 inSet, ANTLR3_UINT32 numElements)
     if	(bitset->bits == NULL)
     {
 	ANTLR3_FREE(bitset);
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     ANTLR3_MEMMOVE(bitset->bits, inSet, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
@@ -158,7 +158,7 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Install the actual bits in the source set
@@ -220,41 +220,41 @@ antlr3BitsetList(pANTLR3_HASH_TABLE list)
 ANTLR3_API pANTLR3_BITSET
 antlr3BitsetLoad(ANTLR3_UINT32 ec, pANTLR3_UINT64 bset)
 {
-    pANTLR3_BITSET  bitset;
-    ANTLR3_UINT32  count;
+	pANTLR3_BITSET  bitset;
+	ANTLR3_UINT32  count;
 
-    /* Allocate memory for the bitset structure itself
-     * the input parameter is the bit number (0 based)
-     * to include in the bitset, so we need at at least
-     * bit + 1 bits. If any arguments indicate a 
-     * a bit higher than the default number of bits (0 menas default size)
-     * then Add() will take care
-     * of it.
-     */
-    bitset  = antlr3BitsetNew(0);
+	/* Allocate memory for the bitset structure itself
+	* the input parameter is the bit number (0 based)
+	* to include in the bitset, so we need at at least
+	* bit + 1 bits. If any arguments indicate a 
+	* a bit higher than the default number of bits (0 menas default size)
+	* then Add() will take care
+	* of it.
+	*/
+	bitset  = antlr3BitsetNew(0);
 
-    if	(bitset == NULL)
-    {
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
-
-    /* Now we can add the element bits into the set
-     */
-    count=0;
-    while (count < ec)
-    {
-	if  (bitset->length <= count)
+	if	(bitset == NULL)
 	{
-	    bitset->grow(bitset, count+1);
+		return	NULL;
 	}
-	
-	bitset->bits[count] = *(bset+count);
-	count++;
-    }
 
-    /* return the new bitset
-     */
-    return  bitset;
+	/* Now we can add the element bits into the set
+	*/
+	count=0;
+	while (count < ec)
+	{
+		if  (bitset->length <= count)
+		{
+			bitset->grow(bitset, count+1);
+		}
+
+		bitset->bits[count] = *(bset+count);
+		count++;
+	}
+
+	/* return the new bitset
+	*/
+	return  bitset;
 }
 
 /*!
@@ -296,7 +296,7 @@ antlr3BitsetOf(ANTLR3_INT32 bit, ...)
 
     if	(bitset == NULL)
     {
-	return	(pANTLR3_BITSET) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Now we can add the element bits into the set

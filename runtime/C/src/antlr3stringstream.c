@@ -37,7 +37,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
 
     if	(input == NULL)
     {
-		return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
     }
     
     /* Structure was allocated correctly, now we can install the pointer.
@@ -79,38 +79,38 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size,
 ANTLR3_API pANTLR3_INPUT_STREAM	
 antlr3NewUCS2StringInPlaceStream   (pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name)
 {
-    /* Pointer to the input stream we are going to create
-     */
-    pANTLR3_INPUT_STREAM    input;
+	/* Pointer to the input stream we are going to create
+	*/
+	pANTLR3_INPUT_STREAM    input;
 
-    /* Layout default file name string in correct encoding
-     */
-    ANTLR3_UINT16   defaultName[] = { '-', 'm', 'e', 'm', 'o', 'r', 'y', '-', '\0' };
+	/* Layout default file name string in correct encoding
+	*/
+	ANTLR3_UINT16   defaultName[] = { '-', 'm', 'e', 'm', 'o', 'r', 'y', '-', '\0' };
 
-    /* Allocate memory for the input stream structure
-     */
-    input   = (pANTLR3_INPUT_STREAM)
-		    ANTLR3_MALLOC(sizeof(ANTLR3_INPUT_STREAM));
+	/* Allocate memory for the input stream structure
+	*/
+	input   = (pANTLR3_INPUT_STREAM)
+		ANTLR3_MALLOC(sizeof(ANTLR3_INPUT_STREAM));
 
-    if	(input == NULL)
-    {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	if	(input == NULL)
+	{
+		return	NULL;
+	}
 
-    /* Structure was allocated correctly, now we can install the pointer.
-     */
-    input->data	    = inString;
-    input->sizeBuf  = size;
+	/* Structure was allocated correctly, now we can install the pointer.
+	*/
+	input->data	    = inString;
+	input->sizeBuf  = size;
 
-    /* Call the common 16 bit input stream handler initializer.
-     */
-    antlr3UCS2SetupStream   (input, ANTLR3_CHARSTREAM);
-    
+	/* Call the common 16 bit input stream handler initializer.
+	*/
+	antlr3UCS2SetupStream   (input, ANTLR3_CHARSTREAM);
+
 	input->istream->streamName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)defaultName : (pANTLR3_UINT8)name);
 	input->fileName				= input->istream->streamName;
 
 
-    return  input;
+	return  input;
 }
 
 /** \brief Create an ASCII string stream as input to ANTLR 3, copying the input string.
@@ -143,7 +143,7 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
 
     if	(input == NULL)
     {
-	return	(pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Indicate that we allocated this input and allocate it
@@ -153,7 +153,7 @@ pANTLR3_INPUT_STREAM	antlr3NewAsciiStringCopyStream	    (pANTLR3_UINT8 inString,
 
     if	(input->data == NULL)
     {
-	return	    (pANTLR3_INPUT_STREAM) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return		NULL;
     }
 
     /* Structure was allocated correctly, now we can install the pointer and set the size.

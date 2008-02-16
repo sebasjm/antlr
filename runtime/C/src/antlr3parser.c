@@ -19,7 +19,7 @@ antlr3ParserNewStreamDbg		(ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream,
 
 	if	(parser == NULL)
     {
-		return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
     }
 
 	parser->setDebugListener(parser, dbg);
@@ -38,17 +38,17 @@ antlr3ParserNew		(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
 
     if	(parser == NULL)
     {
-		return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
     }
 
     /* Install a base parser
      */
     parser->rec =  antlr3BaseRecognizerNew(ANTLR3_TYPE_PARSER, sizeHint, state);
 
-    if	(parser->rec == (pANTLR3_BASE_RECOGNIZER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if	(parser->rec == NULL)
     {
 		parser->free(parser);
-		return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
     }
 
     parser->rec->super	= parser;
@@ -75,9 +75,9 @@ antlr3ParserNewStream	(ANTLR3_UINT32 sizeHint, pANTLR3_TOKEN_STREAM tstream, pAN
 
     parser  = antlr3ParserNew(sizeHint, state);
 
-    if	(parser == (pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    if	(parser == NULL)
     {
-		return	(pANTLR3_PARSER) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
     }
 
     /* Everything seems to be hunky dory so we can install the 

@@ -42,20 +42,20 @@ static	pANTLR3_COMMON_TOKEN    newPoolToken	(pANTLR3_TOKEN_FACTORY factory);
 ANTLR3_API pANTLR3_COMMON_TOKEN
 antlr3CommonTokenNew(ANTLR3_UINT32 ttype)
 {
-    pANTLR3_COMMON_TOKEN    token;
-    
-    /* Create a raw token with the interface installed
-     */
-    token   = newToken();
+	pANTLR3_COMMON_TOKEN    token;
 
-    if	(token != (pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
-    {
-	token->setType(token, ttype);
-    }
+	// Create a raw token with the interface installed
+	//
+	token   = newToken();
 
-    /* All good
-     */
-    return  token;
+	if	(token != NULL)
+	{
+		token->setType(token, ttype);
+	}
+
+	// All good
+	//
+	return  token;
 }
 
 ANTLR3_API pANTLR3_TOKEN_FACTORY
@@ -69,7 +69,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
 
     if	(factory == NULL)
     {
-	return	(pANTLR3_TOKEN_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Install factory API
@@ -240,7 +240,7 @@ newToken(void)
 
     if	(token == NULL)
     {
-	return	(pANTLR3_COMMON_TOKEN)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+	return	NULL;
     }
 
     /* Install the API

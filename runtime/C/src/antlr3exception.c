@@ -41,33 +41,33 @@ static    void	antlr3ExceptionFree (pANTLR3_EXCEPTION ex);
 pANTLR3_EXCEPTION
 antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_BOOLEAN freeMessage)
 {
-    pANTLR3_EXCEPTION	ex;
+	pANTLR3_EXCEPTION	ex;
 
-    /* Allocate memory for the structure
-     */
-    ex	= (pANTLR3_EXCEPTION) ANTLR3_MALLOC(sizeof(ANTLR3_EXCEPTION));
+	/* Allocate memory for the structure
+	*/
+	ex	= (pANTLR3_EXCEPTION) ANTLR3_MALLOC(sizeof(ANTLR3_EXCEPTION));
 
-    /* Check for memory allocation
-     */
-    if	(ex == NULL)
-    {
-	return	(pANTLR3_EXCEPTION)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	/* Check for memory allocation
+	*/
+	if	(ex == NULL)
+	{
+		return	NULL;
+	}
 
-    ex->name		= name;		/* Install exception name	*/
-    ex->type		= exception;	/* Install the exception number	*/
-    ex->message		= message;	/* Install message string	*/
-    
-    /* Indicate whether the string should be freed if exception is destroyed    
-     */
-    ex->freeMessage	= freeMessage;
+	ex->name		= name;		/* Install exception name	*/
+	ex->type		= exception;	/* Install the exception number	*/
+	ex->message		= message;	/* Install message string	*/
 
-    /* Install the API
-     */
-    ex->print	    =  antlr3ExceptionPrint;
-    ex->freeEx	    =  antlr3ExceptionFree;
+	/* Indicate whether the string should be freed if exception is destroyed    
+	*/
+	ex->freeMessage	= freeMessage;
 
-    return ex;
+	/* Install the API
+	*/
+	ex->print	    =  antlr3ExceptionPrint;
+	ex->freeEx	    =  antlr3ExceptionFree;
+
+	return ex;
 }
 
 /**

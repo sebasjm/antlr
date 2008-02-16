@@ -80,65 +80,65 @@ static void antlr3EnumNextEntry(pANTLR3_HASH_ENUM en);
 pANTLR3_HASH_TABLE
 antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
 {
-    /* All we have to do is create the hashtable tracking structure
-     * and allocate memory for the requested number of buckets.
-     */
-    pANTLR3_HASH_TABLE	table;
-    
-    ANTLR3_UINT32	bucket;	/* Used to traverse the buckets	*/
+	/* All we have to do is create the hashtable tracking structure
+	* and allocate memory for the requested number of buckets.
+	*/
+	pANTLR3_HASH_TABLE	table;
 
-    table   = ANTLR3_MALLOC(sizeof(ANTLR3_HASH_TABLE));
+	ANTLR3_UINT32	bucket;	/* Used to traverse the buckets	*/
 
-    /* Error out if no memory left */
-    if	(table	== NULL)
-    {
-	return	(pANTLR3_HASH_TABLE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	table   = ANTLR3_MALLOC(sizeof(ANTLR3_HASH_TABLE));
 
-    /* Allocate memory for the buckets
-     */
-    table->buckets = (pANTLR3_HASH_BUCKET) ANTLR3_MALLOC((size_t) (sizeof(ANTLR3_HASH_BUCKET) * sizeHint)); 
+	/* Error out if no memory left */
+	if	(table	== NULL)
+	{
+		return	NULL;
+	}
 
-    if	(table->buckets == NULL)
-    {
-	ANTLR3_FREE((void *)table);
-	return	(pANTLR3_HASH_TABLE) ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-    }
+	/* Allocate memory for the buckets
+	*/
+	table->buckets = (pANTLR3_HASH_BUCKET) ANTLR3_MALLOC((size_t) (sizeof(ANTLR3_HASH_BUCKET) * sizeHint)); 
 
-    /* Modulo of the table, (bucket count).
-     */
-    table->modulo   = sizeHint;
+	if	(table->buckets == NULL)
+	{
+		ANTLR3_FREE((void *)table);
+		return	NULL;
+	}
 
-    table->count    = 0;	    /* Nothing in there yet ( I hope)	*/
+	/* Modulo of the table, (bucket count).
+	*/
+	table->modulo   = sizeHint;
 
-    /* Initialize the buckets to empty
-     */
-    for	(bucket = 0; bucket < sizeHint; bucket++)
-    {
-	table->buckets[bucket].entries = NULL;
-    }
+	table->count    = 0;	    /* Nothing in there yet ( I hope)	*/
 
-    /* Exclude duplicate entries by default
-     */
-    table->allowDups	= ANTLR3_FALSE;
+	/* Initialize the buckets to empty
+	*/
+	for	(bucket = 0; bucket < sizeHint; bucket++)
+	{
+		table->buckets[bucket].entries = NULL;
+	}
 
-    /* Install the interface
-     */
+	/* Exclude duplicate entries by default
+	*/
+	table->allowDups	= ANTLR3_FALSE;
 
-    table->get		=  antlr3HashGet;
-    table->put		=  antlr3HashPut;
-    table->del		=  antlr3HashDelete;
-    table->remove	=  antlr3HashRemove;
+	/* Install the interface
+	*/
 
-    table->getI		=  antlr3HashGetI;
-    table->putI		=  antlr3HashPutI;
-    table->delI		=  antlr3HashDeleteI;
-    table->removeI	=  antlr3HashRemoveI;
+	table->get		=  antlr3HashGet;
+	table->put		=  antlr3HashPut;
+	table->del		=  antlr3HashDelete;
+	table->remove	=  antlr3HashRemove;
 
-    table->size		=  antlr3HashSize;
-    table->free		=  antlr3HashFree;
+	table->getI		=  antlr3HashGetI;
+	table->putI		=  antlr3HashPutI;
+	table->delI		=  antlr3HashDeleteI;
+	table->removeI	=  antlr3HashRemoveI;
 
-    return  table;
+	table->size		=  antlr3HashSize;
+	table->free		=  antlr3HashFree;
+
+	return  table;
 }
 
 static void
@@ -469,68 +469,68 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
 static	ANTLR3_INT32
 antlr3HashPutI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
-    ANTLR3_UINT32	    hash;
-    pANTLR3_HASH_BUCKET	    bucket;
-    pANTLR3_HASH_ENTRY	    entry;
-    pANTLR3_HASH_ENTRY	    * newPointer;
+	ANTLR3_UINT32	    hash;
+	pANTLR3_HASH_BUCKET	    bucket;
+	pANTLR3_HASH_ENTRY	    entry;
+	pANTLR3_HASH_ENTRY	    * newPointer;
 
-    /* First we need to know the hash of the provided key
-     */
-    hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+	/* First we need to know the hash of the provided key
+	*/
+	hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
 
-    /* Knowing the hash, we can find the bucket
-     */
-    bucket  = table->buckets + hash;
+	/* Knowing the hash, we can find the bucket
+	*/
+	bucket  = table->buckets + hash;
 
-    /* Knowign the bucket, we can traverse the entries until we
-     * we find a NULL pointer ofr we find that this is already 
-     * in the table and duplicates were not allowed.
-     */
-    newPointer	= &bucket->entries;
+	/* Knowing the bucket, we can traverse the entries until we
+	* we find a NULL pointer or we find that this is already 
+	* in the table and duplicates were not allowed.
+	*/
+	newPointer	= &bucket->entries;
 
-    while   (*newPointer !=  NULL)
-    {
-	/* The value at new pointer is pointing to an existing entry.
-	 * If duplicates are allowed then we don't care what it is, but
-	 * must reject this add if the key is the same as the one we are
-	 * supplied with.
-	 */
-	if  (table->allowDups == ANTLR3_FALSE)
+	while   (*newPointer !=  NULL)
 	{
-	    if	((*newPointer)->keybase.key.iKey == key)
-	    {
-		return	ANTLR3_ERR_HASHDUP;
-	    }
+		/* The value at new pointer is pointing to an existing entry.
+		* If duplicates are allowed then we don't care what it is, but
+		* must reject this add if the key is the same as the one we are
+		* supplied with.
+		*/
+		if  (table->allowDups == ANTLR3_FALSE)
+		{
+			if	((*newPointer)->keybase.key.iKey == key)
+			{
+				return	ANTLR3_ERR_HASHDUP;
+			}
+		}
+
+		/* Point to the next entry pointer of the current entry we
+		* are traversing, if it is NULL we will create our new
+		* structure and point this to it.
+		*/
+		newPointer = &((*newPointer)->nextEntry);
 	}
 
-	/* Point to the next entry pointer of the current entry we
-	 * are traversing, if it is NULL we will create our new
-	 * structure and point this to it.
-	 */
-	newPointer = &((*newPointer)->nextEntry);
-    }
+	/* newPointer is now pointing at the pointer where we need to
+	* add our new entry, so let's crate the entry and add it in.
+	*/
+	entry   = (pANTLR3_HASH_ENTRY)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
 
-    /* newPointer is now pointing at the pointer where we need to
-     * add our new entry, so let's crate the entry and add it in.
-     */
-    entry   = (pANTLR3_HASH_ENTRY)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
+	if	(entry == NULL)
+	{
+		return	ANTLR3_ERR_NOMEM;
+	}
 
-    if	(entry == NULL)
-    {
-	return	ANTLR3_ERR_NOMEM;
-    }
-	
-    entry->data			= element;		/* Install the data element supplied			*/
-    entry->free			= freeptr;		/* Function that knows how to release the entry		*/
-    entry->keybase.type		= ANTLR3_HASH_TYPE_INT;	/* Indicate the key type stored here for when we free	*/
-    entry->keybase.key.iKey	= key;			/* Record the key value					*/
-    entry->nextEntry		= NULL;			/* Ensure that the forward pointer ends the chain	*/
+	entry->data			= element;		/* Install the data element supplied			*/
+	entry->free			= freeptr;		/* Function that knows how to release the entry		*/
+	entry->keybase.type		= ANTLR3_HASH_TYPE_INT;	/* Indicate the key type stored here for when we free	*/
+	entry->keybase.key.iKey	= key;			/* Record the key value					*/
+	entry->nextEntry		= NULL;			/* Ensure that the forward pointer ends the chain	*/
 
-    *newPointer	= entry;    /* Install the next entry in this bucket	*/
+	*newPointer	= entry;    /* Install the next entry in this bucket	*/
 
-    table->count++;
+	table->count++;
 
-    return  ANTLR3_SUCCESS;
+	return  ANTLR3_SUCCESS;
 }
 
 
@@ -540,68 +540,68 @@ antlr3HashPutI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void
 static	ANTLR3_INT32
 antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
-    ANTLR3_UINT32	    hash;
-    pANTLR3_HASH_BUCKET	    bucket;
-    pANTLR3_HASH_ENTRY	    entry;
-    pANTLR3_HASH_ENTRY	    * newPointer;
+	ANTLR3_UINT32	    hash;
+	pANTLR3_HASH_BUCKET	    bucket;
+	pANTLR3_HASH_ENTRY	    entry;
+	pANTLR3_HASH_ENTRY	    * newPointer;
 
-    /* First we need to know the hash of the provided key
-     */
-    hash    = antlr3Hash(key, (ANTLR3_UINT32)strlen((const char *)key));
+	/* First we need to know the hash of the provided key
+	*/
+	hash    = antlr3Hash(key, (ANTLR3_UINT32)strlen((const char *)key));
 
-    /* Knowing the hash, we can find the bucket
-     */
-    bucket  = table->buckets + (hash % table->modulo);
+	/* Knowing the hash, we can find the bucket
+	*/
+	bucket  = table->buckets + (hash % table->modulo);
 
-    /* Knowign the bucket, we can traverse the entries until we
-     * we find a NULL pointer ofr we find that this is already 
-     * in the table and duplicates were not allowed.
-     */
-    newPointer	= &bucket->entries;
+	/* Knowign the bucket, we can traverse the entries until we
+	* we find a NULL pointer ofr we find that this is already 
+	* in the table and duplicates were not allowed.
+	*/
+	newPointer	= &bucket->entries;
 
-    while   (*newPointer !=  NULL)
-    {
-	/* The value at new pointer is pointing to an existing entry.
-	 * If duplicates are allowed then we don't care what it is, but
-	 * must reject this add if the key is the same as the one we are
-	 * supplied with.
-	 */
-	if  (table->allowDups == ANTLR3_FALSE)
+	while   (*newPointer !=  NULL)
 	{
-	    if	(strcmp((const char*) key, (const char *)(*newPointer)->keybase.key.sKey) == 0)
-	    {
-		return	ANTLR3_ERR_HASHDUP;
-	    }
+		/* The value at new pointer is pointing to an existing entry.
+		* If duplicates are allowed then we don't care what it is, but
+		* must reject this add if the key is the same as the one we are
+		* supplied with.
+		*/
+		if  (table->allowDups == ANTLR3_FALSE)
+		{
+			if	(strcmp((const char*) key, (const char *)(*newPointer)->keybase.key.sKey) == 0)
+			{
+				return	ANTLR3_ERR_HASHDUP;
+			}
+		}
+
+		/* Point to the next entry pointer of the current entry we
+		* are traversing, if it is NULL we will create our new
+		* structure and point this to it.
+		*/
+		newPointer = &((*newPointer)->nextEntry);
 	}
 
-	/* Point to the next entry pointer of the current entry we
-	 * are traversing, if it is NULL we will create our new
-	 * structure and point this to it.
-	 */
-	newPointer = &((*newPointer)->nextEntry);
-    }
+	/* newPointer is now poiting at the pointer where we need to
+	* add our new entry, so let's crate the entry and add it in.
+	*/
+	entry   = (pANTLR3_HASH_ENTRY)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
 
-    /* newPointer is now poiting at the pointer where we need to
-     * add our new entry, so let's crate the entry and add it in.
-     */
-    entry   = (pANTLR3_HASH_ENTRY)ANTLR3_MALLOC((size_t)sizeof(ANTLR3_HASH_ENTRY));
+	if	(entry == NULL)
+	{
+		return	ANTLR3_ERR_NOMEM;
+	}
 
-    if	(entry == NULL)
-    {
-	return	ANTLR3_ERR_NOMEM;
-    }
-	
-    entry->data			= element;		/* Install the data element supplied		    */
-    entry->free			= freeptr;		/* Function that knows how to release the entry	    */
-    entry->keybase.type		= ANTLR3_HASH_TYPE_STR;	/* Indicate the key type stored here for free()	    */
-    entry->keybase.key.sKey	= ANTLR3_STRDUP(key);	/* Record the key value				    */
-    entry->nextEntry		= NULL;			/* Ensure that the forward pointer ends the chain   */
+	entry->data			= element;					/* Install the data element supplied				*/
+	entry->free			= freeptr;					/* Function that knows how to release the entry	    */
+	entry->keybase.type		= ANTLR3_HASH_TYPE_STR;	/* Indicate the key type stored here for free()	    */
+	entry->keybase.key.sKey	= ANTLR3_STRDUP(key);	/* Record the key value								*/
+	entry->nextEntry		= NULL;					/* Ensure that the forward pointer ends the chain   */
 
-    *newPointer	= entry;    /* Install the next entry in this bucket	*/
+	*newPointer	= entry;    /* Install the next entry in this bucket	*/
 
-    table->count++;
+	table->count++;
 
-    return  ANTLR3_SUCCESS;
+	return  ANTLR3_SUCCESS;
 }
 
 /** \brief Creates an enumeration structure to traverse the hash table.
