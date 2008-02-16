@@ -1,27 +1,32 @@
-use Test::More tests => 5;
+package ANTLR::Runtime::Exception::Test;
 
 use strict;
 use warnings;
 
-use Test::Exception;
+use base qw( Test::Class );
+use Test::More;
 
-BEGIN { use_ok( 'ANTLR::Runtime::Exception' ); }
-require_ok( 'ANTLR::Runtime::Exception' );
+use ANTLR::Runtime::Exception;
 
-{
+sub test_new_default :Test(1) {
+    # pick any error
+    $! = 1;
+    my $expected = "$!";
     my $ex = ANTLR::Runtime::Exception->new();
-    is $ex->message, '';
+    is $ex->message, $expected;
 }
 
-{
+sub test_new_message :Test(1) {
     my $ex = ANTLR::Runtime::Exception->new(message => 'test error message');
     is $ex->message, 'test error message';
 }
 
-{
+sub test_throw_message :Test(1) {
     eval {
         ANTLR::Runtime::Exception->throw(message => 'test error message');
     };
     my $ex = ANTLR::Runtime::Exception->caught();
     is $ex->message, 'test error message';
 }
+
+1;

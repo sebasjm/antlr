@@ -22,6 +22,7 @@ WriteMakefile(
                       'Carp'              => '1.04',
                       'Readonly'          => '1.03',
                       'Object::InsideOut' => '3.35',
+                      'Test::Class'       => '0.28',
                      },
-    test          => { TESTS => 't/class/ANTLR/Runtime/*.t t/*.t' },
+    test          => { TESTS => 't/*.t' },
 );
