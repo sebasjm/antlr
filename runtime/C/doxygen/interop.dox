@@ -109,12 +109,12 @@
 /// \subsection getcharindex GETCHARINDEX()
 ///
 /// The <code>GETCHARINDEX</code> macro returns the index of the current character position as a 0 based
-/// offset from the start of the input stream. It returns a value type of #ANTLR3_UINT64.
+/// offset from the start of the input stream. It returns a value type of #ANTLR3_UINT32.
 ///
 /// \subsection getline GETLINE()
 ///
 /// The <code>GETLINE</code> macro returns the line number of current character (<code>LA(1)</code> in the input
-/// stream. It returns a value type of #ANTLR3_UINT64. Note that the line number is incremented
+/// stream. It returns a value type of #ANTLR3_UINT32. Note that the line number is incremented
 /// automatically by an input stream when it sees the input character '\n'. The character that causes
 /// the line number to increment can be changed by calling the SetNewLineChar() method on the input
 /// stream before invoking the lexer and after creating the input stream.
@@ -301,7 +301,7 @@
 /// \subsection mark MARK()
 ///
 /// This macro will cause the input stream for the current recognizer to be marked with a
-/// checkpoint. It will return a value type of #ANTLR3_UINT64 which you can use as the 
+/// checkpoint. It will return a value type of #ANTLR3_MARKER which you can use as the 
 /// parameter to a <code>REWIND</code> macro to return to the marked point in the input.
 /// 
 /// If you know you will only ever rewind to the last <code>MARK</code>, then you can ignore the return

@@ -73,7 +73,7 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
 
     /** The line number in the input stream where this token was derived from
      */
-    ANTLR3_UINT64   line;
+    ANTLR3_UINT32   line;
 
     /** The offset into the input stream that the line in which this
      *  token resides starts.
@@ -94,17 +94,17 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
 
     /** What the index of this token is, 0, 1, .., n-2, n-1 tokens
      */
-    ANTLR3_UINT64   index;
+    ANTLR3_MARKER   index;
 
     /** The character offset in the input stream where the text for this token
      *  starts.
      */
-    ANTLR3_UINT64   start;
+    ANTLR3_MARKER   start;
 
     /** The character offset in the input stream where the text for this token
      *  stops.
      */
-    ANTLR3_UINT64   stop;
+    ANTLR3_MARKER   stop;
 
     /** Some token types actually do carry around their associated text, hence
      * (*getText)() will return this pointer if it is not NULL
@@ -175,11 +175,11 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
 
     /** Pointer to a function that gets the 'line' number where this token resides
      */
-    ANTLR3_UINT64   (*getLine)(struct ANTLR3_COMMON_TOKEN_struct * token);
+    ANTLR3_UINT32   (*getLine)(struct ANTLR3_COMMON_TOKEN_struct * token);
 
     /** Pointer to a function that sets the 'line' number where this token reside
      */
-    void	    (*setLine)(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_UINT64 line);
+    void	    (*setLine)(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_UINT32 line);
 
     /** Pointer to a function that gets the offset in the line where this token exists
      */ 
@@ -201,32 +201,32 @@ typedef	struct ANTLR3_COMMON_TOKEN_struct
     /** Pointer to a function that returns an index 0...n-1 of the token in the token
      *  input stream.
      */
-    ANTLR3_UINT64   (*getTokenIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token);
+    ANTLR3_MARKER   (*getTokenIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token);
 
-    /** Pointer to a function tha tcna set the token index of this token in the token
+    /** Pointer to a function that can set the token index of this token in the token
      *  input stream.
      */
-    void	    (*setTokenIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_UINT64);
+    void			(*setTokenIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_MARKER);
 
     /** Pointer to a function that gets the start index in the input stream for this token.
      */
-    ANTLR3_UINT64   (*getStartIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token);
+    ANTLR3_MARKER   (*getStartIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token);
 
     /** Pointer to a function that sets the start index in the input stream for this token.
      */
-    void	    (*setStartIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_UINT64 index);
+    void			(*setStartIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_MARKER index);
     
     /** Pointer to a function that gets the stop index in the input stream for this token.
      */
-    ANTLR3_UINT64   (*getStopIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token);
+    ANTLR3_MARKER   (*getStopIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token);
 
     /** Pointer to a function that sets the stop index in the input stream for this token.
      */
-    void	    (*setStopIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_UINT64 index);
+    void			(*setStopIndex)	(struct ANTLR3_COMMON_TOKEN_struct * token, ANTLR3_MARKER index);
 
     /** Pointer to a function that returns this token as a text representation that can be 
      *  printed with embedded control codes such as \n replaced with the printable sequence "\\n"
-     *  This also yields a string structure that can be used more easilly than the pointer to 
+     *  This also yields a string structure that can be used more easily than the pointer to 
      *  the input stream in certain situations.
      */
     pANTLR3_STRING  (*toString)		(struct ANTLR3_COMMON_TOKEN_struct * token);

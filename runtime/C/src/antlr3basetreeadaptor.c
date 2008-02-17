@@ -5,7 +5,7 @@
  */
 #include    <antlr3basetreeadaptor.h>
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( disable : 4100 )
 #endif
 
@@ -36,14 +36,14 @@ static	void				setType					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE
 static	pANTLR3_STRING		getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void				setText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t);
 static	void				setText8				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
-static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
-static	ANTLR3_UINT64		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_UINT64		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
+static	ANTLR3_UINT32		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_UINT32		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_BOOLEAN		isNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static  pANTLR3_BASE_TREE	setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i);
-static  pANTLR3_BASE_TREE	getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
-static  void				setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child);
-static	void				deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
+static  pANTLR3_BASE_TREE	setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT32 i);
+static  ANTLR3_INT32		getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
+static  void				setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child);
+static	void				deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 
 /** Given a pointer to a base tree adaptor structure (which is usually embedded in the
  *  super class the implements the tree adaptor used in the parse), initialize its
@@ -507,23 +507,23 @@ setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
 }
 
 static	pANTLR3_BASE_TREE	
-   getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree, ANTLR3_UINT64 i)
+   getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree, ANTLR3_UINT32 i)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
 	return NULL;
 }
 static  void
-setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child)
+setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setChild()\n");
 }
 static	void
-deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement deleteChild()\n");
 }
 
-static	ANTLR3_UINT64	
+static	ANTLR3_UINT32	
    getChildCount	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
 {
 	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChildCount()\n");
@@ -533,10 +533,10 @@ static	ANTLR3_UINT64
 /** Returns a uniqueID for the node. Because this is the C implementation
  *  we can just use its address suitably converted/cast to an integer.
  */
-static	ANTLR3_UINT64	
+static	ANTLR3_UINT32	
    getUniqueID		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE node)
 {
-	return	ANTLR3_UINT64_CAST(node);
+	return	ANTLR3_UINT32_CAST(node);
 }
 
 static	ANTLR3_BOOLEAN

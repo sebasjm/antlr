@@ -15,7 +15,7 @@
 #include    <antlr3defs.h>
 #include    <antlr3cyclicdfa.h>
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( disable : 4100 )
 #endif
 
@@ -41,7 +41,7 @@ noViableAlt(pANTLR3_BASE_RECOGNIZER rec, pANTLR3_CYCLIC_DFA cdfa, ANTLR3_UINT32	
 ANTLR3_API ANTLR3_INT32
 antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is, pANTLR3_CYCLIC_DFA cdfa)
 {
-    ANTLR3_UINT64	mark;
+    ANTLR3_MARKER	mark;
     ANTLR3_INT32	s;
     ANTLR3_INT32	specialState;
     ANTLR3_INT32	c;

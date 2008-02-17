@@ -219,22 +219,22 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
      *  then it will return ANTLR3_MEMO_RULE_UNKNOWN. If it has parsed from the suppled start point
      *  then it will return the point where it last stopped parsing after that start point.
      */
-    ANTLR3_UINT64	(*getRuleMemoization)		(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
-								ANTLR3_UINT32	ruleIndex,
-								ANTLR3_UINT64	ruleParseStart);
+    ANTLR3_MARKER	(*getRuleMemoization)		(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
+								ANTLR3_INTKEY	ruleIndex,
+								ANTLR3_MARKER	ruleParseStart);
 
     /** Pointer to function that determines whether the rule has parsed input at the current index
      *  in the input stream
      */
     ANTLR3_BOOLEAN	(*alreadyParsedRule)		(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
-								ANTLR3_UINT32	ruleIndex);
+								ANTLR3_MARKER	ruleIndex);
 
     /** Pointer to function that records whether the rule has parsed the input at a 
      *  current position successfully or not.
      */
     void		(*memoize)			(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
-								ANTLR3_UINT32	ruleIndex,
-								ANTLR3_UINT64	ruleParseStart);
+								ANTLR3_MARKER	ruleIndex,
+								ANTLR3_MARKER	ruleParseStart);
 
     /** Pointer to a function that returns whether the supplied grammar function
      *  will parse the current input stream or not. This is the way that syntactic

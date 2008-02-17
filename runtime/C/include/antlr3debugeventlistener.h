@@ -123,13 +123,13 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	/** The parser is going to look arbitrarily ahead; mark this location,
 	 *  the token stream's marker is sent in case you need it.
 	 */
-	void			(*mark)				(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker);
+	void			(*mark)				(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker);
 
 	/** After an arbitrarily long lookahead as with a cyclic DFA (or with
 	 *  any backtrack), this informs the debugger that stream should be
 	 *  rewound to the position associated with marker.
 	 */
-	void			(*rewind)			(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker);
+	void			(*rewind)			(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker);
 
 	/** Rewind to the input position of the last marker.
 	 *  Used currently only after a cyclic DFA and just
@@ -348,7 +348,7 @@ typedef struct ANTLR3_DEBUG_EVENT_LISTENER_struct
 	 *  If you are receiving this event over a socket via
 	 *  RemoteDebugEventSocketListener then only t.ID is set.
 	 */
-	void			(*setTokenBoundaries)	(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, int tokenStartIndex, int tokenStopIndex);
+	void			(*setTokenBoundaries)	(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, ANTLR3_MARKER tokenStartIndex, ANTLR3_MARKER tokenStopIndex);
 
 	/// Free up the resources allocated to this structure
 	///

@@ -8,7 +8,7 @@
  */
 #include    <antlr3baserecognizer.h>
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( disable : 4100 )
 #endif
 
@@ -38,9 +38,9 @@ static void					consumeUntilSet				(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_
 static pANTLR3_STACK		getRuleInvocationStack	    (pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_STACK		getRuleInvocationStackNamed (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 name);
 static pANTLR3_HASH_TABLE	toStrings					(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_HASH_TABLE);
-static ANTLR3_UINT64		getRuleMemoization			(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
-static ANTLR3_BOOLEAN		alreadyParsedRule			(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex);
-static void					memoize						(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart);
+static ANTLR3_MARKER		getRuleMemoization			(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_INTKEY ruleIndex, ANTLR3_MARKER ruleParseStart);
+static ANTLR3_BOOLEAN		alreadyParsedRule			(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_MARKER ruleIndex);
+static void					memoize						(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_MARKER ruleIndex, ANTLR3_MARKER ruleParseStart);
 static ANTLR3_BOOLEAN		synpred						(pANTLR3_BASE_RECOGNIZER recognizer, void * ctx, void (*predicate)(void * ctx));
 static void					reset						(pANTLR3_BASE_RECOGNIZER recognizer);
 static void					freeBR						(pANTLR3_BASE_RECOGNIZER recognizer);
@@ -83,7 +83,6 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		recognizer->state->errorCount		= 0;
 		recognizer->state->backtracking		= 0;
 		recognizer->state->following		= NULL;
-		recognizer->state->_fsp				= -1;
 		recognizer->state->ruleMemo			= NULL;
 		recognizer->state->tokenNames		= NULL;
 		recognizer->state->sizeHint			= sizeHint;
@@ -693,8 +692,8 @@ combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact)
 {
     pANTLR3_BITSET	followSet;
     pANTLR3_BITSET	localFollowSet;
-    ANTLR3_UINT64	top;
-    ANTLR3_UINT64	i;
+    ANTLR3_UINT32	top;
+    ANTLR3_UINT32	i;
 
     top	= recognizer->state->following->size(recognizer->state->following);
 
@@ -1494,19 +1493,19 @@ freeIntTrie    (void * trie)
  * issue (it probably won't, the hash tables are pretty quick) then we could make a special int only
  * version of the table.
  */
-static ANTLR3_UINT64	
-getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart)
+static ANTLR3_MARKER	
+getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_INTKEY ruleIndex, ANTLR3_MARKER ruleParseStart)
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
     pANTLR3_INT_TRIE	ruleList;
-    ANTLR3_UINT64	stopIndex;
+    ANTLR3_MARKER	stopIndex;
     pANTLR3_TRIE_ENTRY	entry;
 
     /* See if we have a list in the ruleMemos for this rule, and if not, then create one
      * as we will need it eventually if we are being asked for the memo here.
      */
-    entry	= recognizer->state->ruleMemo->get(recognizer->state->ruleMemo, (ANTLR3_UINT64)ruleIndex);
+    entry	= recognizer->state->ruleMemo->get(recognizer->state->ruleMemo, (ANTLR3_INTKEY)ruleIndex);
 
     if	(entry == NULL)
     {
@@ -1521,7 +1520,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
 
 		if (ruleList != NULL)
 		{
-			recognizer->state->ruleMemo->add(recognizer->state->ruleMemo, (ANTLR3_UINT64)ruleIndex, ANTLR3_HASH_TYPE_STR, 0, ANTLR3_FUNC_PTR(ruleList), freeIntTrie);
+			recognizer->state->ruleMemo->add(recognizer->state->ruleMemo, (ANTLR3_INTKEY)ruleIndex, ANTLR3_HASH_TYPE_STR, 0, ANTLR3_FUNC_PTR(ruleList), freeIntTrie);
 		}
 
 		/* We cannot have a stopIndex in a trie we have just created of course
@@ -1538,7 +1537,7 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
     entry = ruleList->get(ruleList, ruleParseStart);
     if (entry != NULL)
     {
-		stopIndex = entry->data.intVal;
+		stopIndex = (ANTLR3_MARKER)(entry->data.intVal);
     }
 
     if	(stopIndex == 0)
@@ -1558,9 +1557,9 @@ getRuleMemoization		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleI
  *  1 past the stop token matched for this rule last time.
  */
 static ANTLR3_BOOLEAN	
-alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex)
+alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_MARKER ruleIndex)
 {
-    ANTLR3_UINT64			stopIndex;
+    ANTLR3_MARKER			stopIndex;
     pANTLR3_LEXER			lexer;
     pANTLR3_PARSER			parser;
     pANTLR3_TREE_PARSER	    tparser;
@@ -1596,7 +1595,7 @@ alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIn
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'alreadyParsedRule' called by unknown paresr type - provide override for this function\n");
+			fprintf(stderr, "Base recognizer function 'alreadyParsedRule' called by unknown parser type - provide override for this function\n");
 			return ANTLR3_FALSE;
 
 			break;
@@ -1629,13 +1628,13 @@ alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIn
  *  successfully.
  */
 static void		
-memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UINT64 ruleParseStart)
+memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_MARKER ruleIndex, ANTLR3_MARKER ruleParseStart)
 {
     /* The rule memos are an ANTLR3_LIST of ANTLR3_LIST.
      */
     pANTLR3_INT_TRIE	    ruleList;
     pANTLR3_TRIE_ENTRY	    entry;
-    ANTLR3_UINT64	    stopIndex;
+    ANTLR3_MARKER	    stopIndex;
     pANTLR3_LEXER	    lexer;
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
@@ -1677,7 +1676,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
     
     stopIndex	= recognizer->state->failed == ANTLR3_TRUE ? MEMO_RULE_FAILED : is->index(is) - 1;
 
-    entry	= recognizer->state->ruleMemo->get(recognizer->state->ruleMemo, (ANTLR3_UINT64)ruleIndex);
+    entry	= recognizer->state->ruleMemo->get(recognizer->state->ruleMemo, (ANTLR3_INTKEY)ruleIndex);
 
     if	(entry != NULL)
     {
@@ -1697,7 +1696,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ruleIndex, ANTLR3_UIN
 static ANTLR3_BOOLEAN	
 synpred	(pANTLR3_BASE_RECOGNIZER recognizer, void * ctx, void (*predicate)(void * ctx))
 {
-    ANTLR3_UINT64   start;
+    ANTLR3_MARKER   start;
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
@@ -1772,7 +1771,7 @@ reset(pANTLR3_BASE_RECOGNIZER recognizer)
     recognizer->state->following   = antlr3StackNew(8);
 }
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( default : 4100 )
 #endif
 

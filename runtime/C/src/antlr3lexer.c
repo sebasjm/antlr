@@ -24,8 +24,8 @@ static void					setUpperCompare				(pANTLR3_LEXER lexer, ANTLR3_BOOLEAN flag);
 static ANTLR3_BOOLEAN	    matchRange					(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high);
 static void					matchAny					(pANTLR3_LEXER lexer);
 static void					recover						(pANTLR3_LEXER lexer);
-static ANTLR3_UINT64	    getLine						(pANTLR3_LEXER lexer);
-static ANTLR3_UINT64	    getCharIndex				(pANTLR3_LEXER lexer);
+static ANTLR3_UINT32	    getLine						(pANTLR3_LEXER lexer);
+static ANTLR3_MARKER	    getCharIndex				(pANTLR3_LEXER lexer);
 static ANTLR3_UINT32	    getCharPositionInLine		(pANTLR3_LEXER lexer);
 static pANTLR3_STRING	    getText						(pANTLR3_LEXER lexer);
 static pANTLR3_COMMON_TOKEN nextToken					(pANTLR3_TOKEN_SOURCE toksource);
@@ -312,7 +312,7 @@ reportError		    (pANTLR3_BASE_RECOGNIZER rec)
     rec->displayRecognitionError(rec, rec->state->tokenNames);
 }
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( disable : 4100 )
 #endif
 
@@ -360,7 +360,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	{
 		ANTLR3_INT32	width;
 
-		width	= (ANTLR3_INT32)(ANTLR3_INT64)(((pANTLR3_UINT8)(lexer->input->data)+(lexer->input->size(lexer->input))) - (ANTLR3_INT32)(ex->index));
+		width	= ANTLR3_UINT32_CAST(( (pANTLR3_UINT8)(lexer->input->data) + (lexer->input->size(lexer->input) )) - (pANTLR3_UINT8)(ex->index));
 
 		if	(width >= 1)
 		{			
@@ -381,7 +381,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 								(ANTLR3_UINT32)(lexer->rec->state->tokenStartLine),
 								(ANTLR3_UINT32)(lexer->rec->state->tokenStartCharPositionInLine)
 								);
-			width = (ANTLR3_INT32)(ANTLR3_INT64)(((pANTLR3_UINT8)(lexer->input->data)+(lexer->input->size(lexer->input))) - (ANTLR3_INT32)(lexer->rec->state->tokenStartCharIndex));
+			width = ANTLR3_UINT32_CAST(((pANTLR3_UINT8)(lexer->input->data)+(lexer->input->size(lexer->input))) - (pANTLR3_UINT8)(lexer->rec->state->tokenStartCharIndex));
 
 			if	(width >= 1)
 			{
@@ -739,7 +739,7 @@ recover	    (pANTLR3_LEXER lexer)
     lexer->input->istream->consume(lexer->input->istream);
 }
 
-static ANTLR3_UINT64
+static ANTLR3_UINT32
 getLine	    (pANTLR3_LEXER lexer)
 {
     return  lexer->input->getLine(lexer->input);
@@ -751,7 +751,7 @@ getCharPositionInLine	(pANTLR3_LEXER lexer)
     return  lexer->input->getCharPositionInLine(lexer->input);
 }
 
-static ANTLR3_UINT64	getCharIndex	    (pANTLR3_LEXER lexer)
+static ANTLR3_MARKER	getCharIndex	    (pANTLR3_LEXER lexer)
 {
     return lexer->input->istream->index(lexer->input->istream);
 }
@@ -759,15 +759,16 @@ static ANTLR3_UINT64	getCharIndex	    (pANTLR3_LEXER lexer)
 static pANTLR3_STRING
 getText	    (pANTLR3_LEXER lexer)
 {
-    if (lexer->rec->state->text)
-    {
-	return	lexer->rec->state->text;
+	if (lexer->rec->state->text)
+	{
+		return	lexer->rec->state->text;
 
-    }
-    return  lexer->input->substr(
-			    lexer->input, 
-			    lexer->rec->state->tokenStartCharIndex,
-			    lexer->getCharIndex(lexer)-1);
+	}
+	return  lexer->input->substr(
+									lexer->input, 
+									lexer->rec->state->tokenStartCharIndex,
+									lexer->getCharIndex(lexer) - lexer->input->charByteSize
+							);
 
 }
 

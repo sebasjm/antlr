@@ -1,7 +1,7 @@
 /** \file
  * Simple string interface allows indiscriminate allocation of strings
  * such that they can be allocated all over the place and released in 
- * one chunk via a string factory - saves lots of hassle in remmebering what
+ * one chunk via a string factory - saves lots of hassle in remembering what
  * strings were allocated where.
  */
 #ifndef	_ANTLR3_STRING_H
@@ -23,13 +23,13 @@ typedef	struct ANTLR3_STRING_struct
     pANTLR3_STRING_FACTORY	factory;
 
     /** Pointer to the current string value (starts at NULL unless
-     *  the string allocator is told to create it with a preknown size.
+     *  the string allocator is told to create it with a pre known size.
      */
     pANTLR3_UINT8		chars;
 
     /** Current length of the string up to and not including, the trailing '\0'
      *  Note that the actual allocation (->size)
-     *  is always at least one byte more than this to accomodate trailing '\0'
+     *  is always at least one byte more than this to accommodate trailing '\0'
      */
     ANTLR3_UINT32		len;
 
@@ -38,7 +38,7 @@ typedef	struct ANTLR3_STRING_struct
     ANTLR3_UINT32		size;
 
     /** Index of string (allocation number) in case someone wants
-     *  to explictly release it.
+     *  to explicitly release it.
      */
     ANTLR3_UINT32		index;
 

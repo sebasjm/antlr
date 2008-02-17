@@ -273,14 +273,14 @@ outputFile( LEXER,
 # define	    LA(n) ((NEXTCHAR + n) > (DATAP + INPUT->sizeBuf) ? ANTLR3_CHARSTREAM_EOF : (ANTLR3_UCHAR)(*(NEXTCHAR + n - 1)))
 # define	    CONSUME()											\
 {																	\
-    if	(NEXTCHAR \< (DATAP + INPUT->sizeBuf))					\
+    if	(NEXTCHAR \< (DATAP + INPUT->sizeBuf))						\
     {																\
 		INPUT->charPositionInLine++;								\
 		if  ((ANTLR3_UCHAR)(*NEXTCHAR) == INPUT->newlineChar)		\
 		{															\
-			INPUT->line++;										\
+			INPUT->line++;											\
 			INPUT->charPositionInLine	= 0;						\
-			INPUT->currentLine		= (void *)(NEXTCHAR + 1);	\
+			INPUT->currentLine		= (void *)(NEXTCHAR + 1);		\
 		}															\
 		INPUT->nextChar = (void *)(NEXTCHAR + 1);					\
     }																\
@@ -357,7 +357,6 @@ outputFile( LEXER,
 #define	    REWINDLAST()					INPUT->istream->rewindLast(INPUT->istream)
 #define		SEEK(n)							INPUT->istream->seek(INPUT->istream, n)
 #define	    PERRORRECOVERY					PSRSTATE->errorRecovery
-#define	    _fsp							PSRSTATE->_fsp
 #define	    FAILEDFLAG						PSRSTATE->failed
 #define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
 #define	    BACKTRACKING					recognizer->state->backtracking
@@ -422,7 +421,6 @@ outputFile( LEXER,
 #define	    REWIND(m)						INPUT->tnstream->istream->rewind(INPUT->tnstream->istream, m)
 #define	    REWINDLAST(m)					INPUT->tnstream->istream->rewindLast(INPUT->tnstream->istream)
 #define	    PERRORRECOVERY					PSRSTATE->errorRecovery
-#define	    _fsp							PSRSTATE->_fsp
 #define	    FAILEDFLAG						PSRSTATE->failed
 #define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
 #define	    BACKTRACKING					PSRSTATE->backtracking
@@ -554,7 +552,7 @@ has the callable functions (rules) shown below,
  <actions.(actionScope).includes>
 <actions.(actionScope).header>
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 // Disable: Unreferenced parameter,                - Rules with parameters that are not used
 //          constant conditional,                  - ANTLR realizes that a prediction is always true (synpred usually)
 //          initialized but unused variable        - tree rewrite vairables declared but not needed
@@ -940,7 +938,7 @@ static pANTLR3_COMMON_TOKEN
 		LEXSTATE->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
 		
 		{
-			ANTLR3_UINT64   m;
+			ANTLR3_MARKER   m;
 		    
 			m							= lexer->input->istream->mark(lexer->input->istream);
 			LEXSTATE->backtracking		= 1;				/* No exceptions */
@@ -1264,7 +1262,7 @@ static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:param
 synpred(predname) ::= <<
 static ANTLR3_BOOLEAN <predname>(p<name> ctx) 
 {
-    ANTLR3_UINT64   start;
+    ANTLR3_MARKER   start;
     ANTLR3_BOOLEAN  success;
 
     BACKTRACKING++;
@@ -1402,7 +1400,7 @@ ruleDeclarations() ::= <<
 }>
 <endif>
 <if(memoize)>
-ANTLR3_UINT64 <ruleDescriptor.name>_StartIndex;
+ANTLR3_UINT32 <ruleDescriptor.name>_StartIndex;
 <endif>
 >>
 
@@ -1921,7 +1919,7 @@ lexerRuleRef(rule,label,args,elementIndex) ::= <<
 /* <description> */
 <if(label)>
 {
-    ANTLR3_UINT64 <label>Start<elementIndex> = GETCHARINDEX();
+    ANTLR3_UINT32 <label>Start<elementIndex> = GETCHARINDEX();
     m<rule>(ctx <if(args)>, <endif><args; separator=", ">); 
     <checkRuleBacktrackFailure()>
     <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
@@ -1946,7 +1944,7 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::= <<
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 {
-    ANTLR3_UINT64 <label>Start<elementIndex>;
+    ANTLR3_UINT32 <label>Start<elementIndex>;
     <labelType> <label>;
     <label>Start<elementIndex> = GETCHARINDEX();
     MATCHC(ANTLR3_CHARSTREAM_EOF); 
@@ -2705,7 +2703,7 @@ scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope))-<negIndex>-1)-><attr.name>
 <else>
 <if(index)>
-((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT64)<index>))-><attr.name>
+((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT32)<index>))-><attr.name>
 <else>
 SCOPE_TOP(<scope>)-><attr.name>
 <endif>
@@ -2717,7 +2715,7 @@ scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
 ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope))-<negIndex>-1)-><attr.name> = <expr>;
 <else>
 <if(index)>
-((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT64)<index>))-><attr.name> = <expr>;
+((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT32)<index>))-><attr.name> = <expr>;
 <else>
 SCOPE_TOP(<scope>)-><attr.name>=<expr>;
 <endif>
@@ -2849,7 +2847,7 @@ if ( BACKTRACKING == 0 )
 bitsetDeclare(name, words64) ::= <<
 
 /** Bitset defining follow set for error recovery in rule state: <name>  */
-static	ANTLR3_BITWORD <name>_bits[]	= { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
+static	ANTLR3_BITWORD <name>_bits[]	= { <words64:{ANTLR3_UINT32_LIT(<it>)}; separator=", "> };
 static  ANTLR3_BITSET <name>	= { <name>_bits, <length(words64)>	};
 >>
 

@@ -161,6 +161,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)/antlr3cd.lib"
 			/>
 			<Tool
@@ -300,7 +301,7 @@
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="2"
+				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="2"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
@@ -324,6 +325,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/LTCG"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)/antlr3c.lib"
 			/>
 			<Tool
@@ -479,7 +481,7 @@
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="2"
+				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="2"
 				DisableLanguageExtensions="false"
 				RuntimeTypeInfo="false"
@@ -503,6 +505,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)\antlr3c64.dll"
 				Version="3.0.0.1"
 				OptimizeReferences="2"
@@ -690,6 +693,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)\antlr3c64d.dll"
 				Version="3.0.0.1"
 				GenerateDebugInformation="true"
@@ -830,10 +834,6 @@
 				RelativePath=".\src\antlr3ucs2inputstream.c"
 				>
 			</File>
-			<File
-				RelativePath=".\src\antlr3unbufferedtreenodestream.c"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -962,10 +962,6 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3treeparser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\antlr3unbufferedtreenodestream.h"
 				>
 			</File>
 		</Filter>

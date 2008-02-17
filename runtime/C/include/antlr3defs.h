@@ -46,23 +46,28 @@
 /* Work out what operating system/compiler this is. We just do this once
  * here and use an internal symbol after this.
  */
-#ifdef	_WIN32
-#ifndef	ANTLR3_WINDOWS
-#define	ANTLR3_WINDOWS
-#define	ANTLR3_WIN32
-#endif
-#endif
-
 #ifdef	_WIN64
-#define	ANTLR3_WIN64
-#define	ANTLR3_USE_64BIT
+
+# ifndef	ANTLR3_WINDOWS
+#   define	ANTLR3_WINDOWS
+# endif
+# define	ANTLR3_WIN64
+# define	ANTLR3_USE_64BIT
+
+#else
+
+# ifndef	ANTLR3_WINDOWS
+#  define	ANTLR3_WINDOWS
+# endif
+#define	ANTLR3_WIN32
+
 #endif
 
 #ifdef	ANTLR3_WINDOWS 
 
 #define	WINDOWS_LEAN_AND_MEAN
 
-/* Allow VC 8 (vs2005) to use 'secure' versions of various functions such as sprintf
+/* Allow VC 8 (vs2005) and above to use 'secure' versions of various functions such as sprintf
  */
 #define	_CRT_SECURE_NO_DEPRECATE 
 
@@ -82,19 +87,11 @@ typedef	UINT32	ANTLR3_UCHAR,	*pANTLR3_UCHAR;
 typedef	INT8	ANTLR3_INT8,	*pANTLR3_INT8;
 typedef	INT16	ANTLR3_INT16,	*pANTLR3_INT16;
 typedef	INT32	ANTLR3_INT32,	*pANTLR3_INT32;
-#ifdef	ANTLR3_USE_64BIT
 typedef	INT64	ANTLR3_INT64,	*pANTLR3_INT64;
-#else
-typedef	INT32	ANTLR3_INT64,	*pANTLR3_INT64;
-#endif
 typedef	UINT8	ANTLR3_UINT8,	*pANTLR3_UINT8;
 typedef	UINT16	ANTLR3_UINT16,	*pANTLR3_UINT16;
 typedef	UINT32	ANTLR3_UINT32,	*pANTLR3_UINT32;
-#ifdef	ANTLR3_USE_64BIT
 typedef	UINT64	ANTLR3_UINT64,	*pANTLR3_UINT64;
-#else
-typedef	UINT32	ANTLR3_UINT64,	*pANTLR3_UINT64;
-#endif
 typedef UINT64  ANTLR3_BITWORD, *pANTLR3_BITWORD;
 
 typedef	UINT32	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
@@ -104,10 +101,19 @@ typedef	UINT32	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 typedef FILE *	    ANTLR3_FDSC;
 typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
-#define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT64)(ptr))
-#define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)(ptr)
-#define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
-#define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
+#ifdef	ANTLR3_USE_64BIT
+#define	ANTLR3_FUNC_PTR(ptr)		(void *)((ANTLR3_UINT64)(ptr))
+#define ANTLR3_UINT64_CAST(ptr)		(ANTLR3_UINT64)(ptr))
+#define	ANTLR3_UINT32_CAST(ptr)		(ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
+typedef ANTLR3_INT64				ANTLR3_MARKER;			
+typedef ANTLR3_UINT64				ANTLR3_INTKEY;
+#else
+#define	ANTLR3_FUNC_PTR(ptr)		(void *)((ANTLR3_UINT32)(ptr))
+#define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)((ANTLR3_UINT32)(ptr))
+#define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)(ptr)
+typedef	ANTLR3_INT32				ANTLR3_MARKER;
+typedef ANTLR3_UINT32				ANTLR3_INTKEY;
+#endif
 
 #ifdef	ANTLR3_WIN32
 #endif
@@ -214,20 +220,12 @@ typedef uint32_t	    ANTLR3_UCHAR,   *pANTLR3_UCHAR;
 typedef int8_t		    ANTLR3_INT8,    *pANTLR3_INT8;
 typedef int16_t		    ANTLR3_INT16,   *pANTLR3_INT16;
 typedef int32_t		    ANTLR3_INT32,   *pANTLR3_INT32;
-#ifdef	ANTLR3_USE_64BIT
 typedef int64_t		    ANTLR3_INT64,   *pANTLR3_INT64;
-#else
-typedef int32_t		    ANTLR3_INT64,   *pANTLR3_INT64;
-#endif
 
 typedef uint8_t	    	    ANTLR3_UINT8,   *pANTLR3_UINT8;
 typedef uint16_t      	    ANTLR3_UINT16,  *pANTLR3_UINT16;
 typedef uint32_t	    ANTLR3_UINT32,  *pANTLR3_UINT32;
-#ifdef	ANTLR3_USE_64BIT
 typedef uint64_t	    ANTLR3_UINT64,  *pANTLR3_UINT64;
-#else
-typedef uint32_t	    ANTLR3_UINT64,  *pANTLR3_UINT64;
-#endif
 typedef uint64_t	    ANTLR3_BITWORD, *pANTLR3_BITWORD;
 
 typedef uint32_t	    ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
@@ -238,14 +236,18 @@ typedef uint32_t	    ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
 typedef FILE *	    ANTLR3_FDSC;
 typedef	struct stat ANTLR3_FSTAT_STRUCT;
 
-#ifdef	ANTLR3_64
-#define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT64)(ptr))
-#define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)(ptr))
-#define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
+#ifdef	ANTLR3_USE_64BIT
+#define	ANTLR3_FUNC_PTR(ptr)		(void *)((ANTLR3_UINT64)(ptr))
+#define ANTLR3_UINT64_CAST(ptr)		(ANTLR3_UINT64)(ptr))
+#define	ANTLR3_UINT32_CAST(ptr)		(ANTLR3_UINT32)((ANTLR3_UINT64)(ptr))
+typedef ANTLR3_INT64				ANTLR3_MARKER;
+typedef ANTLR3_UINT64				ANTLR3_INTKEY;
 #else
-#define	ANTLR3_FUNC_PTR(ptr) (void *)((ANTLR3_UINT32)(ptr))
+#define	ANTLR3_FUNC_PTR(ptr)		(void *)((ANTLR3_UINT32)(ptr))
 #define ANTLR3_UINT64_CAST(ptr)   (ANTLR3_UINT64)((ANTLR3_UINT32)(ptr))
 #define	ANTLR3_UINT32_CAST(ptr)	  (ANTLR3_UINT32)(ptr)
+typedef	ANTLR3_INT32				ANTLR3_MARKER;
+typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 #endif
 #define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
 
@@ -300,9 +302,9 @@ ANTLR3_API pANTLR3_EXCEPTION				antlr3ExceptionNew					(ANTLR3_UINT32 exception,
 
 ANTLR3_API pANTLR3_INPUT_STREAM				antlr3AsciiFileStreamNew			(pANTLR3_UINT8 fileName);
 		
-ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
-ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT64 size, pANTLR3_UINT16 name);
-ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewAsciiStringCopyStream		(pANTLR3_UINT8 inString, ANTLR3_UINT64 size, pANTLR3_UINT8 name);
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT32 size, pANTLR3_UINT8 name);
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewUCS2StringInPlaceStream	(pANTLR3_UINT16 inString, ANTLR3_UINT32 size, pANTLR3_UINT16 name);
+ANTLR3_API pANTLR3_INPUT_STREAM				antlr3NewAsciiStringCopyStream		(pANTLR3_UINT8 inString, ANTLR3_UINT32 size, pANTLR3_UINT8 name);
 
 ANTLR3_API pANTLR3_INT_STREAM				antlr3IntStreamNew					(void);
 

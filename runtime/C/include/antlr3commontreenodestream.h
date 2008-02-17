@@ -103,7 +103,7 @@ typedef	struct ANTLR3_TREE_NODE_STREAM_struct
 	/// If parent is null, don't do anything; must be at root of overall tree.
 	/// Can't replace whatever points to the parent externally.  Do nothing.
 	///
-	void						(*replaceChildren)				(struct ANTLR3_TREE_NODE_STREAM_struct * tns, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
+	void						(*replaceChildren)				(struct ANTLR3_TREE_NODE_STREAM_struct * tns, pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t);
 
 }
     ANTLR3_TREE_NODE_STREAM;
@@ -184,11 +184,11 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 	/// The current index into the nodes vector of the current tree
 	/// we are parsing and possibly rewriting.
 	///
-	ANTLR3_INT64				p;
+	ANTLR3_INT32				p;
 
     /// Track the last mark() call result value for use in rewind(). 
     ///
-    ANTLR3_UINT64				lastMarker;
+    ANTLR3_MARKER				lastMarker;
 
     /// Which node are we currently visiting?
     ///
@@ -201,12 +201,12 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
     /// Which child are we currently visiting?  If -1 we have not visited
     /// this node yet; next consume() request will set currentIndex to 0.
     ///
-    ANTLR3_INT64				currentChildIndex;
+    ANTLR3_INT32				currentChildIndex;
 
     /// What node index did we just consume?  i=0..n-1 for n node trees.
     /// IntStream.next is hence 1 + this value.  Size will be same.
     ///
-    ANTLR3_INT64				absoluteNodeIndex;
+    ANTLR3_MARKER				absoluteNodeIndex;
 
     /// Buffer tree node stream for use with LT(i).  This list grows
     /// to fit new lookahead depths, but consume() wraps like a circular
@@ -236,7 +236,7 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     // INTERFACE
 	//
-    void				(*fill)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT64 k);
+    void				(*fill)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT32 k);
 
     void				(*addLookahead)				(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, pANTLR3_BASE_TREE node);
 
@@ -246,7 +246,7 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     pANTLR3_BASE_TREE	(*handleRootnode)			(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
-    pANTLR3_BASE_TREE	(*visitChild)				(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_UINT64 child);
+    pANTLR3_BASE_TREE	(*visitChild)				(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_UINT32 child);
 
     void				(*addNavigationNode)		(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_UINT32 ttype);
 
@@ -263,9 +263,9 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
 
     ANTLR3_UINT32	    (*getLookaheadSize)			(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
-	void				(*push)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT64 index);
+	void				(*push)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns, ANTLR3_INT32 index);
 
-	ANTLR3_INT64		(*pop)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
+	ANTLR3_INT32		(*pop)						(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
     void				(*reset)					(struct ANTLR3_COMMON_TREE_NODE_STREAM_struct * ctns);
 
@@ -282,11 +282,11 @@ typedef	struct ANTLR3_COMMON_TREE_NODE_STREAM_struct
  */
 typedef struct ANTLR3_TREE_WALK_STATE_struct
 {
-    ANTLR3_UINT64			  currentChildIndex;
-    ANTLR3_UINT64			  absoluteNodeIndex;
+    ANTLR3_UINT32			  currentChildIndex;
+    ANTLR3_MARKER			  absoluteNodeIndex;
     pANTLR3_BASE_TREE		  currentNode;
     pANTLR3_BASE_TREE		  previousNode;
-    ANTLR3_UINT64			  nodeStackSize;
+    ANTLR3_UINT32			  nodeStackSize;
     pANTLR3_BASE_TREE	    * lookAhead;
     ANTLR3_UINT32			  lookAheadLength;
     ANTLR3_UINT32			  tail;

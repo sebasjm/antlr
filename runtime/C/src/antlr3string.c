@@ -366,7 +366,7 @@ toUTF8_16	(pANTLR3_STRING string)
 			// everything that was vaguely possible and stopped when it wasn't. It is
 			// up to the grammar programmer to verify that the input is sensible.
 			//
-			utf8String->len = ((pANTLR3_UINT8)outputEnd) - utf8String->chars;
+			utf8String->len = ANTLR3_UINT32_CAST(((pANTLR3_UINT8)outputEnd) - utf8String->chars);
 
 			*(outputEnd+1) = '\0';		// Always null terminate
 		}
@@ -722,13 +722,13 @@ append8	(pANTLR3_STRING string, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(string->len + len + 1));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + len + 1));
 	string->size	= string->len + len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing
      */
-    ANTLR3_MEMMOVE((void *)(string->chars + string->len), newbit, (ANTLR3_UINT64)(len+1));
+    ANTLR3_MEMMOVE((void *)(string->chars + string->len), newbit, (ANTLR3_UINT32)(len+1));
     string->len	+= len;
 
     return string->chars;
@@ -745,7 +745,7 @@ append16_8	(pANTLR3_STRING string, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)((sizeof(ANTLR3_UINT16)*(string->len + len + 1))));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)((sizeof(ANTLR3_UINT16)*(string->len + len + 1))));
 	string->size	= string->len + len + 1;
     }
 
@@ -779,13 +779,13 @@ append16_16	(pANTLR3_STRING string, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)( sizeof(ANTLR3_UINT16) *(string->len + len + 1) ));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)( sizeof(ANTLR3_UINT16) *(string->len + len + 1) ));
 	string->size	= string->len + len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing delimiter
      */
-    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + string->len), newbit, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len+1)));
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + string->len), newbit, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len+1)));
     string->len	+= len;
 
     return string->chars;
@@ -799,13 +799,13 @@ set8	(pANTLR3_STRING string, const char * chars)
     len = (ANTLR3_UINT32)strlen(chars);
     if	(string->size < len + 1)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(len + 1));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(len + 1));
 	string->size	= len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing '\0'
      */
-    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT64)(len+1));
+    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT32)(len+1));
     string->len	    = len;
 
     return  string->chars;
@@ -822,7 +822,7 @@ set16_8	(pANTLR3_STRING string, const char * chars)
     len = (ANTLR3_UINT32)strlen(chars);
     if	(string->size < len + 1)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len + 1)));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len + 1)));
 	string->size	= len + 1;
     }
     apPoint = ((pANTLR3_UINT16)string->chars);
@@ -855,13 +855,13 @@ set16_16    (pANTLR3_STRING string, const char * chars)
 
     if	(string->size < len + 1)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len + 1)));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len + 1)));
 	string->size	= len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing '\0'
      */
-    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT64)((len+1) * sizeof(ANTLR3_UINT16)));
+    ANTLR3_MEMMOVE((void *)(string->chars), chars, (ANTLR3_UINT32)((len+1) * sizeof(ANTLR3_UINT16)));
     string->len	    = len;
 
     return  string->chars;
@@ -873,7 +873,7 @@ addc8	(pANTLR3_STRING string, ANTLR3_UINT32 c)
 {
     if	(string->size < string->len + 2)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(string->len + 2));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + 2));
 	string->size	= string->len + 2;
     }
     *(string->chars + string->len)	= (ANTLR3_UINT8)c;
@@ -890,7 +890,7 @@ addc16	(pANTLR3_STRING string, ANTLR3_UINT32 c)
 
     if	(string->size < string->len + 2)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16) * (string->len + 2)));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16) * (string->len + 2)));
 	string->size	= string->len + 2;
     }
     ptr	= (pANTLR3_UINT16)(string->chars);
@@ -957,17 +957,17 @@ insert8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(string->len + len + 1));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + len + 1));
 	string->size	= string->len + len + 1;
     }
 
     /* Move the characters we are inserting before, including the delimiter
      */
-    ANTLR3_MEMMOVE((void *)(string->chars + point + len), (void *)(string->chars + point), (ANTLR3_UINT64)(string->len - point + 1));
+    ANTLR3_MEMMOVE((void *)(string->chars + point + len), (void *)(string->chars + point), (ANTLR3_UINT32)(string->len - point + 1));
 
     /* Note we copy the exact number of bytes
      */
-    ANTLR3_MEMMOVE((void *)(string->chars + point), newbit, (ANTLR3_UINT64)(len));
+    ANTLR3_MEMMOVE((void *)(string->chars + point), newbit, (ANTLR3_UINT32)(len));
     
     string->len += len;
 
@@ -995,13 +995,13 @@ insert16_8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
 	string->size	= string->len + len + 1;
     }
 
     /* Move the characters we are inserting before, including the delimiter
      */
-    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point + len), (void *)(((pANTLR3_UINT16)string->chars) + point), (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len - point + 1)));
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point + len), (void *)(((pANTLR3_UINT16)string->chars) + point), (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(string->len - point + 1)));
 
     string->len += len;
     
@@ -1042,18 +1042,18 @@ insert16_16	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
+	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
 	string->size	= string->len + len + 1;
     }
 
     /* Move the characters we are inserting before, including the delimiter
      */
-    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point + len), (void *)(((pANTLR3_UINT16)string->chars) + point), (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(string->len - point + 1)));
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point + len), (void *)(((pANTLR3_UINT16)string->chars) + point), (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(string->len - point + 1)));
 
 
     /* Note we copy the exact number of characters
      */
-    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point), newbit, (ANTLR3_UINT64)(sizeof(ANTLR3_UINT16)*(len)));
+    ANTLR3_MEMMOVE((void *)(((pANTLR3_UINT16)string->chars) + point), newbit, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len)));
     
     string->len += len;
 

@@ -28,7 +28,7 @@
  *  same as:
  *   - (i & (nbits-1)).  
  *
- * Since mod is realtively slow, we use an easilly
+ * Since mod is relatively slow, we use an easily
  * precomputed mod mask to do the mod instead.
  */
 #define	ANTLR3_BITSET_MOD_MASK	ANTLR3_BITSET_BITS - 1
@@ -48,19 +48,19 @@ typedef	struct ANTLR3_BITSET_struct
     ANTLR3_UINT32    length;
 
     struct ANTLR3_BITSET_struct  *  (*clone)	    (struct ANTLR3_BITSET_struct  * inSet);
-    struct ANTLR3_BITSET_struct  *  (*or)	    (struct ANTLR3_BITSET_struct  * bitset1, struct ANTLR3_BITSET_struct * bitset2);
-    void			    (*orInPlace)    (struct ANTLR3_BITSET_struct  * bitset,  struct ANTLR3_BITSET_struct * bitset2);
-    ANTLR3_UINT32		    (*size)	    (struct ANTLR3_BITSET_struct  * bitset);
-    void			    (*add)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_INT32 bit);
-    void			    (*grow)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_INT32 newSize);
-    ANTLR3_BOOLEAN		    (*equals)	    (struct ANTLR3_BITSET_struct  * bitset1, struct ANTLR3_BITSET_struct * bitset2);
-    ANTLR3_BOOLEAN		    (*isMember)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_UINT32 bit);
-    ANTLR3_UINT32		    (*numBits)	    (struct ANTLR3_BITSET_struct  * bitset);
-    void			    (*remove)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_UINT32 bit);
-    ANTLR3_BOOLEAN		    (*isNil)	    (struct ANTLR3_BITSET_struct  * bitset);
-    pANTLR3_INT32		    (*toIntList)    (struct ANTLR3_BITSET_struct  * bitset);
+    struct ANTLR3_BITSET_struct  *  (*or)			(struct ANTLR3_BITSET_struct  * bitset1, struct ANTLR3_BITSET_struct * bitset2);
+    void							(*orInPlace)    (struct ANTLR3_BITSET_struct  * bitset,  struct ANTLR3_BITSET_struct * bitset2);
+    ANTLR3_UINT32					(*size)			(struct ANTLR3_BITSET_struct  * bitset);
+    void							(*add)			(struct ANTLR3_BITSET_struct  * bitset, ANTLR3_INT32 bit);
+    void							(*grow)			(struct ANTLR3_BITSET_struct  * bitset, ANTLR3_INT32 newSize);
+    ANTLR3_BOOLEAN					(*equals)	    (struct ANTLR3_BITSET_struct  * bitset1, struct ANTLR3_BITSET_struct * bitset2);
+    ANTLR3_BOOLEAN					(*isMember)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_UINT32 bit);
+    ANTLR3_UINT32					(*numBits)	    (struct ANTLR3_BITSET_struct  * bitset);
+    void							(*remove)	    (struct ANTLR3_BITSET_struct  * bitset, ANTLR3_UINT32 bit);
+    ANTLR3_BOOLEAN					(*isNil)	    (struct ANTLR3_BITSET_struct  * bitset);
+    pANTLR3_INT32					(*toIntList)    (struct ANTLR3_BITSET_struct  * bitset);
 
-    void			    (*free)	    (struct ANTLR3_BITSET_struct  * bitset);
+    void							(*free)			(struct ANTLR3_BITSET_struct  * bitset);
 
 
 }

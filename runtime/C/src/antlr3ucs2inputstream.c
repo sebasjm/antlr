@@ -7,13 +7,13 @@
 // INT Stream API
 //
 static	    void			antlr3UCS2Consume	(pANTLR3_INT_STREAM is);
-static	    ANTLR3_UCHAR    antlr3UCS2LA		(pANTLR3_INT_STREAM is, ANTLR3_INT64 la);
-static	    ANTLR3_INT64    antlr3UCS2Index		(pANTLR3_INT_STREAM is);
-static	    void			antlr3UCS2Seek		(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint);
+static	    ANTLR3_UCHAR    antlr3UCS2LA		(pANTLR3_INT_STREAM is, ANTLR3_INT32 la);
+static	    ANTLR3_MARKER   antlr3UCS2Index		(pANTLR3_INT_STREAM is);
+static	    void			antlr3UCS2Seek		(pANTLR3_INT_STREAM is, ANTLR3_MARKER seekPoint);
 
 // ucs2 Charstream API functions
 //
-static	    pANTLR3_STRING	antlr3UCS2Substr	(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop);
+static	    pANTLR3_STRING	antlr3UCS2Substr	(pANTLR3_INPUT_STREAM input, ANTLR3_MARKER start, ANTLR3_MARKER stop);
 
 /// \brief Common function to setup function interface for a 16 bit "UCS2" input stream.
 ///
@@ -53,6 +53,8 @@ antlr3UCS2SetupStream	(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     //
     input->substr		    =  antlr3UCS2Substr;	    // Return a string from the input stream
         
+	input->charByteSize				= 2;				// Size in bytes of characters in this stream.
+
 }
 
 /// \brief Consume the next character in an 8 bit ASCII input stream
@@ -95,7 +97,7 @@ antlr3UCS2Consume(pANTLR3_INT_STREAM is)
 /// \return Next input character in internal ANTLR3 encoding (UTF32)
 ///
 static ANTLR3_UCHAR 
-antlr3UCS2LA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
+antlr3UCS2LA(pANTLR3_INT_STREAM is, ANTLR3_INT32 la)
 {
 	pANTLR3_INPUT_STREAM input;
 
@@ -115,14 +117,14 @@ antlr3UCS2LA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
 /// \brief Calculate the current index in the output stream.
 /// \param[in] input Input stream context pointer
 ///
-static ANTLR3_INT64 
+static ANTLR3_MARKER 
 antlr3UCS2Index(pANTLR3_INT_STREAM is)
 {
     pANTLR3_INPUT_STREAM input;
 
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
-    return  (ANTLR3_INT64)(((pANTLR3_UINT16)input->nextChar));
+    return  (ANTLR3_MARKER)(input->nextChar);
 }
 
 /// \brief Rewind the lexer input to the state specified by the supplied mark.
@@ -133,9 +135,9 @@ antlr3UCS2Index(pANTLR3_INT_STREAM is)
 /// Assumes ASCII (or at least, 8 Bit) input stream.
 ///
 static void
-antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
+antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_MARKER seekPoint)
 {
-	ANTLR3_INT64   count;
+	ANTLR3_INT32   count;
 	pANTLR3_INPUT_STREAM input;
 
 	input   = ((pANTLR3_INPUT_STREAM) is->super);
@@ -144,13 +146,13 @@ antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 	// input point, then we assume that we are resetting from a mark
 	// and do not need to scan, but can just set to there.
 	//
-	if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
+	if	(seekPoint <= (ANTLR3_MARKER)(input->nextChar))
 	{
-		input->nextChar	= ((pANTLR3_UINT16) seekPoint);
+		input->nextChar	= (void *)seekPoint;
 	}
 	else
 	{
-		count	= seekPoint - ANTLR3_UINT64_CAST(((pANTLR3_UINT16)(input->nextChar)));
+		count	= (ANTLR3_UINT32)((seekPoint - (ANTLR3_MARKER)(input->nextChar)) / 2); // 16 bits per character in UCS2
 
 		while (count--)
 		{
@@ -166,7 +168,7 @@ antlr3UCS2Seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
 /// \param stop  Offset in the input stream where the string ends.
 ///
 static pANTLR3_STRING
-antlr3UCS2Substr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop)
+antlr3UCS2Substr		(pANTLR3_INPUT_STREAM input, ANTLR3_MARKER start, ANTLR3_MARKER stop)
 {
-    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)(start), (ANTLR3_UINT32)(((stop - start)/2) + 1));
+    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)start, ((ANTLR3_UINT32_CAST(stop - start))/2) + 1);
 }

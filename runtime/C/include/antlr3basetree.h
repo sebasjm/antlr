@@ -33,10 +33,10 @@ typedef	struct ANTLR3_BASE_TREE_struct
     ///
     pANTLR3_VECTOR  children;
 
-    /// This is used to store teh current child index position while descending
+    /// This is used to store the current child index position while descending
     /// and ascending trees as the tree walk progresses.
     ///
-    ANTLR3_UINT64   savedIndex;
+    ANTLR3_MARKER   savedIndex;
 
     /// A string factory to produce strings for toString etc
     ///
@@ -53,9 +53,9 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     void    				(*createChildrenList)		(struct ANTLR3_BASE_TREE_struct * tree);
 
-    void    *				(*deleteChild)				(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i);
+    void    *				(*deleteChild)				(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT32 i);
 
-	void					(*replaceChildren)			(struct ANTLR3_BASE_TREE_struct * parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, struct ANTLR3_BASE_TREE_struct * t);
+	void					(*replaceChildren)			(struct ANTLR3_BASE_TREE_struct * parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, struct ANTLR3_BASE_TREE_struct * t);
 
     void    *				(*dupNode)					(struct ANTLR3_BASE_TREE_struct * dupNode);
 
@@ -63,12 +63,12 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     ANTLR3_UINT32			(*getCharPositionInLine)	(struct ANTLR3_BASE_TREE_struct * tree);
 
-    void    *				(*getChild)					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i);
+    void    *				(*getChild)					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT32 i);
 
-	void    				(*setChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_INT64 );
-	ANTLR3_UINT64			(*getChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree );
+	void    				(*setChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_INT32 );
+	ANTLR3_INT32			(*getChildIndex)			(struct ANTLR3_BASE_TREE_struct * tree );
 
-    ANTLR3_UINT64			(*getChildCount)			(struct ANTLR3_BASE_TREE_struct * tree);
+    ANTLR3_UINT32			(*getChildCount)			(struct ANTLR3_BASE_TREE_struct * tree);
 
 	struct ANTLR3_BASE_TREE_struct *
 							(*getParent)				(struct ANTLR3_BASE_TREE_struct * tree);
@@ -79,13 +79,13 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     void    *				(*getFirstChildWithType)	(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT32 type);
 
-    ANTLR3_UINT64			(*getLine)					(struct ANTLR3_BASE_TREE_struct * tree);
+    ANTLR3_UINT32			(*getLine)					(struct ANTLR3_BASE_TREE_struct * tree);
 
     pANTLR3_STRING			(*getText)					(struct ANTLR3_BASE_TREE_struct * tree);
 
     ANTLR3_BOOLEAN			(*isNil)					(struct ANTLR3_BASE_TREE_struct * tree);
 
-    void					(*setChild)					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT64 i, void * child);
+    void					(*setChild)					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT32 i, void * child);
 
     pANTLR3_STRING			(*toStringTree)				(struct ANTLR3_BASE_TREE_struct * tree);
 

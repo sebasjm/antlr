@@ -100,7 +100,7 @@ typedef	struct ANTLR3_EXCEPTION_struct
     /** Indicates the index of the 'token' we were looking at when the
      *  exception occurred.
      */
-    ANTLR3_UINT64   index;
+    ANTLR3_MARKER  index;
 
     /** Indicates what the current token/tree was when the error occurred. Since not
      *  all input streams will be able to retrieve the nth token, we track it here
@@ -131,7 +131,7 @@ typedef	struct ANTLR3_EXCEPTION_struct
      *  generated from a lexer.  We need to track this since the
      *  unexpected char doesn't carry the line info.
      */
-    ANTLR3_UINT64   line;
+    ANTLR3_UINT32   line;
 
     /** Character position in the line where the error occurred.
      */

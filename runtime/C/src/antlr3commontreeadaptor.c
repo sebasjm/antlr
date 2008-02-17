@@ -9,7 +9,7 @@
 
 #include    <antlr3commontreeadaptor.h>
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( disable : 4100 )
 #endif
 
@@ -22,22 +22,22 @@ static	pANTLR3_COMMON_TOKEN	createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adap
 static	pANTLR3_COMMON_TOKEN    getToken				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	pANTLR3_STRING			getText					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32			getType					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	pANTLR3_BASE_TREE		getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
-static	ANTLR3_UINT64			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	void					replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
+static	pANTLR3_BASE_TREE		getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
+static	ANTLR3_UINT32			getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	void					replaceChildren			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t);
 static	void					setDebugEventListener	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LISTENER debugger);
-static  void					setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i);
-static  ANTLR3_UINT64			getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static  void					setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT32 i);
+static  ANTLR3_INT32			getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	void					setParent				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE child, pANTLR3_BASE_TREE parent);
-static  void					setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child);
-static	void					deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i);
+static  void					setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child);
+static	void					deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 
 /* Methods specific to each tree adaptor
  */
 static	void			setTokenBoundaries		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
 static	void			dbgSetTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
-static	ANTLR3_UINT64   getTokenStartIndex		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static  ANTLR3_UINT64   getTokenStopIndex		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_MARKER   getTokenStartIndex		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static  ANTLR3_MARKER   getTokenStopIndex		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 
 static	void		ctaFree			(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 
@@ -288,38 +288,38 @@ createTokenFromToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN fr
 static	void
 setTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken)
 {
-    ANTLR3_UINT64   start;
-    ANTLR3_UINT64   stop;
+	ANTLR3_MARKER   start;
+	ANTLR3_MARKER   stop;
 
-    pANTLR3_COMMON_TREE	    ct;
+	pANTLR3_COMMON_TREE	    ct;
 
-    if	(t == NULL)
-    {
-	return;
-    }
+	if	(t == NULL)
+	{
+		return;
+	}
 
-    if	( startToken != NULL)
-    {
-	start = startToken->getTokenIndex(startToken);
-    }
-    else
-    {
-	start = 0;
-    }
+	if	( startToken != NULL)
+	{
+		start = startToken->getTokenIndex(startToken);
+	}
+	else
+	{
+		start = 0;
+	}
 
-    if	( stopToken != NULL)
-    {
-	stop = stopToken->getTokenIndex(stopToken);
-    }
-    else
-    {
-	stop = 0;
-    }
+	if	( stopToken != NULL)
+	{
+		stop = stopToken->getTokenIndex(stopToken);
+	}
+	else
+	{
+		stop = 0;
+	}
 
-    ct	= (pANTLR3_COMMON_TREE)(t->super);
+	ct	= (pANTLR3_COMMON_TREE)(t->super);
 
-    ct->startIndex  = start;
-    ct->stopIndex   = stop;
+	ct->startIndex  = start;
+	ct->stopIndex   = stop;
 
 }
 static	void
@@ -333,13 +333,13 @@ dbgSetTokenBoundaries	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, p
 	}
 }
 
-static	ANTLR3_UINT64   
+static	ANTLR3_MARKER   
 getTokenStartIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  ((pANTLR3_COMMON_TREE)(t->super))->startIndex;
 }
 
-static	ANTLR3_UINT64   
+static	ANTLR3_MARKER   
 getTokenStopIndex	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
     return  ((pANTLR3_COMMON_TREE)(t->super))->stopIndex;
@@ -365,7 +365,7 @@ getToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 
 static	void					
 replaceChildren
-(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t)
+(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t)
 {
 	if	(parent != NULL)
 	{
@@ -374,35 +374,35 @@ replaceChildren
 }
 
 static	pANTLR3_BASE_TREE
-getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i)
 {
 	return t->getChild(t, i);
 }
 static  void
-setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i, pANTLR3_BASE_TREE child)
+setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child)
 {
 	t->setChild(t, i, child);
 }
 
 static	void
-deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT64 i)
+deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i)
 {
 	t->deleteChild(t, i);
 }
 
-static	ANTLR3_UINT64
+static	ANTLR3_UINT32
 getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
 	return t->getChildCount(t);
 }
 
 static  void
-setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT64 i)
+setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT32 i)
 {
 	t->setChildIndex(t, i);
 }
 
-static  ANTLR3_UINT64
+static  ANTLR3_INT32
 getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
 	t->getChildIndex(t);

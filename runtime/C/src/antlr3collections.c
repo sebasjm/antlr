@@ -18,13 +18,13 @@ static ANTLR3_INT32	    antlr3HashPut	(pANTLR3_HASH_TABLE table, void * key, voi
 
 /* Integer based keys (Lists and so on) */
 
-static void		    antlr3HashDeleteI   (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key);
-static void *		    antlr3HashGetI	(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key);
-static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key);
-static ANTLR3_INT32	    antlr3HashPutI	(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+static void		    antlr3HashDeleteI   (pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key);
+static void *		    antlr3HashGetI	(pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key);
+static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key);
+static ANTLR3_INT32	    antlr3HashPutI	(pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
 
 static void		    antlr3HashFree	(pANTLR3_HASH_TABLE table);
-static ANTLR3_UINT64	    antlr3HashSize	(pANTLR3_HASH_TABLE table);
+static ANTLR3_UINT32	    antlr3HashSize	(pANTLR3_HASH_TABLE table);
 
 /* ----------- */
 
@@ -36,31 +36,31 @@ static void	    antlr3EnumFree	    (pANTLR3_HASH_ENUM en);
 /* Interface functions for List
  */
 static void		antlr3ListFree	(pANTLR3_LIST list);
-static void		antlr3ListDelete(pANTLR3_LIST list, ANTLR3_UINT64 key);
-static void *		antlr3ListGet	(pANTLR3_LIST list, ANTLR3_UINT64 key);
-static ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+static void		antlr3ListDelete(pANTLR3_LIST list, ANTLR3_INTKEY key);
+static void *		antlr3ListGet	(pANTLR3_LIST list, ANTLR3_INTKEY key);
+static ANTLR3_INT32	antlr3ListPut	(pANTLR3_LIST list, ANTLR3_INTKEY key, void * element, void (ANTLR3_CDECL *freeptr)(void *));
 static ANTLR3_INT32	antlr3ListAdd   (pANTLR3_LIST list, void * element, void (ANTLR3_CDECL *freeptr)(void *));
-static void *		antlr3ListRemove(pANTLR3_LIST list, ANTLR3_UINT64 key);
-static ANTLR3_UINT64	antlr3ListSize	(pANTLR3_LIST list);
+static void *		antlr3ListRemove(pANTLR3_LIST list, ANTLR3_INTKEY key);
+static ANTLR3_UINT32	antlr3ListSize	(pANTLR3_LIST list);
 
 /* Interface functions for Stack
  */
 static void		antlr3StackFree	(pANTLR3_STACK  stack);
 static void *		antlr3StackPop	(pANTLR3_STACK	stack);
-static void *		antlr3StackGet	(pANTLR3_STACK	stack, ANTLR3_UINT64 key);
+static void *		antlr3StackGet	(pANTLR3_STACK	stack, ANTLR3_INTKEY key);
 static ANTLR3_BOOLEAN	antlr3StackPush	(pANTLR3_STACK	stack, void * element, void (ANTLR3_CDECL *freeptr)(void *));
-static ANTLR3_UINT64	antlr3StackSize	(pANTLR3_STACK	stack);
+static ANTLR3_UINT32	antlr3StackSize	(pANTLR3_STACK	stack);
 static void *		antlr3StackPeek	(pANTLR3_STACK	stack);
 
 /* Interface functions for vectors
  */
 static	void ANTLR3_CDECL antlr3VectorFree  (pANTLR3_VECTOR vector);
-static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
-static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
-static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry);
-static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *));
-static	ANTLR3_INT32    antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
-static	ANTLR3_UINT64   antlr3VectorSize    (pANTLR3_VECTOR vector);
+static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry);
+static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry);
+static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry);
+static	ANTLR3_UINT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *));
+static	ANTLR3_UINT32    antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
+static	ANTLR3_UINT32   antlr3VectorSize    (pANTLR3_VECTOR vector);
 
 static  void		closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory);
 static	pANTLR3_VECTOR  newVector	    (pANTLR3_VECTOR_FACTORY factory);
@@ -68,9 +68,9 @@ static	pANTLR3_VECTOR  newVector	    (pANTLR3_VECTOR_FACTORY factory);
 
 /* Interface functions for int TRIE
  */
-static	pANTLR3_TRIE_ENTRY	intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key);
-static	ANTLR3_BOOLEAN		intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key);
-static	ANTLR3_BOOLEAN		intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intType, void * data, void (ANTLR3_CDECL *freeptr)(void *));
+static	pANTLR3_TRIE_ENTRY	intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key);
+static	ANTLR3_BOOLEAN		intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key);
+static	ANTLR3_BOOLEAN		intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key, ANTLR3_UINT32 type, ANTLR3_INTKEY intType, void * data, void (ANTLR3_CDECL *freeptr)(void *));
 static	void			intTrieFree	(pANTLR3_INT_TRIE trie);
 
 /* Local function to advance enumeration structure pointers
@@ -213,7 +213,7 @@ antlr3HashFree(pANTLR3_HASH_TABLE table)
 
 /** return the current size of the hash table
  */
-static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table)
+static ANTLR3_UINT32	antlr3HashSize	    (pANTLR3_HASH_TABLE table)
 {
     return  table->count;
 }
@@ -221,7 +221,7 @@ static ANTLR3_UINT64	antlr3HashSize	    (pANTLR3_HASH_TABLE table)
 /** Remove a numeric keyed entry from a hash table if it exists,
  *  no error if it does not exist.
  */
-static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
+static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key)
 {
     ANTLR3_UINT32	    hash;
     pANTLR3_HASH_BUCKET	    bucket;
@@ -230,15 +230,15 @@ static pANTLR3_HASH_ENTRY   antlr3HashRemoveI   (pANTLR3_HASH_TABLE table, ANTLR
 
     /* First we need to know the hash of the provided key
      */
-    hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+    hash    = (ANTLR3_UINT32)(key % (ANTLR3_INTKEY)(table->modulo));
 
     /* Knowing the hash, we can find the bucket
      */
     bucket  = table->buckets + hash;
 
     /* Now, we traverse the entries in the bucket until
-     * we find the key or the end of the entires in the bucket. 
-     * We track the element prior to the one we are exmaining
+     * we find the key or the end of the entries in the bucket. 
+     * We track the element prior to the one we are examining
      * as we need to set its next pointer to the next pointer
      * of the entry we are deleting (if we find it).
      */
@@ -340,7 +340,7 @@ antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
  *  calling the supplied free() routine if any. 
  */
 static void
-antlr3HashDeleteI    (pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
+antlr3HashDeleteI    (pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key)
 {
     pANTLR3_HASH_ENTRY	entry;
 
@@ -388,7 +388,7 @@ antlr3HashDelete    (pANTLR3_HASH_TABLE table, void * key)
  *  key value, or NULL if it don't exist (or was itself NULL).
  */
 static void *
-antlr3HashGetI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
+antlr3HashGetI(pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key)
 {
     ANTLR3_UINT32	    hash;
     pANTLR3_HASH_BUCKET	    bucket;
@@ -396,7 +396,7 @@ antlr3HashGetI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key)
 
     /* First we need to know the hash of the provided key
      */
-    hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+    hash    = (ANTLR3_UINT32)(key % (ANTLR3_INTKEY)(table->modulo));
 
     /* Knowing the hash, we can find the bucket
      */
@@ -467,7 +467,7 @@ antlr3HashGet(pANTLR3_HASH_TABLE table, void * key)
  *  hash of the provided key.
  */
 static	ANTLR3_INT32
-antlr3HashPutI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *))
+antlr3HashPutI(pANTLR3_HASH_TABLE table, ANTLR3_INTKEY key, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
 	ANTLR3_UINT32	    hash;
 	pANTLR3_HASH_BUCKET	    bucket;
@@ -476,7 +476,7 @@ antlr3HashPutI(pANTLR3_HASH_TABLE table, ANTLR3_UINT64 key, void * element, void
 
 	/* First we need to know the hash of the provided key
 	*/
-	hash    = (ANTLR3_UINT32)(key % (ANTLR3_UINT64)(table->modulo));
+	hash    = (ANTLR3_UINT32)(key % (ANTLR3_INTKEY)(table->modulo));
 
 	/* Knowing the hash, we can find the bucket
 	*/
@@ -835,7 +835,7 @@ antlr3ListNew	(ANTLR3_UINT32 sizeHint)
     return  list;
 }
 
-static ANTLR3_UINT64	antlr3ListSize	    (pANTLR3_LIST list)
+static ANTLR3_UINT32	antlr3ListSize	    (pANTLR3_LIST list)
 {
     return  list->table->size(list->table);
 }
@@ -853,13 +853,13 @@ antlr3ListFree	(pANTLR3_LIST list)
 }
 
 static void
-antlr3ListDelete    (pANTLR3_LIST list, ANTLR3_UINT64 key)
+antlr3ListDelete    (pANTLR3_LIST list, ANTLR3_INTKEY key)
 {
     list->table->delI(list->table, key);
 }
 
 static void *
-antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
+antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_INTKEY key)
 {
     return list->table->getI(list->table, key);
 }
@@ -868,7 +868,7 @@ antlr3ListGet	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
  */
 static ANTLR3_INT32	antlr3ListAdd   (pANTLR3_LIST list, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
-    ANTLR3_UINT64   key;
+    ANTLR3_INTKEY   key;
 
     key	    = list->table->size(list->table) + 1;
     return list->put(list, key, element, freeptr);
@@ -878,7 +878,7 @@ static ANTLR3_INT32	antlr3ListAdd   (pANTLR3_LIST list, void * element, void (AN
  *  caller.
  */
 static	void *
-antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
+antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_INTKEY key)
 {
     pANTLR3_HASH_ENTRY	    entry;
 
@@ -895,7 +895,7 @@ antlr3ListRemove	    (pANTLR3_LIST list, ANTLR3_UINT64 key)
 }
 
 static	ANTLR3_INT32
-antlr3ListPut	    (pANTLR3_LIST list, ANTLR3_UINT64 key, void * element, void (ANTLR3_CDECL *freeptr)(void *))
+antlr3ListPut	    (pANTLR3_LIST list, ANTLR3_INTKEY key, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
     return  list->table->putI(list->table, key, element, freeptr);
 }
@@ -936,7 +936,7 @@ antlr3StackNew	(ANTLR3_UINT32 sizeHint)
     return  stack;
 }
 
-static ANTLR3_UINT64	antlr3StackSize	    (pANTLR3_STACK stack)
+static ANTLR3_UINT32	antlr3StackSize	    (pANTLR3_STACK stack)
 {
     return  stack->vector->count;
 }
@@ -964,7 +964,7 @@ antlr3StackPop	(pANTLR3_STACK	stack)
     // And get the element that is the now the top of the stack (if anything)
     // NOTE! This is not quite like a 'real' stack, which would normally return you
     // the current top of the stack, then remove it from the stack.
-    // TODO: Review this, it is correct for followsets which is what this was done for
+    // TODO: Review this, it is correct for follow sets which is what this was done for
     //       but is not as obvious when using it as a 'real'stack.
     //
     stack->top = stack->vector->get(stack->vector, stack->vector->count - 1);
@@ -972,9 +972,9 @@ antlr3StackPop	(pANTLR3_STACK	stack)
 }
 
 static void *
-antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_UINT64 key)
+antlr3StackGet	(pANTLR3_STACK stack, ANTLR3_INTKEY key)
 {
-    return  stack->vector->get(stack->vector, key);
+    return  stack->vector->get(stack->vector, (ANTLR3_UINT32)key);
 }
 
 static void *
@@ -1053,7 +1053,7 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 static	
 void	ANTLR3_CDECL	antlr3VectorFree    (pANTLR3_VECTOR vector)
 {
-	ANTLR3_UINT64   entry;
+	ANTLR3_UINT32   entry;
 
 	// We must traverse every entry in the vector and if it has
 	// a pointer to a free function then we call it with the
@@ -1082,7 +1082,7 @@ void	ANTLR3_CDECL	antlr3VectorFree    (pANTLR3_VECTOR vector)
 	}
 }
 
-static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
+static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 {
 	// Check this is a valid request first
 	//
@@ -1118,7 +1118,7 @@ static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 	vector->count--;
 }
 
-static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
+static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 {
 	// Ensure this is a valid request
 	//
@@ -1137,7 +1137,7 @@ static	void *		antlr3VectorGet     (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 /// Remove the entry from the vector, but do not free any entry, even if it has
 /// a free pointer.
 ///
-static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
+static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 {
 	void * element;
 
@@ -1176,9 +1176,9 @@ static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry)
 }
 
 static  void
-antlr3VectorResize  (pANTLR3_VECTOR vector, ANTLR3_UINT64 hint)
+antlr3VectorResize  (pANTLR3_VECTOR vector, ANTLR3_UINT32 hint)
 {
-	ANTLR3_UINT64	newSize;
+	ANTLR3_UINT32	newSize;
 
 	// Need to resize the element pointers. We double the allocation
 	// unless we have reached 1024 elements, in which case we just
@@ -1218,9 +1218,9 @@ antlr3VectorResize  (pANTLR3_VECTOR vector, ANTLR3_UINT64 hint)
 }
 
 /// Add the supplied pointer and freeing function pointer to the list,
-/// explanding the vector if needed.
+/// expanding the vector if needed.
 ///
-static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *))
+static	ANTLR3_UINT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
 	// Do we need to resize the vector table?
 	//
@@ -1243,8 +1243,8 @@ static	ANTLR3_INT32    antlr3VectorAdd	    (pANTLR3_VECTOR vector, void * elemen
 /// Replace the element at the specified entry point with the supplied
 /// entry.
 ///
-static	ANTLR3_INT32    
-antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting)
+static	ANTLR3_UINT32    
+antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting)
 {
 
 	// If the vector is currently not big enough, then we expand it
@@ -1274,7 +1274,7 @@ antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT64 entry, void * element,
 
 }
 
-static	ANTLR3_UINT64   antlr3VectorSize    (pANTLR3_VECTOR vector)
+static	ANTLR3_UINT32   antlr3VectorSize    (pANTLR3_VECTOR vector)
 {
     return  vector->count;
 }
@@ -1322,7 +1322,7 @@ ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 si
 static  void		
 closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory)
 {
-	ANTLR3_UINT64   entry;
+	ANTLR3_UINT32   entry;
 	pANTLR3_VECTOR  vector;
 	pANTLR3_VECTOR  freeVector;
 
@@ -1461,9 +1461,7 @@ static ANTLR3_UINT64 bitMask[64] =
     0x0000000000010000, 0x0000000000020000, 0x0000000000040000, 0x0000000000080000,
     0x0000000000100000, 0x0000000000200000, 0x0000000000400000, 0x0000000000800000,
     0x0000000001000000, 0x0000000002000000, 0x0000000004000000, 0x0000000008000000,
-    0x0000000010000000, 0x0000000020000000, 0x0000000040000000, 0x0000000080000000
-#ifdef ANTLR3_USE_64BIT
-    ,
+    0x0000000010000000, 0x0000000020000000, 0x0000000040000000, 0x0000000080000000,
     0x0000000100000000, 0x0000000200000000, 0x0000000400000000, 0x0000000800000000,
     0x0000001000000000, 0x0000002000000000, 0x0000004000000000, 0x0000008000000000,
     0x0000010000000000, 0x0000020000000000, 0x0000040000000000, 0x0000080000000000,
@@ -1472,7 +1470,6 @@ static ANTLR3_UINT64 bitMask[64] =
     0x0010000000000000, 0x0020000000000000, 0x0040000000000000, 0x0080000000000000,
     0x0100000000000000, 0x0200000000000000, 0x0400000000000000, 0x0800000000000000,
     0x1000000000000000, 0x2000000000000000, 0x4000000000000000, 0x8000000000000000
-#endif
 };
 
 /* INT TRIE Implementation of depth 64 bits, being the number of bits
@@ -1532,7 +1529,7 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
  *  by the key if it is contained in the trie, otherwise NULL.
  */
 static	pANTLR3_TRIE_ENTRY   
-intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
+intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key)
 {
 	pANTLR3_INT_TRIE_NODE    thisNode; 
 	pANTLR3_INT_TRIE_NODE    nextNode; 
@@ -1602,7 +1599,7 @@ intTrieGet	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
 
 
 static	ANTLR3_BOOLEAN		
-intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
+intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key)
 {
     pANTLR3_INT_TRIE_NODE   p;
 
@@ -1624,15 +1621,15 @@ intTrieDel	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key)
  *  node pointing to itself or the data node we are inserting 'before'. 
  */
 static	ANTLR3_BOOLEAN		
-intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_UINT64 key, ANTLR3_UINT32 type, ANTLR3_UINT64 intVal, void * data, void (ANTLR3_CDECL *freeptr)(void *))
+intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key, ANTLR3_UINT32 type, ANTLR3_INTKEY intVal, void * data, void (ANTLR3_CDECL *freeptr)(void *))
 {
 	pANTLR3_INT_TRIE_NODE   thisNode;
 	pANTLR3_INT_TRIE_NODE   nextNode;
 	pANTLR3_INT_TRIE_NODE   entNode;
-	ANTLR3_UINT32	    depth;
+	ANTLR3_UINT32			depth;
 	pANTLR3_TRIE_ENTRY	    newEnt;
 	pANTLR3_TRIE_ENTRY	    nextEnt;
-	ANTLR3_UINT64	    xorKey;
+	ANTLR3_INTKEY		    xorKey;
 
 	/* Cache the bit depth of this trie, which is always the highest index, 
 	 * which is in the root node

@@ -13,13 +13,13 @@ static pANTLR3_BASE_TREE    dupNode					(pANTLR3_BASE_TREE tree);
 static ANTLR3_BOOLEAN	    isNil					(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT32	    getType					(pANTLR3_BASE_TREE tree);
 static pANTLR3_STRING	    getText					(pANTLR3_BASE_TREE tree);
-static ANTLR3_UINT64	    getLine					(pANTLR3_BASE_TREE tree);
+static ANTLR3_UINT32	    getLine					(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT32	    getCharPositionInLine	(pANTLR3_BASE_TREE tree);
 static pANTLR3_STRING	    toString				(pANTLR3_BASE_TREE tree);
 static pANTLR3_BASE_TREE	getParent				(pANTLR3_BASE_TREE tree);
 static void					setParent				(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE parent);
-static void    				setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT64 i);
-static ANTLR3_UINT64		getChildIndex			(pANTLR3_BASE_TREE tree );
+static void    				setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT32 i);
+static ANTLR3_INT32			getChildIndex			(pANTLR3_BASE_TREE tree );
 
 static void					freeTree			(pANTLR3_BASE_TREE tree);
 
@@ -84,7 +84,7 @@ newPool(pANTLR3_ARBORETUM factory)
     //
     factory->pools = (pANTLR3_COMMON_TREE *)
 		     ANTLR3_REALLOC(	(void *)factory->pools,											// Current pools pointer (starts at NULL)
-					(ANTLR3_UINT64)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TREE *))	// Memory for new pool pointers
+					(ANTLR3_UINT32)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TREE *))	// Memory for new pool pointers
 					);
 
     // Allocate a new pool for the factory
@@ -128,7 +128,7 @@ newPoolTree	    (pANTLR3_ARBORETUM factory)
 
 	// We have our token pointer now, so we can initialize it to the predefined model.
 	//
-	ANTLR3_MEMMOVE((void *)tree, (const void *)&(factory->unTruc), (ANTLR3_UINT64)sizeof(ANTLR3_COMMON_TREE));
+	ANTLR3_MEMMOVE((void *)tree, (const void *)&(factory->unTruc), (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TREE));
 	// The super points to the common tree so we must override the one used by
 	// by the pre-built tree as otherwise we will always poitn to the same initial
 	// common tree and we might spend 3 hours trying to debug why - this woudl never
@@ -432,7 +432,7 @@ getText			(pANTLR3_BASE_TREE tree)
 	return	tree->toString(tree);
 }
 
-static ANTLR3_UINT64	    getLine			(pANTLR3_BASE_TREE tree)
+static ANTLR3_UINT32	    getLine			(pANTLR3_BASE_TREE tree)
 {
 	pANTLR3_COMMON_TREE	    cTree;
 	pANTLR3_COMMON_TOKEN    token;
@@ -503,11 +503,11 @@ setParent				(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE parent)
 }
 
 static void    				
-setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT64 i)
+setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT32 i)
 {
 	((pANTLR3_COMMON_TREE)(tree->super))->childIndex = i;
 }
-static	ANTLR3_UINT64			
+static	ANTLR3_INT32			
 getChildIndex			(pANTLR3_BASE_TREE tree )
 {
 	return ((pANTLR3_COMMON_TREE)(tree->super))->childIndex;

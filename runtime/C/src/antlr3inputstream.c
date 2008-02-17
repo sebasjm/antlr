@@ -7,14 +7,14 @@
 // INT Stream API
 //
 static	    void			antlr3AsciiConsume			(pANTLR3_INT_STREAM is);
-static	    ANTLR3_UCHAR    antlr3AsciiLA				(pANTLR3_INT_STREAM is, ANTLR3_INT64 la);
-static	    ANTLR3_UCHAR    antlr3AsciiLA_ucase			(pANTLR3_INT_STREAM is, ANTLR3_INT64 la);
-static	    ANTLR3_INT64    antlr3AsciiIndex			(pANTLR3_INT_STREAM is);
-static	    ANTLR3_UINT64   antlr3AsciiMark				(pANTLR3_INT_STREAM is);
-static	    void			antlr3AsciiRewind			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
+static	    ANTLR3_UCHAR    antlr3AsciiLA				(pANTLR3_INT_STREAM is, ANTLR3_INT32 la);
+static	    ANTLR3_UCHAR    antlr3AsciiLA_ucase			(pANTLR3_INT_STREAM is, ANTLR3_INT32 la);
+static	    ANTLR3_MARKER   antlr3AsciiIndex			(pANTLR3_INT_STREAM is);
+static	    ANTLR3_MARKER   antlr3AsciiMark				(pANTLR3_INT_STREAM is);
+static	    void			antlr3AsciiRewind			(pANTLR3_INT_STREAM is, ANTLR3_MARKER mark);
 static	    void			antlr3AsciiRewindLast		(pANTLR3_INT_STREAM is);
-static	    void			antlr3AsciiRelease			(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark);
-static	    void			antlr3AsciiSeek				(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint);
+static	    void			antlr3AsciiRelease			(pANTLR3_INT_STREAM is, ANTLR3_MARKER mark);
+static	    void			antlr3AsciiSeek				(pANTLR3_INT_STREAM is, ANTLR3_MARKER seekPoint);
 static		pANTLR3_STRING	antlr3AsciiGetSourceName	(pANTLR3_INT_STREAM is);
 
 // ASCII Charstream API functions
@@ -22,10 +22,10 @@ static		pANTLR3_STRING	antlr3AsciiGetSourceName	(pANTLR3_INT_STREAM is);
 static	    void			antlr3InputClose			(pANTLR3_INPUT_STREAM input);
 static	    void			antlr3InputReset			(pANTLR3_INPUT_STREAM input);
 static	    pANTLR3_UINT8   antlr3InputFileName			(pANTLR3_INPUT_STREAM input);
-static	    void *			antlr3AsciiLT				(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt);
-static	    ANTLR3_UINT64   antlr3AsciiSize				(pANTLR3_INPUT_STREAM input);
-static	    pANTLR3_STRING  antlr3AsciiSubstr			(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop);
-static	    ANTLR3_UINT64   antlr3AsciiGetLine			(pANTLR3_INPUT_STREAM input);
+static	    void *			antlr3AsciiLT				(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 lt);
+static	    ANTLR3_UINT32   antlr3AsciiSize				(pANTLR3_INPUT_STREAM input);
+static	    pANTLR3_STRING  antlr3AsciiSubstr			(pANTLR3_INPUT_STREAM input, ANTLR3_MARKER start, ANTLR3_MARKER stop);
+static	    ANTLR3_UINT32   antlr3AsciiGetLine			(pANTLR3_INPUT_STREAM input);
 static	    void	  *		antlr3AsciiGetLineBuf		(pANTLR3_INPUT_STREAM input);
 static	    ANTLR3_UINT32   antlr3AsciiGetCharPosition	(pANTLR3_INPUT_STREAM input);
 static	    void			antlr3AsciiSetLine			(pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 line);
@@ -98,6 +98,8 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
     input->setCharPositionInLine    =  antlr3AsciiSetCharPosition;  /* Set the offset in to the current line (does not set any pointers	)   */
     input->SetNewLineChar			=  antlr3AsciiSetNewLineChar;   /* Set the value of the newline trigger character						*/
 	input->setUcaseLA				= antlr3AsciiSetUcaseLA;
+
+	input->charByteSize				= 1;		// Size in bytes of characters in this stream.
 
     /* Initialize entries for tables etc
      */
@@ -243,7 +245,7 @@ antlr3AsciiConsume(pANTLR3_INT_STREAM is)
  * \return Next input character in internal ANTLR3 encoding (UTF32)
  */
 static ANTLR3_UCHAR 
-antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
+antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT32 la)
 {
     pANTLR3_INPUT_STREAM input;
 	
@@ -270,7 +272,7 @@ antlr3AsciiLA(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
  * \return Next input character in internal ANTLR3 encoding (UTF32)
  */
 static ANTLR3_UCHAR
-antlr3AsciiLA_ucase	(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
+antlr3AsciiLA_ucase	(pANTLR3_INT_STREAM is, ANTLR3_INT32 la)
 {
     pANTLR3_INPUT_STREAM input;
 	
@@ -295,7 +297,7 @@ antlr3AsciiLA_ucase	(pANTLR3_INT_STREAM is, ANTLR3_INT64 la)
  * \return Next input character in internal ANTLR3 encoding (UTF32)
  */
 static void * 
-antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt)
+antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 lt)
 {
     /* Casting is horrible but it means no warnings and LT should never be called
      * on a character stream anyway I think. If it is then, the void * will need to be 
@@ -308,14 +310,14 @@ antlr3AsciiLT(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 lt)
 /** \brief Calculate the current index in the output stream.
  * \param[in] input Input stream context pointer
  */
-static ANTLR3_INT64 
+static ANTLR3_MARKER
 antlr3AsciiIndex(pANTLR3_INT_STREAM is)
 {
     pANTLR3_INPUT_STREAM input;
 
     input   = ((pANTLR3_INPUT_STREAM) (is->super));
 
-    return  (ANTLR3_INT64)(((pANTLR3_UINT8)input->nextChar));
+    return  (ANTLR3_MARKER)(((pANTLR3_UINT8)input->nextChar));
 }
 
 /** \brief Return the size of the current input stream, as an Ascii file
@@ -325,7 +327,7 @@ antlr3AsciiIndex(pANTLR3_INT_STREAM is)
  *
  * \param[in] input Input stream context pointer
  */
-static	ANTLR3_UINT64 
+static	ANTLR3_UINT32 
 antlr3AsciiSize(pANTLR3_INPUT_STREAM input)
 {
     return  input->sizeBuf;
@@ -337,7 +339,7 @@ antlr3AsciiSize(pANTLR3_INPUT_STREAM input)
  *
  * \param[in] is Input stream context pointer
  */
-static ANTLR3_UINT64
+static ANTLR3_MARKER
 antlr3AsciiMark	(pANTLR3_INT_STREAM is)
 {
     pANTLR3_LEX_STATE	    state;
@@ -404,7 +406,7 @@ antlr3AsciiRewindLast	(pANTLR3_INT_STREAM is)
  * Assumes ASCII (or at least, 8 Bit) input stream.
  */
 static void
-antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
+antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_MARKER mark)
 {
     pANTLR3_LEX_STATE	state;
     pANTLR3_INPUT_STREAM input;
@@ -417,12 +419,12 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
 
     /* Find the supplied mark state 
      */
-    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, mark - 1);
+    state   = (pANTLR3_LEX_STATE)input->markers->get(input->markers, (ANTLR3_UINT32)(mark - 1));
 
     /* Seek input pointer to the requested point (note we supply the void *pointer
      * to whatever is implementing the int stream to seek).
      */
-    antlr3AsciiSeek(is, ANTLR3_UINT64_CAST(state->nextChar));
+    antlr3AsciiSeek(is, (ANTLR3_MARKER)(state->nextChar));
 
     /* Reset to the reset of the information in the mark
      */
@@ -443,7 +445,7 @@ antlr3AsciiRewind	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
  * Assumes ASCII (or at least, 8 Bit) input stream.
  */
 static void
-antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
+antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_MARKER mark)
 {
     pANTLR3_INPUT_STREAM input;
 
@@ -452,7 +454,7 @@ antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
     /* We don't do much here in fact as we never free any higher marks in
      * the hashtable as we just resuse any memory allocated for them.
      */
-    input->markDepth	= mark - 1;
+    input->markDepth	= (ANTLR3_UINT32)(mark - 1);
 }
 
 /** \brief Rewind the lexer input to the state specified by the supplied mark.
@@ -463,30 +465,30 @@ antlr3AsciiRelease	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 mark)
  * Assumes ASCII (or at least, 8 Bit) input stream.
  */
 static void
-antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
+antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_MARKER seekPoint)
 {
-    ANTLR3_INT64   count;
-    pANTLR3_INPUT_STREAM input;
+	ANTLR3_INT32   count;
+	pANTLR3_INPUT_STREAM input;
 
-    input   = ((pANTLR3_INPUT_STREAM) is->super);
+	input   = ANTLR3_FUNC_PTR(((pANTLR3_INPUT_STREAM) is->super));
 
-    /* If the requested seek point is less than the current
-     * input point, then we assume that we are reseting from a mark
-     * and do not need to scan, but can just set to there.
-     */
-    if	(seekPoint <= ANTLR3_UINT64_CAST(input->nextChar))
-    {
-	input->nextChar	= ((pANTLR3_UINT8) seekPoint);
-    }
-    else
-    {
-	count	= seekPoint - ANTLR3_UINT64_CAST(((pANTLR3_UINT8)(input->nextChar)));
-
-	while (count--)
+	/* If the requested seek point is less than the current
+	* input point, then we assume that we are resetting from a mark
+	* and do not need to scan, but can just set to there.
+	*/
+	if	(seekPoint <= (ANTLR3_MARKER)(input->nextChar))
 	{
-	    is->consume(is);
+		input->nextChar	= ((pANTLR3_UINT8) seekPoint);
 	}
-    }
+	else
+	{
+		count	= (ANTLR3_UINT32)(seekPoint - (ANTLR3_MARKER)(input->nextChar));
+
+		while (count--)
+		{
+			is->consume(is);
+		}
+	}
 }
 /** Return a substring of the ASCII (8 bit) input stream in
  *  newly allocated memory.
@@ -496,9 +498,9 @@ antlr3AsciiSeek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 seekPoint)
  * \param stop  Offset in the input stream where the string ends.
  */
 static pANTLR3_STRING
-antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64 stop)
+antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_MARKER start, ANTLR3_MARKER stop)
 {
-    return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)start, (ANTLR3_UINT32)(stop - start + 1));
+	return  input->strFactory->newPtr(input->strFactory, (pANTLR3_UINT8)start, (ANTLR3_UINT32)(stop - start + 1));
 }
 
 /** \brief Return the line number as understood by the 8 bit/ASCII input stream.
@@ -506,7 +508,7 @@ antlr3AsciiSubstr		(pANTLR3_INPUT_STREAM input, ANTLR3_INT64 start, ANTLR3_INT64
  * \param input Input stream context pointer
  * \return	Line number in input stream that we believe we are working on.
  */
-static ANTLR3_UINT64   
+static ANTLR3_UINT32   
 antlr3AsciiGetLine		(pANTLR3_INPUT_STREAM input)
 {
     return  input->line;

@@ -20,11 +20,11 @@ typedef struct ANTLR3_COMMON_TREE_struct
 
     /// Start token index that encases this tree
     ///
-    ANTLR3_UINT64   startIndex;
+    ANTLR3_MARKER   startIndex;
 
     /// End token that encases this tree
     ///
-    ANTLR3_UINT64   stopIndex;
+    ANTLR3_MARKER   stopIndex;
 
     /// A single token, this is the payload for the tree
     ///

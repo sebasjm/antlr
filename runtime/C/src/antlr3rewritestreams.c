@@ -399,7 +399,7 @@ toTreeToken   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 /* Ensure stream emits trees; tokens must be converted to AST nodes.
  * AST nodes can be passed through unmolested.
  */
-#ifdef WIN32
+#ifdef ANTLR3_WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #endif
@@ -410,7 +410,7 @@ toTreeTree   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
     return (pANTLR3_BASE_TREE)element;
 }
 
-#ifdef WIN32
+#ifdef ANTLR3_WINDOWS
 #pragma warning(pop)
 #endif
 

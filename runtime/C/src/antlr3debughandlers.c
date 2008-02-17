@@ -17,8 +17,8 @@ static	void	exitDecision			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int decisionNum
 static	void	consumeToken			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_COMMON_TOKEN t);
 static	void	consumeHiddenToken		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_COMMON_TOKEN t);
 static	void	LT						(pANTLR3_DEBUG_EVENT_LISTENER delboy, int i, pANTLR3_COMMON_TOKEN t);
-static	void	mark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker);
-static	void	rewindMark				(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker);
+static	void	mark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker);
+static	void	rewindMark				(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker);
 static	void	rewindLast				(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 static	void	beginBacktrack			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int level);
 static	void	endBacktrack			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int level, ANTLR3_BOOLEAN successful);
@@ -37,7 +37,7 @@ static	void	createNode				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TRE
 static	void	createNodeTok			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE node, pANTLR3_COMMON_TOKEN token);
 static	void	becomeRoot				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE newRoot, pANTLR3_BASE_TREE oldRoot);
 static	void	addChild				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE root, pANTLR3_BASE_TREE child);
-static	void	setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, int tokenStartIndex, int tokenStopIndex);
+static	void	setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, ANTLR3_MARKER tokenStartIndex, ANTLR3_MARKER tokenStopIndex);
 static	void	freeDel					(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 static	void	ack						(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 
@@ -114,9 +114,9 @@ antlr3DebugListenerNewPort(ANTLR3_UINT32 port)
 // Support functions for sending stuff over the socket interface
 //
 static int 
-sockSend(SOCKET sock, const char * ptr, size_t len)
+sockSend(SOCKET sock, const char * ptr, int len)
 {
-	size_t		sent;
+	int		sent;
 	int		thisSend;
 
 	sent	= 0;
@@ -182,7 +182,7 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	{
 		// Windows requires us to initialize WinSock.
 		//
-#ifdef _WIN32
+#ifdef ANTLR3_WINDOWS
 		{
 			WORD		wVersionRequested;
 			WSADATA		wsaData;
@@ -269,9 +269,9 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	// is that we represent.
 	//
 	sprintf		(message, "ANTLR %d", delboy->PROTOCOL_VERSION);
-	sockSend	(delboy->socket, message, strlen(message));
+	sockSend	(delboy->socket, message, (int)strlen(message));
 	sprintf		(message, "grammar \"%s\"", delboy->grammarFileName->chars);
-	sockSend	(delboy->socket, message, strlen(message));
+	sockSend	(delboy->socket, message, (int)strlen(message));
 	ack			(delboy);
 
 	delboy->initialized = ANTLR3_TRUE;
@@ -283,7 +283,7 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 static void
 transmit(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * ptr)
 {
-	sockSend(delboy->socket, ptr, strlen(ptr));
+	sockSend(delboy->socket, ptr, (int)strlen(ptr));
 	ack(delboy);
 }
 
@@ -486,7 +486,7 @@ serializeNode(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE node)
 	// Start Index of the node
 	//
 	delboy->tokenString->addc(delboy->tokenString, ' ');
-	delboy->tokenString->addi(delboy->tokenString, delboy->adaptor->getTokenStartIndex(delboy->adaptor, node));
+	delboy->tokenString->addi(delboy->tokenString, (ANTLR3_UINT32)(delboy->adaptor->getTokenStartIndex(delboy->adaptor, node)));
 
 	// Now send the text that the node represents.
 	//
@@ -652,7 +652,7 @@ LT						(pANTLR3_DEBUG_EVENT_LISTENER delboy, int i, pANTLR3_COMMON_TOKEN t)
 }
 
 static	void	
-mark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker)
+mark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker)
 {
 	char buffer[128];
 
@@ -664,7 +664,7 @@ mark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker)
 }
 
 static	void	
-rewindMark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_UINT64 marker)
+rewindMark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker)
 {
 	char buffer[128];
 
@@ -800,7 +800,7 @@ semanticPredicate		(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_BOOLEAN result, 
 	}
 }
 
-#ifdef ANTLR3_WIN32
+#ifdef ANTLR3_WINDOWS
 #pragma warning	(push)
 #pragma warning (disable : 4100)
 #endif
@@ -812,7 +812,7 @@ commence				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	//
 }
 
-#ifdef ANTLR3_WIN32
+#ifdef ANTLR3_WINDOWS
 #pragma warning	(pop)
 #endif
 
@@ -992,7 +992,7 @@ addChild				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE root, pANTLR
 }
 
 static	void	
-setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, int tokenStartIndex, int tokenStopIndex)
+setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, ANTLR3_MARKER tokenStartIndex, ANTLR3_MARKER tokenStopIndex)
 {
 	char	buffer[128];
 

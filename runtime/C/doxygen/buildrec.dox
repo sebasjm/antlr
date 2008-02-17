@@ -86,10 +86,10 @@
 ///     // memory strings.
 ///     //
 ///     // For an ASCII/latin-1 memory string use:
-///     //	    input = antlr3NewAsciiStringInPlaceStream (stringtouse, (ANTLR3_UINT64) length, NULL);
+///     //	    input = antlr3NewAsciiStringInPlaceStream (stringtouse, (ANTLR3_UINT32) length, NULL);
 ///     //
 ///     // For a UCS2 (16 bit) memory string use:
-///     //	    input = antlr3NewUCS2StringInPlaceStream (stringtouse, (ANTLR3_UINT64) length, NULL);
+///     //	    input = antlr3NewUCS2StringInPlaceStream (stringtouse, (ANTLR3_UINT32) length, NULL);
 ///     //
 ///     // For input from a file, see code below
 ///     //

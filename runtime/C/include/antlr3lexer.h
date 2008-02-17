@@ -139,8 +139,8 @@ typedef	struct ANTLR3_LEXER_struct
 
     /** Pointer to function to return the current line number in the input stream
      */
-    ANTLR3_UINT64	(*getLine)		(struct ANTLR3_LEXER_struct * lexer);
-    ANTLR3_UINT64	(*getCharIndex)		(struct ANTLR3_LEXER_struct * lexer);
+    ANTLR3_UINT32	(*getLine)		(struct ANTLR3_LEXER_struct * lexer);
+    ANTLR3_MARKER	(*getCharIndex)		(struct ANTLR3_LEXER_struct * lexer);
     ANTLR3_UINT32	(*getCharPositionInLine)(struct ANTLR3_LEXER_struct * lexer);
 
     /** Pointer to function to return the text so far for the current token being generated

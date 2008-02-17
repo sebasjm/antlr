@@ -49,10 +49,6 @@ typedef	struct ANTLR3_RECOGNIZER_SHARED_STATE_struct
      */
     pANTLR3_STACK	following;
 
-    /** Following stack tracker saves time by knowing which follow set we are
-     *  using.
-     */
-    ANTLR3_INT64	_fsp;
 
     /** This is true when we see an error and before having successfully
      *  matched a token.  Prevents generation of more than one error message
@@ -66,7 +62,7 @@ typedef	struct ANTLR3_RECOGNIZER_SHARED_STATE_struct
      *  ad nauseam.  This is a failsafe mechanism to guarantee that at least
      *  one token/tree node is consumed for two errors.
      */
-    ANTLR3_INT64	lastErrorIndex;
+    ANTLR3_MARKER	lastErrorIndex;
 
     /** In lieu of a return value, this indicates that a rule or token
      *  has failed to match.  Reset to false upon valid token match.
@@ -137,7 +133,7 @@ typedef	struct ANTLR3_RECOGNIZER_SHARED_STATE_struct
     /** The input line (where it makes sense) on which the first character of the current
      *  token resides.
      */
-    ANTLR3_INT64		tokenStartLine;
+    ANTLR3_INT32		tokenStartLine;
 
     /** The character position of the first character of the current token
      *  within the line specified by tokenStartLine
@@ -148,10 +144,10 @@ typedef	struct ANTLR3_RECOGNIZER_SHARED_STATE_struct
      *  Needed, for example, to get the text for current token.  Set at
      *  the start of nextToken.
      */
-    ANTLR3_INT64		tokenStartCharIndex;
+    ANTLR3_MARKER		tokenStartCharIndex;
 
     /** Text for the current token. This can be overridden by setting this 
-     *  variable directly or by using the SETTEXT() macro (preffered) in your
+     *  variable directly or by using the SETTEXT() macro (preferred) in your
      *  lexer rules.
      */
     pANTLR3_STRING		text;

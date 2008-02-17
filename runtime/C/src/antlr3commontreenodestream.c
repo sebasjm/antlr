@@ -5,7 +5,7 @@
 
 #include    <antlr3commontreenodestream.h>
 
-#ifdef	WIN32
+#ifdef	ANTLR3_WINDOWS
 #pragma warning( disable : 4100 )
 #endif
 
@@ -17,33 +17,33 @@ static	pANTLR3_BASE_TREE			newDownNode					(pANTLR3_COMMON_TREE_NODE_STREAM ctns
 static	pANTLR3_BASE_TREE			newUpNode					(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	void						reset						(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_STRING				toNodesOnlyString			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-static	void						push						(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_INT64 index);
-static	ANTLR3_INT64				pop							(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-ANTLR3_INT64						index						(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+static	void						push						(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_INT32 index);
+static	ANTLR3_INT32				pop							(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+ANTLR3_INT32						index						(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 
 // TREE NODE STREAM API
 //
 static	pANTLR3_BASE_TREE_ADAPTOR   getTreeAdaptor				(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_BASE_TREE			getTreeSource				(pANTLR3_TREE_NODE_STREAM tns);
-static	pANTLR3_BASE_TREE			_LT							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k);
+static	pANTLR3_BASE_TREE			_LT							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k);
 static	pANTLR3_BASE_TREE			get							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k);
 static	void						setUniqueNavigationNodes	(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_BOOLEAN uniqueNavigationNodes);
 static	pANTLR3_STRING				toString					(pANTLR3_TREE_NODE_STREAM tns);
 static	pANTLR3_STRING				toStringSS					(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop);
 static	void						toStringWork				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE start, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf);
-static	void						replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t);
+static	void						replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t);
 
 // INT STREAM API
 //
 static	void						consume						(pANTLR3_INT_STREAM is);
-static	ANTLR3_INT64				tindex						(pANTLR3_INT_STREAM is);
-static	ANTLR3_UINT32				_LA							(pANTLR3_INT_STREAM is, ANTLR3_INT64 i);
-static	ANTLR3_UINT64				mark						(pANTLR3_INT_STREAM is);
-static	void						release						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
-static	void						rewindMark					(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker);
+static	ANTLR3_MARKER				tindex						(pANTLR3_INT_STREAM is);
+static	ANTLR3_UINT32				_LA							(pANTLR3_INT_STREAM is, ANTLR3_INT32 i);
+static	ANTLR3_MARKER				mark						(pANTLR3_INT_STREAM is);
+static	void						release						(pANTLR3_INT_STREAM is, ANTLR3_MARKER marker);
+static	void						rewindMark					(pANTLR3_INT_STREAM is, ANTLR3_MARKER marker);
 static	void						rewindLast					(pANTLR3_INT_STREAM is);
-static	void						seek						(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index);
-static	ANTLR3_UINT64				size						(pANTLR3_INT_STREAM is);
+static	void						seek						(pANTLR3_INT_STREAM is, ANTLR3_MARKER index);
+static	ANTLR3_UINT32				size						(pANTLR3_INT_STREAM is);
 
 
 // Helper functions
@@ -379,7 +379,7 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 
 
 static pANTLR3_BASE_TREE
-LB(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
+LB(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k)
 {
 	if	( k==0)
 	{
@@ -405,7 +405,7 @@ LB(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
 /// for both parser and tree grammars. :)
 ///
 static	pANTLR3_BASE_TREE	    
-_LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
+_LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k)
 {
 	if	(tns->ctns->p == -1)
 	{
@@ -423,7 +423,7 @@ _LT	    (pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT64 k)
 
 	// k was a legitimate request, 
 	//
-	if	(( tns->ctns->p + k - 1) >= (ANTLR3_INT64)(tns->ctns->nodes->count))
+	if	(( tns->ctns->p + k - 1) >= (ANTLR3_INT32)(tns->ctns->nodes->count))
 	{
 		return &(tns->ctns->EOF_NODE.baseTree);
 	}
@@ -459,7 +459,7 @@ consume	(pANTLR3_INT_STREAM is)
 }
 
 static	ANTLR3_UINT32	    
-_LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
+_LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT32 i)
 {
 	pANTLR3_TREE_NODE_STREAM		tns;
 	pANTLR3_BASE_TREE				t;
@@ -483,7 +483,7 @@ _LA	    (pANTLR3_INT_STREAM is, ANTLR3_INT64 i)
 /// Mark the state of the input stream so that we can come back to it
 /// after a syntactic predicate and so on.
 ///
-static	ANTLR3_UINT64	    
+static	ANTLR3_MARKER	    
 mark	(pANTLR3_INT_STREAM is)
 {
 	pANTLR3_TREE_NODE_STREAM		tns;
@@ -505,7 +505,7 @@ mark	(pANTLR3_INT_STREAM is)
 }
 
 static	void		    
-release	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
+release	(pANTLR3_INT_STREAM is, ANTLR3_MARKER marker)
 {
 }
 
@@ -516,7 +516,7 @@ release	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
 /// upon mark().
 ///
 static	void		    
-rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_UINT64 marker)
+rewindMark	    (pANTLR3_INT_STREAM is, ANTLR3_MARKER marker)
 {
 	is->seek(is, marker);
 }
@@ -531,7 +531,7 @@ rewindLast	(pANTLR3_INT_STREAM is)
 /// spit out the navigation nodes.
 ///
 static	void		    
-seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
+seek	(pANTLR3_INT_STREAM is, ANTLR3_MARKER index)
 {
     pANTLR3_TREE_NODE_STREAM		tns;
     pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
@@ -539,10 +539,10 @@ seek	(pANTLR3_INT_STREAM is, ANTLR3_UINT64 index)
     tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
     ctns    = tns->ctns;
 
-	ctns->p = index;
+	ctns->p = ANTLR3_UINT32_CAST(index);
 }
 
-static	ANTLR3_INT64		    
+static	ANTLR3_MARKER		    
 tindex	(pANTLR3_INT_STREAM is)
 {
     pANTLR3_TREE_NODE_STREAM		tns;
@@ -551,14 +551,14 @@ tindex	(pANTLR3_INT_STREAM is)
     tns	    = (pANTLR3_TREE_NODE_STREAM)(is->super);
     ctns    = tns->ctns;
 
-	return ctns->p;
+	return (ANTLR3_MARKER)(ctns->p);
 }
 
 /// Expensive to compute the size of the whole tree while parsing.
 /// This method only returns how much input has been seen so far.  So
 /// after parsing it returns true size.
 ///
-static	ANTLR3_UINT64		    
+static	ANTLR3_UINT32		    
 size	(pANTLR3_INT_STREAM is)
 {
     pANTLR3_TREE_NODE_STREAM		tns;
@@ -661,8 +661,8 @@ static	void
 toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TREE stop, pANTLR3_STRING buf)
 {
 
-	ANTLR3_UINT64   n;
-	ANTLR3_UINT64   c;
+	ANTLR3_UINT32   n;
+	ANTLR3_UINT32   c;
 
 	if	(!p->isNil(p) )
 	{
@@ -754,7 +754,7 @@ newUpNode		(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 /// Can't replace whatever points to the parent externally.  Do nothing.
 ///
 static	void						
-replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTLR3_UINT32 startChildIndex, ANTLR3_UINT32 stopChildIndex, pANTLR3_BASE_TREE t)
+replaceChildren				(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t)
 {
 	if	(parent != NULL)
 	{
@@ -780,18 +780,18 @@ get							(pANTLR3_TREE_NODE_STREAM tns, ANTLR3_INT32 k)
 }
 
 static	void
-push						(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_INT64 index)
+push						(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_INT32 index)
 {
-	ctns->nodeStack->push(ctns->nodeStack, (void *)(ctns->p), NULL);	// Save current index
+	ctns->nodeStack->push(ctns->nodeStack, ANTLR3_FUNC_PTR(ctns->p), NULL);	// Save current index
 	ctns->tnstream->istream->seek(ctns->tnstream->istream, index);
 }
 
-static	ANTLR3_INT64
+static	ANTLR3_INT32
 pop							(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
-	ANTLR3_INT64	retVal;
+	ANTLR3_INT32	retVal;
 
-	retVal = (ANTLR3_INT64)(ctns->nodeStack->pop(ctns->nodeStack));
+	retVal = ANTLR3_UINT32_CAST(ctns->nodeStack->pop(ctns->nodeStack));
 	ctns->tnstream->istream->seek(ctns->tnstream->istream, retVal);
 	return retVal;
 }
