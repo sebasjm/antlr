@@ -175,30 +175,30 @@ nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 	///
 	for	(;;)
 	{
-		/* Get rid of any previous token (token factory takes care of
-		* any de-allocation when this token is finally used up.
-		*/
+		// Get rid of any previous token (token factory takes care of
+		// any de-allocation when this token is finally used up.
+		//
 		lexer->rec->state->token		    = NULL;
-		lexer->rec->state->error		    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+		lexer->rec->state->error		    = ANTLR3_FALSE;	    // Start out without an exception
 		lexer->rec->state->failed		    = ANTLR3_FALSE;
 
-		/* Record the start of the token in our input stream.
-		*/
+		// Record the start of the token in our input stream.
+		//
 		lexer->rec->state->channel						= ANTLR3_TOKEN_DEFAULT_CHANNEL;
 		lexer->rec->state->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);  
 		lexer->rec->state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
 		lexer->rec->state->tokenStartLine				= lexer->input->getLine(lexer->input);
 		lexer->rec->state->text							= NULL;
 
-		/* Now call the matching rules and see if we can generate a new token
-		*/
+		// Now call the matching rules and see if we can generate a new token
+		//
 		for	(;;)
 		{
 			if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
 			{
-				/* Reached the end of the current stream, nothing more to do if this is
-				* the last in the stack.
-			 */
+				// Reached the end of the current stream, nothing more to do if this is
+				// the last in the stack.
+				//
 				pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
 
 				teof->setStartIndex (teof, lexer->getCharIndex(lexer));
@@ -209,17 +209,17 @@ nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 			}
 
 			lexer->rec->state->token		= NULL;
-			lexer->rec->state->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
+			lexer->rec->state->error		= ANTLR3_FALSE;	    // Start out without an exception
 			lexer->rec->state->failed		= ANTLR3_FALSE;
 
-			/* Call the generated lexer, see if it can get a new token together.
-			*/
+			// Call the generated lexer, see if it can get a new token together.
+			//
 			lexer->mTokens(lexer->ctx);
 
 			if  (lexer->rec->state->error  == ANTLR3_TRUE)
 			{
-				/* Recognition exception, report it and try to recover.
-				*/
+				// Recognition exception, report it and try to recover.
+				//
 				lexer->rec->state->failed	    = ANTLR3_TRUE;
 				lexer->rec->reportError(lexer->rec);
 				lexer->recover(lexer); 
@@ -228,6 +228,8 @@ nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 			{
 				if (lexer->rec->state->token == NULL)
 				{
+					// Emit the real token, which adds it in to the token stream basically
+					//
 					emit(lexer);
 				}
 				else if	(lexer->rec->state->token ==  &(toksource->skipToken))
