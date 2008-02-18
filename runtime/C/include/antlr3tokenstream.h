@@ -38,6 +38,13 @@ typedef struct ANTLR3_TOKEN_SOURCE_struct
      */
     ANTLR3_COMMON_TOKEN	    eofToken;
 
+	/// A special pre-allocated token, which is returned by mTokens() if the
+	/// lexer rule said to just skip the generated token altogether.
+	/// Having this single token stops us wasting memory by have the token factory
+	/// actually create something that we are going to SKIP(); anyway.
+	///
+	ANTLR3_COMMON_TOKEN		skipToken;
+
     /** Whatever is supplying the token source interface, needs a pointer to 
      *  itself so that this pointer can be passed to it when the nextToken
      *  function is called.

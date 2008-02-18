@@ -17,7 +17,7 @@
  */
 #define	ANTLR3_FACTORY_POOL_SIZE    512
 
-/* Base token types, wheich all lexer/parser tokens come after in sequence.
+/* Base token types, which all lexer/parser tokens come after in sequence.
  */
 
 /** Indicator of an invalid token
@@ -34,7 +34,7 @@
  */
 #define	ANTLR3_TOKEN_UP		3
 
-/** First token that can be used by users/genrated code
+/** First token that can be used by users/generated code
  */
 #define	ANTLR3_MIN_TOKEN_TYPE	ANTLR3_UP + 1
 

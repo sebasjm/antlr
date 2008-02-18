@@ -42,7 +42,7 @@ ANTLR3_API pANTLR3_LEXER
 antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
     pANTLR3_LEXER   lexer;
-    pANTLR3_COMMON_TOKEN	eoft;
+    pANTLR3_COMMON_TOKEN	specialT;
 
     /* Allocate memory
      */
@@ -111,10 +111,17 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
     
     /* Initialise the eof token
      */
-    eoft		= &(lexer->rec->state->tokSource->eofToken);	/* Note interfaces allocated with calloc, everything is 0 */
-    antlr3SetTokenAPI	  (eoft);
-    eoft->setType	  (eoft, ANTLR3_TOKEN_EOF);
-    eoft->factoryMade	= ANTLR3_FALSE;
+    specialT				= &(lexer->rec->state->tokSource->eofToken);	/* Note interfaces allocated with calloc, everything is 0 */
+    antlr3SetTokenAPI	  (specialT);
+    specialT->setType	  (specialT, ANTLR3_TOKEN_EOF);
+    specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
+
+	// Initialize the skip token.
+	//
+    specialT				= &(lexer->rec->state->tokSource->skipToken);	/* Note interfaces allocated with calloc, everything is 0 */
+    antlr3SetTokenAPI	  (specialT);
+    specialT->setType	  (specialT, ANTLR3_TOKEN_INVALID);
+    specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
     return  lexer;
 }
 
@@ -140,90 +147,103 @@ reset	(pANTLR3_BASE_RECOGNIZER rec)
     }
 }
 
-/**
- * \brief
- * Returns the next available token from the current input stream.
- * 
- * \param toksource
- * Points to the implementation of a token source. The lexer is 
- * addressed by the super structure pointer.
- * 
- * \returns
- * The next token in the current input stream or the EOF token
- * if there are no more tokens.
- * 
- * \remarks
- * Write remarks for nextToken here.
- * 
- * \see nextToken
- */
+///
+/// \brief
+/// Returns the next available token from the current input stream.
+/// 
+/// \param toksource
+/// Points to the implementation of a token source. The lexer is 
+/// addressed by the super structure pointer.
+/// 
+/// \returns
+/// The next token in the current input stream or the EOF token
+/// if there are no more tokens.
+/// 
+/// \remarks
+/// Write remarks for nextToken here.
+/// 
+/// \see nextToken
+///
 ANTLR3_INLINE static pANTLR3_COMMON_TOKEN
 nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 {
-    pANTLR3_LEXER   lexer;
+	pANTLR3_LEXER   lexer;
 
-    lexer   = (pANTLR3_LEXER)(toksource->super);
+	lexer   = (pANTLR3_LEXER)(toksource->super);
 
-    /* Get rid of any previous token (token factory takes care of
-     * any de-allocation when this token is finally used up.
-     */
-    lexer->rec->state->token		    = NULL;
-    lexer->rec->state->error		    = ANTLR3_FALSE;	    /* Start out without an exception	*/
-    lexer->rec->state->failed		    = ANTLR3_FALSE;
-
-    /* Record the start of the token in our input stream.
-     */
-    lexer->rec->state->channel			= ANTLR3_TOKEN_DEFAULT_CHANNEL;
-    lexer->rec->state->tokenStartCharIndex		= lexer->input->istream->index(lexer->input->istream);  
-    lexer->rec->state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
-    lexer->rec->state->tokenStartLine		= lexer->input->getLine(lexer->input);
-    lexer->rec->state->text				= NULL;
-
-    /* Now call the matching rules and see if we can generate a new token
-     */
-    for	(;;)
-    {
-	if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
+	/// Loop until we get a non skipped token or EOF
+	///
+	for	(;;)
 	{
-	    /* Reached the end of the current stream, nothing more to do if this is
-	     * the last in the stack.
-	     */
-	    pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
-    	
-	    teof->setStartIndex (teof, lexer->getCharIndex(lexer));
-	    teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
-	    teof->setLine	(teof, lexer->getLine(lexer));
-	    teof->factoryMade = ANTLR3_TRUE;	// This isn't really manufactured but it stops things from tying to free it
-	    return  teof;
-	}
+		/* Get rid of any previous token (token factory takes care of
+		* any de-allocation when this token is finally used up.
+		*/
+		lexer->rec->state->token		    = NULL;
+		lexer->rec->state->error		    = ANTLR3_FALSE;	    /* Start out without an exception	*/
+		lexer->rec->state->failed		    = ANTLR3_FALSE;
 
-	lexer->rec->state->token			= NULL;
-	lexer->rec->state->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
-	lexer->rec->state->failed		= ANTLR3_FALSE;
+		/* Record the start of the token in our input stream.
+		*/
+		lexer->rec->state->channel						= ANTLR3_TOKEN_DEFAULT_CHANNEL;
+		lexer->rec->state->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);  
+		lexer->rec->state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
+		lexer->rec->state->tokenStartLine				= lexer->input->getLine(lexer->input);
+		lexer->rec->state->text							= NULL;
 
-	/* Call the generated lexer, see if it can get a new token together.
-	 */
-	lexer->mTokens(lexer->ctx);
+		/* Now call the matching rules and see if we can generate a new token
+		*/
+		for	(;;)
+		{
+			if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
+			{
+				/* Reached the end of the current stream, nothing more to do if this is
+				* the last in the stack.
+			 */
+				pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
 
-	if  (lexer->rec->state->error  == ANTLR3_TRUE)
-	{
-	    /* Recongition exception, report it and try to recover.
-	     */
-	    lexer->rec->state->failed	    = ANTLR3_TRUE;
-	    lexer->rec->reportError(lexer->rec);
-	    lexer->recover(lexer);
+				teof->setStartIndex (teof, lexer->getCharIndex(lexer));
+				teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
+				teof->setLine	(teof, lexer->getLine(lexer));
+				teof->factoryMade = ANTLR3_TRUE;	// This isn't really manufactured but it stops things from trying to free it
+				return  teof;
+			}
+
+			lexer->rec->state->token		= NULL;
+			lexer->rec->state->error		= ANTLR3_FALSE;	    /* Start out without an exception	*/
+			lexer->rec->state->failed		= ANTLR3_FALSE;
+
+			/* Call the generated lexer, see if it can get a new token together.
+			*/
+			lexer->mTokens(lexer->ctx);
+
+			if  (lexer->rec->state->error  == ANTLR3_TRUE)
+			{
+				/* Recognition exception, report it and try to recover.
+				*/
+				lexer->rec->state->failed	    = ANTLR3_TRUE;
+				lexer->rec->reportError(lexer->rec);
+				lexer->recover(lexer); 
+			}
+			else
+			{
+				if (lexer->rec->state->token == NULL)
+				{
+					emit(lexer);
+				}
+				else if	(lexer->rec->state->token ==  &(toksource->skipToken))
+				{
+					// A real token could have been generated, but "Computer say's naaaaah" and it
+					// it is just something we need to skip altogether.
+					//
+					continue;
+				}
+				
+				// Good token, not skipped, not EOF token
+				//
+				return  lexer->rec->state->token;
+			}
+		}
 	}
-	else
-	{
-	    if (lexer->rec->state->token == NULL)
-	    {
-		emit(lexer);
-	    }
-	    // TODO: Deal with SKipped token type
-	    //
-	    return  lexer->rec->state->token;
-	}
-    }
 }
 
 /**
@@ -248,35 +268,35 @@ nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 static pANTLR3_COMMON_TOKEN
 nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 {
-    pANTLR3_COMMON_TOKEN tok;
+	pANTLR3_COMMON_TOKEN tok;
 
-    // Find the next token in the current stream
-    //
-    tok = nextTokenStr(toksource);
+	// Find the next token in the current stream
+	//
+	tok = nextTokenStr(toksource);
 
-    // If we got to the EOF token then switch to the previous
-    // input stream if there were any and just return the
-    // EOF if there are none.
-    //
-    if	(tok->type == ANTLR3_TOKEN_EOF)
-    {
-	pANTLR3_LEXER   lexer;
-
-	lexer   = (pANTLR3_LEXER)(toksource->super);
-
-	if  (lexer->rec->state->streams != NULL && lexer->rec->state->streams->size(lexer->rec->state->streams) > 0)
+	// If we got to the EOF token then switch to the previous
+	// input stream if there were any and just return the
+	// EOF if there are none.
+	//
+	if	(tok->type == ANTLR3_TOKEN_EOF)
 	{
-	    // We have another input stream in the stack so we
-	    // need to revert to it.
-	    //
-	    lexer->popCharStream(lexer);
-	    tok = nextTokenStr(toksource);
-	}
-    }
+		pANTLR3_LEXER   lexer;
 
-    // return whatever token we have, which may be EOF
-    //
-    return  tok;
+		lexer   = (pANTLR3_LEXER)(toksource->super);
+
+		if  (lexer->rec->state->streams != NULL && lexer->rec->state->streams->size(lexer->rec->state->streams) > 0)
+		{
+			// We have another input stream in the stack so we
+			// need to revert to it.
+			//
+			lexer->popCharStream(lexer);
+			tok = nextTokenStr(toksource);
+		}
+	}
+
+	// return whatever token we have, which may be EOF
+	//
+	return  tok;
 }
 
 ANTLR3_API pANTLR3_LEXER

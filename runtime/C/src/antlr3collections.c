@@ -1784,7 +1784,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key, ANTLR3_UINT32 type, ANTLR3
 
     /* We have located the leftmost differing bit, indicated by the depth variable. So, we know what
      * bit index we are to insert the new entry at. There are two cases, being where the two keys
-     * differ at a bit position that is not currently part of the bit testing, and where they differ on a bit
+     * differ at a bit position that is not currently part of the bit testing, where they differ on a bit
      * that is currently being skipped in the indexed comparisons, and where they differ on a bit
      * that is merely lower down in the current bit search. If the bit index went bit 4, bit 2 and they differ
      * at bit 3, then we have the "skipped" bit case. But if that chain was Bit 4, Bit 2 and they differ at bit 1

@@ -211,6 +211,7 @@ outputFile( LEXER,
 #define	    LEXER					ctx->pLexer
 #define	    RECOGNIZER			    LEXER->rec
 #define		LEXSTATE				RECOGNIZER->state
+#define		TOKSOURCE				LEXSTATE->tokSource
 #define	    GETCHARINDEX()			LEXER->getCharIndex(LEXER)
 #define	    GETLINE()				LEXER->getLine(LEXER)
 #define	    GETTEXT()				LEXER->getText(LEXER)
@@ -242,6 +243,7 @@ outputFile( LEXER,
 #define		PUSHSTREAM(str)			LEXER->pushCharStream(LEXER, str)
 #define		POPSTREAM()				LEXER->popCharStream(LEXER)
 #define		SETTEXT(str)			LEXSTATE->text = str
+#define		SKIP()					LEXSTATE->token = &(TOKSOURCE->skipToken
 #define		USER1					LEXSTATE->user1
 #define		USER2					LEXSTATE->user2
 #define		USER3					LEXSTATE->user3
