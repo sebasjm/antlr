@@ -254,7 +254,7 @@ typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 
 #endif
 
-/* Predeclare the typedefs for all the interfaces, then 
+/* Pre declare the typedefs for all the interfaces, then 
  * they can be inter-dependant and we will let the linker
  * sort it out for us.
  */
@@ -266,13 +266,64 @@ typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 
 /* Prototypes
  */
+#ifndef ANTLR3_MALLOC
+/// Default definition of ANTLR3_MALLOC. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define	ANTLR3_MALLOC(request)					calloc  (1, (size_t)(request))
+#endif
+#ifndef ANTLR3_REALLOC
+/// Default definition of ANTLR3_REALLOC. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define ANTLR3_REALLOC(current, request)		realloc ((void *)(current), (size_t)(request))
+#endif
+#ifndef ANTLR3_FREE
+/// Default definition of ANTLR3_FREE. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define	ANTLR3_FREE(ptr)						free    ((void *)(ptr))
+#endif
+#ifndef ANTLR3_FREE_FUNC						
+/// Default definition of ANTLR3_FREE_FUNC						. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define	ANTLR3_FREE_FUNC						free
+#endif
+#ifndef ANTLR3_STRDUP
+/// Default definition of ANTLR3_STRDUP. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define	ANTLR3_STRDUP(instr)					(pANTLR3_UINT8)(strdup  ((const char *)(instr)))
+#endif
+#ifndef ANTLR3_MEMMOVE
+/// Default definition of ANTLR3_MEMMOVE. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define	ANTLR3_MEMMOVE(target, source, size)	memmove((void *)(target), (const void *)(source), (size_t)(size))
+#endif
+#ifndef ANTLR3_MEMSET
+/// Default definition of ANTLR3_MEMSET. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
 #define	ANTLR3_MEMSET(target, byte, size)		memset((void *)(target), (int)(byte), (size_t)(size))
+#endif
+
+#ifndef	ANTLR3_PRINTF
+/// Default definition of printf, set this to something other than printf before including antlr3.h
+/// if your system does not have a printf. Note that you can define this to be <code>//</code>
+/// without harming the runtime.
+///
+#define	ANTLR3_PRINTF							printf
+#endif
+
+#ifndef	ANTLR3_FPRINTF
+/// Default definition of fprintf, set this to something other than fprintf before including antlr3.h
+/// if your system does not have a fprintf. Note that you can define this to be <code>//</code>
+/// without harming the runtime. 
+///
+#define	ANTLR3_FPRINTF							fprintf
+#endif
 
 ANTLR3_API pANTLR3_INT_TRIE					antlr3IntTrieNew					(ANTLR3_UINT32 depth);
 

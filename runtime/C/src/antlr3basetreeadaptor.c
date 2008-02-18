@@ -307,7 +307,7 @@ becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pA
 		{
 			/* TODO: Handle tree exceptions 
 			 */
-			fprintf(stderr, "More than one node as root! TODO: Create tree exception hndling\n");
+			ANTLR3_FPRINTF(stderr, "More than one node as root! TODO: Create tree exception hndling\n");
 			return newRootTree;
 		}
 
@@ -479,7 +479,7 @@ static	ANTLR3_UINT32
 static	void		
    setType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 type)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setType()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setType()\n");
 }
 
 /** Dummy implementation - will be supplied by super class
@@ -487,7 +487,7 @@ static	void
 static	pANTLR3_STRING	
    getText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getText()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getText()\n");
 	return	NULL;
 }
 
@@ -496,37 +496,37 @@ static	pANTLR3_STRING
 static	void		
    setText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_STRING t)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }
 /** Dummy implementation - will be supplied by super class
  */
 static	void		
 setText8		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setText()\n");
 }
 
 static	pANTLR3_BASE_TREE	
    getChild		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree, ANTLR3_UINT32 i)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
 	return NULL;
 }
 static  void
 setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setChild()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setChild()\n");
 }
 static	void
 deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement deleteChild()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement deleteChild()\n");
 }
 
 static	ANTLR3_UINT32	
    getChildCount	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
 {
-	fprintf(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChildCount()\n");
+	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChildCount()\n");
 	return 0;
 }
 

@@ -1247,9 +1247,9 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:parameterScope(scope=it)>) 
 {   
 <if(trace)>
-    printf("enter <ruleName> %d failed = %d, backtracking = %d\\n",input.LT(1),failed,BACKTRACKING);
+    ANTLR3_PRINTF("enter <ruleName> %d failed = %d, backtracking = %d\\n",LT(1),failed,BACKTRACKING);
     <block>
-    printf("exit <ruleName> %d, failed = %d, backtracking = %d\\n",input.LT(1),failed,BACKTRACKING);
+    ANTLR3_PRINTF("exit <ruleName> %d, failed = %d, backtracking = %d\\n",LT(1),failed,BACKTRACKING);
     
 <else>
     <block>
@@ -1331,7 +1331,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 static <returnType()>
 <ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>)
 {   
-    <if(trace)>printf("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), BACKTRACKING);<endif>
+    <if(trace)>ANTLR3_PRINTF("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), BACKTRACKING);<endif>
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
@@ -1565,7 +1565,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <block>
 	LEXSTATE->type = _type;
 <endif>
-    <if(trace)> fprintf(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
+    <if(trace)> ANTLR3_FPRINTF(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
     <ruleCleanUp()>
     <lexerRuleLabelFree()>
     <(ruleDescriptor.actions.after):execAction()>

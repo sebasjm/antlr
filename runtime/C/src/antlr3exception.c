@@ -75,7 +75,7 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
  * Prints out the message in all the exceptions in the supplied chain.
  * 
  * \param[in] ex
- * Pointer to the excpetion structure to print.
+ * Pointer to the exception structure to print.
  * 
  * \remarks
  * You may wish to override this function by installing a pointer to a new function
@@ -95,11 +95,11 @@ antlr3ExceptionPrint(pANTLR3_EXCEPTION ex)
 	 */
 	if  (ex->message == NULL)
 	{
-	    printf("ANTLR3_EXCEPTION number %d (%08X).\n", ex->type, ex->type);
+	    ANTLR3_FPRINTF(stderr, "ANTLR3_EXCEPTION number %d (%08X).\n", ex->type, ex->type);
 	}
 	else
 	{
-	    printf("ANTLR3_EXCEPTION: %s\n", (char *)(ex->message));
+	    ANTLR3_FPRINTF(stderr, "ANTLR3_EXCEPTION: %s\n", (char *)(ex->message));
 	}
 
 	/* Move to next in the chain (if any)

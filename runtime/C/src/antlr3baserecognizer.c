@@ -229,7 +229,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 
 	default:
 
-		fprintf(stderr, "Base recognizer function antlr3RecognitionExceptionNew called by unknown parser type - provide override for this function\n");
+		ANTLR3_FPRINTF(stderr, "Base recognizer function antlr3RecognitionExceptionNew called by unknown parser type - provide override for this function\n");
 		return;
 
 		break;
@@ -351,7 +351,7 @@ match(	pANTLR3_BASE_RECOGNIZER recognizer,
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'match' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'match' called by unknown parser type - provide override for this function\n");
 			return ANTLR3_FALSE;
 
 			break;
@@ -422,7 +422,7 @@ matchAny(pANTLR3_BASE_RECOGNIZER recognizer)
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'matchAny' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'matchAny' called by unknown parser type - provide override for this function\n");
 			return;
 
 		break;
@@ -461,7 +461,7 @@ mismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'mismatch' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'mismatch' called by unknown parser type - provide override for this function\n");
 			return;
 
 			break;
@@ -749,17 +749,17 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 	{
 		if	(((pANTLR3_COMMON_TOKEN)(ex->token))->type == ANTLR3_TOKEN_EOF)
 		{
-			fprintf(stderr, "-end of input-(");
+			ANTLR3_FPRINTF(stderr, "-end of input-(");
 		}
 		else
 		{
-			fprintf(stderr, "-unknown source-(");
+			ANTLR3_FPRINTF(stderr, "-unknown source-(");
 		}
 	}
 	else
 	{
 		ftext = ex->streamName->to8(ex->streamName);
-		fprintf(stderr, "%s(", ftext->chars);
+		ANTLR3_FPRINTF(stderr, "%s(", ftext->chars);
 	}
 
 	// Next comes the line number
@@ -767,16 +767,16 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 #ifdef ANTLR3_WIN64
 	// shnazzle fraazzle Dick Dastardly
 	//
-	fprintf(stderr, "%I64d) ", recognizer->state->exception->line);
+	ANTLR3_FPRINTF(stderr, "%I64d) ", recognizer->state->exception->line);
 #else
 #ifdef ANTLR3_USE_64BIT
-	fprintf(stderr, "%lld) ", recognizer->state->exception->line);
+	ANTLR3_FPRINTF(stderr, "%lld) ", recognizer->state->exception->line);
 #else
-	fprintf(stderr, "%d) ", recognizer->state->exception->line);
+	ANTLR3_FPRINTF(stderr, "%d) ", recognizer->state->exception->line);
 #endif
 #endif
 
-	fprintf(stderr, " : error %d : %s", 
+	ANTLR3_FPRINTF(stderr, " : error %d : %s", 
 		recognizer->state->exception->type,
 		(pANTLR3_UINT8)	   (recognizer->state->exception->message));
 
@@ -796,16 +796,16 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		theToken    = (pANTLR3_COMMON_TOKEN)(recognizer->state->exception->token);
 		ttext	    = theToken->toString(theToken);
 
-		fprintf(stderr, ", at offset %d", recognizer->state->exception->charPositionInLine);
+		ANTLR3_FPRINTF(stderr, ", at offset %d", recognizer->state->exception->charPositionInLine);
 		if  (theToken != NULL)
 		{
 			if (theToken->type == ANTLR3_TOKEN_EOF)
 			{
-				fprintf(stderr, ", at <EOF>");
+				ANTLR3_FPRINTF(stderr, ", at <EOF>");
 			}
 			else
 			{
-				fprintf(stderr, "\n    near %s\n    ", ttext->chars);
+				ANTLR3_FPRINTF(stderr, "\n    near %s\n    ", ttext->chars);
 			}
 		}
 		break;
@@ -826,14 +826,14 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			{
 				theToken	= (pANTLR3_COMMON_TOKEN)    theBaseTree->getToken(theBaseTree);
 			}
-			fprintf(stderr, ", at offset %d", theBaseTree->getCharPositionInLine(theBaseTree));
-			fprintf(stderr, ", near %s", ttext->chars);
+			ANTLR3_FPRINTF(stderr, ", at offset %d", theBaseTree->getCharPositionInLine(theBaseTree));
+			ANTLR3_FPRINTF(stderr, ", near %s", ttext->chars);
 		}
 		break;
 
 	default:
 
-		fprintf(stderr, "Base recognizer function displayRecognitionError called by unknown parser type - provide override for this function\n");
+		ANTLR3_FPRINTF(stderr, "Base recognizer function displayRecognitionError called by unknown parser type - provide override for this function\n");
 		return;
 		break;
 	}
@@ -860,7 +860,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		// You may get this if there are not more tokens and more are needed
 		// to complete a parse for instance.
 		//
-		fprintf(stderr, " : syntax error...\n");    
+		ANTLR3_FPRINTF(stderr, " : syntax error...\n");    
 		break;
 
 	case    ANTLR3_MISMATCHED_TOKEN_EXCEPTION:
@@ -875,17 +875,17 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		//
 		if	(tokenNames == NULL)
 		{
-			fprintf(stderr, " : syntax error...\n");
+			ANTLR3_FPRINTF(stderr, " : syntax error...\n");
 		}
 		else
 		{
 			if	(ex->expecting == ANTLR3_TOKEN_EOF)
 			{
-				fprintf(stderr, " : expected <EOF>\n");
+				ANTLR3_FPRINTF(stderr, " : expected <EOF>\n");
 			}
 			else
 			{
-				fprintf(stderr, " : expected %s ...\n", tokenNames[ex->expecting]);
+				ANTLR3_FPRINTF(stderr, " : expected %s ...\n", tokenNames[ex->expecting]);
 			}
 		}
 		break;
@@ -897,7 +897,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		// you should. It means that at the point where the current token occurred
 		// that the DFA indicates nowhere to go from here.
 		//
-		fprintf(stderr, " : cannot match to any predicted input...\n");
+		ANTLR3_FPRINTF(stderr, " : cannot match to any predicted input...\n");
 
 		break;
 
@@ -913,7 +913,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			// possible tokens at this point, but we did not see any
 			// member of that set.
 			//
-			fprintf(stderr, " : unexpected input...\n  expected one of : ");
+			ANTLR3_FPRINTF(stderr, " : unexpected input...\n  expected one of : ");
 
 			// What tokens could we have accepted at this point in the
 			// parse?
@@ -933,16 +933,16 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 				{
 					if  (tokenNames[bit])
 					{
-						fprintf(stderr, "%%s", count > 0 ? ", " : "", tokenNames[bit]); 
+						ANTLR3_FPRINTF(stderr, "%%s", count > 0 ? ", " : "", tokenNames[bit]); 
 						count++;
 					}
 				}
-				fprintf(stderr, "\n");
+				ANTLR3_FPRINTF(stderr, "\n");
 			}
 			else
 			{
-				fprintf(stderr, "Actually dude, we didn't seem to be expecting anything here, or at least\n");
-				fprintf(stderr, "I could not work out what I was expecting, like so many of us these days!\n");
+				ANTLR3_FPRINTF(stderr, "Actually dude, we didn't seem to be expecting anything here, or at least\n");
+				ANTLR3_FPRINTF(stderr, "I could not work out what I was expecting, like so many of us these days!\n");
 			}
 		}
 		break;
@@ -953,7 +953,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		// but found a token that ended that sequence earlier than
 		// we should have done.
 		//
-		fprintf(stderr, " : missing elements...\n");
+		ANTLR3_FPRINTF(stderr, " : missing elements...\n");
 		break;
 
 	default:
@@ -963,7 +963,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		// then we are just going to report what we know about the
 		// token.
 		//
-		fprintf(stderr, " : syntax not recognized...\n");
+		ANTLR3_FPRINTF(stderr, " : syntax not recognized...\n");
 		break;
 	}
 
@@ -1013,7 +1013,7 @@ recover			    (pANTLR3_BASE_RECOGNIZER recognizer)
 
     default:
 	    
-		fprintf(stderr, "Base recognizer function recover called by unknown parser type - provide override for this function\n");
+		ANTLR3_FPRINTF(stderr, "Base recognizer function recover called by unknown parser type - provide override for this function\n");
 		return;
 
 	break;
@@ -1132,7 +1132,7 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 
 	default:
 
-		fprintf(stderr, "Base recognizer function recoverFromMismatchedToken called by unknown parser type - provide override for this function\n");
+		ANTLR3_FPRINTF(stderr, "Base recognizer function recoverFromMismatchedToken called by unknown parser type - provide override for this function\n");
 		return;
 
 		break;
@@ -1221,7 +1221,7 @@ recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET
 
     default:
 	    
-		fprintf(stderr, "Base recognizer function recoverFromMismatchedSet called by unknown parser type - provide override for this function\n");
+		ANTLR3_FPRINTF(stderr, "Base recognizer function recoverFromMismatchedSet called by unknown parser type - provide override for this function\n");
 		return;
 
 	break;
@@ -1271,7 +1271,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 
     default:
 	    
-		fprintf(stderr, "Base recognizer function recover called by unknown parser type - provide override for this function\n");
+		ANTLR3_FPRINTF(stderr, "Base recognizer function recover called by unknown parser type - provide override for this function\n");
 		return ANTLR3_FALSE;
 
 	break;
@@ -1372,7 +1372,7 @@ consumeUntil	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 tokenType)
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'consumeUntil' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'consumeUntil' called by unknown parser type - provide override for this function\n");
 			return;
 
 			break;
@@ -1422,7 +1422,7 @@ consumeUntilSet			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET set)
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'consumeUntilSet' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'consumeUntilSet' called by unknown parser type - provide override for this function\n");
 			return;
 
 			break;
@@ -1595,7 +1595,7 @@ alreadyParsedRule		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_MARKER ruleIn
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'alreadyParsedRule' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'alreadyParsedRule' called by unknown parser type - provide override for this function\n");
 			return ANTLR3_FALSE;
 
 			break;
@@ -1668,7 +1668,7 @@ memoize	(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_MARKER ruleIndex, ANTLR3_MAR
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function consumeUntilSet called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function consumeUntilSet called by unknown parser type - provide override for this function\n");
 			return;
 
 			break;
@@ -1721,7 +1721,7 @@ synpred	(pANTLR3_BASE_RECOGNIZER recognizer, void * ctx, void (*predicate)(void 
 
 		default:
 		    
-			fprintf(stderr, "Base recognizer function 'synPred' called by unknown parser type - provide override for this function\n");
+			ANTLR3_FPRINTF(stderr, "Base recognizer function 'synPred' called by unknown parser type - provide override for this function\n");
 			return ANTLR3_FALSE;
 
 			break;

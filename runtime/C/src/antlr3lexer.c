@@ -302,7 +302,7 @@ static void mTokens	    (pANTLR3_LEXER lexer)
 {
     if	(lexer)	    // Fool compiler, avoid pragmas
     {
-		fprintf(stderr, "lexer->mTokens(): Error: No lexer rules were added to the lexer yet!\n");
+		ANTLR3_FPRINTF(stderr, "lexer->mTokens(): Error: No lexer rules were added to the lexer yet!\n");
     }
 }
 
@@ -332,27 +332,27 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
     //
     if	(ex->name == NULL)
     {
-		fprintf(stderr, "-unknown source-(");
+		ANTLR3_FPRINTF(stderr, "-unknown source-(");
     }
     else
     {
 		ftext = ex->streamName->to8(ex->streamName);
-		fprintf(stderr, "%s(", ftext->chars);
+		ANTLR3_FPRINTF(stderr, "%s(", ftext->chars);
     }
 
 #ifdef ANTLR3_WIN64
     // shnazzle fraazzle Dick Dastardly
     //
-    fprintf(stderr, "%I64d) ", recognizer->state->exception->line);
+    ANTLR3_FPRINTF(stderr, "%I64d) ", recognizer->state->exception->line);
 #else
 #ifdef ANTLR3_USE_64BIT
-    fprintf(stderr, "%lld) ", recognizer->state->exception->line);
+    ANTLR3_FPRINTF(stderr, "%lld) ", recognizer->state->exception->line);
 #else
-    fprintf(stderr, "%d) ", recognizer->state->exception->line);
+    ANTLR3_FPRINTF(stderr, "%d) ", recognizer->state->exception->line);
 #endif
 #endif
 
-    fprintf(stderr, ": lexer error %d :\n\t%s at offset %d, ", 
+    ANTLR3_FPRINTF(stderr, ": lexer error %d :\n\t%s at offset %d, ", 
 						ex->type,
 						(pANTLR3_UINT8)	   (ex->message),
 					    ex->charPositionInLine+1
@@ -366,18 +366,18 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		{			
 			if	(isprint(ex->c))
 			{
-				fprintf(stderr, "near '%c' :\n", ex->c);
+				ANTLR3_FPRINTF(stderr, "near '%c' :\n", ex->c);
 			}
 			else
 			{
-				fprintf(stderr, "near char(%#02X) :\n", (ANTLR3_UINT8)(ex->c));
+				ANTLR3_FPRINTF(stderr, "near char(%#02X) :\n", (ANTLR3_UINT8)(ex->c));
 			}
-			fprintf(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)ex->index));
+			ANTLR3_FPRINTF(stderr, "\t%.*s\n", width > 20 ? 20 : width ,((pANTLR3_UINT8)ex->index));
 		}
 		else
 		{
-			fprintf(stderr, "(end of input).\n\t This indicates a poorly specified lexer RULE\n\t or unterminated input element such as: \"STRING[\"]\n");
-			fprintf(stderr, "\t The lexer was matching from line %d, offset %d, which\n\t ", 
+			ANTLR3_FPRINTF(stderr, "(end of input).\n\t This indicates a poorly specified lexer RULE\n\t or unterminated input element such as: \"STRING[\"]\n");
+			ANTLR3_FPRINTF(stderr, "\t The lexer was matching from line %d, offset %d, which\n\t ", 
 								(ANTLR3_UINT32)(lexer->rec->state->tokenStartLine),
 								(ANTLR3_UINT32)(lexer->rec->state->tokenStartCharPositionInLine)
 								);
@@ -385,11 +385,11 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 
 			if	(width >= 1)
 			{
-				fprintf(stderr, "looks like this:\n\t\t%.*s\n", width > 20 ? 20 : width ,(pANTLR3_UINT8)(lexer->rec->state->tokenStartCharIndex));
+				ANTLR3_FPRINTF(stderr, "looks like this:\n\t\t%.*s\n", width > 20 ? 20 : width ,(pANTLR3_UINT8)(lexer->rec->state->tokenStartCharIndex));
 			}
 			else
 			{
-				fprintf(stderr, "is also the end of the line, so you must check your lexer rules\n");
+				ANTLR3_FPRINTF(stderr, "is also the end of the line, so you must check your lexer rules\n");
 			}
 		}
 	}

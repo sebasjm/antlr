@@ -128,9 +128,9 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
     {
 	if  (child->children != NULL && child->children == tree->children)
 	{
-	    /* TODO: Change to exception rather than fprintf
+	    /* TODO: Change to exception rather than ANTLR3_FPRINTF
 	     */
-	    fprintf(stderr, "ANTLR3: An attempt was made to add a child list to itself!\n");
+	    ANTLR3_FPRINTF(stderr, "ANTLR3: An attempt was made to add a child list to itself!\n");
 	    return;
 	}
 
@@ -316,7 +316,7 @@ replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3
 
 	if	(parent->children == NULL)
 	{
-		fprintf(stderr, "replaceChildren call: Indexes are invalid; no children in list for %s", parent->getText(parent));
+		ANTLR3_FPRINTF(stderr, "replaceChildren call: Indexes are invalid; no children in list for %s", parent->getText(parent));
 		return;
 	}
 
@@ -333,7 +333,7 @@ replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3
 		newChildren = antlr3VectorNew(1);
 		if	(newChildren == NULL)
 		{
-			fprintf(stderr, "replaceChildren: out of memory!!");
+			ANTLR3_FPRINTF(stderr, "replaceChildren: out of memory!!");
 			exit(1);
 		}
 		newChildren->add(newChildren, (void *)newTree, NULL);

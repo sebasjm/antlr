@@ -66,23 +66,23 @@ typedef	struct ANTLR3_BASE_RECOGNIZER_struct
 	///
 	pANTLR3_DEBUG_EVENT_LISTENER	debugger;
 
-    /** Pointer to a function that matches the current input symbol
-     *  against the supplied type. the function causes an error if a
-     *  match is not found and the default implementation will also
-     *  attempt to perform one token insertion or deletion if that is
-     *  possible with the input stream. You can override the default
-     *  implementation by installing a pointer to your own function
-     *  in this interface after the recognizer has initialized. This can
-     *  perform different recovery options or not recover at all and so on.
-     *  To ignore recovery altogether, see the comments in the default
-     *  implementation of this function in antlr3baserecognizer.c
-     *
-     *  Note that errors are signalled by setting the error flag below
-     *  and creating a new exception structure and installing it in the
-     *  exception pointer below (you can chain these if you like and handle them
-     *  in some customized way).
-     *  TODO: See if we end up using error or just used failed...
-     */
+    /// Pointer to a function that matches the current input symbol
+    ///  against the supplied type. the function causes an error if a
+    /// match is not found and the default implementation will also
+    /// attempt to perform one token insertion or deletion if that is
+    /// possible with the input stream. You can override the default
+    /// implementation by installing a pointer to your own function
+    /// in this interface after the recognizer has initialized. This can
+    /// perform different recovery options or not recover at all and so on.
+    /// To ignore recovery altogether, see the comments in the default
+    /// implementation of this function in antlr3baserecognizer.c
+    ///
+    /// Note that errors are signalled by setting the error flag below
+    /// and creating a new exception structure and installing it in the
+    /// exception pointer below (you can chain these if you like and handle them
+    /// in some customized way).
+    /// TODO : See if we end up using error or just used failed...
+    ///
     ANTLR3_BOOLEAN	(*match)	(struct ANTLR3_BASE_RECOGNIZER_struct * recognizer,
 					    ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 

@@ -165,7 +165,7 @@
 ///     //
 ///     if ( input == NULL )
 ///     {
-/// 			fprintf(stderr, "Unable to open file %s due to malloc() failure1\n", (char *)fName);
+/// 			ANTLR3_FPRINTF(stderr, "Unable to open file %s due to malloc() failure1\n", (char *)fName);
 ///     }
 /// 
 ///     // Our input stream is now open and all set to go, so we can create a new instance of our
@@ -178,7 +178,7 @@
 ///     //
 ///     if ( lxr == NULL )
 ///     {
-/// 			fprintf(stderr, "Unable to create the lexer due to malloc() failure1\n");
+/// 			ANTLR3_FPRINTF(stderr, "Unable to create the lexer due to malloc() failure1\n");
 /// 			exit(ANTLR3_ERR_NOMEM);
 ///     }
 /// 
@@ -198,7 +198,7 @@
 /// 
 ///     if (tstream == NULL)
 ///     {
-/// 		fprintf(stderr, "Out of memory trying to allocate token stream\n");
+/// 		ANTLR3_FPRINTF(stderr, "Out of memory trying to allocate token stream\n");
 /// 		exit(ANTLR3_ERR_NOMEM);
 ///     }
 /// 
@@ -208,7 +208,7 @@
 /// 
 ///     if (psr == NULL)
 ///     {
-/// 		fprintf(stderr, "Out of memory trying to allocate parser\n");
+/// 		ANTLR3_FPRINTF(stderr, "Out of memory trying to allocate parser\n");
 /// 		exit(ANTLR3_ERR_NOMEM);
 ///     }
 /// 
@@ -239,7 +239,7 @@
 ///     //
 /// 	if (psr->pParser->rec->errorCount > 0)
 /// 	{
-/// 		fprintf(stderr, "The parser returned %d errors, tree walking aborted.\n", psr->pParser->rec->errorCount);
+/// 		ANTLR3_FPRINTF(stderr, "The parser returned %d errors, tree walking aborted.\n", psr->pParser->rec->errorCount);
 /// 
 /// 	}
 /// 	else
