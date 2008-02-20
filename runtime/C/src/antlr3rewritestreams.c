@@ -1,74 +1,83 @@
-/** \file
- * Implementation of token/tree streams that are used by the
- * tree re-write rules to manipulate the tokens and trees produced
- * by rules that are subject to rewrite directives.
- */
+/// \file
+/// Implementation of token/tree streams that are used by the
+/// tree re-write rules to manipulate the tokens and trees produced
+/// by rules that are subject to rewrite directives.
+///
 
 #include    <antlr3rewritestreams.h>
 
-/* Static support function forward declarations for the stream types.
- */
-static    void			reset		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream); 
-static	  void			add		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDECL *freePtr)(void *));
-static    void *		next		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static    void *		_next		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static	  void *		dupTok		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
-static	  void *		dupTree		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
-static	  pANTLR3_BASE_TREE	toTreeTree	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element);
-static	  pANTLR3_BASE_TREE	toTreeToken	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element);
-static    ANTLR3_BOOLEAN	hasNext		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static    pANTLR3_BASE_TREE	nextNode	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static    ANTLR3_UINT32		size		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static    pANTLR3_STRING	getDescription	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static	  void			freeRS		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+// Static support function forward declarations for the stream types.
+//
+static	void				reset			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream); 
+static	void				add				(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDECL *freePtr)(void *));
+static	void *				next			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void *				nextTree		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void *				nextToken		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void *				_next			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void *				dupTok			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+static	void *				dupTree			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+static	void *				dupTreeNode		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
+static	pANTLR3_BASE_TREE	toTree			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element);
+static	pANTLR3_BASE_TREE	toTreeNode		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element);
+static	ANTLR3_BOOLEAN		hasNext			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	pANTLR3_BASE_TREE	nextNode		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	pANTLR3_BASE_TREE	nextNodeNode	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	pANTLR3_BASE_TREE	nextNodeToken	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	ANTLR3_UINT32		size			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	pANTLR3_STRING		getDescription	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void				freeRS			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 
 
 static void
 freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
-    {
-	stream->elements->free(stream->elements);
-    }
-    ANTLR3_FREE(stream);
+	if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
+	{
+		stream->elements->free(stream->elements);
+	}
+	ANTLR3_FREE(stream);
 }
 
-/* Functions for creating streams
- */
+// Functions for creating streams
+//
 static  pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
 antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
 {
-    pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
+	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= (pANTLR3_REWRITE_RULE_ELEMENT_STREAM) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_REWRITE_RULE_ELEMENT_STREAM)));
+	// First job is to create the memory we need.
+	//
+	stream	= (pANTLR3_REWRITE_RULE_ELEMENT_STREAM) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_REWRITE_RULE_ELEMENT_STREAM)));
 
-    if	(stream == NULL)
-    {
-	return	NULL;
-    }
+	if	(stream == NULL)
+	{
+		return	NULL;
+	}
 
-    /* Populate the generic interface */
+	// Populate the generic interface
+	//
+	stream->reset			= reset;
+	stream->add				= add;
+	stream->next			= next;
+	stream->nextTree		= nextTree;
+	stream->nextNode		= nextNode;
+	stream->nextToken		= nextToken;
+	stream->_next			= _next;
+	stream->hasNext			= hasNext;
+	stream->size			= size;
+	stream->getDescription  = getDescription;
+	stream->toTree			= toTree;
+	stream->free			= freeRS;
 
-    stream->reset	    = reset;
-    stream->add		    = add;
-    stream->next	    = next;
-    stream->_next	    = _next;
-    stream->hasNext	    = hasNext;
-    stream->size	    = size;
-    stream->getDescription  = getDescription;
-    stream->free	    = freeRS;
+	// Install the description
+	//
+	stream->elementDescription	= adaptor->strFactory->newStr8(adaptor->strFactory, description);
 
-    /* Install the description
-     */
-    stream->elementDescription	= adaptor->strFactory->newStr8(adaptor->strFactory, description);
+	// Install the adaptor
+	//
+	stream->adaptor		= adaptor;
 
-    /* Install the adaptor
-     */
-    stream->adaptor		= adaptor;
-
-    return stream;
+	return stream;
 }
 
 static pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
@@ -76,8 +85,8 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 {
 	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
-	/* First job is to create the memory we need.
-	*/
+	// First job is to create the memory we need.
+	//
 	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
 	if (stream == NULL)
@@ -85,8 +94,8 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 		return NULL;
 	}
 
-	/* Stream seems good so we need to add the supplied element
-	*/
+	// Stream seems good so we need to add the supplied element
+	//
 	stream->add(stream, oneElement, NULL);
 	return stream;
 }
@@ -94,35 +103,10 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 static pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
 antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
-    pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
+	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
-
-    if (stream == NULL)
-    {
-		return stream;
-    }
-
-    /* Stream seems good so we need to install the vector we were
-     * given. We assume that someone else is going to free the
-     * vector.
-     */
-    stream->elements	= vector;
-
-    return stream;
-}
-
-/* Token rewrite stream ... */
-
-ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
-{
-	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
-
-	/* First job is to create the memory we need.
-	*/
+	// First job is to create the memory we need.
+	//
 	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
 	if (stream == NULL)
@@ -130,225 +114,348 @@ antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UIN
 		return stream;
 	}
 
-	/* Install the token based overrides
-	*/
-	stream->dup	    = dupTok;
-	stream->toTree  = toTreeToken;
+	// Stream seems good so we need to install the vector we were
+	// given. We assume that someone else is going to free the
+	// vector.
+	//
+	stream->elements	= vector;
 
-	/* No nextNode implementation for a token rewrite stream */
+	return stream;
+}
+
+// Token rewrite stream ...
+//
+ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
+antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+{
+	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
+
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+
+	if (stream == NULL)
+	{
+		return stream;
+	}
+
+	// Install the token based overrides
+	//
+	stream->dup			= dupTok;
+	stream->nextNode	= nextNodeToken;
+
+	// No nextNode implementation for a token rewrite stream
+	//
 	return stream;
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
 antlr3RewriteRuleTokenStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
 {
-    pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
+	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
 
-    /* Install the token based overrides
-     */
-    stream->dup	    = dupTok;
-    stream->toTree  = toTreeToken;
+	// Install the token based overrides
+	//
+	stream->dup			= dupTok;
+	stream->nextNode	= nextNodeToken;
 
-    /* No nextNode implementation for a token rewrite stream */
-    return stream;
+	// No nextNode implementation for a token rewrite stream
+	//
+	return stream;
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
 antlr3RewriteRuleTokenStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
-    pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
+	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
 
-    /* Install the token based overrides
-     */
-    stream->dup	    = dupTok;
-    stream->toTree  = toTreeToken;
+	// Install the token based overrides
+	//
+	stream->dup			= dupTok;
+	stream->nextNode	= nextNodeToken;
 
-    /* No nextNode implementation for a token rewrite stream */
-    return stream;
+	// No nextNode implementation for a token rewrite stream
+	//
+	return stream;
 }
 
-/* Subtree rewrite stream */
-
+// Subtree rewrite stream
+//
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
 antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
 {
-    pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
+	pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
 
-    if (stream == NULL)
-    {
+	if (stream == NULL)
+	{
+		return stream;
+	}
+
+	// Install the subtree based overrides
+	//
+	stream->dup			= dupTree;
+	stream->nextNode	= nextNode;
+
 	return stream;
-    }
-
-    /* Install the token based overrides
-     */
-    stream->dup		= dupTree;
-    stream->toTree	= toTreeTree;
-    stream->nextNode	= nextNode;
-
-    return stream;
 
 }
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
 antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
 {
-    pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
+	pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
 
-    if (stream == NULL)
-    {
+	if (stream == NULL)
+	{
+		return stream;
+	}
+
+	// Install the subtree based overrides
+	//
+	stream->dup			= dupTree;
+	stream->nextNode	= nextNode;
+
 	return stream;
-    }
-
-    /* Install the token based overrides
-     */
-    stream->dup		= dupTree;
-    stream->toTree	= toTreeTree;
-    stream->nextNode	= nextNode;
-
-    return stream;
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
 antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
-    pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
+	pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
 
-    /* First job is to create the memory we need.
-     */
-    stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
 
-    if (stream == NULL)
-    {
+	if (stream == NULL)
+	{
 		return NULL;
-    }
+	}
 
-    /* Install the token based overrides
-     */
-    stream->dup		= dupTree;
-    stream->toTree	= toTreeTree;
-    stream->nextNode	= nextNode;
+	// Install the subtree based overrides
+	//
+	stream->dup			= dupTree;
+	stream->nextNode	= nextNode;
 
-    return stream;
+	return stream;
 }
-/* Static support functions */
+// Node rewrite stream ...
+//
+ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
+antlr3RewriteRuleNodeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+{
+	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
-/* Reset the condition of this stream so that it appears we have
- * not consumed any of its elements.  Elements themselves are untouched.
- */
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+
+	if (stream == NULL)
+	{
+		return stream;
+	}
+
+	// Install the node based overrides
+	//
+	stream->dup			= dupTreeNode;
+	stream->toTree		= toTreeNode;
+	stream->nextNode	= nextNodeNode;
+
+	return stream;
+}
+
+ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
+antlr3RewriteRuleNodeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+{
+	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
+
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
+
+	// Install the node based overrides
+	//
+	stream->dup			= dupTreeNode;
+	stream->toTree		= toTreeNode;
+	stream->nextNode	= nextNodeNode;
+
+	return stream;
+}
+
+ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
+antlr3RewriteRuleNodeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+{
+	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
+
+	// First job is to create the memory we need.
+	//
+	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
+
+	// Install the Node based overrides
+	//
+	stream->dup			= dupTreeNode;
+	stream->toTree		= toTreeNode;
+	stream->nextNode	= nextNodeNode;
+
+	return stream;
+}
+
+//----------------------------------------------------------------------
+// Static support functions 
+
+/// Reset the condition of this stream so that it appears we have
+/// not consumed any of its elements.  Elements themselves are untouched.
+///
 static void		
 reset    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    stream->cursor = 0;
+	stream->dirty	= ANTLR3_TRUE;
+	stream->cursor	= 0;
 }
 
-/* Add a new pANTLR3_BASE_TREE to this stream
- */
+// Add a new pANTLR3_BASE_TREE to this stream
+//
 static void		
 add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDECL *freePtr)(void *))
 {
-    if (el== NULL)
-    {
-	return;
-    }
-    if (stream->elements != NULL)
-    {
-	/* We have already started with a vector, which means we already have >1
-	 * entries in the stream. So we can just add this new element to the existing
-	 * collection. 
-	 */
-	stream->elements->add(stream->elements, el, freePtr);
-	return;
-    }
-    if (stream->singleElement == NULL)
-    {
-	stream->singleElement = el;
-	return;
-    }
+	if (el== NULL)
+	{
+		return;
+	}
+	if (stream->elements != NULL)
+	{
+		// We have already started with a vector, which means we already have >1
+		// entries in the stream. So we can just add this new element to the existing
+		// collection. 
+		//
+		stream->elements->add(stream->elements, el, freePtr);
+		return;
+	}
+	if (stream->singleElement == NULL)
+	{
+		stream->singleElement = el;
+		return;
+	}
 
-    /* If we got here then we ahd only the one element so far
-     * and we must now create a vector to hold a collection of them
-     */
-    stream->elements = antlr3VectorNew(0);  /* We will let the vector figure things out as it goes */
-    stream->elements->add(stream->elements, stream->singleElement, NULL);
-    stream->elements->add(stream->elements, el, NULL);
-    stream->singleElement = NULL;
+	// If we got here then we had only the one element so far
+	// and we must now create a vector to hold a collection of them
+	//
+	stream->elements = antlr3VectorNew(0);  // We will let the vector figure things out as it goes
+	stream->elements->add	(stream->elements, stream->singleElement, freePtr);
+	stream->elements->add	(stream->elements, el, freePtr);
+	stream->singleElement = NULL;
 
-    return;
+	return;
 }
 
-/* Return the next element in the stream.  If out of elements, throw
- * an exception unless size()==1.  If size is 1, then return elements[0].
- */
+/// Return the next element in the stream.  If out of elements, throw
+/// an exception unless size()==1.  If size is 1, then return elements[0].
+/// Return a duplicate node/subtree if stream is out of elements and
+/// size==1.  If we've already used the element, dup (dirty bit set).
+///
+static void *
+nextTree(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream) 
+{
+	ANTLR3_UINT32		n;
+	void			*  el;
+
+	n = stream->size(stream);
+
+	if ( stream->dirty || (stream->cursor >=n && n==1) ) 
+	{
+		// if out of elements and size is 1, dup
+		//
+		el = stream->_next(stream);
+		return stream->dup(stream, el);
+	}
+
+	// test size above then fetch
+	//
+	el = stream->_next(stream);
+	return el;
+}
+
+/// Return the next element for a caller that wants just the token
+///
+static	void *
+nextToken		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
+{
+	return stream->_next(stream);
+}
+
+/// Return the next element in the stream.  If out of elements, throw
+/// an exception unless size()==1.  If size is 1, then return elements[0].
+///
 static void *	
 next	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    ANTLR3_UINT32   s;
+	ANTLR3_UINT32   s;
 
-    s = stream->size(stream);
-    if (stream->cursor >= s && s == 1)
-    {
-	pANTLR3_BASE_TREE el;
+	s = stream->size(stream);
+	if (stream->cursor >= s && s == 1)
+	{
+		pANTLR3_BASE_TREE el;
 
-	el = stream->_next(stream);
+		el = stream->_next(stream);
 
-	return	stream->dup(stream, el);
-    }
+		return	stream->dup(stream, el);
+	}
 
-    return stream->_next(stream);
+	return stream->_next(stream);
 }
 
-/** Do the work of getting the next element, making sure that it's
- *  a tree node or subtree.  Deal with the optimization of single-
- *  element list versus list of size > 1.  Throw an exception (or something similar)
- *  if the stream is empty or we're out of elements and size>1.
- *  You can override in a subclass if necessary.
- */
+/// Do the work of getting the next element, making sure that it's
+/// a tree node or subtree.  Deal with the optimization of single-
+/// element list versus list of size > 1.  Throw an exception (or something similar)
+/// if the stream is empty or we're out of elements and size>1.
+/// You can override in a 'subclass' if necessary.
+///
 static void *
 _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-	ANTLR3_UINT32	s;
+	ANTLR3_UINT32		n;
 	pANTLR3_BASE_TREE	t;
 
-	s = stream->size(stream);
+	n = stream->size(stream);
 
-	if (s == 0)
+	if (n == 0)
 	{
 		// This means that the stream is empty
 		//
-		return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(NULL);	// Caller must cope with this
+		return NULL;	// Caller must cope with this
 	}
 
 	// Traversed all the available elements already?
 	//
-	if (stream->cursor >= s)
+	if (stream->cursor >= n)
 	{
-		if (s == 1)
+		if (n == 1)
 		{
 			// Special case when size is single element, it will just dup a lot
 			//
-			return stream->singleElement;
+			return stream->toTree(stream, stream->singleElement);
 		}
 
-		// OUt of elements and the size is not 1, so we cannot assume
+		// Out of elements and the size is not 1, so we cannot assume
 		// that we just duplicate the entry n times (such as ID ent+ -> ^(ID ent)+)
-		// THis means we ran out of elements earlier than was expected.
+		// This means we ran out of elements earlier than was expected.
 		//
-		return (pANTLR3_BASE_TREE)ANTLR3_FUNC_PTR(NULL);	// Caller must cope with this
+		return NULL;	// Caller must cope with this
 	}
 
 	// Elements available either for duping or just available
@@ -367,87 +474,129 @@ _next    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	return t;
 }
 
-/* When constructing trees, sometimes we need to dup a token or AST
- * subtree.  Dup'ing a token means just creating another AST node
- * around it.  For trees, you must call the adaptor.dupTree().
- */
+#ifdef ANTLR3_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4100)
+#endif
+/// When constructing trees, sometimes we need to dup a token or AST
+/// subtree.  Dup'ing a token means just creating another AST node
+/// around it.  For trees, you must call the adaptor.dupTree().
+///
 static void *	
 dupTok	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el)
 {
-    return stream->adaptor->create(stream->adaptor, (pANTLR3_COMMON_TOKEN)el);
+	ANTLR3_FPRINTF(stderr, "dup() cannot be called on a token rewrite stream!!");
+	return NULL;
 }
+#ifdef ANTLR3_WINDOWS
+#pragma warning(pop)
+#endif
 
-/* When constructing trees, sometimes we need to dup a token or AST
- * subtree.  Dup'ing a token means just creating another AST node
- * around it.  For trees, you must call the adaptor.dupTree().
- */
+/// When constructing trees, sometimes we need to dup a token or AST
+/// subtree.  Dup'ing a token means just creating another AST node
+/// around it.  For trees, you must call the adaptor.dupTree().
+///
 static void *	
 dupTree	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 {
-    return stream->adaptor->dupNode(stream->adaptor, (pANTLR3_BASE_TREE)element);
+	return stream->adaptor->dupNode(stream->adaptor, (pANTLR3_BASE_TREE)element);
 }
 
-/* Ensure stream emits trees; tokens must be converted to AST nodes.
- * AST nodes can be passed through unmolested.
- */
-static pANTLR3_BASE_TREE	
-toTreeToken   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
+#ifdef ANTLR3_WINDOWS
+#pragma warning(push)
+#pragma warning(disable : 4100)
+#endif
+/// When constructing trees, sometimes we need to dup a token or AST
+/// subtree.  Dup'ing a token means just creating another AST node
+/// around it.  For trees, you must call the adaptor.dupTree().
+///
+static void *	
+dupTreeNode	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 {
-    return stream->adaptor->create(stream->adaptor, (pANTLR3_COMMON_TOKEN) element);
+	ANTLR3_FPRINTF(stderr, "dup() cannot be called on a node rewrite stream!!!");
+	return NULL;
 }
 
-/* Ensure stream emits trees; tokens must be converted to AST nodes.
- * AST nodes can be passed through unmolested.
- */
+
+/// We don;t explicitly convert to a tree unless the call goes to 
+/// nextTree, which means rewrites are heterogeneous 
+///
+static pANTLR3_BASE_TREE	
+toTree   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
+{
+	return (pANTLR3_BASE_TREE)element;
+}
+#ifdef ANTLR3_WINDOWS
+#pragma warning(pop)
+#endif
+
+/// Ensure stream emits trees; tokens must be converted to AST nodes.
+/// AST nodes can be passed through unmolested.
+///
 #ifdef ANTLR3_WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 4100)
 #endif
 
 static pANTLR3_BASE_TREE	
-toTreeTree   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
+toTreeNode   (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * element)
 {
-    return (pANTLR3_BASE_TREE)element;
+	return stream->adaptor->dupNode(stream->adaptor, (pANTLR3_BASE_TREE)element);
 }
 
 #ifdef ANTLR3_WINDOWS
 #pragma warning(pop)
 #endif
 
-/* Returns ANTLR3_TRUE if there is a next element available
- */
+/// Returns ANTLR3_TRUE if there is a next element available
+///
 static ANTLR3_BOOLEAN	
 hasNext  (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    if (	  (stream->singleElement != NULL && stream->cursor < 1)
-			|| stream->elements != NULL && stream->cursor < stream->elements->size(stream->elements))
-    {
+	if (	(stream->singleElement != NULL && stream->cursor < 1)
+		||	(stream->elements != NULL && stream->cursor < stream->elements->size(stream->elements)))
+	{
 		return ANTLR3_TRUE;
-    }
-    else
-    {
+	}
+	else
+	{
 		return ANTLR3_FALSE;
-    }
+	}
 }
 
-/* Treat next element as a single node even if it's a subtree.
- * This is used instead of next() when the result has to be a
- * tree root node.  Also prevents us from duplicating recently-added
- * children; e.g., ^(type ID)+ adds ID to type and then 2nd iteration
- * must dup the type node, but ID has been added.
- *
- * Referencing to a rule result twice is ok; dup entire tree as
- * we can't be adding trees; e.g., expr expr. 
- */
+/// Get the next token from the list and create a node for it
+/// This is the implementation for token streams.
+///
+static pANTLR3_BASE_TREE
+nextNodeToken(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
+{
+	return stream->adaptor->create(stream->adaptor, stream->_next(stream));
+}
+
+static pANTLR3_BASE_TREE
+nextNodeNode(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
+{
+	return stream->_next(stream);
+}
+
+/// Treat next element as a single node even if it's a subtree.
+/// This is used instead of next() when the result has to be a
+/// tree root node.  Also prevents us from duplicating recently-added
+/// children; e.g., ^(type ID)+ adds ID to type and then 2nd iteration
+/// must dup the type node, but ID has been added.
+///
+/// Referencing to a rule result twice is ok; dup entire tree as
+/// we can't be adding trees; e.g., expr expr. 
+///
 static pANTLR3_BASE_TREE	
 nextNode (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
 
-	ANTLR3_UINT32	s;
+	ANTLR3_UINT32	n;
 	pANTLR3_BASE_TREE	el = stream->_next(stream);
 
-	s = stream->size(stream);
-	if (stream->cursor > s && s == 1)
+	n = stream->size(stream);
+	if (stream->dirty == ANTLR3_TRUE || (stream->cursor > n && n == 1))
 	{
 		// We are out of elements and the size is 1, which means we just 
 		// dup the node that we have
@@ -460,17 +609,17 @@ nextNode (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	return  el;
 }
 
-/* Number of elements available in the stream
-*/
+/// Number of elements available in the stream
+///
 static ANTLR3_UINT32	
 size	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
 	ANTLR3_UINT32   n = 0;
 
-	/* Should be a count of one if singleElement is set. I copied this
-	 * logic from the java implementation, which I suspect is just guarding
-	 * against someone setting singleElement and forgetting to NULL it out
-	 */
+	/// Should be a count of one if singleElement is set. I copied this
+	/// logic from the java implementation, which I suspect is just guarding
+	/// against someone setting singleElement and forgetting to NULL it out
+	///
 	if (stream->singleElement != NULL)
 	{
 		n = 1;
@@ -484,15 +633,15 @@ size	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	return n;
 }
 
-/* Returns the description string if there is one available (check for NULL).
- */
+/// Returns the description string if there is one available (check for NULL).
+///
 static pANTLR3_STRING	
 getDescription  (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-    if (stream->elementDescription == NULL)
-    {
-	stream->elementDescription = stream->adaptor->strFactory->newPtr8(stream->adaptor->strFactory, (pANTLR3_UINT8)"<unknown source>", 14);
-    }
+	if (stream->elementDescription == NULL)
+	{
+		stream->elementDescription = stream->adaptor->strFactory->newPtr8(stream->adaptor->strFactory, (pANTLR3_UINT8)"<unknown source>", 14);
+	}
 
-    return  stream->elementDescription;
+	return  stream->elementDescription;
 }

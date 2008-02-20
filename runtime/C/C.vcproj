@@ -978,6 +978,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\ASTParser.stg"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\org\antlr\codegen\templates\C\ASTTreeParser.stg"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\org\antlr\codegen\templates\C\C.stg"
 				>
 			</File>

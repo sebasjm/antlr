@@ -1342,7 +1342,7 @@ parser(	grammar,
 		labelType="pANTLR3_COMMON_TOKEN", 
 		members={<actions.parser.members>}
 		) ::= <<
-<genericParser(inputStreamType="pANTLR3_COMMON_TOKEN_STREAM", ...)>
+<genericParser(inputStreamType="pANTLR3_COMMON_TOKEN_STREAM", rewriteElementType="TOKEN", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
@@ -1362,7 +1362,7 @@ treeParser(	grammar,
 			superClass="TreeParser", 
 			members={<actions.treeparser.members>}
 			) ::= <<
-<genericParser(inputStreamType="pANTLR3_COMMON_TREE_NODE_STREAM", ...)>
+<genericParser(inputStreamType="pANTLR3_COMMON_TREE_NODE_STREAM", rewriteElementType="NODE", ...)>
 >>
 
 /** A simpler version of a rule template that is specific to the imaginary
@@ -1494,7 +1494,7 @@ static <returnType()>
     {
         PREPORTERROR();
         PRECOVER();
-        <@setReturnValue()>
+        <@setErrorReturnValue()>
     }
 <if(ruleDescriptor.actions.after)>
     else
