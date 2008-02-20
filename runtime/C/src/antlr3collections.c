@@ -987,7 +987,7 @@ static ANTLR3_BOOLEAN
 antlr3StackPush	(pANTLR3_STACK stack, void * element, void (ANTLR3_CDECL *freeptr)(void *))
 {
     stack->top	= element;
-    return stack->vector->add(stack->vector, element, freeptr);
+    return (ANTLR3_BOOLEAN)(stack->vector->add(stack->vector, element, freeptr));
 }
 
 ANTLR3_API  pANTLR3_VECTOR

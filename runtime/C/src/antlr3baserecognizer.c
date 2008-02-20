@@ -45,6 +45,7 @@ static ANTLR3_BOOLEAN		synpred						(pANTLR3_BASE_RECOGNIZER recognizer, void * 
 static void					reset						(pANTLR3_BASE_RECOGNIZER recognizer);
 static void					freeBR						(pANTLR3_BASE_RECOGNIZER recognizer);
 
+
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
 antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
@@ -132,10 +133,6 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
      */
     recognizer->type			= type;
 
-
-
-
-
     return  recognizer;
 }
 static void	
@@ -146,6 +143,7 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
     if	(recognizer->state->ruleMemo != NULL)
     {
 		recognizer->state->ruleMemo->free(recognizer->state->ruleMemo);
+		recognizer->state->ruleMemo = NULL;
     }
 
     thisE = recognizer->state->exception;
@@ -154,6 +152,7 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 		thisE->freeEx(thisE);
     }
 
+	ANTLR3_FREE(recognizer->state);
     ANTLR3_FREE(recognizer);
 }
 
