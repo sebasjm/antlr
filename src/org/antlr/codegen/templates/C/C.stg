@@ -1146,7 +1146,7 @@ ANTLR3_API p<name>
     if	(ctx == NULL)
     {
 	/* Failed to allocate memory for parser context */
-        return  (p<name>)ANTLR3_ERR_NOMEM;
+        return  NULL;
     }
     
     /* -------------------------------------------------------------------
