@@ -916,7 +916,7 @@ ANTLR3_API p<name> <name>NewSSD
 <if(filterMode)>
     /* We have filter mode turned on, so install the filtering nextToken function
      */
-    LEXSTATE->tokSource->nextToken = <name>NextToken;
+    lexCtx->pLexer->rec->state->tokSource->nextToken = <name>NextToken;
 <endif>
 	 <actions.lexer.apifuncs>
 
@@ -2846,26 +2846,26 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name>=<expr>;"
  */
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->size((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope))-<negIndex>-1 >= 0 ? ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope))-<negIndex>-1)-><attr.name> : <initValue(attr.type)> )
+((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->size((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>))-<negIndex>-1 >= 0 ? ((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->get(ctx->SCOPE_STACK(<scope>), ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>))-<negIndex>-1)-><attr.name> : <initValue(attr.type)> )
 <else>
 <if(index)>
-((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope) >0 ? ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT32)<index>))-><attr.name> : <initValue(attr.type)> )
+((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>) >0 ? ((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->get(ctx->SCOPE_STACK(<scope>), (ANTLR3_UINT32)<index>))-><attr.name> : <initValue(attr.type)> )
 <else>
-((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope) >0 ? (SCOPE_TOP(<scope>)-><attr.name> : <initValue(attr.type)> )
+((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>)) >0 ? (SCOPE_TOP(<scope>))-><attr.name> : <initValue(attr.type)> )
 <endif>
 <endif>
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-if ((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope)) > 0 )
+if ((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>)) > 0 )
 {
 <if(negIndex)>
-	((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope))-<negIndex>-1)-><attr.name> = <expr>;
+	((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->get(ctx->SCOPE_STACK(<scope>), ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>))-<negIndex>-1)-><attr.name> = <expr>;
 <else>
 <if(index)>
-	((SCOPE_TYPE(scope))ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope), (ANTLR3_UINT32)<index>))-><attr.name> = <expr>;
+	((SCOPE_TYPE(<scope>))ctx->SCOPE_STACK(<scope>)->get(ctx->SCOPE_STACK(<scope>), (ANTLR3_UINT32)<index>))-><attr.name> = <expr>;
 <else>
-	SCOPE_TOP(<scope>)-><attr.name>=<expr>;
+	(SCOPE_TOP(<scope>))-><attr.name>=<expr>;
 <endif>
 <endif>
 }
