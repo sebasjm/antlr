@@ -31,7 +31,7 @@ static  ANTLR3_INT32			getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTL
 static	void					setParent				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE child, pANTLR3_BASE_TREE parent);
 static  void					setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child);
 static	void					deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
-static	pANTLR3_BASE_TREE		errorNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN_STREAM ctnstream, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken, pANTLR3_EXCEPTION e);
+static	pANTLR3_BASE_TREE		errorNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_TOKEN_STREAM ctnstream, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken, pANTLR3_EXCEPTION e);
 /* Methods specific to each tree adaptor
  */
 static	void			setTokenBoundaries		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken);
@@ -175,7 +175,7 @@ ctaFree(pANTLR3_BASE_TREE_ADAPTOR adaptor)
 /* BASE_TREE_ADAPTOR overrides */
 
 static	pANTLR3_BASE_TREE
-errorNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN_STREAM ctnstream, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken, pANTLR3_EXCEPTION e)
+errorNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_TOKEN_STREAM ctnstream, pANTLR3_COMMON_TOKEN startToken, pANTLR3_COMMON_TOKEN stopToken, pANTLR3_EXCEPTION e)
 {
 	// Use the supplied common tree node stream to get another tree from the factory
 	// TODO: Look at creating the erronode as in Java, but this is complicated by the
