@@ -446,7 +446,7 @@ rewriteTokenListLabelRefRoot ::= rewriteTokenLabelRefRoot
 
 /** Gen ^(ID ...) or ^(ID[args] ...) */
 rewriteTokenRefRoot(token,elementIndex,hetero,args) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createRewriteNodeFromElement(...)>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createRewriteNodeFromElement(...)>, root_<treeLevel>);<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
@@ -502,7 +502,7 @@ root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<label>->nextNode(stream_
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot((pANTLR3_BASE_TREE)(stream_<label>->nextNode(stream_<label>)), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot((pANTLR3_BASE_TREE)(stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<
@@ -511,9 +511,9 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <hetero>New(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
 <if(args)>
-(<ASTLabelType>)ADAPTOR->createTypeTokenText(ADAPTOR, TOKTEXT(<args; separator=", ">))
+(<ASTLabelType>)ADAPTOR->createTypeTokenText(ADAPTOR, <tokenType>, TOKTEXT(<args; separator=", ">))
 <else>
-(<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, "<tokenType>")
+(<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, (pANTLR3_UINT8)"<tokenType>")
 <endif>
 <endif>
 >>
