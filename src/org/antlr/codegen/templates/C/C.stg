@@ -2816,7 +2816,7 @@ ruleLabelInitVal(label) ::= <<
 returnScope() ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
-typedef struct <ruleDescriptor:returnStructName()>_struct
+typedef struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStructName()>_struct
 {
 <if(!TREE_PARSER)>
     /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
@@ -2829,7 +2829,7 @@ typedef struct <ruleDescriptor:returnStructName()>_struct
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
 }
-    <ruleDescriptor:returnStructName()>;<\n><\n>
+    <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStructName()>;<\n><\n>
 <endif>
 <endif>
 >>
@@ -2920,14 +2920,14 @@ tokenLabelPropertyRef_index(scope,attr) ::= "(<scope> != NULL ? <scope>->getToke
 tokenLabelPropertyRef_tree(scope,attr) ::= "(<scope> != NULL ? <scope>->tree : NULL)"
 tokenLabelPropertyRef_int(scope,attr) ::= "(<scope> != NULL ? <scope>->getText(<scope>)->toInt32(<scope>->getText(<scope>)) : 0)"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "(<scope> != NULL ? ((<labelType>)<scope>.start) : NULL)"
-ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope> != NULL ? ((<labelType>)<scope>.stop) : NULL)"
-ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope> != NULL ? (<scope>.tree) : NULL)"
+ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
+ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(<scope> != NULL ? STRSTREAM->toStringSS(STRSTREAM, <scope>.start, <scope>.start) : NULL )
+(<scope>.start != NULL ? STRSTREAM->toStringSS(STRSTREAM, <scope>.start, <scope>.start) : NULL )
 <else>
-(<scope> != NULL ? STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop) : NULL )
+(<scope>.start != NULL ? STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop) : NULL )
 <endif>
 >>
 

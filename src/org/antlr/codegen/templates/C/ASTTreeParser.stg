@@ -216,7 +216,7 @@ stream_<token>->nextNode(stream_<token>)
 >>
 
 ruleCleanUp() ::= <<
-<super.ruleCleanUp()>
+<super.ruleCleanUp(...)>
 <if(backtracking)>
 if ( BACKTRACKING==0 ) {<\n>
 <endif>
@@ -228,6 +228,8 @@ if ( BACKTRACKING==0 ) {<\n>
 <if(backtracking)>
 }
 <endif>
-<ruleDescriptor.allTokenRefsInAltsWithRewrites,ruleDescriptor.allRuleRefsInAltsWithRewrites
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+    :{stream_<it>->free(stream_<it>);}; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
     :{stream_<it>->free(stream_<it>);}; separator="\n">
 >>

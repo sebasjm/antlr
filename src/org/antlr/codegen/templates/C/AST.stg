@@ -55,7 +55,9 @@ ADAPTOR->free(ADAPTOR);
 >>
 
 @returnScope.ruleReturnMembers() ::= <<
+
 pANTLR3_BASE_TREE	tree;
+
 >>
 
 /** Add a variable to track rule's return AST */
@@ -84,7 +86,7 @@ ruleLabelInitializations() ::= <<
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>   = antlr3RewriteRuleTokenStreamNewAE(ADAPTOR,(pANTLR3_UINT8)"token <it>");}; separator="\n">
+    :{stream_<it>   = antlr3RewriteRuleTokenStreamNewAE(ADAPTOR,(pANTLR3_UINT8)"token <it>"); }; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
     :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR,(pANTLR3_UINT8)"rule <it>");}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
@@ -146,7 +148,7 @@ tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule>->add(stream_<rule>, <label>.tree, NULL);
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -158,7 +160,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule>->add(stream_<rule>, <label>.tree);
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree);
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -253,14 +255,14 @@ if ( BACKTRACKING==0 ) <\n>
 	<alts:rewriteAlt(); separator="else ">
 	<if(rewriteMode)>
 	<if(TREE_PARSER)>
-	<prevRuleRootRef()>->tree = ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
+	<prevRuleRootRef()>.tree = ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
 	INPUT->replaceChildren(INPUT, ADAPTOR->getParent(ADAPTOR, retval.start),
                       ADAPTOR->.getChildIndex(ADAPTOR, retval.start),
                       ADAPTOR->getChildIndex(ADAPTOR, _last),
                       retval.tree);
 	<endif>
 	<endif>
-	<prevRuleRootRef()>->tree = root_0; // set result root
+	<prevRuleRootRef()>.tree = root_0; // set result root
 	<rewriteCodeLabelsFree()>
 
 }
@@ -291,7 +293,7 @@ rewriteCodeLabelsInit() ::= <<
     separator="\n"
 >
 <referencedTokenListLabels
-    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAEV(ADAPTOR, (pANTLR3_UINT8)"token <it>", list_<it>);};
+    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAEV(ADAPTOR, (pANTLR3_UINT8)"token <it>", list_<it>); };
     separator="\n"
 >
 <referencedRuleLabels 
@@ -419,8 +421,8 @@ rewriteElement(e) ::= <<
 >>
 
 /** Gen ID or ID[args] */
-rewriteTokenRef(token,elementIndex,args) ::= <<
-ADAPTOR->addChildToken(ADAPTOR, root_<treeLevel>, <createRewriteNodeFromElement(...)>));<\n>
+rewriteTokenRef(token,elementIndex,hetero,args) ::= <<
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <createRewriteNodeFromElement(...)>);<\n>
 <endif>
 >>
 
@@ -447,12 +449,12 @@ rewriteTokenRefRoot(token,elementIndex,hetero,args) ::= <<
 root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createRewriteNodeFromElement(...)>), root_<treeLevel>);<\n>
 >>
 
-rewriteImaginaryTokenRef(args,token,elementIndex) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <createRewriteNodeFromElement(...)>);<\n>
+rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <createImaginaryNode(tokenType=token, ...)>);<\n>
 >>
 
-rewriteImaginaryTokenRefRoot(args,token,elementIndex) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createRewriteNodeFromElement(...)>), root_<treeLevel>);<\n>
+rewriteImaginaryTokenRefRoot(args,token,hetero,elementIndex) ::= <<
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createImaginaryNode(tokenType=token, ...)>, root_<treeLevel>);<\n>
 >>
 
 /** plain -> {foo} action */
@@ -472,7 +474,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<rule>->nextTree(stream_<rul
 >>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<rule>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<name>), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
@@ -490,7 +492,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextTree(stream_<la
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, (pANTLR3_BASE_TREE)(stream_<label>->nextTree(stream_<label>)));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, (pANTLR3_BASE_TREE)(stream_<label>->nextTree(stream_<label>));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
@@ -508,7 +510,11 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <! new MethodNode(IDLabel, args) !>
 <hetero>New(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
-(<ASTLabelType>)adaptor.create(<tokenType>, <args; separator=", "><if(!args)>"<tokenType>"<endif>)
+<if(args)>
+(<ASTLabelType>)ADAPTOR->createTypeTokenText(ADAPTOR, TOKTEXT(<args; separator=", ">))
+<else>
+(<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, "<tokenType>")
+<endif>
 <endif>
 >>
 
