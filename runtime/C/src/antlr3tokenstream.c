@@ -804,7 +804,7 @@ tindex	(pANTLR3_INT_STREAM is)
 }
 
 static void		    
-rewindLast	(pANTLR3_INT_STREAM is)
+dbgRewindLast	(pANTLR3_INT_STREAM is)
 {
 	pANTLR3_TOKEN_STREAM	ts;
 
@@ -815,7 +815,7 @@ rewindLast	(pANTLR3_INT_STREAM is)
     is->rewind(is, is->lastMarker);
 }
 static void		    
-dbgRewindLast	(pANTLR3_INT_STREAM is)
+rewindLast	(pANTLR3_INT_STREAM is)
 {
     is->rewind(is, is->lastMarker);
 }

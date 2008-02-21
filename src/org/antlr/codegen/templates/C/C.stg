@@ -2285,6 +2285,11 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  */
 dfaDecision(decisionNumber,description) ::= <<
 alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, INPUT->istream, &cdfa<decisionNumber>);
+if  (HASEXCEPTION())
+{
+    goto rule<ruleDescriptor.name>Ex;
+}
+<checkRuleBacktrackFailure()>
 >>
 
 /* Dump DFA tables as static initialized arrays of shorts(16 bits)/characters(8 bits)

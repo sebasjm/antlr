@@ -22,15 +22,22 @@
 static void
 noViableAlt(pANTLR3_BASE_RECOGNIZER rec, pANTLR3_CYCLIC_DFA cdfa, ANTLR3_UINT32	s)
 {
+	// In backtracking mode, we just set the failed flag so that the
+	// alt can just exit right now. If we are parsing though, then 
+	// we want the exception to be raised.
+	//
     if	(rec->state->backtracking > 0)
     {
 		rec->state->failed = ANTLR3_TRUE;
     }
-    rec->exConstruct(rec);
-    rec->state->exception->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-    rec->state->exception->message      = cdfa->description;
-    rec->state->exception->decisionNum  = cdfa->decisionNumber;
-    rec->state->exception->state        = s;
+	else
+	{
+		rec->exConstruct(rec);
+		rec->state->exception->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
+		rec->state->exception->message      = cdfa->description;
+		rec->state->exception->decisionNum  = cdfa->decisionNumber;
+		rec->state->exception->state        = s;
+	}
 }
 
 /** From the input stream, predict what alternative will succeed
@@ -87,7 +94,7 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
 			return  cdfa->accept[s];
 		}
 
-		/* Look for a normal transition stae based upon the input token element
+		/* Look for a normal transition state based upon the input token element
 		 */
 		c = is->_LA(is, 1);
 
@@ -103,7 +110,7 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
 
 			if	(snext < 0)
 			{
-				/* was in range but not a normal transition
+				/* Was in range but not a normal transition
 				 * must check EOT, which is like the else clause.
 				 * eot[s]>=0 indicates that an EOT edge goes to another
 				 * state.
@@ -125,7 +132,7 @@ antlr3dfapredict (void * ctx, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM is
 			is->consume(is);
 			continue;
 		}
-		/* EOT Transistion?
+		/* EOT Transition?
 		 */
 		if  (cdfa->eot[s] >= 0)
 		{
