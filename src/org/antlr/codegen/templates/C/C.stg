@@ -2716,6 +2716,16 @@ attributeFuncs(scope) ::= <<
 
 static void ANTLR3_CDECL <scope.name>Free(void * data)
 {
+	<scopeType(sname=scope.name)> scope;
+	
+	scope = (<scopeType(sname=scope.name)>) data;
+	
+	// If the user supplied the scope entries with a free function,then call it first
+	//
+	if	(scope->free != NULL)
+	{
+		scope->free(data);
+	}
     ANTLR3_FREE(data);
 }
 
@@ -2736,11 +2746,9 @@ static void ANTLR3_CDECL <scope.name>Free(void * data)
  *   void ANTLR3_CDECL myfunc( <scopeType(sname=scope.name)> ptr). 
  * \endcode
  *
- * It should perform any custom freeing stuff that you need (call ANTLR_FREE, not free()
- * then free the entry it is given with: 
- * \code
- *   ANTLR3_FREE(ptr);
- * \endcode
+ * It should perform any custom freeing stuff that you need (call ANTLR_FREE3, not free()
+ * NB: It should not free the pointer it is given, which is the scope stack entry itself
+ * and will be freed by the function that calls your custom free routine.
  * 
  */ 
 static <scopeType(sname=scope.name)>
