@@ -511,15 +511,15 @@ headerFile( LEXER,
 <<
 <leadIn("C header")>
 <if(PARSER)>
- * The parser <mainName()>
+ * The parser <mainName()> 
 <endif>
 <if(LEXER)>
- * The lexer <mainName()>
+ * The lexer <mainName()> 
 <endif>
 <if(TREE_PARSER)>
- * The tree parser <mainName()>
+ * The tree parser <mainName()> 
 <endif>
- has the callable functions (rules) shown below,
+has the callable functions (rules) shown below,
  * which will invoke the code for the associated rule in the source grammar
  * assuming that the input stream is pointing to a token/text stream that could begin
  * this rule.
@@ -555,6 +555,11 @@ headerFile( LEXER,
 /* End of standard antlr 3 runtime definitions
  * =============================================================================
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Forward declare the context typedef so that we can use it before it is
 // properly defined. Delegators and delegates (from import statements) are
 // interdependent and their context structures contain pointers to each other
@@ -698,6 +703,11 @@ pANTLR3_UINT8   <name>TokenNames[];
 /** \} */
 
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 /* END - Note:Keep extra line feed to satisfy UNIX systems */
 
 >>
@@ -2550,6 +2560,7 @@ globalAttributeScopeFuncDecl(scope) ::=
  * Function declaration for creating a <name>_<scope.name> scope set 
  */
 static <scopeType(sname=scope.name,...)>   <scopePushName(sname=scope.name,...)>(p<name> ctx);
+static void ANTLR3_CDECL <scope.name>Free(<scopeType(sname=scope.name)> scope);
 /* ----------------------------------------------------------------------------- */
 
 <endif>
@@ -2561,7 +2572,7 @@ globalAttributeScopeFuncMacro(scope) ::= <<
  */
 /** Macro for popping the top value from a <scopeStack(sname=scope.name)>
  */
-#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name,...)>)
+#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ((<scopeType(sname=scope.name)>)(ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name,...)>)))
 
 <endif>
 >>
@@ -2574,6 +2585,7 @@ ruleAttributeScopeFuncDecl(scope) ::= <<
  * Function declarations for creating a <name>_<scope.name> scope set 
  */
 static <scopeType(sname=scope.name,...)>   <scopePushName(sname=scope.name,...)>(p<name> ctx);
+static void ANTLR3_CDECL <scope.name>Free(<scopeType(sname=scope.name)> scope);
 /* ----------------------------------------------------------------------------- */
 
 <endif>
@@ -2585,7 +2597,7 @@ ruleAttributeScopeFuncMacro(scope) ::= <<
  */
 /** Macro for popping the top value from a <scopeStack(sname=scope.name,...)>
  */
-#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name)>)
+#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ((<scopeType(sname=scope.name)>)(ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name)>)))
 
 <endif>
 >>
@@ -2714,19 +2726,16 @@ attributeFuncs(scope) ::= <<
 /* attributeFuncs(scope)
  */
 
-static void ANTLR3_CDECL <scope.name>Free(void * data)
+static void ANTLR3_CDECL <scope.name>Free(<scopeType(sname=scope.name)> scope)
 {
-	<scopeType(sname=scope.name)> scope;
-	
-	scope = (<scopeType(sname=scope.name)>) data;
 	
 	// If the user supplied the scope entries with a free function,then call it first
 	//
 	if	(scope->free != NULL)
 	{
-		scope->free(data);
+		scope->free(scope);
 	}
-    ANTLR3_FREE(data);
+    ANTLR3_FREE(scope);
 }
 
 /** \brief Allocate initial memory for a <name> <scope.name> scope variable stack entry and
@@ -2766,7 +2775,7 @@ static <scopeType(sname=scope.name)>
     {
 	/* Standard ANTLR3 library implementation
 	 */
-	ctx-><scopeStack(sname=scope.name)>->push(ctx-><scopeStack(sname=scope.name)>, newAttributes, <scope.name>Free);
+	ctx-><scopeStack(sname=scope.name)>->push(ctx-><scopeStack(sname=scope.name)>, newAttributes, (void (*)(void *))<scope.name>Free);
 	
 	/* Return value is the pointer to the new entry, which may be used locally
 	 * without de-referencing via the context.
