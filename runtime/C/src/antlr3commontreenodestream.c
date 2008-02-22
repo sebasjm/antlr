@@ -305,7 +305,7 @@ fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 	//
 	nCount = t->getChildCount(t);
 
-	if	(nil != ANTLR3_FALSE && nCount>0)
+	if	(nil == ANTLR3_FALSE && nCount>0)
 	{
 		ctns->addNavigationNode(ctns, ANTLR3_TOKEN_DOWN);
 	}

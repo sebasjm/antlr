@@ -44,50 +44,53 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
     pANTLR3_LEXER   lexer;
     pANTLR3_COMMON_TOKEN	specialT;
 
-    /* Allocate memory
-     */
-    lexer   = (pANTLR3_LEXER) ANTLR3_MALLOC(sizeof(ANTLR3_LEXER));
+	/* Allocate memory
+	*/
+	lexer   = (pANTLR3_LEXER) ANTLR3_MALLOC(sizeof(ANTLR3_LEXER));
 
-    if	(lexer == NULL)
-    {
-	return	NULL;
-    }
+	if	(lexer == NULL)
+	{
+		return	NULL;
+	}
 
-    /* Now we need to create the base recognizer
-     */
-    lexer->rec	    =  antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint, state);
+	/* Now we need to create the base recognizer
+	*/
+	lexer->rec	    =  antlr3BaseRecognizerNew(ANTLR3_TYPE_LEXER, sizeHint, state);
 
-    if	(lexer->rec == NULL)
-    {
-	lexer->free(lexer);
-	return	NULL;
-    }
-    lexer->rec->super  =  lexer;
+	if	(lexer->rec == NULL)
+	{
+		lexer->free(lexer);
+		return	NULL;
+	}
+	lexer->rec->super  =  lexer;
 
-    lexer->rec->displayRecognitionError	    =  displayRecognitionError;
-    lexer->rec->reportError		    =  reportError;
-    lexer->rec->reset			    =  reset;
+	lexer->rec->displayRecognitionError	    =  displayRecognitionError;
+	lexer->rec->reportError		    =  reportError;
+	lexer->rec->reset			    =  reset;
 
-    /* Now install the token source interface
-     */
-    lexer->rec->state->tokSource	= (pANTLR3_TOKEN_SOURCE)ANTLR3_MALLOC(sizeof(ANTLR3_TOKEN_SOURCE));
+	/* Now install the token source interface
+	*/
+	if	(lexer->rec->state->tokSource == NULL) 
+	{
+		lexer->rec->state->tokSource	= (pANTLR3_TOKEN_SOURCE)ANTLR3_MALLOC(sizeof(ANTLR3_TOKEN_SOURCE));
 
-    if	(lexer->rec->state->tokSource == NULL) 
-    {
-	lexer->rec->free(lexer->rec);
-	lexer->free(lexer);
+		if	(lexer->rec->state->tokSource == NULL) 
+		{
+			lexer->rec->free(lexer->rec);
+			lexer->free(lexer);
 
-	return	NULL;
-    }
-    lexer->rec->state->tokSource->super    =  lexer;
+			return	NULL;
+		}
+		lexer->rec->state->tokSource->super    =  lexer;
 
-    /* Install the default nextToken() method, which may be overridden
-     * by generated code, or by anything else in fact.
-     */
-    lexer->rec->state->tokSource->nextToken	    =  nextToken;
-    lexer->rec->state->tokSource->strFactory    = NULL;
+		/* Install the default nextToken() method, which may be overridden
+		 * by generated code, or by anything else in fact.
+		 */
+		lexer->rec->state->tokSource->nextToken	    =  nextToken;
+		lexer->rec->state->tokSource->strFactory    = NULL;
 
-    lexer->rec->state->tokFactory				= NULL;
+		lexer->rec->state->tokFactory				= NULL;
+	}
 
     /* Install the lexer API
      */

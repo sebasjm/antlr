@@ -796,6 +796,14 @@ static void
 		RULEMEMO = NULL;
 	}
 <endif>
+<if(grammar.directDelegates)>
+	// Free the lexers that we delegated to
+	// functions to. NULL the state so we only free it once.
+	//
+	<grammar.directDelegates:
+         {g|ctx-><g:delegateName()>->pLexer->rec->state = NULL;
+         ctx-><g:delegateName()>->free(ctx-><g:delegateName()>);}; separator="\n">
+<endif>
     LEXER->free(LEXER);
     
     ANTLR3_FREE(ctx);
@@ -904,7 +912,7 @@ ANTLR3_API p<name> <name>NewSSD
 	// functions to.
 	//
 	<grammar.directDelegates:
-         {g|lexCtx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, state, lexCtx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|lexCtx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, lexCtx->pLexer->rec->state, lexCtx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
 <endif>    
 <if(grammar.delegators)>
 	// Install the pointers back to lexers that will delegate us to perform certain functions
@@ -1200,7 +1208,7 @@ ANTLR3_API p<name>
 	// functions to.
 	//
 	<grammar.directDelegates:
-         {g|ctx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, state, ctx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|ctx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, PSRSTATE, ctx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
 <endif>    
 <if(grammar.delegators)>
 	// Install the pointers back to parsers that will delegate us to perform certain functions
@@ -1241,6 +1249,14 @@ ANTLR3_API p<name>
     
     <@cleanup>
     <@end>
+<if(grammar.directDelegates)>
+	// Free the parsers that we delegated to
+	// functions to.NULL the state so we only free it once.
+	//
+	<grammar.directDelegates:
+         {g| ctx-><g:delegateName()>->pParser->rec->state = NULL;
+         ctx-><g:delegateName()>->free(ctx-><g:delegateName()>);}; separator="\n">
+<endif>
 <if(TREE_PARSER)>
     ctx->pTreeParser->free(ctx->pTreeParser);<\n>
 <else>

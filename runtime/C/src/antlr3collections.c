@@ -1095,7 +1095,7 @@ static	void		antlr3VectorDel	    (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 	//
 	if	(vector->elements[entry].freeptr != NULL)
 	{
-		vector->elements[entry].freeptr(vector->elements[entry-1].element);
+		vector->elements[entry].freeptr(vector->elements[entry].element);
 		vector->elements[entry].freeptr    = NULL;
 	}
 
@@ -1151,7 +1151,7 @@ static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 	// Valid request, return the sorted pointer
 	//
 
-	element				    = vector->elements[entry-1].element;
+	element				    = vector->elements[entry].element;
 
 	if	(entry == vector->count)
 	{

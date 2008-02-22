@@ -140,19 +140,22 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 {
     pANTLR3_EXCEPTION thisE;
 
-    if	(recognizer->state->ruleMemo != NULL)
-    {
-		recognizer->state->ruleMemo->free(recognizer->state->ruleMemo);
-		recognizer->state->ruleMemo = NULL;
-    }
+	if	(recognizer->state != NULL)
+	{
+		if	(recognizer->state->ruleMemo != NULL)
+		{
+			recognizer->state->ruleMemo->free(recognizer->state->ruleMemo);
+			recognizer->state->ruleMemo = NULL;
+		}
 
-    thisE = recognizer->state->exception;
-    if	(thisE != NULL)
-    {
-		thisE->freeEx(thisE);
-    }
+		thisE = recognizer->state->exception;
+		if	(thisE != NULL)
+		{
+			thisE->freeEx(thisE);
+		}
 
-	ANTLR3_FREE(recognizer->state);
+		ANTLR3_FREE(recognizer->state);
+	}
     ANTLR3_FREE(recognizer);
 }
 
