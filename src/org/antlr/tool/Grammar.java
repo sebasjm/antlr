@@ -357,12 +357,12 @@ public class Grammar {
 	protected StringTemplate lexerGrammarST =
 		new StringTemplate(
 			"lexer grammar <name>;\n" +
-			"<if(imports)>import <imports; separator=\", \">;<endif>\n" +
 			"<if(options)>" +
 			"options {\n" +
 			"  <options:{<it.name>=<it.value>;<\\n>}>\n" +
 			"}<\\n>\n" +
 			"<endif>\n" +
+			"<if(imports)>import <imports; separator=\", \">;<endif>\n" +
 			"<actionNames,actions:{n,a|@<n> {<a>}\n}>\n" +
 			"<literals:{<it.ruleName> : <it.literal> ;\n}>\n" +
 			"<rules>",
