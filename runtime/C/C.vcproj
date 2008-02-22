@@ -993,10 +993,6 @@
 				RelativePath="..\..\src\org\antlr\codegen\templates\C\Dbg.stg"
 				>
 			</File>
-			<File
-				RelativePath="..\..\src\org\antlr\codegen\templates\C\ST.stg"
-				>
-			</File>
 			<Filter
 				Name="Interfaces"
 				Filter="*.sti"
@@ -1062,5 +1058,9 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="DevPartner_IsInstrumented"
+			Value="0"
+		/>
 	</Globals>
 </VisualStudioProject>
