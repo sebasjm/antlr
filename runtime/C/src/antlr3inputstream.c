@@ -87,6 +87,7 @@ antlr3GenericSetupStream  (pANTLR3_INPUT_STREAM input, ANTLR3_UINT32 type)
 	/* Charstream API
      */
     input->close					=  antlr3InputClose;			/* Close down the stream completely										*/
+    input->free						=  antlr3InputClose;			/* Synonym for free														*/
     input->reset					=  antlr3InputReset;			/* Reset input to start													*/
     input->_LT						=  antlr3AsciiLT;				/* Same as _LA for 8 bit Ascii file										*/
     input->size						=  antlr3AsciiSize;				/* Return the size of the input buffer									*/
