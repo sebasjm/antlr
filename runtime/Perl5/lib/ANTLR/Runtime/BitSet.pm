@@ -28,7 +28,7 @@ our $LOG_BITS :Constant = 6;  # 2^6 == 64
 our $MOD_MASK :Constant = BITS - 1;
 
 # The actual data bit
-my @bits :Field :Lvalue(bits);
+my @bits :Field :Accessor(Name => 'bits', lvalue => 1);
 
 sub _init :Init {
     my ($self, $args) = @_;
