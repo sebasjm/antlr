@@ -19,7 +19,7 @@ static	void						reset						(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	pANTLR3_STRING				toNodesOnlyString			(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 static	void						push						(pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_INT32 index);
 static	ANTLR3_INT32				pop							(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
-ANTLR3_INT32						index						(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
+//static	ANTLR3_INT32				index						(pANTLR3_COMMON_TREE_NODE_STREAM ctns);
 
 // TREE NODE STREAM API
 //

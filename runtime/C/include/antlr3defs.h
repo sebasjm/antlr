@@ -56,10 +56,13 @@
 
 #else
 
+#ifdef	_wIN32
 # ifndef	ANTLR3_WINDOWS
 #  define	ANTLR3_WINDOWS
 # endif
+
 #define	ANTLR3_WIN32
+#endif
 
 #endif
 
@@ -151,6 +154,10 @@ typedef struct sockaddr *	pANTLR3_SOCKADDR;		// Type used for cast on accept()
 
 #include <stdio.h>
 
+#if HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
 #if HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
@@ -187,13 +194,31 @@ typedef struct sockaddr *	pANTLR3_SOCKADDR;		// Type used for cast on accept()
 # include <inttypes.h>
 #endif
 
-#if HAVE_STDINT_H
-# include <stdint.h>
-#endif
-
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+
+#ifdef HAVE_NETINET_IN_H
+#include	<netinet/in.h>
+#endif
+
+#ifdef HAVE_SOCKET_H
+# include	<socket.h>
+#else
+# if HAVE_SYS_SOCKET_H
+#  include	<sys/socket.h>
+# endif
+#endif
+
+#ifdef HAVE_NETINET_TCP_H
+#include	<netinet/tcp.h>
+#endif
+
+#ifdef HAVE_SYS_RESOLVE_H
+#include	<sys/resolv.h>
+#endif
+
+
 
 #ifdef	HAVE_MALLOC_H
 # include    <malloc.h>
@@ -218,9 +243,27 @@ typedef struct sockaddr *	pANTLR3_SOCKADDR;		// Type used for cast on accept()
 
 #define _stat   stat
 
+// SOCKET not defined on Unix
+// 
+typedef	int				SOCKET;
+
 #define ANTLR3_API
 #define	ANTLR3_CDECL
 #define ANTLR3_FASTCALL
+
+#ifdef	__hpux
+typedef void *	pANTLR3_SOCKADDR;
+typedef int		ANTLR3_SALENT;
+#else
+# ifdef	_AIX
+typedef	socklen_t	ANTLR3_SALENT;
+# else
+typedef	size_t	ANTLR3_SALENT;
+# endif
+typedef struct sockaddr_in * pANTLR3_SOCKADDR;
+#endif
+
+#define INVALID_SOCKET ((SOCKET)-1)
 
 #ifdef __cplusplus
 extern "C" {

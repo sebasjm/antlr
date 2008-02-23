@@ -55,7 +55,7 @@ include_HEADERS =	include/antlr3.h						\
 					include/antlr3memory.h					\
 					include/antlr3parser.h					\
 					include/antlr3parsetree.h				\
-					include/antlr3recongnizersharedstate.h	\
+					include/antlr3recognizersharedstate.h	\
 					include/antlr3rewritestreams.h			\
 					include/antlr3string.h					\
 					include/antlr3stringstream.h			\

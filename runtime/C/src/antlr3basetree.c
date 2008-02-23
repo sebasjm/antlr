@@ -451,3 +451,4 @@ freshenPACIndexes	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 offset)
 		child->setParent(child, tree);
 	}
 }
+

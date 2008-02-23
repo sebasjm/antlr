@@ -1779,3 +1779,4 @@ reset(pANTLR3_BASE_RECOGNIZER recognizer)
 
 /// @}
 ///
+

@@ -133,7 +133,7 @@ AC_PROG_MAKE_SET
 
 # Checks for header files.
 AC_INCLUDES_DEFAULT()
-AC_CHECK_HEADERS([malloc.h sys/malloc.h stdarg.h sys/stat.h ctype.h])
+AC_CHECK_HEADERS([malloc.h sys/malloc.h stdarg.h sys/stat.h ctype.h sys/socket.h socket.h netinet/tcp.h netinet/in.h resolv.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -152,7 +152,7 @@ AC_C_INLINE
 
 
 # Checks for library functions.
-AC_CHECK_FUNCS([memmove memset strdup])
+AC_CHECK_FUNCS([memmove memset strdup accept])
 
 AC_CONFIG_HEADERS(antlr3config.h)
 AC_CONFIG_FILES([Makefile])
