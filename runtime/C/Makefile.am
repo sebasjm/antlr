@@ -11,7 +11,9 @@ LIBSOURCES		=	src/antlr3baserecognizer.c			\
 					src/antlr3commontree.c				\
 					src/antlr3commontreeadaptor.c		\
 					src/antlr3commontreenodestream.c	\
+					src/antlr3convertutf.c				\
 					src/antlr3cyclicdfa.c				\
+					src/antlr3debughandlers.c			\
 					src/antlr3encodings.c				\
 					src/antlr3exception.c				\
 					src/antlr3filestream.c				\
@@ -19,11 +21,11 @@ LIBSOURCES		=	src/antlr3baserecognizer.c			\
 					src/antlr3intstream.c				\
 					src/antlr3lexer.c					\
 					src/antlr3parser.c					\
+					src/antlr3rewritestreams.c			\
 					src/antlr3string.c					\
 					src/antlr3stringstream.c			\
 					src/antlr3tokenstream.c				\
 					src/antlr3treeparser.c				\
-					src/antlr3rewritestreams.c			\
 					src/antlr3ucs2inputstream.c
 
 libantlr3c_la_SOURCES = $(LIBSOURCES)
@@ -38,7 +40,9 @@ include_HEADERS =	include/antlr3.h						\
 					include/antlr3commontree.h				\
 					include/antlr3commontreeadaptor.h		\
 					include/antlr3commontreenodestream.h	\
+					include/antlr3convertutf.h				\
 					include/antlr3cyclicdfa.h				\
+					include/antlr3debugeventlistener.h		\
 					include/antlr3defs.h					\
 					include/antlr3encodings.h				\
 					include/antlr3errors.h					\
@@ -51,20 +55,24 @@ include_HEADERS =	include/antlr3.h						\
 					include/antlr3memory.h					\
 					include/antlr3parser.h					\
 					include/antlr3parsetree.h				\
+					include/antlr3recongnizersharedstate.h	\
+					include/antlr3rewritestreams.h			\
 					include/antlr3string.h					\
 					include/antlr3stringstream.h			\
 					include/antlr3tokenstream.h				\
 					include/antlr3treeparser.h				\
-					include/antlr3rewritestreams.h			\
 					antlr3config.h
 
 libantlr3c_la_LDFLAGS = -avoid-version
 
 INCLUDES = -Iinclude -Iinclude
 
-
-EXTRA_DIST = 	vs2005/rulefiles/antlr3.rules	\
-			 	C.sln C.vcproj C.vcproj.vspscc	\
+EXTRA_DIST = 	\
+				vsrulefiles/antlr3lexerandparser.rules		\
+				vsrulefiles/antlr3lexer.rules				\
+				vsrulefiles/antlr3parser.rules				\
+				vsrulefiles/antlr3treeparser.rules			\
+			 	C.sln C.vcproj C.vcproj.vspscc				\
 				C.vssscc
 
 export OBJECT_MODE
