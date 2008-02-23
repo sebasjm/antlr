@@ -619,7 +619,7 @@ typedef struct <name>_Ctx_struct <name>, * p<name>;
 
 /** Context tracking structure for <mainName()>
  */
-typedef struct <name>_Ctx_struct
+struct <name>_Ctx_struct
 {
     /** Built in ANTLR3 context tracker contains all the generic elements
      *  required for context tracking.
@@ -665,8 +665,7 @@ typedef struct <name>_Ctx_struct
     <@members>
     <@end>
     <actions.(actionScope).context>
-}
-    <name>, * p<name>;
+};
 
 // Function protoypes for the constructor functions that external translation units
 // such as delegators and delegates may wish to call.
