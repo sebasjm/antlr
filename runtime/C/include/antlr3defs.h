@@ -56,7 +56,7 @@
 
 #else
 
-#ifdef	_wIN32
+#ifdef	_WIN32
 # ifndef	ANTLR3_WINDOWS
 #  define	ANTLR3_WINDOWS
 # endif
@@ -131,8 +131,9 @@ typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 #endif
 
 
-typedef	int	ANTLR3_SALENT;							// type used for size of accept structure
-typedef struct sockaddr *	pANTLR3_SOCKADDR;		// Type used for cast on accept()
+typedef	int				ANTLR3_SALENT;								// Type used for size of accept structure
+typedef struct sockaddr_in	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
+typedef struct sockaddr		ANTLR3_SOCKADDRC, * pANTLR3_SOCKADDRC;	// Type used for cast on accept()
 
 #ifdef __cplusplus
 }
@@ -252,15 +253,26 @@ typedef	int				SOCKET;
 #define ANTLR3_FASTCALL
 
 #ifdef	__hpux
-typedef void *	pANTLR3_SOCKADDR;
-typedef int		ANTLR3_SALENT;
+
+ typedef struct sockaddr	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
+ typedef void *				pANTLR3_SOCKADDRC;						// Type used for cast on accept()
+ typedef int				ANTLR3_SALENT;
+
 #else
+
 # ifdef	_AIX
-typedef	socklen_t	ANTLR3_SALENT;
+
+   typedef	socklen_t	ANTLR3_SALENT;
+
 # else
-typedef	size_t	ANTLR3_SALENT;
+
+   typedef	size_t		ANTLR3_SALENT;
+
 # endif
-typedef struct sockaddr_in * pANTLR3_SOCKADDR;
+
+   typedef struct sockaddr	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
+   typedef struct sockaddr	* pANTLR3_SOCKADDRC;					// Type used for cast on accept()
+
 #endif
 
 #define INVALID_SOCKET ((SOCKET)-1)

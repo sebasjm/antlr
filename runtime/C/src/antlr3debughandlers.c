@@ -160,8 +160,8 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	// Connection structures to deal with the client after we accept the connection
 	// and the server while we accept a connection.
 	//
-	struct sockaddr_in	client;
-	struct sockaddr_in	server;
+	ANTLR3_SOCKADDRT	client;
+	ANTLR3_SOCKADDRT	server;
 
 	// Buffer to construct our message in
 	//
@@ -171,8 +171,6 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	// Windows use int, everyone else uses size_t
 	//
 	ANTLR3_SALENT				sockaddr_len;
-
-
 
 	// Option holder for setsockopt()
 	//
@@ -227,7 +225,7 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 		// Maybe change this at some point, but rejecting the bind at this point will ensure
 		// that people realize they have left something running in the background.
 		//
-		if	(bind(serverSocket, (const struct sockaddr *)&server, sizeof(server)) == -1)
+		if	(bind(serverSocket, (pANTLR3_SOCKADDRC)&server, sizeof(server)) == -1)
 		{
 			return ANTLR3_FALSE;
 		}
@@ -245,7 +243,7 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 		// Now we can try to accept a connection on the port
 		//
 		sockaddr_len	= sizeof(client);
-		delboy->socket	= accept(serverSocket, (pANTLR3_SOCKADDR)&client, &sockaddr_len);
+		delboy->socket	= accept(serverSocket, (pANTLR3_SOCKADDRC)&client, &sockaddr_len);
 
 		// Having accepted a connection, we can stop listening and close down the socket
 		//
