@@ -672,7 +672,10 @@ struct <name>_Ctx_struct
 //
 ANTLR3_API p<name> <name>New         (<inputType()> instream<recognizer.grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>);
 ANTLR3_API p<name> <name>NewSSD      (<inputType()> instream, pANTLR3_RECOGNIZER_SHARED_STATE state<recognizer.grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>);
-pANTLR3_UINT8   <name>TokenNames[];
+<if(!recognizer.grammar.grammarIsRoot)>
+extern pANTLR3_UINT8   <recognizer.grammar.composite.rootGrammar.recognizerName>TokenNames[];
+<endif>
+
 
 /** Symbolic definitions of all the tokens that the <grammarType()> will work with.
  * \{
@@ -1082,10 +1085,12 @@ genericParser(  grammar,
 				rewriteElementType
               ) ::= <<
 
+
+<if(grammar.grammarIsRoot)>
 /** \brief Table of all token names in symbolic order, mainly used for
  *         error reporting.
  */
-pANTLR3_UINT8   <name>TokenNames[]
+pANTLR3_UINT8   <name>TokenNames[<length(tokenNames)>+4]
      = {
         (pANTLR3_UINT8) "\<invalid>",       /* String to print to indicate an invalid token */
         (pANTLR3_UINT8) "\<EOR>",
@@ -1093,6 +1098,7 @@ pANTLR3_UINT8   <name>TokenNames[]
         (pANTLR3_UINT8) "\<UP>", 
         <tokenNames:{(pANTLR3_UINT8) <it>}; separator=",\n">
        };
+<endif>
 
     <@members>
 
