@@ -1854,7 +1854,7 @@ earlyExitEx() ::= <<
  */
 CONSTRUCTEX();
 EXCEPTION->type = ANTLR3_EARLY_EXIT_EXCEPTION;
-EXCEPTION->name = ANTLR3_EARLY_EXIT_NAME;
+EXCEPTION->name = (void *)ANTLR3_EARLY_EXIT_NAME;
 <\n>
 >>
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -2004,7 +2004,7 @@ else
 mismatchedSetEx() ::= <<
 CONSTRUCTEX();
 EXCEPTION->type         = ANTLR3_MISMATCHED_SET_EXCEPTION;
-EXCEPTION->name         = ANTLR3_MISMATCHED_SET_NAME;
+EXCEPTION->name         = (void *)ANTLR3_MISMATCHED_SET_NAME;
 <if(PARSER)>
 EXCEPTION->expectingSet = &FOLLOW_set_in_<ruleName><elementIndex>;
 <endif>
@@ -2170,8 +2170,8 @@ if ( !(<evalPredicate(...)>) )
 newFPE() ::= <<
     CONSTRUCTEX();
     EXCEPTION->type         = ANTLR3_FAILED_PREDICATE_EXCEPTION;
-    EXCEPTION->message      = "<description>";
-    EXCEPTION->ruleName	 = "<ruleName>";
+    EXCEPTION->message      = (void *)"<description>";
+    EXCEPTION->ruleName	 = (void *)"<ruleName>";
     <\n>
 >>
 
@@ -2200,7 +2200,7 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 newNVException() ::= <<
 CONSTRUCTEX();
 EXCEPTION->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-EXCEPTION->message      = "<description>";
+EXCEPTION->message      = (void *)"<description>";
 EXCEPTION->decisionNum  = <decisionNumber>;
 EXCEPTION->state        = <stateNumber>;
 <@noViableAltException()>
@@ -2400,7 +2400,7 @@ static ANTLR3_INT32 dfa<dfa.decisionNumber>_sst(p<name> ctx, pANTLR3_BASE_RECOGN
     
     CONSTRUCTEX();
     EXCEPTION->type         = ANTLR3_NO_VIABLE_ALT_EXCEPTION;
-    EXCEPTION->message      = "<dfa.description>";
+    EXCEPTION->message      = (void *)"<dfa.description>";
     EXCEPTION->decisionNum  = <dfa.decisionNumber>;
     EXCEPTION->state        = _s;
     <@noViableAltException()>

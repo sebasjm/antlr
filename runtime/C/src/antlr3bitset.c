@@ -92,8 +92,8 @@ ANTLR3_API void
 antlr3BitsetSetAPI(pANTLR3_BITSET bitset)
 {
     bitset->clone	=    antlr3BitsetClone;
-    bitset->or		=    antlr3BitsetOR;
-    bitset->orInPlace	=    antlr3BitsetORInPlace;
+    bitset->bor		=    antlr3BitsetOR;
+    bitset->borInPlace	=    antlr3BitsetORInPlace;
     bitset->size	=    antlr3BitsetSize;
     bitset->add		=    antlr3BitsetAdd;
     bitset->grow	=    grow;

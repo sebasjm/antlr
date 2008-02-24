@@ -707,7 +707,7 @@ combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact)
 
 		if  (localFollowSet != NULL)
 		{
-			followSet->orInPlace(followSet, localFollowSet);
+			followSet->borInPlace(followSet, localFollowSet);
 		}
 
 		if	(      exact == ANTLR3_TRUE
@@ -1303,7 +1303,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 
 		/* Knowing that, we can or in the follow set
 		 */
-		newFollow   = follow->or(follow, viableToksFollowingRule);
+		newFollow   = follow->bor(follow, viableToksFollowingRule);
 		
 		/* Remove the EOR token, which we do not wish to compute with
 		 */
