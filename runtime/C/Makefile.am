@@ -1,4 +1,5 @@
 AUTOMAKE_OPTIONS = gnu
+AM_LIBTOOLFLAGS = --silent
 
 lib_LTLIBRARIES = libantlr3c.la
 
