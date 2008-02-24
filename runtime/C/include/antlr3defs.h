@@ -135,6 +135,8 @@ typedef	int				ANTLR3_SALENT;								// Type used for size of accept structure
 typedef struct sockaddr_in	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
 typedef struct sockaddr		ANTLR3_SOCKADDRC, * pANTLR3_SOCKADDRC;	// Type used for cast on accept()
 
+#define	ANTLR3_CLOSESOCKET	closesocket
+
 #ifdef __cplusplus
 }
 #endif
@@ -279,6 +281,7 @@ typedef	int				SOCKET;
 #endif
 
 #define INVALID_SOCKET ((SOCKET)-1)
+#define	ANTLR3_CLOSESOCKET	close
 
 #ifdef __cplusplus
 extern "C" {

@@ -146,7 +146,7 @@ static void
 sockClose(SOCKET sock)
 {
 	shutdown	(sock, 0x01);	// Prevent further sending now
-	closesocket	(sock);			// Close the socket
+	ANTLR3_CLOSESOCKET	(sock);			// Close the socket
 }
 
 static	ANTLR3_BOOLEAN	
@@ -248,7 +248,7 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 		// Having accepted a connection, we can stop listening and close down the socket
 		//
 		shutdown		(serverSocket, 0x02);
-		closesocket		(serverSocket);
+		ANTLR3_CLOSESOCKET		(serverSocket);
 
 		if	(delboy->socket == -1)
 		{
