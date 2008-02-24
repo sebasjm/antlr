@@ -254,7 +254,10 @@ typedef	int				SOCKET;
 
 #ifdef	__hpux
 
- typedef struct sockaddr	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
+	// HPUX is always different usually for no good reason. Tru64 should have kicked it
+	// into touch and everyone knows it ;-)
+	//
+ typedef struct sockaddr_in	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
  typedef void *				pANTLR3_SOCKADDRC;						// Type used for cast on accept()
  typedef int				ANTLR3_SALENT;
 
@@ -270,8 +273,8 @@ typedef	int				SOCKET;
 
 # endif
 
-   typedef struct sockaddr	ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
-   typedef struct sockaddr	* pANTLR3_SOCKADDRC;					// Type used for cast on accept()
+   typedef struct sockaddr_in	  ANTLR3_SOCKADDRT, * pANTLR3_SOCKADDRT;	// Type used for socket address declaration
+   typedef struct sockaddr		* pANTLR3_SOCKADDRC;					// Type used for cast on accept()
 
 #endif
 
