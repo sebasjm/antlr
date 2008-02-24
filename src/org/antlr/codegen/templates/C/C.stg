@@ -1237,9 +1237,11 @@ ANTLR3_API p<name>
     <actions.parser.apifuncs>
     <actions.treeparser.apifuncs>
 <if(memoize)>
+<if(grammar.grammarIsRoot)>
     /* Create a LIST for recording rule memos.
      */
      RULEMEMO    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
+<endif>
 <endif>	
     /* Install the token table
      */
@@ -1274,6 +1276,17 @@ ANTLR3_API p<name>
          {g| ctx-><g:delegateName()>->pParser->rec->state = NULL;
          ctx-><g:delegateName()>->free(ctx-><g:delegateName()>);}; separator="\n">
 <endif>
+<if(memoize)>
+<if(grammar.grammarIsRoot)>
+	if	(RULEMEMO != NULL)
+	{
+		RULEMEMO->free(RULEMEMO);
+		RULEMEMO = NULL;
+	}
+<endif>
+<endif>
+	// Free this parser
+	//
 <if(TREE_PARSER)>
     ctx->pTreeParser->free(ctx->pTreeParser);<\n>
 <else>

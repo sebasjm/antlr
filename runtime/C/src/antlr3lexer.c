@@ -601,19 +601,26 @@ emit	    (pANTLR3_LEXER lexer)
 static void 
 freeLexer    (pANTLR3_LEXER lexer)
 {
-	if	(lexer->rec->state->streams != NULL)
+	// This may have ben a delegate or delegator lexer, in which case the
+	// state may already have been freed (and set to NULL therefore)
+	// so we ignore the state if we don't have it.
+	//
+	if	(lexer->rec->state != NULL)
 	{
-		lexer->rec->state->streams->free(lexer->rec->state->streams);
-	}
-	if	(lexer->rec->state->tokFactory != NULL)
-	{
-		lexer->rec->state->tokFactory->close(lexer->rec->state->tokFactory);
-		lexer->rec->state->tokFactory = NULL;
-	}
-	if	(lexer->rec->state->tokSource != NULL)
-	{
-		ANTLR3_FREE(lexer->rec->state->tokSource);
-		lexer->rec->state->tokSource = NULL;
+		if	(lexer->rec->state->streams != NULL)
+		{
+			lexer->rec->state->streams->free(lexer->rec->state->streams);
+		}
+		if	(lexer->rec->state->tokFactory != NULL)
+		{
+			lexer->rec->state->tokFactory->close(lexer->rec->state->tokFactory);
+			lexer->rec->state->tokFactory = NULL;
+		}
+		if	(lexer->rec->state->tokSource != NULL)
+		{
+			ANTLR3_FREE(lexer->rec->state->tokSource);
+			lexer->rec->state->tokSource = NULL;
+		}
 	}
 	if	(lexer->rec != NULL)
 	{

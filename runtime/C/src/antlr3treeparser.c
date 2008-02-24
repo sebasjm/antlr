@@ -77,7 +77,7 @@ antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREA
 ANTLR3_API	void
 antlr3MTNExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 {
-    /* Create a basic recognition exception strucuture
+    /* Create a basic recognition exception structure
      */
     antlr3RecognitionExceptionNew(recognizer);
 
@@ -93,13 +93,20 @@ antlr3MTNExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 static void
 freeParser	(pANTLR3_TREE_PARSER parser)
 {
-    if	(parser->rec != NULL)
-    {
-	    if	(parser->rec->state->following != NULL)
-	    {
-		parser->rec->state->following->free(parser->rec->state->following);
-		parser->rec->state->following = NULL;
-	    }
+	if	(parser->rec != NULL)
+	{
+		// This may have ben a delegate or delegator parser, in which case the
+		// state may already have been freed (and set to NULL therefore)
+		// so we ignore the state if we don't have it.
+		//
+		if	(parser->rec->state != NULL)
+		{
+			if	(parser->rec->state->following != NULL)
+			{
+				parser->rec->state->following->free(parser->rec->state->following);
+				parser->rec->state->following = NULL;
+			}
+		}
 	    parser->rec->free(parser->rec);
 	    parser->rec	= NULL;
     }

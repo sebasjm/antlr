@@ -93,11 +93,18 @@ freeParser			    (pANTLR3_PARSER parser)
 {
     if	(parser->rec != NULL)
     {
-	    if	(parser->rec->state->following != NULL)
-	    {
-			parser->rec->state->following->free(parser->rec->state->following);
-			parser->rec->state->following = NULL;
-	    }
+		// This may have ben a delegate or delegator parser, in which case the
+		// state may already have been freed (and set to NULL therefore)
+		// so we ignore the state if we don't have it.
+		//
+		if	(parser->rec->state != NULL)
+		{
+			if	(parser->rec->state->following != NULL)
+			{
+				parser->rec->state->following->free(parser->rec->state->following);
+				parser->rec->state->following = NULL;
+			}
+		}
 	    parser->rec->free(parser->rec);
 	    parser->rec	= NULL;
 
