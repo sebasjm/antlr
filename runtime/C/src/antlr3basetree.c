@@ -30,23 +30,22 @@ ANTLR3_API pANTLR3_BASE_TREE
 antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
 {
     /* api */
-    tree->getChild			=  getChild;
-    tree->getChildCount	    =  getChildCount;
-    tree->addChild			=  (void (*)(pANTLR3_BASE_TREE, void *))(addChild);
-    tree->addChildren	    =  addChildren;
-    tree->setChild			=  setChild;
-    tree->deleteChild	    =  deleteChild;
-    tree->dupTree			=  dupTree;
-    tree->toStringTree	    =  toStringTree;
-    tree->createChildrenList
-							=  createChildrenList;
-    tree->getCharPositionInLine
-							=  getCharPositionInLine;
-    tree->getLine			=  getLine;
-	tree->replaceChildren	=  replaceChildren;
-    tree->getFirstChildWithType
-							=  (void *(*)(pANTLR3_BASE_TREE, ANTLR3_UINT32))(getFirstChildWithType);
-    tree->children			= NULL;
+    tree->getChild				= getChild;
+    tree->getChildCount			= getChildCount;
+    tree->addChild				= (void (*)(pANTLR3_BASE_TREE, void *))(addChild);
+    tree->addChildren			= addChildren;
+    tree->setChild				= setChild;
+    tree->deleteChild			= deleteChild;
+    tree->dupTree				= dupTree;
+    tree->toStringTree			= toStringTree;
+    tree->createChildrenList	= createChildrenList;
+    tree->getCharPositionInLine	= getCharPositionInLine;
+    tree->getLine				= getLine;
+	tree->replaceChildren		= replaceChildren;
+	tree->freshenPACIndexesAll	= freshenPACIndexesAll;
+	tree->freshenPACIndexes		= freshenPACIndexes;
+    tree->getFirstChildWithType	= (void *(*)(pANTLR3_BASE_TREE, ANTLR3_UINT32))(getFirstChildWithType);
+    tree->children				= NULL;
 
     /* Rest must be filled in by caller.
      */

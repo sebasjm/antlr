@@ -106,7 +106,7 @@ _last = (<ASTLabelType>)LT(1);
 <if(!rewriteMode)>
 <if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
 <label>_tree = (<ASTLabelType>)ADAPTOR->dupNode(ADAPTOR, <label>);
-ADPATOR->addChild(ADAPTOR, root_<treeLevel>, <label>_tree);
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <endif>
 >>
@@ -224,7 +224,6 @@ if ( BACKTRACKING==0 ) {<\n>
 	retval.stop = LT(-1);<\n>
 <endif>
 	retval.tree = ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
-	ADAPTOR->setTokenBoundaries(ADAPTOR, retval.tree, retval.start, retval.stop);
 <if(backtracking)>
 }
 <endif>

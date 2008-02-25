@@ -186,6 +186,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	stream->tnstream->istream->mark			=  mark;
 	stream->tnstream->istream->release	    =  release;
 	stream->tnstream->istream->rewind	    =  rewindMark;
+	stream->tnstream->istream->rewindLast   =  rewindLast;
 	stream->tnstream->istream->seek			=  seek;
 	stream->tnstream->istream->size			=  size;
 
@@ -368,8 +369,9 @@ getNodeIndex(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 static	void		
 reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
-	ctns->p					= -1;
-	ctns->lastMarker		= 0;
+	ctns->p									= -1;
+	ctns->tnstream->istream->lastMarker		= 0;
+
 	if	(ctns->nodeStack != NULL)
 	{
 		ctns->nodeStack->free(ctns->nodeStack);
@@ -499,9 +501,9 @@ mark	(pANTLR3_INT_STREAM is)
 
 	// Return the current mark point
 	//
-	ctns->lastMarker = ctns->tnstream->istream->index(ctns->tnstream->istream);
+	ctns->tnstream->istream->lastMarker = ctns->tnstream->istream->index(ctns->tnstream->istream);
 
-	return ctns->lastMarker;
+	return ctns->tnstream->istream->lastMarker;
 }
 
 static	void		    

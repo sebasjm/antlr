@@ -86,7 +86,7 @@ ruleLabelInitializations() ::= <<
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>   = antlr3RewriteRuleTokenStreamNewAE(ADAPTOR,(pANTLR3_UINT8)"token <it>"); }; separator="\n">
+    :{stream_<it>   = antlr3RewriteRule<rewriteElementType>StreamNewAE(ADAPTOR,(pANTLR3_UINT8)"token <it>"); }; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
     :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR,(pANTLR3_UINT8)"rule <it>");}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
@@ -140,7 +140,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
-<if(backtracking)>if ( BACTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
 >>
 
 
@@ -289,11 +289,11 @@ rewriteCodeLabelsDecl() ::= <<
 
 rewriteCodeLabelsInit() ::= <<
 <referencedTokenLabels
-    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAEE(ADAPTOR, (pANTLR3_UINT8)"token <it>", <it>);};
+    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEE(ADAPTOR, (pANTLR3_UINT8)"token <it>", <it>);};
     separator="\n"
 >
 <referencedTokenListLabels
-    :{stream_<it>=antlr3RewriteRuleTokenStreamNewAEV(ADAPTOR, (pANTLR3_UINT8)"token <it>", list_<it>); };
+    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEV(ADAPTOR, (pANTLR3_UINT8)"token <it>", list_<it>); };
     separator="\n"
 >
 <referencedRuleLabels 
@@ -511,7 +511,7 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <hetero>New(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
 <if(args)>
-(<ASTLabelType>)ADAPTOR->createTypeTokenText(ADAPTOR, <tokenType>, TOKTEXT(<args; separator=", ">))
+(<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, (pANTLR3_UINT8)<args; separator=", ">)
 <else>
 (<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, (pANTLR3_UINT8)"<tokenType>")
 <endif>
@@ -523,7 +523,7 @@ createRewriteNodeFromElement(token,hetero,args) ::= <<
 <hetero>New(stream_<token>->nextToken(stream_<token>)<if(args)>, <args; separator=", "><endif>)
 <else>
 <if(args)> <! must create new node from old !>
-ADAPTOR->createTypeTokenText(ADAPTOR, <token>, TOKTEXT(<args; separator=", ">))
+ADAPTOR->createTypeToken(ADAPTOR, <token>->getType(<token>, TOKTEXT(<token>, <args; separator=", ">))
 <else>
 stream_<token>->nextNode(stream_<token>)
 <endif>

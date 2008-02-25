@@ -227,22 +227,23 @@ outputFile( LEXER,
 #define	    FAILEDFLAG				LEXSTATE->failed
 #define	    INPUT					LEXER->input
 #define	    STRSTREAM				INPUT
-#define		INDEX()					INPUT->istream->index(INPUT->istream)
-#define		SEEK(n)					INPUT->istream->seek(INPUT->istream, n)
+#define		ISTREAM					INPUT->istream
+#define		INDEX()					ISTREAM->index(ISTREAM)
+#define		SEEK(n)					ISTREAM->seek(ISTREAM, n)
 #define	    EOF_TOKEN				&(LEXSTATE->tokSource->eofToken)
 #define	    HASEXCEPTION()			(LEXSTATE->error == ANTLR3_TRUE)
 #define	    EXCEPTION				LEXSTATE->exception
 #define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
 #define	    LRECOVER()				LEXER->recover(LEXER)
-#define	    MARK()					INPUT->istream->mark(INPUT->istream)
-#define	    REWIND(m)				INPUT->istream->rewind(INPUT->istream, m)
-#define	    REWINDLAST()			INPUT->istream->rewindLast(INPUT->istream)
+#define	    MARK()					ISTREAM->mark(ISTREAM)
+#define	    REWIND(m)				ISTREAM->rewind(ISTREAM, m)
+#define	    REWINDLAST()			ISTREAM->rewindLast(ISTREAM)
 #define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define		PUSHSTREAM(str)			LEXER->pushCharStream(LEXER, str)
 #define		POPSTREAM()				LEXER->popCharStream(LEXER)
 #define		SETTEXT(str)			LEXSTATE->text = str
-#define		SKIP()					LEXSTATE->token = &(TOKSOURCE->skipToken
+#define		SKIP()					LEXSTATE->token = &(TOKSOURCE->skipToken)
 #define		USER1					LEXSTATE->user1
 #define		USER2					LEXSTATE->user2
 #define		USER3					LEXSTATE->user3
@@ -341,7 +342,8 @@ outputFile( LEXER,
 #define		MEMOIZE(ri,si)					RECOGNIZER->memoize(RECOGNIZER, ri, si)
 #define	    INPUT							PARSER->tstream
 #define	    STRSTREAM						INPUT
-#define		INDEX()							INPUT->istream->index(INPUT->istream)
+#define		ISTREAM							INPUT->istream
+#define		INDEX()							ISTREAM->index(INPUT->istream)
 #define	    HASEXCEPTION()					(PSRSTATE->error == ANTLR3_TRUE)
 #define	    EXCEPTION						PSRSTATE->exception
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
@@ -351,14 +353,14 @@ outputFile( LEXER,
 #define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
-#define	    LA(n)							INPUT->istream->_LA(INPUT->istream, n)
+#define	    LA(n)							INPUT->istream->_LA(ISTREAM, n)
 #define	    LT(n)							INPUT->_LT(INPUT, n)
 #define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
-#define	    CONSUME()						INPUT->istream->consume(INPUT->istream)
-#define	    MARK()							INPUT->istream->mark(INPUT->istream)
-#define	    REWIND(m)						INPUT->istream->rewind(INPUT->istream, m)
-#define	    REWINDLAST()					INPUT->istream->rewindLast(INPUT->istream)
-#define		SEEK(n)							INPUT->istream->seek(INPUT->istream, n)
+#define	    CONSUME()						ISTREAM->consume(ISTREAM)
+#define	    MARK()							ISTREAM->mark(ISTREAM)
+#define	    REWIND(m)						ISTREAM->rewind(ISTREAM, m)
+#define	    REWINDLAST()					ISTREAM->rewindLast(ISTREAM)
+#define		SEEK(n)							ISTREAM->seek(ISTREAM, n)
 #define	    PERRORRECOVERY					PSRSTATE->errorRecovery
 #define	    FAILEDFLAG						PSRSTATE->failed
 #define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
@@ -401,13 +403,16 @@ outputFile( LEXER,
 #undef	    RECOVERFROMMISMATCHEDELEMENT
 #undef	    BACKTRACKING
 #undef      ADAPTOR
-#undef	    RULEMEMO		    
+#undef	    RULEMEMO		
+#undef		SEEK    
+#undef		INDEX
 
 #define	    PARSER							ctx->pTreeParser  
 #define	    RECOGNIZER						PARSER->rec
 #define		PSRSTATE						RECOGNIZER->state
 #define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
 #define	    INPUT							PARSER->ctnstream
+#define		ISTREAM							INPUT->tnstream->istream
 #define	    STRSTREAM						INPUT->tnstream
 #define	    HASEXCEPTION()					(PSRSTATE->error == ANTLR3_TRUE)
 #define	    EXCEPTION						PSRSTATE->exception
@@ -418,13 +423,13 @@ outputFile( LEXER,
 #define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
-#define	    LA(n)							INPUT->tnstream->istream->_LA(INPUT->tnstream->istream, n)
+#define	    LA(n)							ISTREAM->_LA(ISTREAM, n)
 #define	    LT(n)							INPUT->tnstream->_LT(INPUT->tnstream, n)
 #define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
-#define	    CONSUME()						INPUT->tnstream->istream->consume(INPUT->tnstream->istream)
-#define	    MARK()							INPUT->tnstream->istream->mark(INPUT->tnstream->istream)
-#define	    REWIND(m)						INPUT->tnstream->istream->rewind(INPUT->tnstream->istream, m)
-#define	    REWINDLAST(m)					INPUT->tnstream->istream->rewindLast(INPUT->tnstream->istream)
+#define	    CONSUME()						ISTREAM->consume(ISTREAM)
+#define	    MARK()							ISTREAM->mark(ISTREAM)
+#define	    REWIND(m)						ISTREAM->rewind(ISTREAM, m)
+#define	    REWINDLAST()					ISTREAM->rewindLast(ISTREAM)
 #define	    PERRORRECOVERY					PSRSTATE->errorRecovery
 #define	    FAILEDFLAG						PSRSTATE->failed
 #define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
@@ -433,6 +438,10 @@ outputFile( LEXER,
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 #define     ADAPTOR                         INPUT->adaptor
 #define		RULEMEMO						PSRSTATE->ruleMemo
+#define		SEEK(n)							ISTREAM->seek(ISTREAM, n)
+#define		INDEX()					ISTREAM->index(ISTREAM)
+
+
 <endif>
 
 #define		TOKTEXT(tok, txt)				tok, (pANTLR3_UINT8)txt
@@ -2330,7 +2339,7 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, INPUT->istream, &cdfa<decisionNumber>);
+alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, ISTREAM, &cdfa<decisionNumber>);
 if  (HASEXCEPTION())
 {
     goto rule<ruleDescriptor.name>Ex;
@@ -2883,6 +2892,7 @@ typedef struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStr
     pANTLR3_COMMON_TOKEN    stop;
 <else>
     pANTLR3_BASE_TREE       start;
+    pANTLR3_BASE_TREE       stop;
 <endif>
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">

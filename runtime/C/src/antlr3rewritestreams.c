@@ -126,7 +126,7 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 // Token rewrite stream ...
 //
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+antlr3RewriteRuleTOKENStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
 {
 	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
@@ -150,7 +150,7 @@ antlr3RewriteRuleTokenStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UIN
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTokenStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+antlr3RewriteRuleTOKENStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
 {
 	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
@@ -169,7 +169,7 @@ antlr3RewriteRuleTokenStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UI
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTokenStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+antlr3RewriteRuleTOKENStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
 	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
@@ -257,7 +257,7 @@ antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 // Node rewrite stream ...
 //
 ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
-antlr3RewriteRuleNodeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+antlr3RewriteRuleNODEStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
 {
 	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
@@ -280,7 +280,7 @@ antlr3RewriteRuleNodeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
-antlr3RewriteRuleNodeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+antlr3RewriteRuleNODEStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
 {
 	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
@@ -298,7 +298,7 @@ antlr3RewriteRuleNodeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UIN
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
-antlr3RewriteRuleNodeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+antlr3RewriteRuleNODEStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
 	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
