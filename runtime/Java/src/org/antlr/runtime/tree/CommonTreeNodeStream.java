@@ -139,7 +139,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		p = 0; // buffer of nodes intialized now
 	}
 
-	protected void fillBuffer(Object t) {
+	public void fillBuffer(Object t) {
 		boolean nil = adaptor.isNil(t);
 		if ( !nil ) {
 			nodes.add(t); // add this node

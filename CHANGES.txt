@@ -8,6 +8,11 @@ University of San Francisco
 
 CHANGES
 
+February 26, 2008
+
+* made fillBuffer public in CommonTreeNodeStream so we can add trees
+  to stream for interactive interpreters.
+
 February 14, 2008
 
 * Fixed a bug in the code generation where tree level 0 was used
