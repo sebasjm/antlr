@@ -31,7 +31,8 @@ static	void				freeRS			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static void
 freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-	if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
+	if (//stream->freeElements == ANTLR3_TRUE && 
+		stream->elements != NULL)
 	{
 		stream->elements->free(stream->elements);
 	}
