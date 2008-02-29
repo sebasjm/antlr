@@ -492,7 +492,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextTree(stream_<la
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, (pANTLR3_BASE_TREE)(stream_<label>->nextTree(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextTree(stream_<label>));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
