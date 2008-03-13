@@ -11,7 +11,7 @@
 static	void				reset			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream); 
 static	void				add				(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDECL *freePtr)(void *));
 static	void *				next			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static	void *				nextTree		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	pANTLR3_BASE_TREE	nextTree		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	void *				nextToken		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	void *				_next			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	void *				dupTok			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el);
@@ -368,7 +368,7 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDE
 /// Return a duplicate node/subtree if stream is out of elements and
 /// size==1.  If we've already used the element, dup (dirty bit set).
 ///
-static void *
+static pANTLR3_BASE_TREE
 nextTree(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream) 
 {
 	ANTLR3_UINT32		n;
