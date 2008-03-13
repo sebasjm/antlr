@@ -75,6 +75,7 @@
 #define	_CRT_SECURE_NO_DEPRECATE 
 
 #include    <windows.h>
+#include	<winsock.h>
 #include    <stdio.h>
 #include    <sys/types.h>
 #include    <sys/stat.h>
