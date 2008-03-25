@@ -657,12 +657,24 @@ public class Grammar {
 	 */
 	public String getRecognizerName() {
 		String suffix = "";
+		List<Grammar> grammarsFromRootToMe = composite.getDelegators(this);
+		//System.out.println("grammarsFromRootToMe="+grammarsFromRootToMe);
+		String qualifiedName = name;
+		if ( grammarsFromRootToMe!=null ) {
+			StringBuffer buf = new StringBuffer();
+			for (Grammar g : grammarsFromRootToMe) {
+				buf.append(g.name);
+				buf.append('_');
+			}
+			buf.append(name);
+			qualifiedName = buf.toString();
+		}
 		if ( type==Grammar.COMBINED ||
 			 (type==Grammar.LEXER && implicitLexer) )
 		{
 			suffix = Grammar.grammarTypeToFileNameSuffix[type];
 		}
-		return name+suffix;
+		return qualifiedName+suffix;
 	}
 
 	public File getImportedVocabFileName(String vocabName) {

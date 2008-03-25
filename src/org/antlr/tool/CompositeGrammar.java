@@ -205,6 +205,9 @@ public class CompositeGrammar {
 		return grammars;
 	}
 
+	/** Return list of delegate grammars from root down to g.
+	 *  Order is root, ..., g.parent.  (g not included).
+	 */
 	public List<Grammar> getDelegators(Grammar g) {
 		if ( g==delegateGrammarTreeRoot.grammar ) {
 			return null;
@@ -214,7 +217,7 @@ public class CompositeGrammar {
 		// walk backwards to root, collecting grammars
 		CompositeGrammarTree p = t.parent;
 		while ( p!=null ) {
-			grammars.add(p.grammar);
+			grammars.add(0, p.grammar); // add to head so in order later
 			p = p.parent;
 		}
 		return grammars;

@@ -73,7 +73,7 @@ import java.util.HashMap;
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
-public class <name> extends Lexer {
+public class <grammar.recognizerName> extends Lexer {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
@@ -85,11 +85,11 @@ public class <name> extends Lexer {
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
 
-    public <name>() {;} <! needed by subclasses !>
-    public <name>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+    public <grammar.recognizerName>() {;} <! needed by subclasses !>
+    public <grammar.recognizerName>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         this(input, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>);
     }
-    public <name>(CharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+    public <grammar.recognizerName>(CharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         super(input,state);
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
@@ -178,7 +178,7 @@ filteringActionGate() ::= "state.backtracking==1"
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members, rewriteElementType) ::= <<
-public class <name> extends <@superClassName><superClass><@end> {
+public class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 <if(grammar.grammarIsRoot)>
     public static final String[] tokenNames = new String[] {
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
@@ -196,10 +196,10 @@ public class <name> extends <@superClassName><superClass><@end> {
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
     <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
-    public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+    public <grammar.recognizerName>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         this(input, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>);
     }
-    public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
+    public <grammar.recognizerName>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
         super(input, state);
         <parserCtorBody()>
         <grammar.directDelegates:
