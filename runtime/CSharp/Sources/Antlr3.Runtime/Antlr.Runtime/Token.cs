@@ -112,6 +112,12 @@ namespace Antlr.Runtime
 			set;
 		}
 
+		public abstract ICharStream InputStream
+		{
+			get;
+			set;
+		}
+
 		/// <summary>Set or Get the text of the token</summary>
 		/// <remarks>
 		/// When setting the text, it might be a NOP such as for the CommonToken,

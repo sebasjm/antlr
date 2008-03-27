@@ -88,6 +88,13 @@ public class ClassicToken implements Token {
 		this.index = index;
 	}
 
+	public CharStream getInputStream() {
+		return null;
+	}
+
+	public void setInputStream(CharStream input) {
+	}
+	
 	public String toString() {
 		String channelStr = "";
 		if ( channel>0 ) {

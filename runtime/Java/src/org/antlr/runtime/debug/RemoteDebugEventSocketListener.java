@@ -29,6 +29,7 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.CharStream;
 import org.antlr.runtime.tree.BaseTree;
 import org.antlr.runtime.tree.Tree;
 
@@ -108,6 +109,11 @@ public class RemoteDebugEventSocketListener implements Runnable {
 		}
 		public void setTokenIndex(int index) {
 			this.index = index;
+		}
+		public CharStream getInputStream() {
+			return null;
+		}
+		public void setInputStream(CharStream input) {
 		}
 		public String toString() {
 			String channelStr = "";

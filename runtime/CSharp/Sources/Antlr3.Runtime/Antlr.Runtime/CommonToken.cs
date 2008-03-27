@@ -118,6 +118,12 @@ namespace Antlr.Runtime
 			set { this.index = value; }
 		}
 
+		override public ICharStream InputStream
+		{
+			get { return input; }
+			set { this.input = value; }
+		}
+
 		public override string Text
 		{
 			get

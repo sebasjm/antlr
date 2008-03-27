@@ -130,6 +130,12 @@ namespace Antlr.Runtime.Debug
 				set { this.text = value; }
 			}
 
+			public ICharStream InputStream
+			{
+				get { return null; }
+				set { ; }
+			}
+
 			public override string ToString()
 			{
 				string channelStr = "";

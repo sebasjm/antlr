@@ -116,6 +116,12 @@ namespace Antlr.Runtime
 			set { text = value; }
 		}
 
+		override public ICharStream InputStream
+		{
+			get { return null; }
+			set { }
+		}
+
 		override public string ToString()
 		{
 			string channelStr = "";
