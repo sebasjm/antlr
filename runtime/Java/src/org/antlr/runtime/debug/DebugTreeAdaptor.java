@@ -205,7 +205,7 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 
 	// support
 
-	public DebugEventListener getDebugEventListener() {
+	public DebugEventListener getDebugListener() {
 		return dbg;
 	}
 
