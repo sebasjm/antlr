@@ -394,7 +394,7 @@ public class Tool {
 	/** Create NFA, DFA and generate code for grammar.
 	 *  Create NFA for any delegates first.  Once all NFA are created,
 	 *  it's ok to create DFA, which must check for left-recursion.  That check
-	 *  is done by walking the full NFA, which therefore muts be complete.
+	 *  is done by walking the full NFA, which therefore must be complete.
 	 *  After all NFA, comes DFA conversion for root grammar then code gen for
 	 *  root grammar.  DFA and code gen for delegates comes next.
 	 */
@@ -419,11 +419,10 @@ public class Tool {
 				generateDFAs(grammar);
 			}
 
-			List<Grammar> delegates = grammar.getDelegates();
+			List<Grammar> delegates = grammar.getDirectDelegates();
 			for (int i = 0; delegates!=null && i < delegates.size(); i++) {
 				Grammar delegate = (Grammar)delegates.get(i);
 				if ( delegate!=grammar ) { // already processing this one
-					//delegate.constructNFA();
 					generateRecognizer(delegate);
 				}
 			}

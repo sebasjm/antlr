@@ -225,7 +225,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testCompositeImportsComposite() throws Exception {
+	public void testCombinedImportsCombined() throws Exception {
 		String slave =
 			"grammar S;\n" + // A, B, C token type order
 			"tokens { A; B; C; }\n" +
