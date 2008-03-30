@@ -225,6 +225,25 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
+	public void testCompositeImportsComposite() throws Exception {
+		String slave =
+			"grammar S;\n" + // A, B, C token type order
+			"tokens { A; B; C; }\n" +
+			"x : 'x' INT {System.out.println(\"S.x\");} ;\n" +
+			"INT : '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {skip();} ;\n";
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g", slave);
+
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"s : x INT ;\n";
+		String found = execParser("M.g", master, "MParser", "MLexer",
+								  "s", "x 32 1932", debug);
+		assertEquals("S.x\n", found);
+	}
+
 	public void testSameStringTwoNames() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -433,7 +452,7 @@ public class TestCompositeGrammars extends BaseTest {
 		g.composite.assignTokenTypes();
 
 		// whole bunch of errors from bad S.g file
-		assertEquals("unexpected errors: "+equeue, 4, equeue.errors.size());
+		assertEquals("unexpected errors: "+equeue, 5, equeue.errors.size());
 	}
 
 	public void testSyntaxErrorsInImportsNotThrownOut2() throws Exception {
@@ -459,7 +478,7 @@ public class TestCompositeGrammars extends BaseTest {
 		g.composite.assignTokenTypes();
 
 		// whole bunch of errors from bad S.g file
-		assertEquals("unexpected errors: "+equeue, 2, equeue.errors.size());
+		assertEquals("unexpected errors: "+equeue, 3, equeue.errors.size());
 	}
 
 	public void testDelegatorRuleOverridesDelegate() throws Exception {
@@ -711,10 +730,52 @@ public class TestCompositeGrammars extends BaseTest {
 		composite.setDelegationRoot(g);
 		g.parseAndBuildAST();
 		g.composite.assignTokenTypes();
+		g.composite.defineGrammarSymbols();
 
-		String expectedTokenIDToTypeMap = "[M=5, S=4]";
+		String expectedTokenIDToTypeMap = "[M=6, S=5, T=4]";
 		String expectedStringLiteralToTypeMap = "{}";
-		String expectedTypeToTokenList = "[S, M]";
+		String expectedTypeToTokenList = "[T, S, M]";
+
+		assertEquals(expectedTokenIDToTypeMap,
+					 realElements(g.composite.tokenIDToTypeMap).toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList,
+					 realElements(g.composite.typeToTokenList).toString());
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testRulesVisibleThroughMultilevelImport() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String slave =
+			"parser grammar T;\n" +
+			"x : T ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "T.g", slave);
+		String slave2 =
+			"parser grammar S;\n" + // A, B, C token type order
+			"import T;\n" +
+			"a : S ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g", slave2);
+
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"a : M x ;\n" ; // x MUST BE VISIBLE TO M
+		writeFile(tmpdir, "M.g", master);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
+		composite.setDelegationRoot(g);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+		g.composite.defineGrammarSymbols();
+
+		String expectedTokenIDToTypeMap = "[M=6, S=5, T=4]";
+		String expectedStringLiteralToTypeMap = "{}";
+		String expectedTypeToTokenList = "[T, S, M]";
 
 		assertEquals(expectedTokenIDToTypeMap,
 					 realElements(g.composite.tokenIDToTypeMap).toString());

@@ -8,6 +8,14 @@ University of San Francisco
 
 CHANGES
 
+March 29, 2008
+
+* Import couldn't handle A imports B imports C.
+
+March 27, 2008
+
+* Added get/setInputStream to Token interface and affected classes.
+
 February 26, 2008
 
 * made fillBuffer public in CommonTreeNodeStream so we can add trees

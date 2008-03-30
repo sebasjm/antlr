@@ -2008,6 +2008,9 @@ outer:
 			Grammar delegateGrammar = null;
 			delegateGrammar = new Grammar(tool, gfile.getName(), composite);
 			delegateGrammar.label = label;
+
+			addDelegateGrammar(delegateGrammar);
+
 			delegateGrammar.parseAndBuildAST(br);
 			if ( !validImport(delegateGrammar) ) {
 				ErrorManager.grammarError(ErrorManager.MSG_INVALID_IMPORT,
@@ -2038,7 +2041,6 @@ outer:
 					// but, this parser grammar will need the vocab
 					// so add to composite anyway so we suck in the tokens later
 				}
-				composite.addGrammar(this,delegateGrammar);
 			}
 			//System.out.println("Got grammar:\n"+delegateGrammar);
 		}
@@ -2059,6 +2061,14 @@ outer:
 				}
 			}
 		}
+	}
+
+	/** add new delegate to composite tree */
+	protected void addDelegateGrammar(Grammar delegateGrammar) {
+		CompositeGrammarTree t = composite.delegateGrammarTreeRoot.findNode(this);
+		t.addChild(new CompositeGrammarTree(delegateGrammar));
+		// make sure new grammar shares this composite
+		delegateGrammar.composite = this.composite;
 	}
 
 	/** Load a vocab file <vocabName>.tokens and return max token type found. */
