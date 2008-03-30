@@ -683,4 +683,46 @@ public class TestCompositeGrammars extends BaseTest {
 			"warning(105): /tmp/antlr3/M.g:3:5: no lexer rule corresponding to token: ABC";
 		assertEquals(expectedError, equeue.warnings.get(0).toString());
 	}
+
+	/** Make sure that M can import S that imports T. */
+	public void test3LevelImport() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String slave =
+			"parser grammar T;\n" +
+			"a : T ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "T.g", slave);
+		String slave2 =
+			"parser grammar S;\n" + // A, B, C token type order
+			"import T;\n" +
+			"a : S ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g", slave2);
+
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"a : M ;\n" ;
+		writeFile(tmpdir, "M.g", master);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
+		composite.setDelegationRoot(g);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+
+		String expectedTokenIDToTypeMap = "[M=5, S=4]";
+		String expectedStringLiteralToTypeMap = "{}";
+		String expectedTypeToTokenList = "[S, M]";
+
+		assertEquals(expectedTokenIDToTypeMap,
+					 realElements(g.composite.tokenIDToTypeMap).toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList,
+					 realElements(g.composite.typeToTokenList).toString());
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 }

@@ -141,7 +141,12 @@ public class CompositeGrammar {
 
 	public CompositeGrammar(Grammar g) {
 		this();
-		delegateGrammarTreeRoot = new CompositeGrammarTree(g);
+		setDelegationRoot(g);
+	}
+
+	public void setDelegationRoot(Grammar root) {
+		delegateGrammarTreeRoot = new CompositeGrammarTree(root);
+		root.compositeTreeNode = delegateGrammarTreeRoot;
 	}
 
 	public Rule getRule(String ruleName) {
@@ -154,15 +159,17 @@ public class CompositeGrammar {
 
 	/** Add delegate grammar as child of delegator */
 	public void addGrammar(Grammar delegator, Grammar delegate) {
-		// find delegator in tree so we can add a child to it
+		if ( delegator.compositeTreeNode==null ) {
+			delegator.compositeTreeNode = new CompositeGrammarTree(delegator);
+		}
+		delegator.compositeTreeNode.addChild(new CompositeGrammarTree(delegate));
+
+		/*// find delegator in tree so we can add a child to it
 		CompositeGrammarTree t = delegateGrammarTreeRoot.findNode(delegator);
-		t.addChild(new CompositeGrammarTree(delegate));
+		t.addChild();
+		*/
 		// make sure new grammar shares this composite
 		delegate.composite = this;
-	}
-
-	public void setDelegationRoot(Grammar root) {
-		delegateGrammarTreeRoot = new CompositeGrammarTree(root);
 	}
 
 	/** Get parent of this grammar */

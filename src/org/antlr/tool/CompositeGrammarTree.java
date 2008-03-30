@@ -48,7 +48,7 @@ public class CompositeGrammarTree {
 			return; // do nothing upon addChild(null)
 		}
 		if ( children==null ) {
-			children = new ArrayList();
+			children = new ArrayList<CompositeGrammarTree>();
 		}
 		children.add(t);
 		t.parent = this;

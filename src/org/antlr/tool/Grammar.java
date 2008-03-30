@@ -241,6 +241,9 @@ public class Grammar {
 	 */
 	public CompositeGrammar composite;
 
+	/** A pointer back into grammar tree.  Needed so we can add delegates. */
+	public CompositeGrammarTree compositeTreeNode;
+
 	/** If this is a delegate of another grammar, this is the label used
 	 *  as an instance var by that grammar to point at this grammar. null
 	 *  if no label was specified in the delegate statement.
@@ -1986,9 +1989,7 @@ outer:
 	}
 
 	/** Import the rules/tokens of a delegate grammar. All delegate grammars are
-	 *  read during the ctor of first Grammar created so we must set master
-	 *  here to the first one encountered.  I.e., can't set after ctor finishes
-	 *  as most work is done by then.
+	 *  read during the ctor of first Grammar created.
 	 *
 	 *  Do not create NFA here because NFA construction needs to hook up with
 	 *  overridden rules in delegation root grammar.
