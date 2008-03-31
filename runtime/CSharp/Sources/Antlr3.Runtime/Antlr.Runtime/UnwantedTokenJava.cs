@@ -1,7 +1,6 @@
 /*
 [The "BSD licence"]
 Copyright (c) 2007-2008 Johannes Luber
-Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,41 +31,26 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+using System;
 
 namespace Antlr.Runtime
 {
-	using System;
 	
 	/// <summary>
-	/// A source of tokens must provide a sequence of tokens via NextToken()
-	/// and also must reveal it's source of characters; CommonToken's text is
-	/// computed from a CharStream; it only store indices into the char stream.
-	/// 
-	/// Errors from the lexer are never passed to the parser.  Either you want
-	/// to keep going or you do not upon token recognition error.  If you do not
-	/// want to continue lexing then you do not want to continue parsing.  Just
-	/// throw an exception not under RecognitionException and Java will naturally
-	/// toss you all the way out of the recognizers.  If you want to continue
-	/// lexing then you should not throw an exception to the parser--it has already
-	/// requested a token.  Keep lexing until you get a valid one.  Just report
-	/// errors and keep going, looking for a valid token.
+	/// An extra token while parsing a TokenStream.
 	/// </summary>
-	public interface ITokenSource
-	{
-		/// <summary>
-		/// Returns a Token object from the input stream (usually a CharStream).
-		/// Does not fail/return upon lexing error; just keeps chewing on the 
-		/// characters until it gets a good one; errors are not passed through 
-		/// to the parser.
-		/// </summary>
-		IToken NextToken();
-
-		/// <summary>
-		/// Where are you getting tokens from? normally the implication will simply
-		/// ask lexers input stream.
-		/// </summary>
-		string SourceName {
-			get;
+	public class UnwantedTokenException : MismatchedTokenException {
+		public UnwantedTokenException(int expecting, IIntStream input)
+			: base(expecting, input) {
+		}
+	
+		public IToken UnexpectedToken {
+			get { return token; }
+		}
+	
+		public override string ToString() {
+			return "UnwantedTokenException(found=" + token.Text + ", expected " +
+				   expecting + ")";
 		}
 	}
 }

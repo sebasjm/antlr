@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -58,6 +59,11 @@ namespace Antlr.Runtime
 			this.input = input;
 		}
 
+		public Lexer(ICharStream input, RecognizerSharedState state)
+			: base(state) {
+			this.input = input;
+		}
+	
 		#endregion
 
 		#region Public API
@@ -73,6 +79,11 @@ namespace Antlr.Runtime
 				this.input = value;
 			}
 		}
+
+		override public string SourceName {
+			get { return input.SourceName; }
+		}
+
 
 		override public IIntStream Input
 		{
@@ -128,6 +139,12 @@ namespace Antlr.Runtime
 		{
 			base.Reset(); // reset all recognizer state variables
 			// wack Lexer state variables
+			if (input != null) {
+				input.Seek(0); // rewind the input
+			}
+			if (state == null) {
+				return; // no shared state work to do
+			}
 			state.token = null;
 			state.type = Token.INVALID_TOKEN_TYPE;
 			state.channel = Token.DEFAULT_CHANNEL;
@@ -135,10 +152,6 @@ namespace Antlr.Runtime
 			state.tokenStartCharPositionInLine = -1;
 			state.tokenStartLine = -1;
 			state.text = null;
-			if ( input != null ) 
-			{
-				input.Seek(0); // rewind the input
-			}
 		}
 
 		/// <summary>
@@ -171,10 +184,13 @@ namespace Antlr.Runtime
 					}
 					return state.token;
 				}
-				catch (RecognitionException re)
-				{
+				catch (NoViableAltException nva) {
+					ReportError(nva);
+					Recover(nva); // throw out current char and try again
+				}
+				catch (RecognitionException re) {
 					ReportError(re);
-					Recover(re);
+					// Match() routine has already called Recover()
 				}
 			}
 		}
@@ -234,7 +250,7 @@ namespace Antlr.Runtime
 						return;
 					}
 					MismatchedTokenException mte = new MismatchedTokenException(s[i], input);
-					Recover(mte);
+					Recover(mte); // don't really recover; just consume in lexer
 					throw mte;
 				}
 				i++;

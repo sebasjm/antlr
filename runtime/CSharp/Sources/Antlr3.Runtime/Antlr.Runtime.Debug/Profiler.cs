@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -103,7 +104,7 @@ namespace Antlr.Runtime.Debug
 			this.parser = parser;
 		}
 
-		public override void EnterRule(string ruleName)
+		public override void EnterRule(string grammarFileName, string ruleName)
 		{
 			ruleLevel++;
 			numRuleInvocations++;
@@ -140,7 +141,7 @@ namespace Antlr.Runtime.Debug
 			numMemoizationCacheEntries++;
 		}
 
-		public override void ExitRule(string ruleName)
+		public override void ExitRule(string grammarFileName, string ruleName)
 		{
 			ruleLevel--;
 		}

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -62,14 +63,10 @@ namespace Antlr.Runtime
 
 		public BaseRecognizer(RecognizerSharedState state)
 		{
-			if (state != null)
-			{
-				this.state = state;
+			if ( state==null ) {
+				state = new RecognizerSharedState();
 			}
-			else
-			{
-				this.state = new RecognizerSharedState();
-			}
+			this.state = state;
 		}
 
 		#endregion
@@ -96,10 +93,14 @@ namespace Antlr.Runtime
 		public virtual void Reset()
 		{
 			// wack everything related to error recovery
+			if (state == null) {
+				return; // no shared state work to do
+			}
 			state.followingStackPointer = -1;
 			state.errorRecovery = false;
 			state.lastErrorIndex = -1;
 			state.failed = false;
+			state.syntaxErrors = 0;
 			// wack everything related to backtracking and memoization
 			state.backtracking = 0;
 			for (int i = 0; (state.ruleMemo != null) && (i < state.ruleMemo.Length); i++)
@@ -110,14 +111,16 @@ namespace Antlr.Runtime
 		}
 
 		/// <summary>
-		/// Match current input symbol against ttype.  Upon error, do one token
-		/// insertion or deletion if possible.
+		/// Match current input symbol against ttype.  Throw exception upon
+		/// error, bailing out of the current production to the normal error
+		/// exception catch (at the end of the method) by just throwing
+		/// MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
+		/// by resynchronize into the set of symbols the can follow.
 		/// </summary>
 		/// <remarks>
-		/// You can override to not Recover here and bail out of the current 
-		/// production to the normal error exception catch (at the end of the 
-		/// method) by just throwing MismatchedTokenException upon 
-		/// input.LA(1) != ttype.
+		/// Prior to v3.1, this method used to do one token insertion or
+		/// deletion if possible. You can override Mismatch()
+		/// to recover here if you want.
 		/// </remarks>
 		public virtual void Match(IIntStream input, int ttype, BitSet follow)
 		{
@@ -137,11 +140,38 @@ namespace Antlr.Runtime
 			return;
 		}
 
+		/// <summary> Match the wildcard: in a symbol</summary>
 		public virtual void MatchAny(IIntStream input)
 		{
 			state.errorRecovery = false;
 			state.failed = false;
 			input.Consume();
+		}
+
+		public bool MismatchIsUnwantedToken(IIntStream input, int ttype) {
+			return input.LA(2) == ttype;
+		}
+	
+		public bool MismatchIsMissingToken(IIntStream input, BitSet follow) {
+			if (follow == null) {
+				// we have no information about the follow; we can only consume
+				// a single token and hope for the best
+				return false;
+			}
+			// compute what can follow this grammar element reference
+			if (follow.Member(Token.EOR_TOKEN_TYPE)) {
+				BitSet viableTokensFollowingThisRule =
+					ComputeContextSensitiveRuleFOLLOW();
+				follow = follow.Or(viableTokensFollowingThisRule);
+				follow.Remove(Token.EOR_TOKEN_TYPE);
+			}
+			// if current token is consistent with what could come after set
+			// then we know we're missing a token; error recovery is free to
+			// "insert" the missing token
+			if (follow.Member(input.LA(1))) {
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -158,6 +188,8 @@ namespace Antlr.Runtime
 		/// 3. consume until token found in resynch set
 		/// 4. try to resume parsing
 		/// 5. next Match() will reset errorRecovery mode
+		///
+		/// If you override, make sure to update syntaxErrors if you care about that.
 		/// </remarks>
 		public virtual void ReportError(RecognitionException e)
 		{
@@ -167,6 +199,7 @@ namespace Antlr.Runtime
 			{
 				return;
 			}
+			state.syntaxErrors++; // don't count spurious
 			state.errorRecovery = true;
 
 			DisplayRecognitionError(this.TokenNames, e);
@@ -201,7 +234,30 @@ namespace Antlr.Runtime
 		public virtual string GetErrorMessage(RecognitionException e, string[] tokenNames)
 		{
 			string msg = null;
-			if (e is MismatchedTokenException)
+			if (e is UnwantedTokenException) {
+				UnwantedTokenException ute = (UnwantedTokenException)e;
+				string tokenName="<unknown>";
+				if ( ute.expecting== Token.EOF ) {
+					tokenName = "EOF";
+				}
+				else {
+					tokenName = tokenNames[ute.expecting];
+				}
+				msg = "extraneous input " + GetTokenErrorDisplay(ute.UnexpectedToken) +
+					" expecting " + tokenName;
+			}
+			else if (e is MissingTokenException) {
+				MissingTokenException mte = (MissingTokenException)e;
+				string tokenName="<unknown>";
+				if ( mte.expecting == Token.EOF ) {
+					tokenName = "EOF";
+				}
+				else {
+					tokenName = tokenNames[mte.expecting];
+				}
+				msg = "missing " + tokenName + " at " + GetTokenErrorDisplay(e.Token);
+			}
+			else if (e is MismatchedTokenException)
 			{
 				MismatchedTokenException mte = (MismatchedTokenException)e;
 				string tokenName = "<unknown>";
@@ -263,6 +319,18 @@ namespace Antlr.Runtime
 		}
 
 		/// <summary>
+		/// Get number of recognition errors (lexer, parser, tree parser).  Each
+		/// recognizer tracks its own number.  So parser and lexer each have
+		/// separate count.  Does not count the spurious errors found between
+		/// an error and next valid token match
+		///
+		/// See also ReportError()
+		/// </summary>
+		public int NumberOfSyntaxErrors {
+			get { return state.syntaxErrors; }
+		}
+
+		/// <summary>
 		/// What is the error header, normally line/character position information?
 		/// </summary>
 		public virtual string GetErrorHeader(RecognitionException e)
@@ -307,9 +375,12 @@ namespace Antlr.Runtime
 			Console.Error.WriteLine(msg);
 		}
 
-		/// <summary>Recover from an error found on the input stream.  Mostly this is
-		/// NoViableAlt exceptions, but could be a mismatched token that
-		/// the Match() routine could not Recover from.
+		/// <summary>
+		/// Recover from an error found on the input stream.  This is
+		/// for NoViableAlt and mismatched symbol exceptions.  If you enable
+		/// single token insertion and deletion, this will usually not
+		/// handle mismatched symbol exceptions but there could be a mismatched
+		/// token that the Match() routine could not recover from.
 		/// </summary>
 		public virtual void Recover(IIntStream input, RecognitionException re)
 		{
@@ -373,8 +444,7 @@ namespace Antlr.Runtime
 		public virtual void RecoverFromMismatchedToken(IIntStream input, RecognitionException e, int ttype, BitSet follow)
 		{
 			// if next token is what we are looking for then "delete" this token
-			if (input.LA(2) == ttype)
-			{
+			if (MismatchIsUnwantedToken(input, ttype)) {
 				ReportError(e);
 				BeginResync();
 				input.Consume(); // simply delete extra token
@@ -382,7 +452,7 @@ namespace Antlr.Runtime
 				input.Consume(); // move past ttype token as if all were ok
 				return;
 			}
-			if (!RecoverFromMismatchedElement(input, e, follow))
+			if (!RecoverFromMissingElement(input, e, follow))
 			{
 				throw e;
 			}
@@ -391,7 +461,7 @@ namespace Antlr.Runtime
 		public virtual void RecoverFromMismatchedSet(IIntStream input, RecognitionException e, BitSet follow)
 		{
 			// TODO do single token deletion like above for Token mismatch
-			if (!RecoverFromMismatchedElement(input, e, follow))
+			if (!RecoverFromMissingElement(input, e, follow))
 			{
 				throw e;
 			}
@@ -470,12 +540,21 @@ namespace Antlr.Runtime
 
 		/// <summary>
 		/// For debugging and other purposes, might want the grammar name.
-		/// Have ANTLR generate an implementation for this method.
+		/// Have ANTLR generate an implementation for this property.
 		/// </summary>
 		/// <returns></returns>
 		public virtual string GrammarFileName
 		{
 			get { return null; }
+		}
+
+		/// <summary>
+		/// For debugging and other purposes, might want the source name.
+		/// Have ANTLR provide a hook for this property.
+		/// </summary>
+		/// <returns>The source name</returns>
+		public abstract string SourceName {
+			get; set;
 		}
 
 		/// <summary>A convenience method for use most often with template rewrites.
@@ -625,13 +704,32 @@ namespace Antlr.Runtime
 
 		/// <summary>
 		/// Factor out what to do upon token mismatch so tree parsers can behave
-		/// differently. Override this method in your parser to do things like 
-		/// bailing out after the first error; just throw the mte object instead 
-		/// of calling the recovery method.
+		/// differently.  Override and call MismatchRecover(input, ttype, follow)
+	 	/// to get single token insertion and deletion.
 		/// </summary>
 		protected internal virtual void Mismatch(IIntStream input, int ttype, BitSet follow)
 		{
-			MismatchedTokenException mte = new MismatchedTokenException(ttype, input);
+			if ( MismatchIsUnwantedToken(input, ttype) ) {
+				throw new UnwantedTokenException(ttype, input);
+			}
+			else if ( MismatchIsMissingToken(input, follow) ) {
+				throw new MissingTokenException(ttype, input);
+			}
+			throw new MismatchedTokenException(ttype, input);
+		}
+	
+		protected void MismatchRecover(IIntStream input, int ttype, BitSet follow)
+		{
+			MismatchedTokenException mte = null;
+			if ( MismatchIsUnwantedToken(input, ttype) ) {
+				mte = new UnwantedTokenException(ttype, input);
+			}
+			else if ( MismatchIsMissingToken(input, follow) ) {
+				mte = new MissingTokenException(ttype, input);
+			}
+			else {
+				mte = new MismatchedTokenException(ttype, input);
+			}
 			RecoverFromMismatchedToken(input, mte, ttype, follow);
 		}
 		
@@ -810,9 +908,9 @@ namespace Antlr.Runtime
 		/// both.  No tokens are consumed to Recover from insertions.  Return
 		/// true if recovery was possible else return false.
 		/// </summary>
-		protected internal virtual bool RecoverFromMismatchedElement(IIntStream input, RecognitionException e, BitSet follow)
+		protected internal virtual bool RecoverFromMissingElement(IIntStream input, RecognitionException e, BitSet follow)
 		{
-			if (follow == null)
+			if (MismatchIsMissingToken(input, follow))
 			{
 				// we have no information about the follow; we can only consume
 				// a single token and hope for the best

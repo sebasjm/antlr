@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -73,6 +74,24 @@ namespace Antlr.Runtime.Tree
 		/// </summary>
 		object GetNilNode();
 		
+		/// <summary>
+		/// Return a tree node representing an error. This node records the
+		/// tokens consumed during error recovery. The start token indicates the
+		/// input symbol at which the error was detected. The stop token indicates
+		/// the last symbol consumed during recovery.
+		/// </summary> 
+		/// <remarks>
+		/// <para>You must specify the input stream so that the erroneous text can
+		/// be packaged up in the error node. The exception could be useful
+		/// to some applications; default implementation stores ptr to it in
+		/// the CommonErrorNode.</para>
+		///
+		/// <para>This only makes sense during token parsing, not tree parsing.
+		/// Tree parsing should happen only when parsing and tree construction
+		/// succeed.</para>
+		/// </remarks>
+		object ErrorNode(ITokenStream input, IToken start, IToken stop, RecognitionException e);
+
 		/// <summary>
 		/// Is tree considered a nil node used to make lists of child nodes?
 		/// </summary>

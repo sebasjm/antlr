@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -70,6 +71,10 @@ namespace Antlr.Runtime
 			index = oldToken.TokenIndex;
 			charPositionInLine = oldToken.CharPositionInLine;
 			channel = oldToken.Channel;
+			if (oldToken is CommonToken) {
+				start = ((CommonToken)oldToken).start;
+				stop = ((CommonToken)oldToken).stop;
+			}
 		}
 
 		#endregion

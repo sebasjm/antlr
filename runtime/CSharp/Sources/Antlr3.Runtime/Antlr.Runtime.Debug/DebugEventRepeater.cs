@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -46,7 +47,7 @@ namespace Antlr.Runtime.Debug
 	/// Useful if you want to listen in on a few debug events w/o 
 	/// interrupting the debugger.  Just subclass the repeater and override 
 	/// the methods you want to listen in on.  Remember to call the method 
-	/// in this class so the event will continue on to the originalrecipient.
+	/// in this class so the event will continue on to the original recipient.
 	/// </remarks>
 	public class DebugEventRepeater : IDebugEventListener
 	{
@@ -57,8 +58,8 @@ namespace Antlr.Runtime.Debug
 			this.listener = listener;
 		}
 
-		public void EnterRule(string ruleName) { listener.EnterRule(ruleName); }
-		public void ExitRule(string ruleName) { listener.ExitRule(ruleName); }
+		public void EnterRule(string grammarFileName, string ruleName) { listener.EnterRule(grammarFileName, ruleName); }
+		public void ExitRule(string grammarFileName, string ruleName) { listener.ExitRule(grammarFileName, ruleName); }
 		public void EnterAlt(int alt) { listener.EnterAlt(alt); }
 		public void EnterSubRule(int decisionNumber) { listener.EnterSubRule(decisionNumber); }
 		public void ExitSubRule(int decisionNumber) { listener.ExitSubRule(decisionNumber); }
@@ -88,6 +89,7 @@ namespace Antlr.Runtime.Debug
 		// AST Stuff
 
 		public void GetNilNode(object t) { listener.GetNilNode(t); }
+		public void ErrorNode(object t) { listener.ErrorNode(t); }
 		public void CreateNode(object t) { listener.CreateNode(t); }
 		public void CreateNode(object node, IToken token) { listener.CreateNode(node, token); }
 		public void BecomeRoot(object newRoot, object oldRoot) { listener.BecomeRoot(newRoot, oldRoot); }

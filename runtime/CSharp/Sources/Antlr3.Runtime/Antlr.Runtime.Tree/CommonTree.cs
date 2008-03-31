@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -79,7 +80,7 @@ namespace Antlr.Runtime.Tree
 			{
 				if (token == null)
 				{
-					return 0;
+					return Runtime.Token.INVALID_TOKEN_TYPE;
 				}
 				return token.Type;
 			}
@@ -194,6 +195,12 @@ namespace Antlr.Runtime.Tree
 			if (IsNil)
 			{
 				return "nil";
+			}
+			if ( Type == Runtime.Token.INVALID_TOKEN_TYPE ) {
+				return "<errornode>";
+			}
+			if (token == null) {
+				return null;
 			}
 			return token.Text;
 		}

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -79,21 +80,21 @@ namespace Antlr.Runtime.Debug
 			listeners.Add(listeners);
 		}
 
-		public void EnterRule(string ruleName)
+		public void EnterRule(string grammarFileName, string ruleName)
 		{
 			for (int i = 0; i < listeners.Count; i++)
 			{
 				IDebugEventListener listener = (IDebugEventListener)listeners[i];
-				listener.EnterRule(ruleName);
+				listener.EnterRule(grammarFileName, ruleName);
 			}
 		}
 
-		public void ExitRule(string ruleName)
+		public void ExitRule(string grammarFileName, string ruleName)
 		{
 			for (int i = 0; i < listeners.Count; i++)
 			{
 				IDebugEventListener listener = (IDebugEventListener)listeners[i];
-				listener.ExitRule(ruleName);
+				listener.ExitRule(grammarFileName, ruleName);
 			}
 		}
 
@@ -309,6 +310,13 @@ namespace Antlr.Runtime.Debug
 			{
 				IDebugEventListener listener = (IDebugEventListener)listeners[i];
 				listener.GetNilNode(t);
+			}
+		}
+
+		public void ErrorNode(object t) {
+			for (int i = 0; i < listeners.Count; i++) {
+				IDebugEventListener listener = (IDebugEventListener)listeners[i];
+				listener.ErrorNode(t);
 			}
 		}
 

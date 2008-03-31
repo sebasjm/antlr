@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -76,6 +77,11 @@ namespace Antlr.Runtime
 			
 		}
 		
+		public override string SourceName {
+			get { return input.SourceName; }
+			set { throw new NotSupportedException("Setter doesn't work - value can't be delegated."); }
+		}
+	
 		protected internal ITokenStream input;
 
 		override public IIntStream Input

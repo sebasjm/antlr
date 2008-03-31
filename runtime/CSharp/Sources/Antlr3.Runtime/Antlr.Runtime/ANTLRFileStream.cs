@@ -82,7 +82,7 @@ namespace Antlr.Runtime
 		/// <summary>
 		/// Gets the file name of this ANTLRFileStream underlying file
 		/// </summary>
-		virtual public string SourceName
+		override public string SourceName
 		{
 			get { return fileName; }
 		}

@@ -52,8 +52,12 @@ namespace Antlr.Runtime.Debug
 			this.adaptor = adaptor;
 		}
 
-		override public void EnterRule(string ruleName) { Console.Out.WriteLine("EnterRule " + ruleName); }
-		override public void ExitRule(string ruleName) { Console.Out.WriteLine("ExitRule " + ruleName); }
+		override public void EnterRule(string grammarFileName, string ruleName) {
+			Console.Out.WriteLine("EnterRule " + grammarFileName + " " + ruleName);
+		}
+		override public void ExitRule(string grammarFileName, string ruleName) {
+			Console.Out.WriteLine("ExitRule " + grammarFileName + " " + ruleName);
+		}
 		override public void EnterSubRule(int decisionNumber) { Console.Out.WriteLine("EnterSubRule"); }
 		override public void ExitSubRule(int decisionNumber) { Console.Out.WriteLine("ExitSubRule"); }
 		override public void Location(int line, int pos) { Console.Out.WriteLine("Location " + line + ":" + pos); }

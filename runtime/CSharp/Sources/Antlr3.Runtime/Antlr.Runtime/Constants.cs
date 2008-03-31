@@ -43,7 +43,8 @@ namespace Antlr.Runtime
     {
 		public static readonly string VERSION					= "3.1b1";
 
-		public static readonly string DEBUG_PROTOCOL_VERSION	= "1";
+		// Moved to version 2 for v3.1: added grammar name to enter/exit Rule
+		public static readonly string DEBUG_PROTOCOL_VERSION	= "2";
 
 		public static readonly string ANTLRWORKS_DIR			= "antlrworks";
 	}

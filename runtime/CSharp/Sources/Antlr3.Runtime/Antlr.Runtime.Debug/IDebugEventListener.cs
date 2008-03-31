@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -55,8 +56,10 @@ namespace Antlr.Runtime.Debug
 		/// The parser has just entered a rule.  No decision has been made about
 		/// which alt is predicted.  This is fired AFTER init actions have been
 		/// executed.  Attributes are defined and available etc...
+		/// The grammarFileName allows composite grammars to jump around among
+		/// multiple grammar files.
 		/// </summary>
-		void  EnterRule(string ruleName);
+		void  EnterRule(string grammarFileName, string ruleName);
 		
 		/// <summary>
 		/// Because rules can have lots of alternatives, it is very useful to
@@ -69,8 +72,10 @@ namespace Antlr.Runtime.Debug
 		/// executed even if an exception is thrown.  This is triggered after
 		/// error reporting and recovery have occurred (unless the exception is
 		/// not caught in this rule).  This implies an "exitAlt" event.
+		/// The grammarFileName allows composite grammars to jump around among
+		/// multiple grammar files.
 		/// </summary>
-		void  ExitRule(string ruleName);
+		void  ExitRule(string grammarFileName, string ruleName);
 		
 		/// <summary>Track entry into any (...) subrule other EBNF construct </summary>
 		void  EnterSubRule(int decisionNumber);
@@ -289,6 +294,13 @@ namespace Antlr.Runtime.Debug
 		/// RemoteDebugEventSocketListener then only t.ID is set.
 		/// </remarks>
 		void GetNilNode(object t);
+
+		/// <summary>
+		/// Upon syntax error, recognizers bracket the error with an error node
+		/// if they are building ASTs.
+		/// </summary>
+		/// <param name="t">The object</param>
+		void ErrorNode(object t);
 
 		/// <summary>
 		/// Announce a new node built from token elements such as type etc...

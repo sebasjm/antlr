@@ -1,5 +1,6 @@
 /*
  [The "BSD licence"]
+ Copyright (c) 2007-2008 Johannes Luber
  Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005-2006 Terence Parr
  All rights reserved.
@@ -46,7 +47,7 @@ ruleDeclarations() ::= <<
 <ASTLabelType> _last = null;<\n>
 >>
 
-/** What to emit when there is no rewrite.  For auto build
+/** What to emit when there is no rewrite rule.  For auto build
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
@@ -141,6 +142,43 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
+// SET AST
+
+matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
+<super.matchSet(..., postmatchCode={
+<if(!rewriteMode)>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<label>_tree = (<ASTLabelType>)adaptor.DupNode(<label>);
+adaptor.AddChild(root_<treeLevel>, <label>_tree);
+<if(backtracking)>}<endif>
+<endif>
+}
+)>
+>>
+
+matchRuleBlockSet(s,label,hetero,elementIndex,postmatchCode,treeLevel="0") ::= <<
+<matchSet(...)>
+<noRewrite()> <! set return tree !>
+>>
+
+matchSetBang(s,label,elementIndex,postmatchCode) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
+<super.matchSet(...)>
+>>
+
+matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
+<super.matchSet(..., postmatchCode={
+<if(!rewriteMode)>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<label>_tree = (<ASTLabelType>)adaptor.DupNode(<label>);
+root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_<treeLevel>);
+<if(backtracking)>}<endif>
+<endif>
+}
+)>
+>>
+
 // RULE REF AST
 
 /** rule auto construct */
@@ -186,7 +224,6 @@ stream_<token>.NextNode()
 
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
-<if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!rewriteMode)>
 <if(backtracking)>
 if ( state.backtracking==0 )
@@ -195,7 +232,6 @@ if ( state.backtracking==0 )
 	retval.tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
 <if(backtracking)>
 }
-<endif>
 <endif>
 <endif>
 >>

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -35,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Antlr.Runtime.Debug
 {
 	using System;
+	using System.Globalization;
 	using System.Threading;
 	using StreamReader = System.IO.StreamReader;
 	using StreamWriter = System.IO.StreamWriter;
@@ -260,7 +262,7 @@ namespace Antlr.Runtime.Debug
 			return success;
 		}
 		
-		protected virtual void  CloseConnection()
+		protected virtual void CloseConnection()
 		{
 			try
 			{
@@ -334,11 +336,11 @@ namespace Antlr.Runtime.Debug
 			}
 			if (elements[0].Equals("enterRule"))
 			{
-				listener.EnterRule(elements[1]);
+				listener.EnterRule(elements[1], elements[2]);
 			}
 			else if (elements[0].Equals("exitRule"))
 			{
-				listener.ExitRule(elements[1]);
+				listener.ExitRule(elements[1], elements[2]);
 			}
 			else if (elements[0].Equals("enterAlt"))
 			{
@@ -490,6 +492,15 @@ namespace Antlr.Runtime.Debug
 				int ID = int.Parse(elements[1]);
 				ProxyTree node = new ProxyTree(ID);
 				listener.GetNilNode(node);
+			}
+			else if ( elements[0].Equals("errorNode") ) {
+				// TODO: do we need a special tree here?
+				int ID = int.Parse(elements[1], CultureInfo.InvariantCulture);
+				int type = int.Parse(elements[2], CultureInfo.InvariantCulture);
+				String text = elements[3];
+				text = UnEscapeNewlines(text);
+				ProxyTree node = new ProxyTree(ID, type, -1, -1, -1, text);
+				listener.ErrorNode(node);
 			}
 			else if (elements[0].Equals("becomeRoot"))
 			{

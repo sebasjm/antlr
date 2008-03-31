@@ -55,24 +55,24 @@ namespace Antlr.Runtime.Debug
 			this.input = input;
 		}
 		
-		override public void  EnterRule(string ruleName)
+		override public void EnterRule(string grammarFileName, string ruleName)
 		{
 			for (int i = 1; i <= level; i++)
 			{
 				Console.Out.Write(" ");
 			}
-			Console.Out.WriteLine("> " + ruleName + " lookahead(1)=" + GetInputSymbol(1));
+			Console.Out.WriteLine("> " + grammarFileName + " " + ruleName + " lookahead(1)=" + GetInputSymbol(1));
 			level++;
 		}
 
-		override public void ExitRule(string ruleName)
+		override public void ExitRule(string grammarFileName, string ruleName)
 		{
 			level--;
 			for (int i = 1; i <= level; i++)
 			{
 				Console.Out.Write(" ");
 			}
-			Console.Out.WriteLine("< " + ruleName + " lookahead(1)=" + GetInputSymbol(1));
+			Console.Out.WriteLine("< " + grammarFileName + " " + ruleName + " lookahead(1)=" + GetInputSymbol(1));
 		}
 
 		public virtual object GetInputSymbol(int k)

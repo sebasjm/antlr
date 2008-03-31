@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -57,25 +58,20 @@ namespace Antlr.Runtime.Debug
 		/// Create a normal parser except wrap the token stream in a debug
 		/// proxy that fires consume events.
 		/// </summary>
-		public DebugTreeParser(ITreeNodeStream input, IDebugEventListener dbg)
-			: base(new DebugTreeNodeStream(input, dbg))
+		public DebugTreeParser(ITreeNodeStream input, IDebugEventListener dbg, RecognizerSharedState state)
+			: base((input is DebugTreeNodeStream ? input : new DebugTreeNodeStream(input, dbg)), state)
 		{
 			
 			DebugListener = dbg;
 		}
 
-		public DebugTreeParser(ITreeNodeStream input)
-			: this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null)
+		public DebugTreeParser(ITreeNodeStream input, RecognizerSharedState state)
+			: base((input is DebugTreeNodeStream ? input : new DebugTreeNodeStream(input, null)), state)
 		{
 		}
 
-		public DebugTreeParser(ITreeNodeStream input, int port)
-			: this(input, port, null)
-		{
-		}
-
-		public DebugTreeParser(ITreeNodeStream input, int port, RecognizerSharedState state)
-			: base(new DebugTreeNodeStream(input, null), state)
+		public DebugTreeParser(ITreeNodeStream input, IDebugEventListener dbg)
+			: this((input is DebugTreeNodeStream ? input : new DebugTreeNodeStream(input, dbg)), dbg, null)
 		{
 		}
 

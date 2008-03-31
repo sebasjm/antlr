@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -80,6 +81,11 @@ namespace Antlr.Runtime
 		/// has failed to match.  Reset to false upon valid token match.
 		/// </summary>
 		public bool failed = false;
+
+		/// <summary>
+		/// Did the recognizer encounter a syntax error?  Track how many.
+		/// </summary>
+		public int syntaxErrors = 0;
 
 		/// <summary>
 		/// If 0, no backtracking is going on.  Safe to exec actions etc...

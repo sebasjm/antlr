@@ -1,6 +1,7 @@
 /*
 [The "BSD licence"]
 Copyright (c) 2005-2007 Kunle Odutola
+Copyright (c) 2007-2008 Johannes Luber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,8 +48,8 @@ namespace Antlr.Runtime.Debug
 	/// </summary>
 	public class BlankDebugEventListener : IDebugEventListener
 	{
-		public virtual void EnterRule(string ruleName) { }
-		public virtual void ExitRule(string ruleName) { }
+		public virtual void EnterRule(string grammarFileName, string ruleName) { }
+		public virtual void ExitRule(string grammarFileName, string ruleName) { }
 		public virtual void EnterAlt(int alt) { }
 		public virtual void EnterSubRule(int decisionNumber) { }
 		public virtual void ExitSubRule(int decisionNumber) { }
@@ -82,12 +83,13 @@ namespace Antlr.Runtime.Debug
 		#region AST Stuff
 
 		public virtual void GetNilNode(object t) { }
+		public virtual void ErrorNode(object t) {}
 		public virtual void CreateNode(object t) { }
 		public virtual void CreateNode(object node, IToken token) { }
 		public virtual void BecomeRoot(object newRoot, object oldRoot) { }
 		public virtual void AddChild(object root, object child) { }
 		public virtual void SetTokenBoundaries(object t, int tokenStartIndex, int tokenStopIndex) { }
-
+		
 		#endregion
 	}
 }

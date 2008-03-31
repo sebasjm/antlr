@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -42,7 +43,7 @@ namespace Antlr.Runtime
 	/// </summary>
 	public interface IIntStream
 	{
-		void  Consume();
+		void Consume();
 		
 		/// <summary>
         /// Get int at current input pointer + i ahead (where i=1 is next int)
@@ -110,7 +111,7 @@ namespace Antlr.Runtime
 		/// argument. So if you're nested 5 levels of Mark(), and then Release(2)
 		/// you have to release resources for depths 2..5.
 		/// </remarks>
-		void  Release(int marker);
+		void Release(int marker);
 		
 		/// <summary>
         /// Set the input cursor to the position indicated by index.  This is
@@ -137,7 +138,7 @@ namespace Antlr.Runtime
 		/// the ith symbol.  So, seeking to 0 means LA(1) will return the first 
 		/// element in the stream.
         /// </remarks>
-		void  Seek(int index);
+		void Seek(int index);
 		
 		/// <summary>Returns the size of the entire stream.</summary>
         /// <remarks>
@@ -146,5 +147,14 @@ namespace Antlr.Runtime
 		/// This value includes a single EOF.
         /// </remarks>
 		int Size();
+
+		/// <summary>
+		/// Where are you getting symbols from?  Normally, implementations will
+		/// pass the buck all the way to the lexer who can ask its input stream
+		/// for the file name or whatever.
+		/// </summary>
+		string SourceName {
+			get;
+		}
 	}
 }

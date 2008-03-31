@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -74,22 +75,20 @@ namespace Antlr.Runtime.Debug
 		/// Create a normal parser except wrap the token stream in a debug 
 		/// proxy that fires consume events.
 		/// </summary>
-		public DebugParser(ITokenStream input, IDebugEventListener dbg)
-			: base(new DebugTokenStream(input, dbg))
+		public DebugParser(ITokenStream input, IDebugEventListener dbg, RecognizerSharedState state)
+			: base((input is DebugTokenStream ? input : new DebugTokenStream(input, dbg)), state)
 		{
 			DebugListener = dbg;
 		}
 
-		public DebugParser(ITokenStream input)
-			: this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null)
-		{
+		public DebugParser(ITokenStream input, RecognizerSharedState state)
+			: base((input is DebugTokenStream ? input : new DebugTokenStream(input, null)), state) {
 		}
 
-		public DebugParser(ITokenStream input, int port, RecognizerSharedState state)
-			: base(new DebugTokenStream(input, null), state)
+		public DebugParser(ITokenStream input, IDebugEventListener dbg)
+			: this((input is DebugTokenStream ? input : new DebugTokenStream(input, dbg)), dbg, null)
 		{
 		}
-
 
 		public virtual void ReportError(System.IO.IOException e)
 		{

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -68,14 +69,42 @@ namespace Antlr.Runtime.Debug
 			return node;
 		}
 
+		public Object ErrorNode(ITokenStream input, IToken start, IToken stop,
+								RecognitionException e)
+		{
+			Object node = adaptor.ErrorNode(input, start, stop, e);
+			if (node != null) {
+				dbg.ErrorNode(node);
+			}
+			return node;
+		}
+
 		public object DupTree(object tree)
 		{
-			return adaptor.DupTree(tree);
+			Object t = adaptor.DupTree(tree);
+			// walk the tree and emit create and add child events
+			// to simulate what DupTree has done. DupTree does not call this debug
+			// adapter so I must simulate.
+			SimulateTreeConstruction(t);
+			return t;
+		}
+	
+		/** ^(A B C): emit create A, create B, add child, ...*/
+		protected void SimulateTreeConstruction(Object t) {
+			dbg.CreateNode(t);
+			int n = adaptor.GetChildCount(t);
+			for (int i=0; i<n; i++) {
+				Object child = adaptor.GetChild(t, i);
+				SimulateTreeConstruction(child);
+				dbg.AddChild(t, child);
+			}
 		}
 
 		public object DupNode(object treeNode)
 		{
-			return adaptor.DupNode(treeNode);
+			Object d = adaptor.DupNode(treeNode);
+			dbg.CreateNode(d);
+			return d;
 		}
 
 		public object GetNilNode()
@@ -245,7 +274,7 @@ namespace Antlr.Runtime.Debug
 
 		#region Support
 
-		public IDebugEventListener DebugEventListener
+		public IDebugEventListener DebugListener
 		{
 			get { return dbg;  }
 			set { dbg = value; }

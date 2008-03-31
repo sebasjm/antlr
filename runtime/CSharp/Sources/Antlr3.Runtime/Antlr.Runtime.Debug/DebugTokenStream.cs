@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -159,6 +160,10 @@ namespace Antlr.Runtime.Debug
 		public virtual ITokenSource TokenSource
 		{
 			get { return input.TokenSource; }
+		}
+		
+		public virtual string SourceName {
+			get { return TokenSource.SourceName; }
 		}
 
 		public override string ToString()

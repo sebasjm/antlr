@@ -1,5 +1,6 @@
 /*
  [The "BSD licence"]
+ Copyright (c) 2007-2008 Johannes Luber
  Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -41,25 +42,41 @@ public ITreeAdaptor TreeAdaptor
 }<\n>
 >>
 
+parserCtorBody() ::= <<
+<super.parserCtorBody()>
+adaptor.setDebugListener(dbg);
+>>
+
 createListenerAndHandshake() ::= <<
 DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, adaptor);
-DebugListener = proxy;
 adaptor.DebugEventListener = proxy;
-try
-{
+DebugListener = proxy;
+set<inputStreamType>(new Debug<inputStreamType>(input,proxy));
+try {
     proxy.Handshake();
-}
-catch (IOException ioe)
-{
+} catch (IOException ioe) {
     ReportError(ioe);
 }
 >>
 
+/**
+Added additional constructor
+*/
 ctorForPredefinedListener() ::= <<
 public <name>(<inputStreamType> input, IDebugEventListener dbg)
 	: base(input, dbg)
 {
-    adaptor.DebugEventListener = dbg;
+<if(profile)>
+    Profiler p = (Profiler)dbg;
+    p.Parser = this;<\n>
+<endif>
+    <parserCtorBody()>
+    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+}
+
+public <name>(<inputStreamType> input, int port)
+	: this(input, port, null)
+{
 }<\n>
 >>
 

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -36,6 +37,9 @@ namespace Antlr.Runtime
 {
 	using System;
 	
+	/// <summary>
+	/// A mismatched char or Token or tree node.
+	/// </summary>
 	[Serializable]
 	public class MismatchedTokenException : RecognitionException
 	{

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -55,6 +56,24 @@ namespace Antlr.Runtime.Tree
 			return Create(null);
 		}
 		
+		/// <summary>
+		/// Create tree node that holds the start and stop tokens associated
+		///  with an error.
+		/// </summary>
+		/// <remarks>
+		/// If you specify your own kind of tree nodes, you will likely have to
+		/// override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
+		/// if no token payload but you might have to set token type for diff
+		/// node type.
+		/// </remarks>
+		public object ErrorNode(ITokenStream input, IToken start, IToken stop,
+								RecognitionException e)
+		{
+			CommonErrorNode t = new CommonErrorNode(input, start, stop, e);
+			//System.out.println("returning error node '"+t+"' @index="+input.index());
+			return t;
+		}
+	
 		public virtual bool IsNil(object tree) 
 		{
 			return ((ITree)tree).IsNil;

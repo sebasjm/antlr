@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -143,9 +144,9 @@ namespace Antlr.Runtime.Debug
 			Ack();
 		}
 
-		public override void EnterRule(string ruleName)
+		public override void EnterRule(string grammarFileName, string ruleName)
 		{
-			Transmit("enterRule " + ruleName);
+			Transmit("enterRule " + grammarFileName + " " + ruleName);
 		}
 
 		public override void EnterAlt(int alt)
@@ -153,9 +154,9 @@ namespace Antlr.Runtime.Debug
 			Transmit("enterAlt " + alt);
 		}
 
-		public override void ExitRule(string ruleName)
+		public override void ExitRule(string grammarFileName, string ruleName)
 		{
-			Transmit("exitRule " + ruleName);
+			Transmit("exitRule " + grammarFileName + " " + ruleName);
 		}
 
 		public override void EnterSubRule(int decisionNumber)
@@ -292,6 +293,18 @@ namespace Antlr.Runtime.Debug
 		{
 			int ID = adaptor.GetUniqueID(t);
 			Transmit("nilNode " + ID);
+		}
+
+		public override void ErrorNode(object t) {
+			int ID = adaptor.GetUniqueID(t);
+			String text = t.ToString();
+			StringBuilder buf = new StringBuilder(50);
+			buf.Append("errorNode ");
+			buf.Append(ID);
+			buf.Append(" ");
+			buf.Append(Token.INVALID_TOKEN_TYPE);
+			SerializeText(buf, text);
+			Transmit(buf.ToString());
 		}
 
 		public override void CreateNode(object t)

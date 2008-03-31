@@ -1,6 +1,6 @@
 /*
  [The "BSD licence"]
- Copyright (c) 2007 Johannes Luber
+ Copyright (c) 2007-2008 Johannes Luber
  Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -112,13 +112,15 @@ public class <name> : Lexer
 		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>) {
     }
     public <name>(ICharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
-		: base(input) {
-		InitializeCyclicDFAs();
-<if(backtracking)>
-        this.state.ruleMemo = new IDictionary[<numRules>+1];<\n> <! index from 1..n !>
+		: base(input, state) {
+		InitializeCyclicDFAs(); <! Necessary in C#??? Not removed yet. !>
+<if(memoize)>
+<if(grammar.grammarIsRoot)>
+        state.ruleMemo = new Hashtable[<numRules>+1];<\n> <! index from 1..n !>
+<endif>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
     }
@@ -138,7 +140,7 @@ public class <name> : Lexer
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber>;}; separator="\n">
 	private void InitializeCyclicDFAs()
 	{
-	    <cyclicDFAs:{dfa | this.dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this);}; separator="\n">
+	    <cyclicDFAs:{dfa | this.dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this<@debugAddition()>);}; separator="\n">
 	    <cyclicDFAs:{dfa | <if(dfa.specialStateSTs)>this.dfa<dfa.decisionNumber>.specialStateTransitionHandler = new DFA.SpecialStateTransitionHandler(DFA<dfa.decisionNumber>_SpecialStateTransition);<endif>}; separator="\n">
 	}
 
@@ -223,6 +225,7 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               ASTLabelType="object", labelType, members, rewriteElementType) ::= <<
 public class <name> : <@superClassName><superClass><@end> 
 {
+<if(grammar.grammarIsRoot)>
     public static readonly string[] tokenNames = new string[] 
 	{
         "\<invalid>", 
@@ -230,7 +233,8 @@ public class <name> : <@superClassName><superClass><@end>
 		"\<DOWN>", 
 		"\<UP>", 
 		<tokenNames; separator=", \n">
-    };
+    };<\n>
+<endif>
 
     <tokens:{public const int <it.name> = <it.type>;}; separator="\n">
 
@@ -246,7 +250,7 @@ public class <name> : <@superClassName><superClass><@end>
     <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
 
     public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
-		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>) {
+		: this(input, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>) {
     }
 
     public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
@@ -254,19 +258,17 @@ public class <name> : <@superClassName><superClass><@end>
 		InitializeCyclicDFAs();
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
     }
     <@end>
 
-    override public string[] TokenNames
-	{
-		get { return tokenNames; }
-	}
+    override public string[] TokenNames {
+		get { return <grammar.composite.rootGrammar.recognizerName>.tokenNames; }
+    }
 
-    override public string GrammarFileName
-	{
+    override public string GrammarFileName {
 		get { return "<fileName>"; }
-	}
+    }
 
     <members>
 
@@ -299,7 +301,9 @@ public class <name> : <@superClassName><superClass><@end>
 
 parserCtorBody() ::= <<
 <if(memoize)>
-this.state.ruleMemo = new Hashtable[<numRules>+1];<\n> <! index from 1..n !>
+<if(grammar.grammarIsRoot)>
+this.state.ruleMemo = new Hashtable[<length(grammar.allImportedRules)>+1];<\n> <! index from 1..n !>
+<endif>
 <endif>
 <grammar.delegators:
  {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
@@ -430,6 +434,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
 	{
         ReportError(re);
         Recover(input,re);
+	<@setErrorReturnValue()>
     }<\n>
 <endif>
 <endif>
@@ -788,17 +793,21 @@ if ( <s> )
 else 
 {
     <ruleBacktrackFailure()>
-    MismatchedSetException mse =
-        new MismatchedSetException(null,input);
+    MismatchedSetException mse = new MismatchedSetException(null,input);
     <@mismatchedSetException()>
 <if(LEXER)>
     Recover(mse);
-<else>
-    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
-<endif>
     throw mse;
+<else>
+    throw mse;
+    <! use following code to make it recover inline; remove throw mse;
+    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_<ruleName><elementIndex>);
+    !>
+<endif>
 }<\n>
 >>
+
+matchRuleBlockSet ::= matchSet
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
@@ -1085,7 +1094,12 @@ static readonly short[][] DFA<dfa.decisionNumber>_transition = {
 
 protected class DFA<dfa.decisionNumber> : DFA
 {
-    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer) 
+    <@debugMember()>
+    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer) : this(recognizer, null)
+    {
+    }
+
+    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer, IDebugEventListener dbg) 
     {
         this.recognizer = recognizer;
         this.decisionNumber = <dfa.decisionNumber>;
@@ -1096,6 +1110,7 @@ protected class DFA<dfa.decisionNumber> : DFA
         this.accept     = DFA<dfa.decisionNumber>_accept;
         this.special    = DFA<dfa.decisionNumber>_special;
         this.transition = DFA<dfa.decisionNumber>_transition;
+	<@debugConstructorCalls()>
     }
 
     override public string Description
@@ -1218,9 +1233,11 @@ protected Stack <scope.name>_stack = new Stack();<\n>
 <endif>
 >>
 
+returnStructName() ::= "<it.name>_return"
+
 returnType() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<ruleDescriptor.name>_return
+<ruleDescriptor.grammar.recognizerName>.<ruleDescriptor:returnStructName()>
 <else>
 <if(ruleDescriptor.hasSingleReturnValue)>
 <ruleDescriptor.singleValueReturnType>
@@ -1235,7 +1252,7 @@ void
  */
 ruleLabelType(referencedRule) ::= <<
 <if(referencedRule.hasMultipleReturnValues)>
-<referencedRule.name>_return
+<referencedRule.grammar.recognizerName>.<referencedRule.name>_return
 <else>
 <if(referencedRule.hasSingleReturnValue)>
 <referencedRule.singleValueReturnType>
@@ -1267,7 +1284,7 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public class <returnType()> : <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope 
+public class <ruleDescriptor:returnStructName()> : <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope 
 {
     <scope.attributes:{public <it.decl>;}; separator="\n">
     <@ruleReturnMembers()>

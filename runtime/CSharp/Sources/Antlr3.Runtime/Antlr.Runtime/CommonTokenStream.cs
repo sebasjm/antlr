@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2006 Kunle Odutola
 Copyright (c) 2005 Terence Parr
 All rights reserved.
@@ -162,6 +163,10 @@ namespace Antlr.Runtime
 				p = -1;
 				channel = Token.DEFAULT_CHANNEL;
 			}
+		}
+		
+		public virtual string SourceName {
+			get { return TokenSource.SourceName; }
 		}
 
 		public virtual string ToString(int start, int stop)

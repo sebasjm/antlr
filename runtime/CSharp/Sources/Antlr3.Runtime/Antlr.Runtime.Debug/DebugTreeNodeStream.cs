@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -72,6 +73,10 @@ namespace Antlr.Runtime.Debug
 		public ITokenStream TokenStream
 		{
 			get { return input.TokenStream; }
+		}
+
+		public string SourceName {
+			get { return TokenStream.SourceName; }
 		}
 
 		public ITreeAdaptor TreeAdaptor

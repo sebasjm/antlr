@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -69,7 +70,7 @@ namespace Antlr.Runtime.Debug
 			return new ParseTree(payload);
 		}
 
-		override public void EnterRule(string ruleName) 
+		override public void EnterRule(string filename, string ruleName) 
 		{
 			ParseTree parentRuleNode = (ParseTree)callStack.Peek();
 			ParseTree ruleNode = Create(ruleName);
@@ -77,7 +78,7 @@ namespace Antlr.Runtime.Debug
 			callStack.Push(ruleNode);
 		}
 
-		override public void ExitRule(string ruleName) 
+		override public void ExitRule(string filename, string ruleName) 
 		{
 			callStack.Pop();
 		}

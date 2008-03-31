@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -250,6 +251,11 @@ namespace Antlr.Runtime
         {
             return new string(data, start, stop - start + 1);
         }
+		
+		public virtual string SourceName {
+			get { return name; }
+			set { name = value; }
+		}
 
         #endregion
 
@@ -292,6 +298,11 @@ namespace Antlr.Runtime
 		/// Track the last Mark() call result value for use in Rewind().
 		/// </summary>
 		protected int lastMarker;
+
+		/// <summary>
+		/// What is name or source of this char stream?
+		/// </summary>
+		protected string name;
 
 		#endregion
 

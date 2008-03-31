@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -242,7 +243,7 @@ namespace Antlr.Runtime.Tree
 			p = 0; // buffer of nodes intialized now
 		}
 
-		protected void FillBuffer(object t) 
+		public void FillBuffer(object t) 
 		{
 			bool nil = adaptor.IsNil(t);
 			if ( !nil ) 
@@ -376,6 +377,10 @@ namespace Antlr.Runtime.Tree
 		virtual public object TreeSource
 		{
 			get { return root; }
+		}
+
+		virtual public string SourceName {
+			get { return TokenStream.SourceName; }
 		}
 
 		virtual public ITokenStream TokenStream

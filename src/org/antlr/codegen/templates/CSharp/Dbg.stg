@@ -1,5 +1,6 @@
 /*
  [The "BSD licence"]
+ Copyright (c) 2007-2008 Johannes Luber
  Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -38,40 +39,43 @@ using IOException = System.IO.IOException;
 >>
 
 @genericParser.members() ::= <<
+<if(grammar.grammarIsRoot)>
 public static readonly string[] ruleNames = new string[] {
-    "invalidRule", <rules:{rST | "<rST.ruleName>"}; wrap="\n    ", separator=", ">
+    "invalidRule", <grammar.allImportedRules:{rST | "<rST.name>"}; wrap="\n    ", separator=", ">
 };<\n>
-public int ruleLevel = 0;
-<! bug: can't use <@super.members()> cut-n-paste instead !>
-<! Same except we add port number and profile stuff !>
-public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>)
-    : this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, null<grammar.delegators:{g|, <g:delegateName()>}>)
-{    
-}
-public <name>(<inputStreamType> input, int port, RecognizerSharedState state<grammar.delegators:{g|, <g.name><superClass> <g:delegateName()>}>)
-	: <if(profile)>this(input, new Profiler(null))<else>base(input, port, state)<endif>
-{
-<if(profile)>
-        Profiler p = (Profiler)dbg;
-        p.Parser = this;
 <endif>
-    <parserCtorBody()>
-    <grammar.directDelegates:
-     {g|<g:delegateName()> = new <g.name><superClass>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-    <createListenerAndHandshake()>
-}
+<if(grammar.grammarIsRoot)> <! grammar imports other grammar(s) !>
+    private int ruleLevel = 0;
+    public int RuleLevel {
+	get { return ruleLevel; }
+    }
+    public void IncRuleLevel() { ruleLevel++; }
+    public void DecRuleLevel() { ruleLevel--; }
+<if(profile)>
+    <ctorForProfilingRootGrammar()>
+<else>
+    <ctorForRootGrammar()>
+<endif>
 <ctorForPredefinedListener()>
+<else> <! imported grammar !>
+    public int RuleLevel {
+	get { return <grammar.delegators:{g| <g:delegateName()>}>.RuleLevel; }
+    }
+    public void IncRuleLevel() { <grammar.delegators:{g| <g:delegateName()>}>.IncRuleLevel(); }
+    public void DecRuleLevel() { <grammar.delegators:{g| <g:delegateName()>}>.DecRuleLevel(); }
+    <ctorForDelegateGrammar()>
+<endif>
 <if(profile)>
 override public bool AlreadyParsedRule(IIntStream input, int ruleIndex)
 {
-    ((Profiler)dbg).ExamineRuleMemoization(input, ruleIndex, ruleNames[ruleIndex]);
+    ((Profiler)dbg).ExamineRuleMemoization(input, ruleIndex, <grammar.composite.rootGrammar.recognizerName>.ruleNames[ruleIndex]);
     return base.AlreadyParsedRule(input, ruleIndex);
 }<\n>
 override public void Memoize(IIntStream input,
                     int ruleIndex,
                     int ruleStartIndex)
 {
-    ((Profiler)dbg).Memoize(input, ruleIndex, ruleStartIndex, ruleNames[ruleIndex]);
+    ((Profiler)dbg).Memoize(input, ruleIndex, ruleStartIndex, <grammar.composite.rootGrammar.recognizerName>.ruleNames[ruleIndex]);
     base.Memoize(input, ruleIndex, ruleStartIndex);
 }<\n>
 <endif>
@@ -79,6 +83,62 @@ protected bool EvalPredicate(bool result, string predicate)
 {
     dbg.SemanticPredicate(result, predicate);
     return result;
+}<\n>
+>>
+
+ctorForRootGrammar() ::= <<
+<! bug: can't use <@super.members()> cut-n-paste instead !>
+<! Same except we add port number and profile stuff if root grammar !>
+public <name>(<inputStreamType> input) {
+    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, new RecognizerSharedState());
+}
+
+public <name>(<inputStreamType> input, int port, RecognizerSharedState state)
+    : base(input, state) {
+    <parserCtorBody()>
+    <createListenerAndHandshake()>
+    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+<\n>
+}<\n>
+>>
+
+ctorForProfilingRootGrammar() ::= <<
+<! bug: can't use <@super.members()> cut-n-paste instead !>
+public <name>(<inputStreamType> input) {
+    this(input, new Profiler(null), new RecognizerSharedState());
+}
+
+public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedState state)
+    : base(input, dbg, state) {
+    Profiler p = (Profiler)dbg;
+    p.setParser(this);
+    <parserCtorBody()>
+    <grammar.directDelegates:
+     {g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+}
+<\n>
+>>
+
+
+/** Basically we don't want to set any dbg listeners are root will have it. */
+ctorForDelegateGrammar() ::= <<
+public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+    : base(input, dbg, state) {
+    <parserCtorBody()>
+    <grammar.directDelegates:
+     {g|<g:delegateName()> = new <g.recognizerName>(input, this, state<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+}
+>>
+
+ctorForPredefinedListener() ::= <<
+public <name>(<inputStreamType> input, DebugEventListener dbg)
+    : base(input, dbg, new RecognizerSharedState()) {
+<if(profile)>
+    Profiler p = (Profiler)dbg;
+    p.setParser(this);
+<endif>
+    <parserCtorBody()>
+    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
 }<\n>
 >>
 
@@ -99,33 +159,25 @@ catch (IOException ioe)
 }
 >>
 
-/** TODO: make this deal with delegates */
-ctorForPredefinedListener() ::= <<
-public <name>(<inputStreamType> input, IDebugEventListener dbg)
-	: base(input, dbg)
-{
-}<\n>
->>
-
 @genericParser.superClassName() ::= "Debug<@super.superClassName()>"
 
 @rule.preamble() ::= <<
-try 
-{
-	dbg.EnterRule("<ruleName>");
-	if ( ruleLevel==0 ) {dbg.Commence();}
-	ruleLevel++;
+try {
+	dbg.EnterRule(GrammarFileName, "<ruleName>");
+	if ( RuleLevel==0 ) {dbg.Commence();}
+	IncRuleLevel();
 	dbg.Location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 >>
+
+@lexer.debugAddition() ::= ", dbg"
 
 @rule.postamble() ::= <<
 dbg.Location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
 }
-finally
-{
-    dbg.ExitRule("<ruleName>");
-    ruleLevel--;
-    if ( ruleLevel==0 ) {dbg.Terminate();}
+finally {
+    dbg.ExitRule(GrammarFileName, "<ruleName>");
+    DecRuleLevel();
+    if ( RuleLevel==0 ) {dbg.Terminate();}
 }<\n>
 >>
 
@@ -209,8 +261,15 @@ catch (NoViableAltException nvae)
 }
 >>
 
+@cyclicDFA.debugMember() ::= <<
+IDebugEventListener dbg;
+
+>>
+
+@cyclicDFA.debugConstructorCalls() ::= "this.dbg = dbg;"
+
 @cyclicDFA.errorMethod() ::= <<
-public virtual void Error(NoViableAltException nvae) 
+public override void Error(NoViableAltException nvae) 
 {
     dbg.RecognitionException(nvae);
 }
