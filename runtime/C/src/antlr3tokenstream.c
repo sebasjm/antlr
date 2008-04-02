@@ -219,13 +219,14 @@ antlr3CommonTokenStreamNew(ANTLR3_UINT32 hint)
 
     /* Install the token stream API
      */
-    stream->tstream->_LT		=  tokLT;
-    stream->tstream->get		=  get;
-    stream->tstream->getTokenSource	=  getTokenSource;
-    stream->tstream->setTokenSource	=  setTokenSource;
-    stream->tstream->toString		=  toString;
-    stream->tstream->toStringSS		=  toStringSS;
-    stream->tstream->toStringTT		=  toStringTT;
+    stream->tstream->_LT				=  tokLT;
+    stream->tstream->get				=  get;
+    stream->tstream->getTokenSource		=  getTokenSource;
+    stream->tstream->setTokenSource		=  setTokenSource;
+    stream->tstream->toString			=  toString;
+    stream->tstream->toStringSS			=  toStringSS;
+    stream->tstream->toStringTT			=  toStringTT;
+	stream->tstream->setDebugListener	=  setDebugListener;
 
     /* Install INT_STREAM interface
      */
@@ -261,8 +262,8 @@ setDebugListener	(pANTLR3_TOKEN_STREAM ts, pANTLR3_DEBUG_EVENT_LISTENER debugger
 	ts->istream->consume		= dbgConsume;
 	ts->istream->_LA			= dbgLA;
 	ts->istream->mark			= dbgMark;
-	ts->istream->rewind		= dbgRewindStream;
-	ts->istream->rewindLast	= dbgRewindLast;
+	ts->istream->rewind			= dbgRewindStream;
+	ts->istream->rewindLast		= dbgRewindLast;
 	ts->istream->seek			= dbgSeek;
 }
 

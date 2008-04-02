@@ -92,6 +92,8 @@ antlr3DebugListenerNew()
 
 	delboy->PROTOCOL_VERSION		= 2;	// ANTLR 3.1 is at protocol version 2
 
+	delboy->port					= DEFAULT_DEBUGGER_PORT;
+
 	return delboy;
 }
 
@@ -266,9 +268,9 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	// send it the protocol version we are using and what the name of the grammar
 	// is that we represent.
 	//
-	sprintf		(message, "ANTLR %d", delboy->PROTOCOL_VERSION);
+	sprintf		(message, "ANTLR %d\n", delboy->PROTOCOL_VERSION);
 	sockSend	(delboy->socket, message, (int)strlen(message));
-	sprintf		(message, "grammar \"%s\"", delboy->grammarFileName->chars);
+	sprintf		(message, "grammar \"%s\"\n", delboy->grammarFileName->chars);
 	sockSend	(delboy->socket, message, (int)strlen(message));
 	ack			(delboy);
 
@@ -819,7 +821,7 @@ terminate				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 {
 	// Terminate sequence
 	//
-	sockSend(delboy->socket, "terminate", 9);		// Send out the command
+	sockSend(delboy->socket, "terminate\n", 10);		// Send out the command
 }
 
 //----------------------------------------------------------------

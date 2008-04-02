@@ -249,6 +249,7 @@ outputFile( LEXER,
 #define		USER3					LEXSTATE->user3
 #define		CUSTOM					LEXSTATE->custom
 #define		RULEMEMO				LEXSTATE->ruleMemo
+#define		DBG						RECOGNIZER->debugger
 
 /* If we have been told we can rely on the standard 8 bit or 16 bit input
  * stream, then we can define our macros to use the direct pointers
@@ -334,6 +335,7 @@ outputFile( LEXER,
 #undef      ADAPTOR
 #undef		SEEK
 #undef	    RULEMEMO		    
+#undef		DBG
 
 #define	    PARSER							ctx->pParser  
 #define	    RECOGNIZER						PARSER->rec
@@ -369,6 +371,7 @@ outputFile( LEXER,
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 #define     ADAPTOR                         ctx->adaptor
 #define		RULEMEMO						PSRSTATE->ruleMemo
+#define		DBG								RECOGNIZER->debugger
 <endif>
 
 <if(TREE_PARSER)>
@@ -406,6 +409,7 @@ outputFile( LEXER,
 #undef	    RULEMEMO		
 #undef		SEEK    
 #undef		INDEX
+#undef		DBG
 
 #define	    PARSER							ctx->pTreeParser  
 #define	    RECOGNIZER						PARSER->rec
@@ -439,8 +443,8 @@ outputFile( LEXER,
 #define     ADAPTOR                         INPUT->adaptor
 #define		RULEMEMO						PSRSTATE->ruleMemo
 #define		SEEK(n)							ISTREAM->seek(ISTREAM, n)
-#define		INDEX()					ISTREAM->index(ISTREAM)
-
+#define		INDEX()							ISTREAM->index(ISTREAM)
+#define		DBG								RECOGNIZER->debugger
 
 <endif>
 
@@ -669,7 +673,7 @@ struct <name>_Ctx_struct
 <recognizer.grammar.delegatedRules:{ruleDescriptor|
     <headerReturnType(ruleDescriptor)> (*<ruleDescriptor.name>)(struct <name>_Ctx_struct * ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 <endif>
-    unsigned char * (*getGrammarFileName)();
+    const char * (*getGrammarFileName)();
     void	    (*free)   (struct <name>_Ctx_struct * ctx);
     <@members>
     <@end>
@@ -834,11 +838,11 @@ static void
 
 /** \brief Name of the grammar file that generated this code
  */
-static unsigned char fileName[] = "<fileName>";
+static const char fileName[] = "<fileName>";
 
 /** \brief Return the name of the grammar file that generated this code.
  */
-static unsigned char * getGrammarFileName()
+static const char * getGrammarFileName()
 {
 	return fileName;
 }
@@ -1142,11 +1146,11 @@ static	void ANTLR3_CDECL freeScope(void * scope)
 
 /** \brief Name of the grammar file that generated this code
  */
-static unsigned char fileName[] = "<fileName>";
+static const char fileName[] = "<fileName>";
 
 /** \brief Return the name of the grammar file that generated this code.
  */
-static unsigned char * getGrammarFileName()
+static const char * getGrammarFileName()
 {
 	return fileName;
 }
@@ -1179,7 +1183,8 @@ ANTLR3_API p<name>
     
     if	(ctx == NULL)
     {
-	/* Failed to allocate memory for parser context */
+		// Failed to allocate memory for parser context
+		//
         return  NULL;
     }
     
@@ -1259,6 +1264,8 @@ ANTLR3_API p<name>
     /* Initialize the follow bit sets
      */
     <name>LoadFollowSets();
+    
+    <@debugStuff()>
     
     /* Return the newly built parser to the caller
      */
@@ -2211,7 +2218,7 @@ dfaState(k,edges,eotPredictsAlt,description,stateNumber,semPredState) ::= <<
 <else>
         <ruleBacktrackFailure()>
     
-        <newNVException()>    
+        <newNVException()>
         goto rule<ruleDescriptor.name>Ex;
 
 <endif>
