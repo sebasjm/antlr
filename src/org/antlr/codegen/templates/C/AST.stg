@@ -511,7 +511,13 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <hetero>New(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
 <if(args)>
-(<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, (pANTLR3_UINT8)<args; separator=", ">)
+
+#if <length(args)> == 2
+	(<ASTLabelType>)ADAPTOR->createTypeTokenText(ADAPTOR, <tokenType>, TOKTEXT(<args; separator=", ">))
+#else
+	(<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, (pANTLR3_UINT8)<args; separator=", ">)
+#endif
+
 <else>
 (<ASTLabelType>)ADAPTOR->createTypeText(ADAPTOR, <tokenType>, (pANTLR3_UINT8)"<tokenType>")
 <endif>
@@ -523,7 +529,13 @@ createRewriteNodeFromElement(token,hetero,args) ::= <<
 <hetero>New(stream_<token>->nextToken(stream_<token>)<if(args)>, <args; separator=", "><endif>)
 <else>
 <if(args)> <! must create new node from old !>
-ADAPTOR->createTypeToken(ADAPTOR, <token>->getType(<token>, TOKTEXT(<token>, <args; separator=", ">))
+
+#if	<length(args)> == 2
+ADAPTOR->createTypeTokenText(ADAPTOR, <token>->getType(<token>, TOKTEXT(<token>, <args; separator=", ">)) /* JIMI */
+#else
+ADAPTOR->createTypeToken(ADAPTOR, <token>->getType(<token>, <token>, <args; separator=", ">)
+#endif
+
 <else>
 stream_<token>->nextNode(stream_<token>)
 <endif>
