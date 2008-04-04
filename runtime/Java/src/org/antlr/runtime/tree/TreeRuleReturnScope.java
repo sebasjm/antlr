@@ -37,4 +37,5 @@ import org.antlr.runtime.RuleReturnScope;
 public class TreeRuleReturnScope extends RuleReturnScope {
 	/** First node or root node of tree matched for this rule. */
 	public Object start;
+	public Object getStart() { return start; }	
 }
