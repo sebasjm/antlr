@@ -554,7 +554,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		/// <returns>The source name</returns>
 		public abstract string SourceName {
-			get; set;
+			get;
 		}
 
 		/// <summary>A convenience method for use most often with template rewrites.

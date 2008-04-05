@@ -42,7 +42,8 @@
 group ASTParser;
 
 @rule.setErrorReturnValue() ::= <<
-retval.tree = (<ASTLabelType>)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+// Conversion of the second argument necessary, but harmless
+retval.tree = (<ASTLabelType>)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
 <! System.Console.WriteLine("<ruleName> returns " + ((CommonTree)retval.tree).ToStringTree()); !>
 >>
 

@@ -344,27 +344,28 @@ namespace Antlr.Runtime.Debug
 			}
 			else if (elements[0].Equals("enterAlt"))
 			{
-				listener.EnterAlt(int.Parse(elements[1]));
+				listener.EnterAlt(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("enterSubRule"))
 			{
-				listener.EnterSubRule(int.Parse(elements[1]));
+				listener.EnterSubRule(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("exitSubRule"))
 			{
-				listener.ExitSubRule(int.Parse(elements[1]));
+				listener.ExitSubRule(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("enterDecision"))
 			{
-				listener.EnterDecision(int.Parse(elements[1]));
+				listener.EnterDecision(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("exitDecision"))
 			{
-				listener.ExitDecision(int.Parse(elements[1]));
+				listener.ExitDecision(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("location"))
 			{
-				listener.Location(int.Parse(elements[1]), int.Parse(elements[2]));
+				listener.Location(int.Parse(elements[1], CultureInfo.InvariantCulture),
+				    int.Parse(elements[2], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("consumeToken"))
 			{
@@ -389,17 +390,17 @@ namespace Antlr.Runtime.Debug
 			else if (elements[0].Equals("LT"))
 			{
 				IToken t = DeserializeToken(elements, 2);
-				listener.LT(int.Parse(elements[1]), t);
+				listener.LT(int.Parse(elements[1], CultureInfo.InvariantCulture), t);
 			}
 			else if (elements[0].Equals("mark"))
 			{
-				listener.Mark(int.Parse(elements[1]));
+				listener.Mark(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("rewind"))
 			{
 				if (elements[1] != null)
 				{
-					listener.Rewind(int.Parse(elements[1]));
+					listener.Rewind(int.Parse(elements[1], CultureInfo.InvariantCulture));
 				}
 				else
 				{
@@ -408,12 +409,12 @@ namespace Antlr.Runtime.Debug
 			}
 			else if (elements[0].Equals("beginBacktrack"))
 			{
-				listener.BeginBacktrack(int.Parse(elements[1]));
+				listener.BeginBacktrack(int.Parse(elements[1], CultureInfo.InvariantCulture));
 			}
 			else if (elements[0].Equals("endBacktrack"))
 			{
-				int level = int.Parse(elements[1]);
-				int successI = int.Parse(elements[2]);
+				int level = int.Parse(elements[1], CultureInfo.InvariantCulture);
+				int successI = int.Parse(elements[2], CultureInfo.InvariantCulture);
 				//listener.EndBacktrack(level, successI == (int)true);
 				listener.EndBacktrack(level, successI == 1 /*1=TRUE*/);
 			}
@@ -428,9 +429,9 @@ namespace Antlr.Runtime.Debug
 				{
 					excClass = System.Type.GetType(excName);
 					RecognitionException e = (RecognitionException) System.Activator.CreateInstance(excClass);
-					e.Index = int.Parse(indexS);
-					e.Line = int.Parse(lineS);
-					e.CharPositionInLine = int.Parse(posS);
+					e.Index = int.Parse(indexS, CultureInfo.InvariantCulture);
+					e.Line = int.Parse(lineS, CultureInfo.InvariantCulture);
+					e.CharPositionInLine = int.Parse(posS, CultureInfo.InvariantCulture);
 					listener.RecognitionException(e);
 				}
 				catch (System.UnauthorizedAccessException iae)
@@ -465,14 +466,14 @@ namespace Antlr.Runtime.Debug
 			}
 			else if (elements[0].Equals("LN"))
 			{
-				int i = int.Parse(elements[1]);
+				int i = int.Parse(elements[1], CultureInfo.InvariantCulture);
 				ProxyTree node = DeserializeNode(elements, 2);
 				listener.LT(i, node);
 			}
 			else if (elements[0].Equals("createNodeFromTokenElements"))
 			{
-				int ID = int.Parse(elements[1]);
-				int type = int.Parse(elements[2]);
+				int ID = int.Parse(elements[1], CultureInfo.InvariantCulture);
+				int type = int.Parse(elements[2], CultureInfo.InvariantCulture);
 				string text = elements[3];
 				text = UnEscapeNewlines(text);
 				ProxyTree node = new ProxyTree(ID, type, -1, -1, -1, text);
@@ -480,8 +481,8 @@ namespace Antlr.Runtime.Debug
 			}
 			else if (elements[0].Equals("createNode"))
 			{
-				int ID = int.Parse(elements[1]);
-				int tokenIndex = int.Parse(elements[2]);
+				int ID = int.Parse(elements[1], CultureInfo.InvariantCulture);
+				int tokenIndex = int.Parse(elements[2], CultureInfo.InvariantCulture);
 				// create dummy node/token filled with ID, tokenIndex
 				ProxyTree node = new ProxyTree(ID);
 				ProxyToken token = new ProxyToken(tokenIndex);
@@ -489,7 +490,7 @@ namespace Antlr.Runtime.Debug
 			}
 			else if (elements[0].Equals("nilNode"))
 			{
-				int ID = int.Parse(elements[1]);
+				int ID = int.Parse(elements[1], CultureInfo.InvariantCulture);
 				ProxyTree node = new ProxyTree(ID);
 				listener.GetNilNode(node);
 			}
@@ -504,27 +505,27 @@ namespace Antlr.Runtime.Debug
 			}
 			else if (elements[0].Equals("becomeRoot"))
 			{
-				int newRootID = int.Parse(elements[1]);
-				int oldRootID = int.Parse(elements[2]);
+				int newRootID = int.Parse(elements[1], CultureInfo.InvariantCulture);
+				int oldRootID = int.Parse(elements[2], CultureInfo.InvariantCulture);
 				ProxyTree newRoot = new ProxyTree(newRootID);
 				ProxyTree oldRoot = new ProxyTree(oldRootID);
 				listener.BecomeRoot(newRoot, oldRoot);
 			}
 			else if (elements[0].Equals("addChild"))
 			{
-				int rootID = int.Parse(elements[1]);
-				int childID = int.Parse(elements[2]);
+				int rootID = int.Parse(elements[1], CultureInfo.InvariantCulture);
+				int childID = int.Parse(elements[2], CultureInfo.InvariantCulture);
 				ProxyTree root = new ProxyTree(rootID);
 				ProxyTree child = new ProxyTree(childID);
 				listener.AddChild(root, child);
 			}
 			else if (elements[0].Equals("setTokenBoundaries"))
 			{
-				int ID = int.Parse(elements[1]);
+				int ID = int.Parse(elements[1], CultureInfo.InvariantCulture);
 				ProxyTree node = new ProxyTree(ID);
 				listener.SetTokenBoundaries(node,
-											int.Parse(elements[2]),
-											int.Parse(elements[3]));
+											int.Parse(elements[2], CultureInfo.InvariantCulture),
+											int.Parse(elements[3], CultureInfo.InvariantCulture));
 			}
 			else
 			{
@@ -534,11 +535,11 @@ namespace Antlr.Runtime.Debug
 
 		protected internal ProxyTree DeserializeNode(string[] elements, int offset)
 		{
-			int ID = int.Parse(elements[offset + 0]);
-			int type = int.Parse(elements[offset + 1]);
-			int tokenLine = int.Parse(elements[offset + 2]);
-			int charPositionInLine = int.Parse(elements[offset + 3]);
-			int tokenIndex = int.Parse(elements[offset + 4]);
+			int ID = int.Parse(elements[offset + 0], CultureInfo.InvariantCulture);
+			int type = int.Parse(elements[offset + 1], CultureInfo.InvariantCulture);
+			int tokenLine = int.Parse(elements[offset + 2], CultureInfo.InvariantCulture);
+			int charPositionInLine = int.Parse(elements[offset + 3], CultureInfo.InvariantCulture);
+			int tokenIndex = int.Parse(elements[offset + 4], CultureInfo.InvariantCulture);
 			string text = elements[offset + 5];
 			text = UnEscapeNewlines(text);
 			return new ProxyTree(ID, type, tokenLine, charPositionInLine, tokenIndex, text);
@@ -553,8 +554,8 @@ namespace Antlr.Runtime.Debug
 			string posS = elements[offset + 4];
 			string text = elements[offset + 5];
 			text = UnEscapeNewlines(text);
-			int index = int.Parse(indexS);
-			ProxyToken t = new ProxyToken(index, int.Parse(typeS), int.Parse(channelS), int.Parse(lineS), int.Parse(posS), text);
+			int index = int.Parse(indexS, CultureInfo.InvariantCulture);
+			ProxyToken t = new ProxyToken(index, int.Parse(typeS, CultureInfo.InvariantCulture), int.Parse(channelS, CultureInfo.InvariantCulture), int.Parse(lineS, CultureInfo.InvariantCulture), int.Parse(posS, CultureInfo.InvariantCulture), text);
 			return t;
 		}
 		

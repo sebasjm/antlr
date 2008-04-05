@@ -67,6 +67,7 @@ namespace <actions.(actionScope).namespace>
 <@imports>
 using System;
 using Antlr.Runtime;
+using Antlr.Runtime.Debug;
 <if(TREE_PARSER)>
 using Antlr.Runtime.Tree;
 <endif>
@@ -91,7 +92,7 @@ using Hashtable 	= System.Collections.Hashtable;
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="IToken",
       filterMode) ::= <<
-public class <name> : Lexer 
+public class <grammar.recognizerName> : Lexer 
 {
     <tokens:{public const int <it.name> = <it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
@@ -104,14 +105,14 @@ public class <name> : Lexer
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
 
-    public <name>() <! needed by subclasses !>
+    public <grammar.recognizerName>() <! needed by subclasses !>
     {
 		InitializeCyclicDFAs();
     }
-    public <name>(ICharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+    public <grammar.recognizerName>(ICharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
 		: this(input, null<grammar.delegators:{g|, <g:delegateName()>}>) {
     }
-    public <name>(ICharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+    public <grammar.recognizerName>(ICharStream input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
 		: base(input, state) {
 		InitializeCyclicDFAs(); <! Necessary in C#??? Not removed yet. !>
 <if(memoize)>
@@ -223,7 +224,7 @@ filteringActionGate() ::= "(state.backtracking == 1)"
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="object", labelType, members, rewriteElementType) ::= <<
-public class <name> : <@superClassName><superClass><@end> 
+public class <grammar.recognizerName> : <@superClassName><superClass><@end> 
 {
 <if(grammar.grammarIsRoot)>
     public static readonly string[] tokenNames = new string[] 
@@ -249,11 +250,11 @@ public class <name> : <@superClassName><superClass><@end>
     <@members>
     <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
 
-    public <name>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+    public <grammar.recognizerName>(<inputStreamType> input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
 		: this(input, new RecognizerSharedState()<grammar.delegators:{g|, <g:delegateName()>}>) {
     }
 
-    public <name>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+    public <grammar.recognizerName>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
 		: base(input, state) {
 		InitializeCyclicDFAs();
         <parserCtorBody()>

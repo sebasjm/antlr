@@ -69,7 +69,6 @@ namespace Antlr.Runtime.Tree
 
 		override public string SourceName {
 			get { return input.SourceName; }
-			set { throw new NotSupportedException("Setter doesn't work - value can't be delegated."); }
 		}
 
 		/// <summary>Reset the parser </summary>
