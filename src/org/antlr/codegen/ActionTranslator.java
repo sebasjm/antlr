@@ -1,13 +1,17 @@
-// $ANTLR 3.1b1 ActionTranslator.g 2007-12-27 16:51:36
+// $ANTLR 3.1b1 ActionTranslator.g 2008-04-08 16:46:22
 
 package org.antlr.codegen;
-import org.antlr.runtime.*;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.runtime.*;
 import org.antlr.tool.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+
+import org.antlr.runtime.*;
+import java.util.Stack;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 public class ActionTranslator extends Lexer {
     public static final int LOCAL_ATTR=17;
     public static final int SET_DYNAMIC_SCOPE_ATTR=18;
@@ -35,7 +39,6 @@ public class ActionTranslator extends Lexer {
     public static final int EOF=-1;
     public static final int SET_LOCAL_ATTR=16;
     public static final int TEXT=36;
-    public static final int Tokens=38;
     public static final int DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR=22;
     public static final int SET_TOKEN_SCOPE_ATTR=9;
     public static final int ERROR_SCOPED_XY=20;
@@ -77,35 +80,6 @@ public class ActionTranslator extends Lexer {
     	    this.actionToken = actionToken;
     		this.outerAltNum = outerAltNum;
     	}
-    	// BACKWARD COMPATIBILITY UNTIL REGENERATING WITH 3.0b7
-    /*
-    	public Token emit(int tokenType,
-    					  int line, int charPosition,
-    					  int channel,
-    					  int start, int stop)
-    	{
-    		Token t = new CommonToken(input, tokenType, channel, start, stop);
-    		t.setLine(line);
-    		t.setText(text);
-    		t.setCharPositionInLine(charPosition);
-    		emit(t);
-    		return t;
-    	}
-    */
-
-    /*
-    public ActionTranslatorLexer(CharStream input, CodeGenerator generator,
-                                 Grammar grammar, Rule enclosingRule,
-                                 antlr.Token actionToken, int outerAltNum)
-    {
-        this(input);
-        this.grammar = grammar;
-        this.generator = generator;
-        this.enclosingRule = enclosingRule;
-        this.actionToken = actionToken;
-        this.outerAltNum = outerAltNum;
-    }
-    */
 
     /** Return a list of strings and StringTemplate objects that
      *  represent the translated action.
@@ -134,10 +108,10 @@ public class ActionTranslator extends Lexer {
     public List translateAction(String action) {
         ActionTranslator translator =
             new ActionTranslator(generator,
-								 enclosingRule.name,
-								 new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
-		return translator.translateToChunks();
-	}
+                                      enclosingRule.name,
+                                      new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
+        return translator.translateToChunks();
+    }
 
     public boolean isTokenRefInAlt(String id) {
         return enclosingRule.getTokenRefsInAlt(id, outerAltNum)!=null;
@@ -200,13 +174,12 @@ public class ActionTranslator extends Lexer {
     // delegates
     // delegators
 
-    public ActionTranslator() {;}
+    public ActionTranslator() {;} 
     public ActionTranslator(CharStream input) {
         this(input, new RecognizerSharedState());
     }
     public ActionTranslator(CharStream input, RecognizerSharedState state) {
         super(input,state);
-        this.state.ruleMemo = new HashMap[61+1];
 
     }
     public String getGrammarFileName() { return "ActionTranslator.g"; }
@@ -224,14 +197,14 @@ public class ActionTranslator extends Lexer {
     	state.text = null;
             try {
                 int m = input.mark();
-                state.backtracking=1;
+                state.backtracking=1; 
                 state.failed=false;
                 mTokens();
                 state.backtracking=0;
 
                 if ( state.failed ) {
                     input.rewind(m);
-                    input.consume();
+                    input.consume(); 
                 }
                 else {
                     emit();
@@ -264,8 +237,8 @@ public class ActionTranslator extends Lexer {
             Token y=null;
             Token expr=null;
 
-            // ActionTranslator.g:202:2: ( '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?)
-            // ActionTranslator.g:202:4: '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?
+            // ActionTranslator.g:173:2: ( '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?)
+            // ActionTranslator.g:173:4: '$' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?
             {
             match('$'); if (state.failed) return ;
             int xStart50 = getCharIndex();
@@ -275,18 +248,19 @@ public class ActionTranslator extends Lexer {
             int yStart56 = getCharIndex();
             mID(); if (state.failed) return ;
             y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart56, getCharIndex()-1);
-            // ActionTranslator.g:202:22: ( WS )?
+            // ActionTranslator.g:173:22: ( WS )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
-            if ( ((LA1_0>='\t' && LA1_0<='\n')||LA1_0==' ') ) {
+            if ( ((LA1_0>='\t' && LA1_0<='\n')||LA1_0=='\r'||LA1_0==' ') ) {
                 alt1=1;
             }
             switch (alt1) {
                 case 1 :
-                    // ActionTranslator.g:202:22: WS
+                    // ActionTranslator.g:173:22: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -342,8 +316,9 @@ public class ActionTranslator extends Lexer {
               			st.setAttribute("attr", scope.getAttribute((y!=null?y.getText():null)));
               			st.setAttribute("expr", translateAction((expr!=null?expr.getText():null)));
               		}
-
+              		
             }
+
 
             }
 
@@ -361,8 +336,8 @@ public class ActionTranslator extends Lexer {
             Token x=null;
             Token y=null;
 
-            // ActionTranslator.g:247:2: ( '$' x= ID '.' y= ID {...}?)
-            // ActionTranslator.g:247:4: '$' x= ID '.' y= ID {...}?
+            // ActionTranslator.g:218:2: ( '$' x= ID '.' y= ID {...}?)
+            // ActionTranslator.g:218:4: '$' x= ID '.' y= ID {...}?
             {
             match('$'); if (state.failed) return ;
             int xStart97 = getCharIndex();
@@ -404,8 +379,9 @@ public class ActionTranslator extends Lexer {
               			st.setAttribute("ruleDescriptor", enclosingRule);
               			st.setAttribute("attr", scope.getAttribute((y!=null?y.getText():null)));
               		}
-
+              		
             }
+
 
             }
 
@@ -423,8 +399,8 @@ public class ActionTranslator extends Lexer {
             Token x=null;
             Token y=null;
 
-            // ActionTranslator.g:281:2: ( '$' x= ID '.' y= ID ( WS )? '=' {...}?)
-            // ActionTranslator.g:281:4: '$' x= ID '.' y= ID ( WS )? '=' {...}?
+            // ActionTranslator.g:252:2: ( '$' x= ID '.' y= ID ( WS )? '=' {...}?)
+            // ActionTranslator.g:252:4: '$' x= ID '.' y= ID ( WS )? '=' {...}?
             {
             match('$'); if (state.failed) return ;
             int xStart129 = getCharIndex();
@@ -434,18 +410,19 @@ public class ActionTranslator extends Lexer {
             int yStart135 = getCharIndex();
             mID(); if (state.failed) return ;
             y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart135, getCharIndex()-1);
-            // ActionTranslator.g:281:22: ( WS )?
+            // ActionTranslator.g:252:22: ( WS )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
-            if ( ((LA2_0>='\t' && LA2_0<='\n')||LA2_0==' ') ) {
+            if ( ((LA2_0>='\t' && LA2_0<='\n')||LA2_0=='\r'||LA2_0==' ') ) {
                 alt2=1;
             }
             switch (alt2) {
                 case 1 :
-                    // ActionTranslator.g:281:22: WS
+                    // ActionTranslator.g:252:22: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -467,8 +444,9 @@ public class ActionTranslator extends Lexer {
               								  actionToken,
               								  (x!=null?x.getText():null),
               								  (y!=null?y.getText():null));
-
+              		
             }
+
 
             }
 
@@ -486,8 +464,8 @@ public class ActionTranslator extends Lexer {
             Token x=null;
             Token y=null;
 
-            // ActionTranslator.g:300:2: ( '$' x= ID '.' y= ID {...}?)
-            // ActionTranslator.g:300:4: '$' x= ID '.' y= ID {...}?
+            // ActionTranslator.g:271:2: ( '$' x= ID '.' y= ID {...}?)
+            // ActionTranslator.g:271:4: '$' x= ID '.' y= ID {...}?
             {
             match('$'); if (state.failed) return ;
             int xStart174 = getCharIndex();
@@ -525,8 +503,9 @@ public class ActionTranslator extends Lexer {
               		StringTemplate st = template("tokenLabelPropertyRef_"+(y!=null?y.getText():null));
               		st.setAttribute("scope", label);
               		st.setAttribute("attr", AttributeScope.tokenScope.getAttribute((y!=null?y.getText():null)));
-
+              		
             }
+
 
             }
 
@@ -548,8 +527,8 @@ public class ActionTranslator extends Lexer {
             Grammar.LabelElementPair pair=null;
             String refdRuleName=null;
 
-            // ActionTranslator.g:338:2: ( '$' x= ID '.' y= ID ( WS )? '=' {...}?{...}?)
-            // ActionTranslator.g:338:4: '$' x= ID '.' y= ID ( WS )? '=' {...}?{...}?
+            // ActionTranslator.g:309:2: ( '$' x= ID '.' y= ID ( WS )? '=' {...}?{...}?)
+            // ActionTranslator.g:309:4: '$' x= ID '.' y= ID ( WS )? '=' {...}?{...}?
             {
             match('$'); if (state.failed) return ;
             int xStart211 = getCharIndex();
@@ -559,18 +538,19 @@ public class ActionTranslator extends Lexer {
             int yStart217 = getCharIndex();
             mID(); if (state.failed) return ;
             y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart217, getCharIndex()-1);
-            // ActionTranslator.g:338:22: ( WS )?
+            // ActionTranslator.g:309:22: ( WS )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
-            if ( ((LA3_0>='\t' && LA3_0<='\n')||LA3_0==' ') ) {
+            if ( ((LA3_0>='\t' && LA3_0<='\n')||LA3_0=='\r'||LA3_0==' ') ) {
                 alt3=1;
             }
             switch (alt3) {
                 case 1 :
-                    // ActionTranslator.g:338:22: WS
+                    // ActionTranslator.g:309:22: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -589,7 +569,7 @@ public class ActionTranslator extends Lexer {
               		if ( pair!=null ) {
               			refdRuleName = pair.referencedRuleName;
               		}
-
+              		
             }
             if ( !((enclosingRule.getRuleLabel((x!=null?x.getText():null))!=null || isRuleRefInAlt((x!=null?x.getText():null))) &&
             	      getRuleLabelAttribute(enclosingRule.getRuleLabel((x!=null?x.getText():null))!=null?enclosingRule.getRuleLabel((x!=null?x.getText():null)).referencedRuleName:(x!=null?x.getText():null),(y!=null?y.getText():null))!=null) ) {
@@ -603,8 +583,9 @@ public class ActionTranslator extends Lexer {
               								  actionToken,
               								  (x!=null?x.getText():null),
               								  (y!=null?y.getText():null));
-
+              		
             }
+
 
             }
 
@@ -626,8 +607,8 @@ public class ActionTranslator extends Lexer {
             Grammar.LabelElementPair pair=null;
             String refdRuleName=null;
 
-            // ActionTranslator.g:367:2: ( '$' x= ID '.' y= ID {...}?{...}?)
-            // ActionTranslator.g:367:4: '$' x= ID '.' y= ID {...}?{...}?
+            // ActionTranslator.g:338:2: ( '$' x= ID '.' y= ID {...}?{...}?)
+            // ActionTranslator.g:338:4: '$' x= ID '.' y= ID {...}?{...}?
             {
             match('$'); if (state.failed) return ;
             int xStart270 = getCharIndex();
@@ -648,7 +629,7 @@ public class ActionTranslator extends Lexer {
               		if ( pair!=null ) {
               			refdRuleName = pair.referencedRuleName;
               		}
-
+              		
             }
             if ( !((enclosingRule.getRuleLabel((x!=null?x.getText():null))!=null || isRuleRefInAlt((x!=null?x.getText():null))) &&
             	      getRuleLabelAttribute(enclosingRule.getRuleLabel((x!=null?x.getText():null))!=null?enclosingRule.getRuleLabel((x!=null?x.getText():null)).referencedRuleName:(x!=null?x.getText():null),(y!=null?y.getText():null))!=null) ) {
@@ -694,8 +675,9 @@ public class ActionTranslator extends Lexer {
               			st.setAttribute("scope", label);
               			st.setAttribute("attr", scope.getAttribute((y!=null?y.getText():null)));
               		}
-
+              		
             }
+
 
             }
 
@@ -712,8 +694,8 @@ public class ActionTranslator extends Lexer {
             int _type = LABEL_REF;
             Token ID1=null;
 
-            // ActionTranslator.g:425:2: ( '$' ID {...}?)
-            // ActionTranslator.g:425:4: '$' ID {...}?
+            // ActionTranslator.g:396:2: ( '$' ID {...}?)
+            // ActionTranslator.g:396:4: '$' ID {...}?
             {
             match('$'); if (state.failed) return ;
             int ID1Start318 = getCharIndex();
@@ -738,8 +720,9 @@ public class ActionTranslator extends Lexer {
               			st = template("listLabelRef");
               		}
               		st.setAttribute("label", (ID1!=null?ID1.getText():null));
-
+              		
             }
+
 
             }
 
@@ -756,8 +739,8 @@ public class ActionTranslator extends Lexer {
             int _type = ISOLATED_TOKEN_REF;
             Token ID2=null;
 
-            // ActionTranslator.g:446:2: ( '$' ID {...}?)
-            // ActionTranslator.g:446:4: '$' ID {...}?
+            // ActionTranslator.g:417:2: ( '$' ID {...}?)
+            // ActionTranslator.g:417:4: '$' ID {...}?
             {
             match('$'); if (state.failed) return ;
             int ID2Start342 = getCharIndex();
@@ -781,8 +764,9 @@ public class ActionTranslator extends Lexer {
               			StringTemplate st = template("tokenLabelRef");
               			st.setAttribute("label", label);
               		}
-
+              		
             }
+
 
             }
 
@@ -799,8 +783,8 @@ public class ActionTranslator extends Lexer {
             int _type = ISOLATED_LEXER_RULE_REF;
             Token ID3=null;
 
-            // ActionTranslator.g:466:2: ( '$' ID {...}?)
-            // ActionTranslator.g:466:4: '$' ID {...}?
+            // ActionTranslator.g:437:2: ( '$' ID {...}?)
+            // ActionTranslator.g:437:4: '$' ID {...}?
             {
             match('$'); if (state.failed) return ;
             int ID3Start366 = getCharIndex();
@@ -826,8 +810,9 @@ public class ActionTranslator extends Lexer {
               			StringTemplate st = template("lexerRuleLabel");
               			st.setAttribute("label", label);
               		}
-
+              		
             }
+
 
             }
 
@@ -845,25 +830,26 @@ public class ActionTranslator extends Lexer {
             Token expr=null;
             Token ID4=null;
 
-            // ActionTranslator.g:498:2: ( '$' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?)
-            // ActionTranslator.g:498:4: '$' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?
+            // ActionTranslator.g:469:2: ( '$' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?)
+            // ActionTranslator.g:469:4: '$' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?
             {
             match('$'); if (state.failed) return ;
             int ID4Start390 = getCharIndex();
             mID(); if (state.failed) return ;
             ID4 = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, ID4Start390, getCharIndex()-1);
-            // ActionTranslator.g:498:11: ( WS )?
+            // ActionTranslator.g:469:11: ( WS )?
             int alt4=2;
             int LA4_0 = input.LA(1);
 
-            if ( ((LA4_0>='\t' && LA4_0<='\n')||LA4_0==' ') ) {
+            if ( ((LA4_0>='\t' && LA4_0<='\n')||LA4_0=='\r'||LA4_0==' ') ) {
                 alt4=1;
             }
             switch (alt4) {
                 case 1 :
-                    // ActionTranslator.g:498:11: WS
+                    // ActionTranslator.g:469:11: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -911,8 +897,9 @@ public class ActionTranslator extends Lexer {
               			st.setAttribute("attr", scope.getAttribute((ID4!=null?ID4.getText():null)));
               			st.setAttribute("expr", translateAction((expr!=null?expr.getText():null)));
               			}
-
+              		
             }
+
 
             }
 
@@ -929,8 +916,8 @@ public class ActionTranslator extends Lexer {
             int _type = LOCAL_ATTR;
             Token ID5=null;
 
-            // ActionTranslator.g:534:2: ( '$' ID {...}?)
-            // ActionTranslator.g:534:4: '$' ID {...}?
+            // ActionTranslator.g:505:2: ( '$' ID {...}?)
+            // ActionTranslator.g:505:4: '$' ID {...}?
             {
             match('$'); if (state.failed) return ;
             int ID5Start422 = getCharIndex();
@@ -964,8 +951,9 @@ public class ActionTranslator extends Lexer {
               			st.setAttribute("ruleDescriptor", enclosingRule);
               			st.setAttribute("attr", scope.getAttribute((ID5!=null?ID5.getText():null)));
               		}
-
+              		
             }
+
 
             }
 
@@ -984,8 +972,8 @@ public class ActionTranslator extends Lexer {
             Token y=null;
             Token expr=null;
 
-            // ActionTranslator.g:575:2: ( '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?)
-            // ActionTranslator.g:575:4: '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?
+            // ActionTranslator.g:546:2: ( '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?)
+            // ActionTranslator.g:546:4: '$' x= ID '::' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' {...}?
             {
             match('$'); if (state.failed) return ;
             int xStart448 = getCharIndex();
@@ -996,18 +984,19 @@ public class ActionTranslator extends Lexer {
             int yStart454 = getCharIndex();
             mID(); if (state.failed) return ;
             y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart454, getCharIndex()-1);
-            // ActionTranslator.g:575:23: ( WS )?
+            // ActionTranslator.g:546:23: ( WS )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
-            if ( ((LA5_0>='\t' && LA5_0<='\n')||LA5_0==' ') ) {
+            if ( ((LA5_0>='\t' && LA5_0<='\n')||LA5_0=='\r'||LA5_0==' ') ) {
                 alt5=1;
             }
             switch (alt5) {
                 case 1 :
-                    // ActionTranslator.g:575:23: WS
+                    // ActionTranslator.g:546:23: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -1036,8 +1025,9 @@ public class ActionTranslator extends Lexer {
               		else {
               			// error: invalid dynamic attribute
               		}
-
+              		
             }
+
 
             }
 
@@ -1055,8 +1045,8 @@ public class ActionTranslator extends Lexer {
             Token x=null;
             Token y=null;
 
-            // ActionTranslator.g:594:2: ( '$' x= ID '::' y= ID {...}?)
-            // ActionTranslator.g:594:4: '$' x= ID '::' y= ID {...}?
+            // ActionTranslator.g:565:2: ( '$' x= ID '::' y= ID {...}?)
+            // ActionTranslator.g:565:4: '$' x= ID '::' y= ID {...}?
             {
             match('$'); if (state.failed) return ;
             int xStart498 = getCharIndex();
@@ -1083,8 +1073,9 @@ public class ActionTranslator extends Lexer {
               		else {
               			// error: invalid dynamic attribute
               		}
-
+              		
             }
+
 
             }
 
@@ -1102,8 +1093,8 @@ public class ActionTranslator extends Lexer {
             Token x=null;
             Token y=null;
 
-            // ActionTranslator.g:613:2: ( '$' x= ID '::' y= ID )
-            // ActionTranslator.g:613:4: '$' x= ID '::' y= ID
+            // ActionTranslator.g:584:2: ( '$' x= ID '::' y= ID )
+            // ActionTranslator.g:584:4: '$' x= ID '::' y= ID
             {
             match('$'); if (state.failed) return ;
             int xStart538 = getCharIndex();
@@ -1119,9 +1110,10 @@ public class ActionTranslator extends Lexer {
               		chunks.add(getText());
               		generator.issueInvalidScopeError((x!=null?x.getText():null),(y!=null?y.getText():null),
               		                                 enclosingRule,actionToken,
-              		                                 outerAltNum);
-
+              		                                 outerAltNum);		
+              		
             }
+
 
             }
 
@@ -1140,8 +1132,8 @@ public class ActionTranslator extends Lexer {
             Token expr=null;
             Token y=null;
 
-            // ActionTranslator.g:631:2: ( '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
-            // ActionTranslator.g:631:4: '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
+            // ActionTranslator.g:602:2: ( '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
+            // ActionTranslator.g:602:4: '$' x= ID '[' '-' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
             int xStart566 = getCharIndex();
@@ -1164,8 +1156,9 @@ public class ActionTranslator extends Lexer {
               		st.setAttribute("scope",    (x!=null?x.getText():null));
               		st.setAttribute("attr",     resolveDynamicScope((x!=null?x.getText():null)).getAttribute((y!=null?y.getText():null)));
               		st.setAttribute("negIndex", (expr!=null?expr.getText():null));
-
+              		
             }
+
 
             }
 
@@ -1184,8 +1177,8 @@ public class ActionTranslator extends Lexer {
             Token expr=null;
             Token y=null;
 
-            // ActionTranslator.g:642:2: ( '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
-            // ActionTranslator.g:642:4: '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
+            // ActionTranslator.g:613:2: ( '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID )
+            // ActionTranslator.g:613:4: '$' x= ID '[' expr= SCOPE_INDEX_EXPR ']' '::' y= ID
             {
             match('$'); if (state.failed) return ;
             int xStart606 = getCharIndex();
@@ -1207,8 +1200,9 @@ public class ActionTranslator extends Lexer {
               		st.setAttribute("scope", (x!=null?x.getText():null));
               		st.setAttribute("attr",  resolveDynamicScope((x!=null?x.getText():null)).getAttribute((y!=null?y.getText():null)));
               		st.setAttribute("index", (expr!=null?expr.getText():null));
-
+              		
             }
+
 
             }
 
@@ -1222,10 +1216,10 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start SCOPE_INDEX_EXPR
     public final void mSCOPE_INDEX_EXPR() throws RecognitionException {
         try {
-            // ActionTranslator.g:654:2: ( (~ ']' )+ )
-            // ActionTranslator.g:654:4: (~ ']' )+
+            // ActionTranslator.g:625:2: ( (~ ']' )+ )
+            // ActionTranslator.g:625:4: (~ ']' )+
             {
-            // ActionTranslator.g:654:4: (~ ']' )+
+            // ActionTranslator.g:625:4: (~ ']' )+
             int cnt6=0;
             loop6:
             do {
@@ -1239,7 +1233,7 @@ public class ActionTranslator extends Lexer {
 
                 switch (alt6) {
             	case 1 :
-            	    // ActionTranslator.g:654:5: ~ ']'
+            	    // ActionTranslator.g:625:5: ~ ']'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\\')||(input.LA(1)>='^' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -1247,10 +1241,10 @@ public class ActionTranslator extends Lexer {
             	    }
             	    else {
             	        if (state.backtracking>0) {state.failed=true; return ;}
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
+
 
 
             	    }
@@ -1267,6 +1261,7 @@ public class ActionTranslator extends Lexer {
             } while (true);
 
 
+
             }
 
         }
@@ -1281,8 +1276,8 @@ public class ActionTranslator extends Lexer {
             int _type = ISOLATED_DYNAMIC_SCOPE;
             Token ID6=null;
 
-            // ActionTranslator.g:663:2: ( '$' ID {...}?)
-            // ActionTranslator.g:663:4: '$' ID {...}?
+            // ActionTranslator.g:634:2: ( '$' ID {...}?)
+            // ActionTranslator.g:634:4: '$' ID {...}?
             {
             match('$'); if (state.failed) return ;
             int ID6Start663 = getCharIndex();
@@ -1296,8 +1291,9 @@ public class ActionTranslator extends Lexer {
 
               		StringTemplate st = template("isolatedDynamicScopeRef");
               		st.setAttribute("scope", (ID6!=null?ID6.getText():null));
-
+              		
             }
+
 
             }
 
@@ -1312,35 +1308,36 @@ public class ActionTranslator extends Lexer {
     public final void mTEMPLATE_INSTANCE() throws RecognitionException {
         try {
             int _type = TEMPLATE_INSTANCE;
-            // ActionTranslator.g:676:2: ( '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
-            // ActionTranslator.g:676:4: '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
+            // ActionTranslator.g:647:2: ( '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
+            // ActionTranslator.g:647:4: '%' ID '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
             {
             match('%'); if (state.failed) return ;
             mID(); if (state.failed) return ;
             match('('); if (state.failed) return ;
-            // ActionTranslator.g:676:15: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
+            // ActionTranslator.g:647:15: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
             int alt11=2;
             int LA11_0 = input.LA(1);
 
-            if ( ((LA11_0>='\t' && LA11_0<='\n')||LA11_0==' '||(LA11_0>='A' && LA11_0<='Z')||LA11_0=='_'||(LA11_0>='a' && LA11_0<='z')) ) {
+            if ( ((LA11_0>='\t' && LA11_0<='\n')||LA11_0=='\r'||LA11_0==' '||(LA11_0>='A' && LA11_0<='Z')||LA11_0=='_'||(LA11_0>='a' && LA11_0<='z')) ) {
                 alt11=1;
             }
             switch (alt11) {
                 case 1 :
-                    // ActionTranslator.g:676:17: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
+                    // ActionTranslator.g:647:17: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
                     {
-                    // ActionTranslator.g:676:17: ( WS )?
+                    // ActionTranslator.g:647:17: ( WS )?
                     int alt7=2;
                     int LA7_0 = input.LA(1);
 
-                    if ( ((LA7_0>='\t' && LA7_0<='\n')||LA7_0==' ') ) {
+                    if ( ((LA7_0>='\t' && LA7_0<='\n')||LA7_0=='\r'||LA7_0==' ') ) {
                         alt7=1;
                     }
                     switch (alt7) {
                         case 1 :
-                            // ActionTranslator.g:676:17: WS
+                            // ActionTranslator.g:647:17: WS
                             {
                             mWS(); if (state.failed) return ;
+
 
                             }
                             break;
@@ -1348,7 +1345,7 @@ public class ActionTranslator extends Lexer {
                     }
 
                     mARG(); if (state.failed) return ;
-                    // ActionTranslator.g:676:25: ( ',' ( WS )? ARG )*
+                    // ActionTranslator.g:647:25: ( ',' ( WS )? ARG )*
                     loop9:
                     do {
                         int alt9=2;
@@ -1361,21 +1358,22 @@ public class ActionTranslator extends Lexer {
 
                         switch (alt9) {
                     	case 1 :
-                    	    // ActionTranslator.g:676:26: ',' ( WS )? ARG
+                    	    // ActionTranslator.g:647:26: ',' ( WS )? ARG
                     	    {
                     	    match(','); if (state.failed) return ;
-                    	    // ActionTranslator.g:676:30: ( WS )?
+                    	    // ActionTranslator.g:647:30: ( WS )?
                     	    int alt8=2;
                     	    int LA8_0 = input.LA(1);
 
-                    	    if ( ((LA8_0>='\t' && LA8_0<='\n')||LA8_0==' ') ) {
+                    	    if ( ((LA8_0>='\t' && LA8_0<='\n')||LA8_0=='\r'||LA8_0==' ') ) {
                     	        alt8=1;
                     	    }
                     	    switch (alt8) {
                     	        case 1 :
-                    	            // ActionTranslator.g:676:30: WS
+                    	            // ActionTranslator.g:647:30: WS
                     	            {
                     	            mWS(); if (state.failed) return ;
+
 
                     	            }
                     	            break;
@@ -1383,6 +1381,7 @@ public class ActionTranslator extends Lexer {
                     	    }
 
                     	    mARG(); if (state.failed) return ;
+
 
                     	    }
                     	    break;
@@ -1392,23 +1391,25 @@ public class ActionTranslator extends Lexer {
                         }
                     } while (true);
 
-                    // ActionTranslator.g:676:40: ( WS )?
+                    // ActionTranslator.g:647:40: ( WS )?
                     int alt10=2;
                     int LA10_0 = input.LA(1);
 
-                    if ( ((LA10_0>='\t' && LA10_0<='\n')||LA10_0==' ') ) {
+                    if ( ((LA10_0>='\t' && LA10_0<='\n')||LA10_0=='\r'||LA10_0==' ') ) {
                         alt10=1;
                     }
                     switch (alt10) {
                         case 1 :
-                            // ActionTranslator.g:676:40: WS
+                            // ActionTranslator.g:647:40: WS
                             {
                             mWS(); if (state.failed) return ;
+
 
                             }
                             break;
 
                     }
+
 
 
                     }
@@ -1432,8 +1433,9 @@ public class ActionTranslator extends Lexer {
               		if ( st!=null ) {
               			chunks.add(st);
               		}
-
+              		
             }
+
 
             }
 
@@ -1448,37 +1450,38 @@ public class ActionTranslator extends Lexer {
     public final void mINDIRECT_TEMPLATE_INSTANCE() throws RecognitionException {
         try {
             int _type = INDIRECT_TEMPLATE_INSTANCE;
-            // ActionTranslator.g:697:2: ( '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
-            // ActionTranslator.g:697:4: '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
+            // ActionTranslator.g:668:2: ( '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')' )
+            // ActionTranslator.g:668:4: '%' '(' ACTION ')' '(' ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )? ')'
             {
             match('%'); if (state.failed) return ;
             match('('); if (state.failed) return ;
             mACTION(); if (state.failed) return ;
             match(')'); if (state.failed) return ;
             match('('); if (state.failed) return ;
-            // ActionTranslator.g:697:27: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
+            // ActionTranslator.g:668:27: ( ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )? )?
             int alt16=2;
             int LA16_0 = input.LA(1);
 
-            if ( ((LA16_0>='\t' && LA16_0<='\n')||LA16_0==' '||(LA16_0>='A' && LA16_0<='Z')||LA16_0=='_'||(LA16_0>='a' && LA16_0<='z')) ) {
+            if ( ((LA16_0>='\t' && LA16_0<='\n')||LA16_0=='\r'||LA16_0==' '||(LA16_0>='A' && LA16_0<='Z')||LA16_0=='_'||(LA16_0>='a' && LA16_0<='z')) ) {
                 alt16=1;
             }
             switch (alt16) {
                 case 1 :
-                    // ActionTranslator.g:697:29: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
+                    // ActionTranslator.g:668:29: ( WS )? ARG ( ',' ( WS )? ARG )* ( WS )?
                     {
-                    // ActionTranslator.g:697:29: ( WS )?
+                    // ActionTranslator.g:668:29: ( WS )?
                     int alt12=2;
                     int LA12_0 = input.LA(1);
 
-                    if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0==' ') ) {
+                    if ( ((LA12_0>='\t' && LA12_0<='\n')||LA12_0=='\r'||LA12_0==' ') ) {
                         alt12=1;
                     }
                     switch (alt12) {
                         case 1 :
-                            // ActionTranslator.g:697:29: WS
+                            // ActionTranslator.g:668:29: WS
                             {
                             mWS(); if (state.failed) return ;
+
 
                             }
                             break;
@@ -1486,7 +1489,7 @@ public class ActionTranslator extends Lexer {
                     }
 
                     mARG(); if (state.failed) return ;
-                    // ActionTranslator.g:697:37: ( ',' ( WS )? ARG )*
+                    // ActionTranslator.g:668:37: ( ',' ( WS )? ARG )*
                     loop14:
                     do {
                         int alt14=2;
@@ -1499,21 +1502,22 @@ public class ActionTranslator extends Lexer {
 
                         switch (alt14) {
                     	case 1 :
-                    	    // ActionTranslator.g:697:38: ',' ( WS )? ARG
+                    	    // ActionTranslator.g:668:38: ',' ( WS )? ARG
                     	    {
                     	    match(','); if (state.failed) return ;
-                    	    // ActionTranslator.g:697:42: ( WS )?
+                    	    // ActionTranslator.g:668:42: ( WS )?
                     	    int alt13=2;
                     	    int LA13_0 = input.LA(1);
 
-                    	    if ( ((LA13_0>='\t' && LA13_0<='\n')||LA13_0==' ') ) {
+                    	    if ( ((LA13_0>='\t' && LA13_0<='\n')||LA13_0=='\r'||LA13_0==' ') ) {
                     	        alt13=1;
                     	    }
                     	    switch (alt13) {
                     	        case 1 :
-                    	            // ActionTranslator.g:697:42: WS
+                    	            // ActionTranslator.g:668:42: WS
                     	            {
                     	            mWS(); if (state.failed) return ;
+
 
                     	            }
                     	            break;
@@ -1521,6 +1525,7 @@ public class ActionTranslator extends Lexer {
                     	    }
 
                     	    mARG(); if (state.failed) return ;
+
 
                     	    }
                     	    break;
@@ -1530,23 +1535,25 @@ public class ActionTranslator extends Lexer {
                         }
                     } while (true);
 
-                    // ActionTranslator.g:697:52: ( WS )?
+                    // ActionTranslator.g:668:52: ( WS )?
                     int alt15=2;
                     int LA15_0 = input.LA(1);
 
-                    if ( ((LA15_0>='\t' && LA15_0<='\n')||LA15_0==' ') ) {
+                    if ( ((LA15_0>='\t' && LA15_0<='\n')||LA15_0=='\r'||LA15_0==' ') ) {
                         alt15=1;
                     }
                     switch (alt15) {
                         case 1 :
-                            // ActionTranslator.g:697:52: WS
+                            // ActionTranslator.g:668:52: WS
                             {
                             mWS(); if (state.failed) return ;
+
 
                             }
                             break;
 
                     }
+
 
 
                     }
@@ -1564,8 +1571,9 @@ public class ActionTranslator extends Lexer {
               												   actionToken,
               												   action);
               		chunks.add(st);
-
+              		
             }
+
 
             }
 
@@ -1579,12 +1587,13 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start ARG
     public final void mARG() throws RecognitionException {
         try {
-            // ActionTranslator.g:711:5: ( ID '=' ACTION )
-            // ActionTranslator.g:711:7: ID '=' ACTION
+            // ActionTranslator.g:682:5: ( ID '=' ACTION )
+            // ActionTranslator.g:682:7: ID '=' ACTION
             {
             mID(); if (state.failed) return ;
             match('='); if (state.failed) return ;
             mACTION(); if (state.failed) return ;
+
 
             }
 
@@ -1602,8 +1611,8 @@ public class ActionTranslator extends Lexer {
             Token expr=null;
             Token ID7=null;
 
-            // ActionTranslator.g:716:2: ( '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionTranslator.g:716:4: '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionTranslator.g:687:2: ( '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionTranslator.g:687:4: '%' a= ACTION '.' ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
             int aStart813 = getCharIndex();
@@ -1613,18 +1622,19 @@ public class ActionTranslator extends Lexer {
             int ID7Start817 = getCharIndex();
             mID(); if (state.failed) return ;
             ID7 = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, ID7Start817, getCharIndex()-1);
-            // ActionTranslator.g:716:24: ( WS )?
+            // ActionTranslator.g:687:24: ( WS )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
-            if ( ((LA17_0>='\t' && LA17_0<='\n')||LA17_0==' ') ) {
+            if ( ((LA17_0>='\t' && LA17_0<='\n')||LA17_0=='\r'||LA17_0==' ') ) {
                 alt17=1;
             }
             switch (alt17) {
                 case 1 :
-                    // ActionTranslator.g:716:24: WS
+                    // ActionTranslator.g:687:24: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -1644,8 +1654,9 @@ public class ActionTranslator extends Lexer {
               		st.setAttribute("st", translateAction(action));
               		st.setAttribute("attrName", (ID7!=null?ID7.getText():null));
               		st.setAttribute("expr", translateAction((expr!=null?expr.getText():null)));
-
+              		
             }
+
 
             }
 
@@ -1664,8 +1675,8 @@ public class ActionTranslator extends Lexer {
             Token y=null;
             Token expr=null;
 
-            // ActionTranslator.g:733:2: ( '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
-            // ActionTranslator.g:733:4: '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
+            // ActionTranslator.g:704:2: ( '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';' )
+            // ActionTranslator.g:704:4: '%' x= ID '.' y= ID ( WS )? '=' expr= ATTR_VALUE_EXPR ';'
             {
             match('%'); if (state.failed) return ;
             int xStart853 = getCharIndex();
@@ -1675,18 +1686,19 @@ public class ActionTranslator extends Lexer {
             int yStart859 = getCharIndex();
             mID(); if (state.failed) return ;
             y = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, yStart859, getCharIndex()-1);
-            // ActionTranslator.g:733:22: ( WS )?
+            // ActionTranslator.g:704:22: ( WS )?
             int alt18=2;
             int LA18_0 = input.LA(1);
 
-            if ( ((LA18_0>='\t' && LA18_0<='\n')||LA18_0==' ') ) {
+            if ( ((LA18_0>='\t' && LA18_0<='\n')||LA18_0=='\r'||LA18_0==' ') ) {
                 alt18=1;
             }
             switch (alt18) {
                 case 1 :
-                    // ActionTranslator.g:733:22: WS
+                    // ActionTranslator.g:704:22: WS
                     {
                     mWS(); if (state.failed) return ;
+
 
                     }
                     break;
@@ -1704,8 +1716,9 @@ public class ActionTranslator extends Lexer {
               		st.setAttribute("st", (x!=null?x.getText():null));
               		st.setAttribute("attrName", (y!=null?y.getText():null));
               		st.setAttribute("expr", translateAction((expr!=null?expr.getText():null)));
-
+              		
             }
+
 
             }
 
@@ -1719,8 +1732,8 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start ATTR_VALUE_EXPR
     public final void mATTR_VALUE_EXPR() throws RecognitionException {
         try {
-            // ActionTranslator.g:746:2: (~ '=' (~ ';' )* )
-            // ActionTranslator.g:746:4: ~ '=' (~ ';' )*
+            // ActionTranslator.g:717:2: (~ '=' (~ ';' )* )
+            // ActionTranslator.g:717:4: ~ '=' (~ ';' )*
             {
             if ( (input.LA(1)>='\u0000' && input.LA(1)<='<')||(input.LA(1)>='>' && input.LA(1)<='\uFFFE') ) {
                 input.consume();
@@ -1728,12 +1741,11 @@ public class ActionTranslator extends Lexer {
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return ;}
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
-            // ActionTranslator.g:746:9: (~ ';' )*
+            // ActionTranslator.g:717:9: (~ ';' )*
             loop19:
             do {
                 int alt19=2;
@@ -1746,7 +1758,7 @@ public class ActionTranslator extends Lexer {
 
                 switch (alt19) {
             	case 1 :
-            	    // ActionTranslator.g:746:10: ~ ';'
+            	    // ActionTranslator.g:717:10: ~ ';'
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<=':')||(input.LA(1)>='<' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -1754,10 +1766,10 @@ public class ActionTranslator extends Lexer {
             	    }
             	    else {
             	        if (state.backtracking>0) {state.failed=true; return ;}
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
+
 
 
             	    }
@@ -1767,6 +1779,7 @@ public class ActionTranslator extends Lexer {
             	    break loop19;
                 }
             } while (true);
+
 
 
             }
@@ -1783,8 +1796,8 @@ public class ActionTranslator extends Lexer {
             int _type = TEMPLATE_EXPR;
             Token a=null;
 
-            // ActionTranslator.g:751:2: ( '%' a= ACTION )
-            // ActionTranslator.g:751:4: '%' a= ACTION
+            // ActionTranslator.g:722:2: ( '%' a= ACTION )
+            // ActionTranslator.g:722:4: '%' a= ACTION
             {
             match('%'); if (state.failed) return ;
             int aStart917 = getCharIndex();
@@ -1796,8 +1809,9 @@ public class ActionTranslator extends Lexer {
               		String action = (a!=null?a.getText():null);
               		action = action.substring(1,action.length()-1); // stuff inside {...}
               		st.setAttribute("stringExpr", translateAction(action));
-
+              		
             }
+
 
             }
 
@@ -1811,11 +1825,11 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start ACTION
     public final void mACTION() throws RecognitionException {
         try {
-            // ActionTranslator.g:763:2: ( '{' ( options {greedy=false; } : . )* '}' )
-            // ActionTranslator.g:763:4: '{' ( options {greedy=false; } : . )* '}'
+            // ActionTranslator.g:734:2: ( '{' ( options {greedy=false; } : . )* '}' )
+            // ActionTranslator.g:734:4: '{' ( options {greedy=false; } : . )* '}'
             {
             match('{'); if (state.failed) return ;
-            // ActionTranslator.g:763:8: ( options {greedy=false; } : . )*
+            // ActionTranslator.g:734:8: ( options {greedy=false; } : . )*
             loop20:
             do {
                 int alt20=2;
@@ -1831,9 +1845,10 @@ public class ActionTranslator extends Lexer {
 
                 switch (alt20) {
             	case 1 :
-            	    // ActionTranslator.g:763:33: .
+            	    // ActionTranslator.g:734:33: .
             	    {
             	    matchAny(); if (state.failed) return ;
+
 
             	    }
             	    break;
@@ -1844,6 +1859,7 @@ public class ActionTranslator extends Lexer {
             } while (true);
 
             match('}'); if (state.failed) return ;
+
 
             }
 
@@ -1857,7 +1873,7 @@ public class ActionTranslator extends Lexer {
     public final void mESC() throws RecognitionException {
         try {
             int _type = ESC;
-            // ActionTranslator.g:766:5: ( '\\\\' '$' | '\\\\' '%' | '\\\\' ~ ( '$' | '%' ) )
+            // ActionTranslator.g:737:5: ( '\\\\' '$' | '\\\\' '%' | '\\\\' ~ ( '$' | '%' ) )
             int alt21=3;
             int LA21_0 = input.LA(1);
 
@@ -1890,7 +1906,7 @@ public class ActionTranslator extends Lexer {
             }
             switch (alt21) {
                 case 1 :
-                    // ActionTranslator.g:766:9: '\\\\' '$'
+                    // ActionTranslator.g:737:9: '\\\\' '$'
                     {
                     match('\\'); if (state.failed) return ;
                     match('$'); if (state.failed) return ;
@@ -1898,10 +1914,11 @@ public class ActionTranslator extends Lexer {
                       chunks.add("$");
                     }
 
+
                     }
                     break;
                 case 2 :
-                    // ActionTranslator.g:767:4: '\\\\' '%'
+                    // ActionTranslator.g:738:4: '\\\\' '%'
                     {
                     match('\\'); if (state.failed) return ;
                     match('%'); if (state.failed) return ;
@@ -1909,10 +1926,11 @@ public class ActionTranslator extends Lexer {
                       chunks.add("%");
                     }
 
+
                     }
                     break;
                 case 3 :
-                    // ActionTranslator.g:768:4: '\\\\' ~ ( '$' | '%' )
+                    // ActionTranslator.g:739:4: '\\\\' ~ ( '$' | '%' )
                     {
                     match('\\'); if (state.failed) return ;
                     if ( (input.LA(1)>='\u0000' && input.LA(1)<='#')||(input.LA(1)>='&' && input.LA(1)<='\uFFFE') ) {
@@ -1921,14 +1939,14 @@ public class ActionTranslator extends Lexer {
                     }
                     else {
                         if (state.backtracking>0) {state.failed=true; return ;}
-                        MismatchedSetException mse =
-                            new MismatchedSetException(null,input);
-                        recover(mse);    throw mse;
-                    }
+                        MismatchedSetException mse = new MismatchedSetException(null,input);
+                        recover(mse);
+                        throw mse;}
 
                     if ( state.backtracking==1 ) {
                       chunks.add(getText());
                     }
+
 
                     }
                     break;
@@ -1948,8 +1966,8 @@ public class ActionTranslator extends Lexer {
             Token x=null;
             Token y=null;
 
-            // ActionTranslator.g:772:2: ( '$' x= ID '.' y= ID )
-            // ActionTranslator.g:772:4: '$' x= ID '.' y= ID
+            // ActionTranslator.g:743:2: ( '$' x= ID '.' y= ID )
+            // ActionTranslator.g:743:4: '$' x= ID '.' y= ID
             {
             match('$'); if (state.failed) return ;
             int xStart1017 = getCharIndex();
@@ -1965,8 +1983,9 @@ public class ActionTranslator extends Lexer {
               		generator.issueInvalidAttributeError((x!=null?x.getText():null),(y!=null?y.getText():null),
               		                                     enclosingRule,actionToken,
               		                                     outerAltNum);
-
+              		
             }
+
 
             }
 
@@ -1983,8 +2002,8 @@ public class ActionTranslator extends Lexer {
             int _type = ERROR_X;
             Token x=null;
 
-            // ActionTranslator.g:782:2: ( '$' x= ID )
-            // ActionTranslator.g:782:4: '$' x= ID
+            // ActionTranslator.g:753:2: ( '$' x= ID )
+            // ActionTranslator.g:753:4: '$' x= ID
             {
             match('$'); if (state.failed) return ;
             int xStart1043 = getCharIndex();
@@ -1996,8 +2015,9 @@ public class ActionTranslator extends Lexer {
               		generator.issueInvalidAttributeError((x!=null?x.getText():null),
               		                                     enclosingRule,actionToken,
               		                                     outerAltNum);
-
+              		
             }
+
 
             }
 
@@ -2012,7 +2032,7 @@ public class ActionTranslator extends Lexer {
     public final void mUNKNOWN_SYNTAX() throws RecognitionException {
         try {
             int _type = UNKNOWN_SYNTAX;
-            // ActionTranslator.g:792:2: ( '$' | '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )* )
+            // ActionTranslator.g:763:2: ( '$' | '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )* )
             int alt23=2;
             int LA23_0 = input.LA(1);
 
@@ -2031,81 +2051,90 @@ public class ActionTranslator extends Lexer {
             }
             switch (alt23) {
                 case 1 :
-                    // ActionTranslator.g:792:4: '$'
+                    // ActionTranslator.g:763:4: '$'
                     {
                     match('$'); if (state.failed) return ;
                     if ( state.backtracking==1 ) {
 
                       		chunks.add(getText());
                       		// shouldn't need an error here.  Just accept $ if it doesn't look like anything
-
+                      		
                     }
+
 
                     }
                     break;
                 case 2 :
-                    // ActionTranslator.g:797:4: '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
+                    // ActionTranslator.g:768:4: '%' ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
                     {
                     match('%'); if (state.failed) return ;
-                    // ActionTranslator.g:797:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
+                    // ActionTranslator.g:768:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*
                     loop22:
                     do {
                         int alt22=9;
                         alt22 = dfa22.predict(input);
                         switch (alt22) {
                     	case 1 :
-                    	    // ActionTranslator.g:797:9: ID
+                    	    // ActionTranslator.g:768:9: ID
                     	    {
                     	    mID(); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 2 :
-                    	    // ActionTranslator.g:797:12: '.'
+                    	    // ActionTranslator.g:768:12: '.'
                     	    {
                     	    match('.'); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 3 :
-                    	    // ActionTranslator.g:797:16: '('
+                    	    // ActionTranslator.g:768:16: '('
                     	    {
                     	    match('('); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 4 :
-                    	    // ActionTranslator.g:797:20: ')'
+                    	    // ActionTranslator.g:768:20: ')'
                     	    {
                     	    match(')'); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 5 :
-                    	    // ActionTranslator.g:797:24: ','
+                    	    // ActionTranslator.g:768:24: ','
                     	    {
                     	    match(','); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 6 :
-                    	    // ActionTranslator.g:797:28: '{'
+                    	    // ActionTranslator.g:768:28: '{'
                     	    {
                     	    match('{'); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 7 :
-                    	    // ActionTranslator.g:797:32: '}'
+                    	    // ActionTranslator.g:768:32: '}'
                     	    {
                     	    match('}'); if (state.failed) return ;
+
 
                     	    }
                     	    break;
                     	case 8 :
-                    	    // ActionTranslator.g:797:36: '\"'
+                    	    // ActionTranslator.g:768:36: '\"'
                     	    {
                     	    match('\"'); if (state.failed) return ;
+
 
                     	    }
                     	    break;
@@ -2122,8 +2151,9 @@ public class ActionTranslator extends Lexer {
                       								  grammar,
                       								  actionToken,
                       								  getText());
-
+                      		
                     }
+
 
                     }
                     break;
@@ -2140,10 +2170,10 @@ public class ActionTranslator extends Lexer {
     public final void mTEXT() throws RecognitionException {
         try {
             int _type = TEXT;
-            // ActionTranslator.g:807:5: ( (~ ( '$' | '%' | '\\\\' ) )+ )
-            // ActionTranslator.g:807:7: (~ ( '$' | '%' | '\\\\' ) )+
+            // ActionTranslator.g:778:5: ( (~ ( '$' | '%' | '\\\\' ) )+ )
+            // ActionTranslator.g:778:7: (~ ( '$' | '%' | '\\\\' ) )+
             {
-            // ActionTranslator.g:807:7: (~ ( '$' | '%' | '\\\\' ) )+
+            // ActionTranslator.g:778:7: (~ ( '$' | '%' | '\\\\' ) )+
             int cnt24=0;
             loop24:
             do {
@@ -2157,7 +2187,7 @@ public class ActionTranslator extends Lexer {
 
                 switch (alt24) {
             	case 1 :
-            	    // ActionTranslator.g:807:7: ~ ( '$' | '%' | '\\\\' )
+            	    // ActionTranslator.g:778:7: ~ ( '$' | '%' | '\\\\' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='#')||(input.LA(1)>='&' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFE') ) {
             	        input.consume();
@@ -2165,10 +2195,10 @@ public class ActionTranslator extends Lexer {
             	    }
             	    else {
             	        if (state.backtracking>0) {state.failed=true; return ;}
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
+
 
 
             	    }
@@ -2188,6 +2218,7 @@ public class ActionTranslator extends Lexer {
               chunks.add(getText());
             }
 
+
             }
 
             state.type = _type;
@@ -2200,8 +2231,8 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start ID
     public final void mID() throws RecognitionException {
         try {
-            // ActionTranslator.g:811:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
-            // ActionTranslator.g:811:9: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // ActionTranslator.g:782:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
+            // ActionTranslator.g:782:9: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             {
             if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -2209,12 +2240,11 @@ public class ActionTranslator extends Lexer {
             }
             else {
                 if (state.backtracking>0) {state.failed=true; return ;}
-                MismatchedSetException mse =
-                    new MismatchedSetException(null,input);
-                recover(mse);    throw mse;
-            }
+                MismatchedSetException mse = new MismatchedSetException(null,input);
+                recover(mse);
+                throw mse;}
 
-            // ActionTranslator.g:811:33: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // ActionTranslator.g:782:33: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             loop25:
             do {
                 int alt25=2;
@@ -2235,10 +2265,9 @@ public class ActionTranslator extends Lexer {
             	    }
             	    else {
             	        if (state.backtracking>0) {state.failed=true; return ;}
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
 
 
             	    }
@@ -2248,6 +2277,7 @@ public class ActionTranslator extends Lexer {
             	    break loop25;
                 }
             } while (true);
+
 
 
             }
@@ -2261,10 +2291,10 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start INT
     public final void mINT() throws RecognitionException {
         try {
-            // ActionTranslator.g:815:5: ( ( '0' .. '9' )+ )
-            // ActionTranslator.g:815:7: ( '0' .. '9' )+
+            // ActionTranslator.g:786:5: ( ( '0' .. '9' )+ )
+            // ActionTranslator.g:786:7: ( '0' .. '9' )+
             {
-            // ActionTranslator.g:815:7: ( '0' .. '9' )+
+            // ActionTranslator.g:786:7: ( '0' .. '9' )+
             int cnt26=0;
             loop26:
             do {
@@ -2278,9 +2308,10 @@ public class ActionTranslator extends Lexer {
 
                 switch (alt26) {
             	case 1 :
-            	    // ActionTranslator.g:815:7: '0' .. '9'
+            	    // ActionTranslator.g:786:7: '0' .. '9'
             	    {
             	    matchRange('0','9'); if (state.failed) return ;
+
 
             	    }
             	    break;
@@ -2296,6 +2327,7 @@ public class ActionTranslator extends Lexer {
             } while (true);
 
 
+
             }
 
         }
@@ -2307,17 +2339,17 @@ public class ActionTranslator extends Lexer {
     // $ANTLR start WS
     public final void mWS() throws RecognitionException {
         try {
-            // ActionTranslator.g:819:4: ( ( ' ' | '\\t' | '\\n' )+ )
-            // ActionTranslator.g:819:6: ( ' ' | '\\t' | '\\n' )+
+            // ActionTranslator.g:790:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
+            // ActionTranslator.g:790:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
             {
-            // ActionTranslator.g:819:6: ( ' ' | '\\t' | '\\n' )+
+            // ActionTranslator.g:790:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
             int cnt27=0;
             loop27:
             do {
                 int alt27=2;
                 int LA27_0 = input.LA(1);
 
-                if ( ((LA27_0>='\t' && LA27_0<='\n')||LA27_0==' ') ) {
+                if ( ((LA27_0>='\t' && LA27_0<='\n')||LA27_0=='\r'||LA27_0==' ') ) {
                     alt27=1;
                 }
 
@@ -2326,16 +2358,15 @@ public class ActionTranslator extends Lexer {
             	case 1 :
             	    // ActionTranslator.g:
             	    {
-            	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)==' ' ) {
+            	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ' ) {
             	        input.consume();
             	    state.failed=false;
             	    }
             	    else {
             	        if (state.backtracking>0) {state.failed=true; return ;}
-            	        MismatchedSetException mse =
-            	            new MismatchedSetException(null,input);
-            	        recover(mse);    throw mse;
-            	    }
+            	        MismatchedSetException mse = new MismatchedSetException(null,input);
+            	        recover(mse);
+            	        throw mse;}
 
 
             	    }
@@ -2350,6 +2381,7 @@ public class ActionTranslator extends Lexer {
                 }
                 cnt27++;
             } while (true);
+
 
 
             }
@@ -2370,12 +2402,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mSET_ENCLOSING_RULE_SCOPE_ATTR(); if (state.failed) return ;
 
+
                 }
                 break;
             case 2 :
                 // ActionTranslator.g:1:71: ENCLOSING_RULE_SCOPE_ATTR
                 {
                 mENCLOSING_RULE_SCOPE_ATTR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2384,12 +2418,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mSET_TOKEN_SCOPE_ATTR(); if (state.failed) return ;
 
+
                 }
                 break;
             case 4 :
                 // ActionTranslator.g:1:118: TOKEN_SCOPE_ATTR
                 {
                 mTOKEN_SCOPE_ATTR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2398,12 +2434,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mSET_RULE_SCOPE_ATTR(); if (state.failed) return ;
 
+
                 }
                 break;
             case 6 :
                 // ActionTranslator.g:1:155: RULE_SCOPE_ATTR
                 {
                 mRULE_SCOPE_ATTR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2412,12 +2450,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mLABEL_REF(); if (state.failed) return ;
 
+
                 }
                 break;
             case 8 :
                 // ActionTranslator.g:1:181: ISOLATED_TOKEN_REF
                 {
                 mISOLATED_TOKEN_REF(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2426,12 +2466,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mISOLATED_LEXER_RULE_REF(); if (state.failed) return ;
 
+
                 }
                 break;
             case 10 :
                 // ActionTranslator.g:1:224: SET_LOCAL_ATTR
                 {
                 mSET_LOCAL_ATTR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2440,12 +2482,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mLOCAL_ATTR(); if (state.failed) return ;
 
+
                 }
                 break;
             case 12 :
                 // ActionTranslator.g:1:250: SET_DYNAMIC_SCOPE_ATTR
                 {
                 mSET_DYNAMIC_SCOPE_ATTR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2454,12 +2498,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mDYNAMIC_SCOPE_ATTR(); if (state.failed) return ;
 
+
                 }
                 break;
             case 14 :
                 // ActionTranslator.g:1:292: ERROR_SCOPED_XY
                 {
                 mERROR_SCOPED_XY(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2468,12 +2514,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mDYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR(); if (state.failed) return ;
 
+
                 }
                 break;
             case 16 :
                 // ActionTranslator.g:1:344: DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
                 {
                 mDYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2482,12 +2530,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mISOLATED_DYNAMIC_SCOPE(); if (state.failed) return ;
 
+
                 }
                 break;
             case 18 :
                 // ActionTranslator.g:1:403: TEMPLATE_INSTANCE
                 {
                 mTEMPLATE_INSTANCE(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2496,12 +2546,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mINDIRECT_TEMPLATE_INSTANCE(); if (state.failed) return ;
 
+
                 }
                 break;
             case 20 :
                 // ActionTranslator.g:1:448: SET_EXPR_ATTRIBUTE
                 {
                 mSET_EXPR_ATTRIBUTE(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2510,12 +2562,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mSET_ATTRIBUTE(); if (state.failed) return ;
 
+
                 }
                 break;
             case 22 :
                 // ActionTranslator.g:1:481: TEMPLATE_EXPR
                 {
                 mTEMPLATE_EXPR(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2524,12 +2578,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mESC(); if (state.failed) return ;
 
+
                 }
                 break;
             case 24 :
                 // ActionTranslator.g:1:499: ERROR_XY
                 {
                 mERROR_XY(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2538,12 +2594,14 @@ public class ActionTranslator extends Lexer {
                 {
                 mERROR_X(); if (state.failed) return ;
 
+
                 }
                 break;
             case 26 :
                 // ActionTranslator.g:1:516: UNKNOWN_SYNTAX
                 {
                 mUNKNOWN_SYNTAX(); if (state.failed) return ;
+
 
                 }
                 break;
@@ -2552,6 +2610,7 @@ public class ActionTranslator extends Lexer {
                 {
                 mTEXT(); if (state.failed) return ;
 
+
                 }
                 break;
 
@@ -2559,286 +2618,311 @@ public class ActionTranslator extends Lexer {
 
     }
 
-    // $ANTLR start synpred1
-    public final void synpred1_fragment() throws RecognitionException {
+    // $ANTLR start synpred1_ActionTranslator
+    public final void synpred1_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:41: ( SET_ENCLOSING_RULE_SCOPE_ATTR )
         // ActionTranslator.g:1:41: SET_ENCLOSING_RULE_SCOPE_ATTR
         {
         mSET_ENCLOSING_RULE_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred1
+    // $ANTLR end synpred1_ActionTranslator
 
-    // $ANTLR start synpred2
-    public final void synpred2_fragment() throws RecognitionException {
+    // $ANTLR start synpred2_ActionTranslator
+    public final void synpred2_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:71: ( ENCLOSING_RULE_SCOPE_ATTR )
         // ActionTranslator.g:1:71: ENCLOSING_RULE_SCOPE_ATTR
         {
         mENCLOSING_RULE_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred2
+    // $ANTLR end synpred2_ActionTranslator
 
-    // $ANTLR start synpred3
-    public final void synpred3_fragment() throws RecognitionException {
+    // $ANTLR start synpred3_ActionTranslator
+    public final void synpred3_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:97: ( SET_TOKEN_SCOPE_ATTR )
         // ActionTranslator.g:1:97: SET_TOKEN_SCOPE_ATTR
         {
         mSET_TOKEN_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred3
+    // $ANTLR end synpred3_ActionTranslator
 
-    // $ANTLR start synpred4
-    public final void synpred4_fragment() throws RecognitionException {
+    // $ANTLR start synpred4_ActionTranslator
+    public final void synpred4_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:118: ( TOKEN_SCOPE_ATTR )
         // ActionTranslator.g:1:118: TOKEN_SCOPE_ATTR
         {
         mTOKEN_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred4
+    // $ANTLR end synpred4_ActionTranslator
 
-    // $ANTLR start synpred5
-    public final void synpred5_fragment() throws RecognitionException {
+    // $ANTLR start synpred5_ActionTranslator
+    public final void synpred5_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:135: ( SET_RULE_SCOPE_ATTR )
         // ActionTranslator.g:1:135: SET_RULE_SCOPE_ATTR
         {
         mSET_RULE_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred5
+    // $ANTLR end synpred5_ActionTranslator
 
-    // $ANTLR start synpred6
-    public final void synpred6_fragment() throws RecognitionException {
+    // $ANTLR start synpred6_ActionTranslator
+    public final void synpred6_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:155: ( RULE_SCOPE_ATTR )
         // ActionTranslator.g:1:155: RULE_SCOPE_ATTR
         {
         mRULE_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred6
+    // $ANTLR end synpred6_ActionTranslator
 
-    // $ANTLR start synpred7
-    public final void synpred7_fragment() throws RecognitionException {
+    // $ANTLR start synpred7_ActionTranslator
+    public final void synpred7_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:171: ( LABEL_REF )
         // ActionTranslator.g:1:171: LABEL_REF
         {
         mLABEL_REF(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred7
+    // $ANTLR end synpred7_ActionTranslator
 
-    // $ANTLR start synpred8
-    public final void synpred8_fragment() throws RecognitionException {
+    // $ANTLR start synpred8_ActionTranslator
+    public final void synpred8_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:181: ( ISOLATED_TOKEN_REF )
         // ActionTranslator.g:1:181: ISOLATED_TOKEN_REF
         {
         mISOLATED_TOKEN_REF(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred8
+    // $ANTLR end synpred8_ActionTranslator
 
-    // $ANTLR start synpred9
-    public final void synpred9_fragment() throws RecognitionException {
+    // $ANTLR start synpred9_ActionTranslator
+    public final void synpred9_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:200: ( ISOLATED_LEXER_RULE_REF )
         // ActionTranslator.g:1:200: ISOLATED_LEXER_RULE_REF
         {
         mISOLATED_LEXER_RULE_REF(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred9
+    // $ANTLR end synpred9_ActionTranslator
 
-    // $ANTLR start synpred10
-    public final void synpred10_fragment() throws RecognitionException {
+    // $ANTLR start synpred10_ActionTranslator
+    public final void synpred10_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:224: ( SET_LOCAL_ATTR )
         // ActionTranslator.g:1:224: SET_LOCAL_ATTR
         {
         mSET_LOCAL_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred10
+    // $ANTLR end synpred10_ActionTranslator
 
-    // $ANTLR start synpred11
-    public final void synpred11_fragment() throws RecognitionException {
+    // $ANTLR start synpred11_ActionTranslator
+    public final void synpred11_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:239: ( LOCAL_ATTR )
         // ActionTranslator.g:1:239: LOCAL_ATTR
         {
         mLOCAL_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred11
+    // $ANTLR end synpred11_ActionTranslator
 
-    // $ANTLR start synpred12
-    public final void synpred12_fragment() throws RecognitionException {
+    // $ANTLR start synpred12_ActionTranslator
+    public final void synpred12_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:250: ( SET_DYNAMIC_SCOPE_ATTR )
         // ActionTranslator.g:1:250: SET_DYNAMIC_SCOPE_ATTR
         {
         mSET_DYNAMIC_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred12
+    // $ANTLR end synpred12_ActionTranslator
 
-    // $ANTLR start synpred13
-    public final void synpred13_fragment() throws RecognitionException {
+    // $ANTLR start synpred13_ActionTranslator
+    public final void synpred13_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:273: ( DYNAMIC_SCOPE_ATTR )
         // ActionTranslator.g:1:273: DYNAMIC_SCOPE_ATTR
         {
         mDYNAMIC_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred13
+    // $ANTLR end synpred13_ActionTranslator
 
-    // $ANTLR start synpred14
-    public final void synpred14_fragment() throws RecognitionException {
+    // $ANTLR start synpred14_ActionTranslator
+    public final void synpred14_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:292: ( ERROR_SCOPED_XY )
         // ActionTranslator.g:1:292: ERROR_SCOPED_XY
         {
         mERROR_SCOPED_XY(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred14
+    // $ANTLR end synpred14_ActionTranslator
 
-    // $ANTLR start synpred15
-    public final void synpred15_fragment() throws RecognitionException {
+    // $ANTLR start synpred15_ActionTranslator
+    public final void synpred15_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:308: ( DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR )
         // ActionTranslator.g:1:308: DYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR
         {
         mDYNAMIC_NEGATIVE_INDEXED_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred15
+    // $ANTLR end synpred15_ActionTranslator
 
-    // $ANTLR start synpred16
-    public final void synpred16_fragment() throws RecognitionException {
+    // $ANTLR start synpred16_ActionTranslator
+    public final void synpred16_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:344: ( DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR )
         // ActionTranslator.g:1:344: DYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR
         {
         mDYNAMIC_ABSOLUTE_INDEXED_SCOPE_ATTR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred16
+    // $ANTLR end synpred16_ActionTranslator
 
-    // $ANTLR start synpred17
-    public final void synpred17_fragment() throws RecognitionException {
+    // $ANTLR start synpred17_ActionTranslator
+    public final void synpred17_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:380: ( ISOLATED_DYNAMIC_SCOPE )
         // ActionTranslator.g:1:380: ISOLATED_DYNAMIC_SCOPE
         {
         mISOLATED_DYNAMIC_SCOPE(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred17
+    // $ANTLR end synpred17_ActionTranslator
 
-    // $ANTLR start synpred18
-    public final void synpred18_fragment() throws RecognitionException {
+    // $ANTLR start synpred18_ActionTranslator
+    public final void synpred18_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:403: ( TEMPLATE_INSTANCE )
         // ActionTranslator.g:1:403: TEMPLATE_INSTANCE
         {
         mTEMPLATE_INSTANCE(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred18
+    // $ANTLR end synpred18_ActionTranslator
 
-    // $ANTLR start synpred19
-    public final void synpred19_fragment() throws RecognitionException {
+    // $ANTLR start synpred19_ActionTranslator
+    public final void synpred19_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:421: ( INDIRECT_TEMPLATE_INSTANCE )
         // ActionTranslator.g:1:421: INDIRECT_TEMPLATE_INSTANCE
         {
         mINDIRECT_TEMPLATE_INSTANCE(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred19
+    // $ANTLR end synpred19_ActionTranslator
 
-    // $ANTLR start synpred20
-    public final void synpred20_fragment() throws RecognitionException {
+    // $ANTLR start synpred20_ActionTranslator
+    public final void synpred20_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:448: ( SET_EXPR_ATTRIBUTE )
         // ActionTranslator.g:1:448: SET_EXPR_ATTRIBUTE
         {
         mSET_EXPR_ATTRIBUTE(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred20
+    // $ANTLR end synpred20_ActionTranslator
 
-    // $ANTLR start synpred21
-    public final void synpred21_fragment() throws RecognitionException {
+    // $ANTLR start synpred21_ActionTranslator
+    public final void synpred21_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:467: ( SET_ATTRIBUTE )
         // ActionTranslator.g:1:467: SET_ATTRIBUTE
         {
         mSET_ATTRIBUTE(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred21
+    // $ANTLR end synpred21_ActionTranslator
 
-    // $ANTLR start synpred22
-    public final void synpred22_fragment() throws RecognitionException {
+    // $ANTLR start synpred22_ActionTranslator
+    public final void synpred22_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:481: ( TEMPLATE_EXPR )
         // ActionTranslator.g:1:481: TEMPLATE_EXPR
         {
         mTEMPLATE_EXPR(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred22
+    // $ANTLR end synpred22_ActionTranslator
 
-    // $ANTLR start synpred24
-    public final void synpred24_fragment() throws RecognitionException {
+    // $ANTLR start synpred24_ActionTranslator
+    public final void synpred24_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:499: ( ERROR_XY )
         // ActionTranslator.g:1:499: ERROR_XY
         {
         mERROR_XY(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred24
+    // $ANTLR end synpred24_ActionTranslator
 
-    // $ANTLR start synpred25
-    public final void synpred25_fragment() throws RecognitionException {
+    // $ANTLR start synpred25_ActionTranslator
+    public final void synpred25_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:508: ( ERROR_X )
         // ActionTranslator.g:1:508: ERROR_X
         {
         mERROR_X(); if (state.failed) return ;
 
+
         }
     }
-    // $ANTLR end synpred25
+    // $ANTLR end synpred25_ActionTranslator
 
-    // $ANTLR start synpred26
-    public final void synpred26_fragment() throws RecognitionException {
+    // $ANTLR start synpred26_ActionTranslator
+    public final void synpred26_ActionTranslator_fragment() throws RecognitionException {   
         // ActionTranslator.g:1:516: ( UNKNOWN_SYNTAX )
         // ActionTranslator.g:1:516: UNKNOWN_SYNTAX
         {
         mUNKNOWN_SYNTAX(); if (state.failed) return ;
 
-        }
-    }
-    // $ANTLR end synpred26
 
-    public final boolean synpred25() {
+        }
+    }
+    // $ANTLR end synpred26_ActionTranslator
+
+    public final boolean synpred19_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred25_fragment(); // can never throw exception
+            synpred19_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2848,11 +2932,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred7() {
+    public final boolean synpred16_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred7_fragment(); // can never throw exception
+            synpred16_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2862,11 +2946,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred14() {
+    public final boolean synpred25_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred14_fragment(); // can never throw exception
+            synpred25_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2876,11 +2960,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred15() {
+    public final boolean synpred17_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred15_fragment(); // can never throw exception
+            synpred17_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2890,11 +2974,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred22() {
+    public final boolean synpred1_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred22_fragment(); // can never throw exception
+            synpred1_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2904,11 +2988,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred4() {
+    public final boolean synpred10_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred4_fragment(); // can never throw exception
+            synpred10_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2918,11 +3002,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred12() {
+    public final boolean synpred24_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred12_fragment(); // can never throw exception
+            synpred24_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2932,11 +3016,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred9() {
+    public final boolean synpred15_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred9_fragment(); // can never throw exception
+            synpred15_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2946,11 +3030,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred1() {
+    public final boolean synpred11_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred1_fragment(); // can never throw exception
+            synpred11_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2960,11 +3044,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred20() {
+    public final boolean synpred18_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred20_fragment(); // can never throw exception
+            synpred18_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2974,11 +3058,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred17() {
+    public final boolean synpred21_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred17_fragment(); // can never throw exception
+            synpred21_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -2988,11 +3072,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred2() {
+    public final boolean synpred3_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred2_fragment(); // can never throw exception
+            synpred3_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3002,11 +3086,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred18() {
+    public final boolean synpred26_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred18_fragment(); // can never throw exception
+            synpred26_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3016,11 +3100,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred3() {
+    public final boolean synpred9_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred3_fragment(); // can never throw exception
+            synpred9_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3030,11 +3114,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred11() {
+    public final boolean synpred2_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred11_fragment(); // can never throw exception
+            synpred2_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3044,11 +3128,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred26() {
+    public final boolean synpred4_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred26_fragment(); // can never throw exception
+            synpred4_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3058,11 +3142,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred8() {
+    public final boolean synpred22_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred8_fragment(); // can never throw exception
+            synpred22_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3072,11 +3156,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred21() {
+    public final boolean synpred5_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred21_fragment(); // can never throw exception
+            synpred5_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3086,11 +3170,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred10() {
+    public final boolean synpred6_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred10_fragment(); // can never throw exception
+            synpred6_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3100,11 +3184,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred16() {
+    public final boolean synpred7_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred16_fragment(); // can never throw exception
+            synpred7_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3114,11 +3198,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred19() {
+    public final boolean synpred12_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred19_fragment(); // can never throw exception
+            synpred12_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3128,11 +3212,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred5() {
+    public final boolean synpred8_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred5_fragment(); // can never throw exception
+            synpred8_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3142,11 +3226,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred24() {
+    public final boolean synpred13_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred24_fragment(); // can never throw exception
+            synpred13_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3156,11 +3240,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred6() {
+    public final boolean synpred20_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred6_fragment(); // can never throw exception
+            synpred20_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3170,11 +3254,11 @@ public class ActionTranslator extends Lexer {
         state.failed=false;
         return success;
     }
-    public final boolean synpred13() {
+    public final boolean synpred14_ActionTranslator() {
         state.backtracking++;
         int start = input.mark();
         try {
-            synpred13_fragment(); // can never throw exception
+            synpred14_ActionTranslator_fragment(); // can never throw exception
         } catch (RecognitionException re) {
             System.err.println("impossible: "+re);
         }
@@ -3244,7 +3328,7 @@ public class ActionTranslator extends Lexer {
             this.transition = DFA22_transition;
         }
         public String getDescription() {
-            return "()* loopback of 797:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*";
+            return "()* loopback of 768:8: ( ID | '.' | '(' | ')' | ',' | '{' | '}' | '\"' )*";
         }
     }
     static final String DFA28_eotS =
@@ -3252,19 +3336,17 @@ public class ActionTranslator extends Lexer {
     static final String DFA28_eofS =
         "\36\uffff";
     static final String DFA28_minS =
-        "\1\0\2\uffff\1\0\6\uffff\1\0\23\uffff";
+        "\2\0\7\uffff\1\0\24\uffff";
     static final String DFA28_maxS =
-        "\1\ufffe\2\uffff\1\0\6\uffff\1\0\23\uffff";
+        "\1\ufffe\1\0\7\uffff\1\0\24\uffff";
     static final String DFA28_acceptS =
-        "\1\uffff\1\27\1\33\1\uffff\1\22\1\23\1\24\1\25\1\26\1\32\1\uffff"+
-        "\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\15\1\16"+
-        "\1\17\1\20\1\21\1\30\1\31";
+        "\2\uffff\1\22\1\23\1\24\1\25\1\26\1\32\1\33\1\uffff\1\1\1\2\1\3"+
+        "\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1\15\1\16\1\17\1\20\1"+
+        "\21\1\30\1\31\1\27";
     static final String DFA28_specialS =
-        "\3\uffff\1\0\6\uffff\1\1\23\uffff}>";
+        "\1\uffff\1\0\7\uffff\1\1\24\uffff}>";
     static final String[] DFA28_transitionS = {
-            "\44\2\1\12\1\3\66\2\1\1\uffa2\2",
-            "",
-            "",
+            "\44\10\1\11\1\1\66\10\1\35\uffa2\10",
             "\1\uffff",
             "",
             "",
@@ -3272,7 +3354,9 @@ public class ActionTranslator extends Lexer {
             "",
             "",
             "",
+            "",
             "\1\uffff",
+            "",
             "",
             "",
             "",
@@ -3331,77 +3415,77 @@ public class ActionTranslator extends Lexer {
         	int _s = s;
             switch ( s ) {
                     case 0 : 
-                        int LA28_3 = input.LA(1);
+                        int LA28_1 = input.LA(1);
 
                          
-                        int index28_3 = input.index();
+                        int index28_1 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred18()) ) {s = 4;}
+                        if ( (synpred18_ActionTranslator()) ) {s = 2;}
 
-                        else if ( (synpred19()) ) {s = 5;}
+                        else if ( (synpred19_ActionTranslator()) ) {s = 3;}
 
-                        else if ( (synpred20()) ) {s = 6;}
+                        else if ( (synpred20_ActionTranslator()) ) {s = 4;}
 
-                        else if ( (synpred21()) ) {s = 7;}
+                        else if ( (synpred21_ActionTranslator()) ) {s = 5;}
 
-                        else if ( (synpred22()) ) {s = 8;}
+                        else if ( (synpred22_ActionTranslator()) ) {s = 6;}
 
-                        else if ( (synpred26()) ) {s = 9;}
+                        else if ( (synpred26_ActionTranslator()) ) {s = 7;}
 
                          
-                        input.seek(index28_3);
+                        input.seek(index28_1);
                         if ( s>=0 ) return s;
                         break;
                     case 1 : 
-                        int LA28_10 = input.LA(1);
+                        int LA28_9 = input.LA(1);
 
                          
-                        int index28_10 = input.index();
+                        int index28_9 = input.index();
                         input.rewind();
                         s = -1;
-                        if ( (synpred1()) ) {s = 11;}
+                        if ( (synpred1_ActionTranslator()) ) {s = 10;}
 
-                        else if ( (synpred2()) ) {s = 12;}
+                        else if ( (synpred2_ActionTranslator()) ) {s = 11;}
 
-                        else if ( (synpred3()) ) {s = 13;}
+                        else if ( (synpred3_ActionTranslator()) ) {s = 12;}
 
-                        else if ( (synpred4()) ) {s = 14;}
+                        else if ( (synpred4_ActionTranslator()) ) {s = 13;}
 
-                        else if ( (synpred5()) ) {s = 15;}
+                        else if ( (synpred5_ActionTranslator()) ) {s = 14;}
 
-                        else if ( (synpred6()) ) {s = 16;}
+                        else if ( (synpred6_ActionTranslator()) ) {s = 15;}
 
-                        else if ( (synpred7()) ) {s = 17;}
+                        else if ( (synpred7_ActionTranslator()) ) {s = 16;}
 
-                        else if ( (synpred8()) ) {s = 18;}
+                        else if ( (synpred8_ActionTranslator()) ) {s = 17;}
 
-                        else if ( (synpred9()) ) {s = 19;}
+                        else if ( (synpred9_ActionTranslator()) ) {s = 18;}
 
-                        else if ( (synpred10()) ) {s = 20;}
+                        else if ( (synpred10_ActionTranslator()) ) {s = 19;}
 
-                        else if ( (synpred11()) ) {s = 21;}
+                        else if ( (synpred11_ActionTranslator()) ) {s = 20;}
 
-                        else if ( (synpred12()) ) {s = 22;}
+                        else if ( (synpred12_ActionTranslator()) ) {s = 21;}
 
-                        else if ( (synpred13()) ) {s = 23;}
+                        else if ( (synpred13_ActionTranslator()) ) {s = 22;}
 
-                        else if ( (synpred14()) ) {s = 24;}
+                        else if ( (synpred14_ActionTranslator()) ) {s = 23;}
 
-                        else if ( (synpred15()) ) {s = 25;}
+                        else if ( (synpred15_ActionTranslator()) ) {s = 24;}
 
-                        else if ( (synpred16()) ) {s = 26;}
+                        else if ( (synpred16_ActionTranslator()) ) {s = 25;}
 
-                        else if ( (synpred17()) ) {s = 27;}
+                        else if ( (synpred17_ActionTranslator()) ) {s = 26;}
 
-                        else if ( (synpred24()) ) {s = 28;}
+                        else if ( (synpred24_ActionTranslator()) ) {s = 27;}
 
-                        else if ( (synpred25()) ) {s = 29;}
+                        else if ( (synpred25_ActionTranslator()) ) {s = 28;}
 
-                        else if ( (synpred26()) ) {s = 9;}
+                        else if ( (synpred26_ActionTranslator()) ) {s = 7;}
 
                          
-                        input.seek(index28_10);
+                        input.seek(index28_9);
                         if ( s>=0 ) return s;
                         break;
             }
