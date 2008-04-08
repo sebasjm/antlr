@@ -41,9 +41,9 @@ using Hashtable = System.Collections.Hashtable;
 
 /** Add this to each rule's return value struct */
 @returnScope.ruleReturnMembers() ::= <<
-public StringTemplate st;
-public override object Template 		{ get { return st; } }
-public override string ToString() 		{ return (st == null) ? null : st.ToString(); }
+public StringTemplate St;
+public override object Template 		{ get { return St; } }
+public override string ToString() 		{ return (St == null) ? null : St.ToString(); }
 >>
 
 @genericParser.members() ::= <<
@@ -99,14 +99,14 @@ if ( state.backtracking==0 )
 replaceTextInLine() ::= <<
 <if(TREE_PARSER)>
 ((TokenRewriteStream)input.TokenStream).Replace(
-  input.TreeAdaptor.GetTokenStartIndex(retval.start),
-  input.TreeAdaptor.GetTokenStopIndex(retval.start),
-  retval.st);
+  input.TreeAdaptor.GetTokenStartIndex(retval.Start),
+  input.TreeAdaptor.GetTokenStopIndex(retval.Start),
+  retval.St);
 <else>
 ((TokenRewriteStream)input).Replace(
-  ((Token)retval.start).TokenIndex,
+  ((IToken)retval.Start).TokenIndex,
   input.LT(-1).TokenIndex,
-  retval.st);
+  retval.St);
 <endif>
 >>
 
@@ -114,11 +114,11 @@ rewriteTemplateAlt() ::= <<
 // <it.description>
 <if(it.pred)>
 if (<it.pred>) {
-    retval.st = <it.alt>;
+    retval.St = <it.alt>;
 }<\n>
 <else>
 {
-    retval.st = <it.alt>;
+    retval.St = <it.alt>;
 }<\n>
 <endif>
 >>

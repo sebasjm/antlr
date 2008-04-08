@@ -38,7 +38,7 @@ namespace Antlr.Runtime
 	using System;
 	
 	[Serializable]
-	public class CommonToken : Token
+	public class CommonToken : IToken
 	{
 		#region Constructors
 
@@ -59,7 +59,7 @@ namespace Antlr.Runtime
 		public CommonToken(int type, string text)
 		{
 			this.type = type;
-			this.channel = DEFAULT_CHANNEL;
+			this.channel = Token.DEFAULT_CHANNEL;
 			this.text = text;
 		}
 
@@ -81,25 +81,25 @@ namespace Antlr.Runtime
 
 		#region Public API
 
-		override public int Type
+		virtual public int Type
 		{
 			get { return type; }
 			set { this.type = value; }
 		}
 
-		override public int Line
+		virtual public int Line
 		{
 			get { return line; }
 			set { this.line = value; }
 		}
 
-		override public int CharPositionInLine
+		virtual public int CharPositionInLine
 		{
 			get { return charPositionInLine; }
 			set { this.charPositionInLine = value; }
 		}
 
-		override public int Channel
+		virtual public int Channel
 		{
 			get { return channel; }
 			set { this.channel = value; }
@@ -117,19 +117,19 @@ namespace Antlr.Runtime
 			set { this.stop = value; }
 		}
 
-		override public int TokenIndex
+		virtual public int TokenIndex
 		{
 			get { return index; }
 			set { this.index = value; }
 		}
 
-		override public ICharStream InputStream
+		virtual public ICharStream InputStream
 		{
 			get { return input; }
 			set { this.input = value; }
 		}
 
-		public override string Text
+		virtual public string Text
 		{
 			get
 			{
@@ -184,7 +184,7 @@ namespace Antlr.Runtime
 		protected internal int type;
 		protected internal int line;
 		protected internal int charPositionInLine = -1; // set to invalid position
-		protected internal int channel = DEFAULT_CHANNEL;
+		protected internal int channel = Token.DEFAULT_CHANNEL;
 		[NonSerialized] protected internal ICharStream input;
 
 		/// <summary>We need to be able to change the text once in a while.  If

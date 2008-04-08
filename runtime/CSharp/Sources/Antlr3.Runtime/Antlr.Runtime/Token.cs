@@ -37,7 +37,7 @@ namespace Antlr.Runtime
 	using System;
 
 	[Serializable]
-	public abstract class Token : IToken
+	public abstract class Token
 	{
 		public const int EOR_TOKEN_TYPE = 1;
 
@@ -49,16 +49,16 @@ namespace Antlr.Runtime
 		public static readonly int MIN_TOKEN_TYPE = UP + 1;
 
 		public static readonly int EOF = (int)CharStreamConstants.EOF;
-		public static readonly Token EOF_TOKEN = new CommonToken(EOF);
+		public static readonly IToken EOF_TOKEN = new CommonToken(EOF);
 
 		public const int INVALID_TOKEN_TYPE = 0;
-		public static readonly Token INVALID_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);
+		public static readonly IToken INVALID_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);
 
 		/// <summary>
 		/// In an action, a lexer rule can set token to this SKIP_TOKEN and ANTLR
 		/// will avoid creating a token for this symbol and try to fetch another.
 		/// </summary>
-		public static readonly Token SKIP_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);
+		public static readonly IToken SKIP_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);
 
 		/// <summary>
 		/// All tokens go to the parser (unless skip() is called in that rule)
@@ -71,66 +71,5 @@ namespace Antlr.Runtime
 		/// Anything on different channel than DEFAULT_CHANNEL is not parsed by parser.
 		/// </summary>
 		public const int HIDDEN_CHANNEL = 99;
-
-
-		public abstract int Type
-		{
-			get;
-			set;
-		}
-
-		public abstract int Line
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// The index of the first character relative to the beginning of the line 0..n-1
-		/// </summary>
-		public abstract int CharPositionInLine
-		{
-			get;
-			set;
-		}
-
-		public abstract int Channel
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// An index from 0..n-1 of the token object in the input stream
-		/// </summary>
-		/// <remarks>
-		/// This must be valid in order to use the ANTLRWorks debugger.
-		/// </remarks>
-		public abstract int TokenIndex
-		{
-			get;
-			set;
-		}
-
-		public abstract ICharStream InputStream
-		{
-			get;
-			set;
-		}
-
-		/// <summary>Set or Get the text of the token</summary>
-		/// <remarks>
-		/// When setting the text, it might be a NOP such as for the CommonToken,
-		/// which doesn't have string pointers, just indexes into a char buffer.
-		/// </remarks>
-		public virtual string Text
-		{
-			get { return null; }
-			set
-			{
-				//throw new InvalidOperationException("you cannot set the text of " + GetType().FullName + " token objects");
-				;
-			}
-		}
 	}
 }

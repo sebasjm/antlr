@@ -43,8 +43,8 @@ group ASTParser;
 
 @rule.setErrorReturnValue() ::= <<
 // Conversion of the second argument necessary, but harmless
-retval.tree = (<ASTLabelType>)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
-<! System.Console.WriteLine("<ruleName> returns " + ((CommonTree)retval.tree).ToStringTree()); !>
+retval.Tree = (<ASTLabelType>)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
+<! System.Console.WriteLine("<ruleName> returns " + ((CommonTree)retval.Tree).ToStringTree()); !>
 >>
 
 // TOKEN AST STUFF
@@ -136,7 +136,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_0, <label>.tree);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_0, <label>.Tree);
 >>
 
 /** rule! is same as normal rule ref */
@@ -145,25 +145,25 @@ ruleRefBang(rule,label,elementIndex,args,scope) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>.tree, root_0);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_0 = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_0);
 >>
 
 /** x+=rule when output=AST */
 ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
-<listLabel(elem=label+".tree",...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** x+=rule! when output=AST is a rule ref with list addition */
 ruleRefBangAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefBang(...)>
-<listLabel(elem=label+".tree",...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** x+=rule^ */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<listLabel(elem=label+".tree",...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 // WILDCARD AST
@@ -210,9 +210,9 @@ ruleCleanUp() ::= <<
 if ( state.backtracking==0 )
 {
 <endif>
-	retval.tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
+	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
 <if(!TREE_PARSER)>
-	adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
+	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);
 <endif>
 <if(backtracking)>
 }

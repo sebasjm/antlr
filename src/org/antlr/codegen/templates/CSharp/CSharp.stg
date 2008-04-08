@@ -463,7 +463,7 @@ catch (<e.decl>)
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <returnType()> retval = new <returnType()>();
-retval.start = input.LT(1);<\n>
+retval.Start = input.LT(1);<\n>
 <else>
 <ruleDescriptor.returnScope.attributes:{ a |
 <a.type> <a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>;
@@ -524,7 +524,7 @@ retval
 ruleCleanUp() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!TREE_PARSER)>
-retval.stop = input.LT(-1);<\n>
+retval.Stop = input.LT(-1);<\n>
 <endif>
 <endif>
 >>
@@ -1375,19 +1375,19 @@ tokenLabelPropertyRef_index(scope,attr) ::= "((<scope> != null) ? <scope>.TokenI
 tokenLabelPropertyRef_tree(scope,attr) ::= "<scope>_tree"
 tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.Text):0)"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.start) : null)"
-ruleLabelPropertyRef_stop(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.stop) : null)"
-ruleLabelPropertyRef_tree(scope,attr) ::= "((<scope> != null) ? ((<ASTLabelType>)<scope>.tree) : null)"
+ruleLabelPropertyRef_start(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.Start) : null)"
+ruleLabelPropertyRef_stop(scope,attr) ::= "((<scope> != null) ? ((<labelType>)<scope>.Stop) : null)"
+ruleLabelPropertyRef_tree(scope,attr) ::= "((<scope> != null) ? ((<ASTLabelType>)<scope>.Tree) : null)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 ((<scope> != null) ? input.TokenStream.ToString(
-  input.TreeAdaptor.GetTokenStartIndex(<scope>.start),
-  input.TreeAdaptor.GetTokenStopIndex(<scope>.start)) : null)
+  input.TreeAdaptor.GetTokenStartIndex(<scope>.Start),
+  input.TreeAdaptor.GetTokenStopIndex(<scope>.Start)) : null)
 <else>
-((<scope> != null) ? input.ToString(<scope>.start,<scope>.stop) : null)
+((<scope> != null) ? input.ToString(<scope>.Start,<scope>.Stop) : null)
 <endif>
 >>
-ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> != null) ? <scope>.st : null)"
+ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> != null) ? <scope>.St : null)"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
@@ -1401,19 +1401,19 @@ lexerRuleLabelPropertyRef_text(scope,attr) ::= "((<scope> != null) ? <scope>.Tex
 lexerRuleLabelPropertyRef_int(scope,attr) ::= "(<scope>!=null?int.Parse(<scope>.Text):0)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.start)"
-rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval.stop)"
-rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.tree)"
+rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval.Start)"
+rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval.Stop)"
+rulePropertyRef_tree(scope,attr) ::= "((<ASTLabelType>)retval.Tree)"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 input.TokenStream.ToString(
-  input.TreeAdaptor.GetTokenStartIndex(retval.start),
-  input.TreeAdaptor.GetTokenStopIndex(retval.start) )
+  input.TreeAdaptor.GetTokenStartIndex(retval.Start),
+  input.TreeAdaptor.GetTokenStopIndex(retval.Start) )
 <else>
-input.ToString(retval.start,input.LT(-1))
+input.ToString(retval.Start,input.LT(-1))
 <endif>
 >>
-rulePropertyRef_st(scope,attr) ::= "retval.st"
+rulePropertyRef_st(scope,attr) ::= "retval.St"
 
 lexerRulePropertyRef_text(scope,attr) ::= "Text"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
@@ -1427,8 +1427,8 @@ lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.Text)"
 
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree = <expr>;"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st = <expr>;"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.Tree = <expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.St = <expr>;"
 
 
 /** How to execute an action (only when not backtracking) */

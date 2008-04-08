@@ -52,10 +52,11 @@ public ITreeAdaptor TreeAdaptor
 >>
 
 @returnScope.ruleReturnMembers() ::= <<
-internal <ASTLabelType> tree;
+private <ASTLabelType> tree;
 override public object Tree
 {
 	get { return tree; }
+	set { tree = (<ASTLabelType>) value; }
 }
 >>
 
@@ -139,7 +140,7 @@ ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 /** ^(x+=rule ...) rewrite */
 ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRootTrack(...)>
-<listLabel(elem=label+".tree",...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 
@@ -164,20 +165,20 @@ rewriteCode(
 <if(backtracking)>
 if ( state.backtracking==0 ) {<\n>
 <endif>
-<prevRuleRootRef()>.tree = root_0;
+<prevRuleRootRef()>.Tree = root_0;
 <rewriteCodeLabels()>
 root_0 = (<ASTLabelType>)adaptor.GetNilNode();
 <alts:rewriteAlt(); separator="else ">
 <if(rewriteMode)>
 <if(TREE_PARSER)>
-<prevRuleRootRef()>.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
-input.ReplaceChildren(adaptor.GetParent(retval.start),
-                      adaptor.GetChildIndex(retval.start),
+<prevRuleRootRef()>.Tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
+input.ReplaceChildren(adaptor.GetParent(retval.Start),
+                      adaptor.GetChildIndex(retval.Start),
                       adaptor.GetChildIndex(_last),
-                      retval.tree);
+                      retval.Tree);
 <endif>
 <endif>
-<prevRuleRootRef()>.tree = root_0; <! set result root !>
+<prevRuleRootRef()>.Tree = root_0; <! set result root !>
 <if(backtracking)>
 }
 <endif>
@@ -193,7 +194,7 @@ rewriteCodeLabels() ::= <<
     separator="\n"
 >
 <referencedRuleLabels
-    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", (<it>!=null ? <it>.tree : null));};
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", (<it>!=null ? <it>.Tree : null));};
     separator="\n"
 >
 <referencedRuleListLabels
@@ -327,7 +328,7 @@ root_0 = <action>;<\n>
 /** What is the name of the previous value of this rule's root tree?  This
  *  let's us refer to $rule to mean previous value.  I am reusing the
  *  variable 'tree' sitting in retval struct to hold the value of root_0 right
- *  before I set it during rewrites.  The assign will be to retval.tree.
+ *  before I set it during rewrites.  The assign will be to retval.Tree.
  */
 prevRuleRootRef() ::= "retval"
 

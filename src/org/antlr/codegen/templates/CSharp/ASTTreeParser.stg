@@ -51,7 +51,7 @@ ruleDeclarations() ::= <<
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
-<if(rewriteMode)>retval.tree = (<ASTLabelType>)retval.Start;<endif>
+<if(rewriteMode)>retval.Tree = (<ASTLabelType>)retval.Start;<endif>
 >>
 
 /** match ^(root children) in tree parser; override here to
@@ -186,14 +186,14 @@ ruleRef(rule,label,elementIndex,args,scope) ::= <<
 _last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_<treeLevel>, <label>.tree);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>adaptor.AddChild(root_<treeLevel>, <label>.Tree);
 <endif>
 >>
 
 /** x+=rule auto construct */
 ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRef(...)>
-<listLabel(elem=label+".tree",...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** ^(rule ...) auto construct */
@@ -201,14 +201,14 @@ ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 _last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.tree, root_<treeLevel>);
+<if(backtracking)>if ( state.backtracking == 0 ) <endif>root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>.Tree, root_<treeLevel>);
 <endif>
 >>
 
 /** ^(x+=rule ...) auto construct */
 ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<listLabel(elem=label+".tree",...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** Streams for token refs are tree nodes now; override to
@@ -229,7 +229,7 @@ ruleCleanUp() ::= <<
 if ( state.backtracking==0 )
 {
 <endif>
-	retval.tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
+	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
 <if(backtracking)>
 }
 <endif>

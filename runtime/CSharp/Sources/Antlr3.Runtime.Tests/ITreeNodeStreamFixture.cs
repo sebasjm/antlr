@@ -117,7 +117,7 @@ namespace Antlr.Runtime.Tests
 		[Test]
 		public void testFlatList()
 		{
-			ITree root = new CommonTree((Token)null);
+			ITree root = new CommonTree((IToken)null);
 
 			root.AddChild(new CommonTree(new CommonToken(101)));
 			root.AddChild(new CommonTree(new CommonToken(102)));
@@ -136,7 +136,7 @@ namespace Antlr.Runtime.Tests
 		[Test]
 		public void testListWithOneNode()
 		{
-			ITree root = new CommonTree((Token)null);
+			ITree root = new CommonTree((IToken)null);
 
 			root.AddChild(new CommonTree(new CommonToken(101)));
 
@@ -598,7 +598,7 @@ namespace Antlr.Runtime.Tests
 		{
 			int N = 10;
 			// make tree with types: 1 2 ... INITIAL_LOOKAHEAD_BUFFER_SIZE+N
-			ITree t = new CommonTree((Token)null);
+			ITree t = new CommonTree((IToken)null);
 			for (int i = 0; i < UnBufferedTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE + N; i++)
 			{
 				t.AddChild(new CommonTree(new CommonToken(i + 1)));

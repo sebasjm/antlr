@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2006 Kunle Odutola
 Copyright (c) 2005 Terence Parr
 All rights reserved.
@@ -42,12 +43,13 @@ namespace Antlr.Runtime.Tree
 	public class TreeRuleReturnScope : RuleReturnScope
 	{
 		/// <summary>First node or root node of tree matched for this rule.</summary>
-		public object start;
+		private object start;
 
 		/// <summary>Return the start token or tree </summary>
 		override public object Start
 		{
 			get { return start; }
+			set { start = value; }
 		}
 	}
 }

@@ -77,7 +77,7 @@ namespace Antlr.Runtime.Tests
 		public void testList()
 		{
 			// ^(nil 101 102 103)
-			CommonTree r0 = new CommonTree((Token)null);
+			CommonTree r0 = new CommonTree((IToken)null);
 			CommonTree c0, c1, c2;
 			r0.AddChild(c0 = new CommonTree(new CommonToken(101)));
 			r0.AddChild(c1 = new CommonTree(new CommonToken(102)));
@@ -101,7 +101,7 @@ namespace Antlr.Runtime.Tests
 			CommonTree root = new CommonTree(new CommonToken(5));
 
 			// child tree
-			CommonTree r0 = new CommonTree((Token)null);
+			CommonTree r0 = new CommonTree((IToken)null);
 			CommonTree c0, c1, c2;
 			r0.AddChild(c0 = new CommonTree(new CommonToken(101)));
 			r0.AddChild(c1 = new CommonTree(new CommonToken(102)));
@@ -129,7 +129,7 @@ namespace Antlr.Runtime.Tests
 			root.AddChild(new CommonTree(new CommonToken(6)));
 
 			// child tree
-			CommonTree r0 = new CommonTree((Token)null);
+			CommonTree r0 = new CommonTree((IToken)null);
 			CommonTree c0, c1, c2;
 			r0.AddChild(c0 = new CommonTree(new CommonToken(101)));
 			r0.AddChild(c1 = new CommonTree(new CommonToken(102)));
@@ -175,7 +175,7 @@ namespace Antlr.Runtime.Tests
 			// 5 becomes new root of ^(nil 101 102 103)
 			CommonTree newRoot = new CommonTree(new CommonToken(5));
 
-			CommonTree oldRoot = new CommonTree((Token)null);
+			CommonTree oldRoot = new CommonTree((IToken)null);
 			oldRoot.AddChild(new CommonTree(new CommonToken(101)));
 			oldRoot.AddChild(new CommonTree(new CommonToken(102)));
 			oldRoot.AddChild(new CommonTree(new CommonToken(103)));
@@ -204,10 +204,10 @@ namespace Antlr.Runtime.Tests
 		public void testBecomeRoot3()
 		{
 			// ^(nil 5) becomes new root of ^(nil 101 102 103)
-			CommonTree newRoot = new CommonTree((Token)null);
+			CommonTree newRoot = new CommonTree((IToken)null);
 			newRoot.AddChild(new CommonTree(new CommonToken(5)));
 
-			CommonTree oldRoot = new CommonTree((Token)null);
+			CommonTree oldRoot = new CommonTree((IToken)null);
 			oldRoot.AddChild(new CommonTree(new CommonToken(101)));
 			oldRoot.AddChild(new CommonTree(new CommonToken(102)));
 			oldRoot.AddChild(new CommonTree(new CommonToken(103)));
@@ -221,7 +221,7 @@ namespace Antlr.Runtime.Tests
 		public void testBecomeRoot5()
 		{
 			// ^(nil 5) becomes new root of ^(101 102 103)
-			CommonTree newRoot = new CommonTree((Token)null);
+			CommonTree newRoot = new CommonTree((IToken)null);
 			newRoot.AddChild(new CommonTree(new CommonToken(5)));
 
 			CommonTree oldRoot = new CommonTree(new CommonToken(101));

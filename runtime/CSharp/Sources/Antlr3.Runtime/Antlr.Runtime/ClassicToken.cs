@@ -45,7 +45,7 @@ namespace Antlr.Runtime
 	/// new strings.
 	/// </summary>
 	[Serializable]
-	public class ClassicToken : Token
+	public class ClassicToken : IToken
 	{
 		#region Constructors
 
@@ -80,43 +80,43 @@ namespace Antlr.Runtime
 
 		#region Public API
 
-		override public int Type
+		virtual public int Type
 		{
 			get { return type; }
 			set { this.type = value; }
 		}
 
-		override public int Line
+		virtual public int Line
 		{
 			get { return line; }
 			set { this.line = value; }
 		}
 
-		override public int CharPositionInLine
+		virtual public int CharPositionInLine
 		{
 			get { return charPositionInLine; }
 			set { this.charPositionInLine = value; }
 		}
 
-		override public int Channel
+		virtual public int Channel
 		{
 			get { return channel; }
 			set { this.channel = value; }
 		}
 
-		override public int TokenIndex
+		virtual public int TokenIndex
 		{
 			get { return index; }
 			set { this.index = value; }
 		}
 
-		override public string Text
+		virtual public string Text
 		{
 			get { return text; }
 			set { text = value; }
 		}
 
-		override public ICharStream InputStream
+		virtual public ICharStream InputStream
 		{
 			get { return null; }
 			set { }
@@ -151,7 +151,7 @@ namespace Antlr.Runtime
 		protected internal int type;
 		protected internal int line;
 		protected internal int charPositionInLine;
-		protected internal int channel = DEFAULT_CHANNEL;
+		protected internal int channel = Token.DEFAULT_CHANNEL;
 
 		/// <summary>What token number is this from 0..n-1 tokens </summary>
 		protected internal int index;

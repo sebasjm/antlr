@@ -45,19 +45,21 @@ namespace Antlr.Runtime
 		virtual public object Start
 		{
 			get { return null; }
+			set { throw new NotSupportedException("Setter has not been defined for this property."); }
 		}
 
 		/// <summary>Return the stop token or tree </summary>
 		virtual public object Stop
 		{
 			get { return null; }
+			set { throw new NotSupportedException("Setter has not been defined for this property."); }
 		}
 
 		/// <summary>Has a value potentially if output=AST; </summary>
 		virtual public object Tree
 		{
 			get { return null; }
-			
+			set { throw new NotSupportedException("Setter has not been defined for this property."); }
 		}
 		/// <summary>
 		/// Has a value potentially if output=template; 
