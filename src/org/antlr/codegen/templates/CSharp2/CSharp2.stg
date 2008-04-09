@@ -27,7 +27,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-group CSharp implements ANTLRCore;
+group CSharp2 implements ANTLRCore;
 
 /** The overall file structure of a recognizer; stores methods for rules
  *  and cyclic DFAs plus support code.
@@ -1255,7 +1255,7 @@ delegateName() ::= <<
  *  must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
-default(typeName)
+default(<typeName>)
 >>
 
 /** Define a rule label including default value */
