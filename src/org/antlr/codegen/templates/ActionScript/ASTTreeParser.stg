@@ -99,7 +99,7 @@ _last = <ASTLabelType>(input.LT(1));
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
-<label>_tree = (<ASTLabelType>)adaptor.dupNode(<label>);
+<label>_tree = <ASTLabelType>(adaptor.dupNode(<label>));
 adaptor.addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <endif>
@@ -158,7 +158,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
-<label>_tree = <ASTLabelType>)(adaptor.dupNode(<label>));
+<label>_tree = <ASTLabelType>(adaptor.dupNode(<label>));
 root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(<label>_tree, root_<treeLevel>));
 <if(backtracking)>}<endif>
 <endif>

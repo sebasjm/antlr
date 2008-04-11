@@ -363,7 +363,7 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <! new MethodNode(IDLabel, args) !>
 new <hetero>(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
-(<ASTLabelType>)adaptor.create(<tokenType>, <args; separator=", "><if(!args)>"<tokenType>"<endif>)
+<ASTLabelType>(adaptor.create(<tokenType>, <args; separator=", "><if(!args)>"<tokenType>"<endif>))
 <endif>
 >>
 
