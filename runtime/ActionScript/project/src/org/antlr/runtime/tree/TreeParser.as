@@ -58,6 +58,10 @@ package org.antlr.runtime.tree {
 		public function get treeNodeStream():TreeNodeStream {
 			return input;
 		}
+		
+		public override function get sourceName():String {
+			return input.sourceName;
+		}
 	
 		/** Match '.' in tree parser has special meaning.  Skip node or
 		 *  entire tree if node has children.  If children, scan until

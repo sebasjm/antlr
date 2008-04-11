@@ -56,6 +56,8 @@ package org.antlr.runtime {
 		/** Track the last mark() call result value for use in rewind(). */
 		protected var lastMarker:int;
 	
+		protected var _sourceName:String;
+		
 	    protected var _lineDelimiter:String;
 	    
 		/** Copy data in string to a local char array */
@@ -194,6 +196,15 @@ package org.antlr.runtime {
 		public function set charPositionInLine(pos:int):void {
 			this._charPositionInLine = pos;
 		}
+		
+		public function get sourceName():String {
+			return _sourceName;
+		}
+		
+		public function set sourceName(sourceName:String):void {
+			_sourceName = sourceName;
+		}
+		
 	}
 
 }

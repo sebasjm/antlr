@@ -51,6 +51,14 @@ package org.antlr.runtime {
 		 */
 		function get tokenIndex():int;
 		function set tokenIndex(index:int):void;
+		
+		/** From what character stream was this token created?  You don't have to
+		 *  implement but it's nice to know where a Token comes from if you have
+		 *  include files etc... on the input.
+		 */
+		function get inputStream():CharStream;
+		function set inputStream(input:CharStream):void;
+	
 	}
 
 }

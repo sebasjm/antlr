@@ -55,6 +55,10 @@ package org.antlr.runtime {
 			return input;
 		}
 	
+		public override function get sourceName():String {
+			return input.sourceName;
+		}
+		
 		public function traceIn(ruleName:String, ruleIndex:int):void  {
 			super.traceInSymbol(ruleName, ruleIndex, input.LT(1));
 		}

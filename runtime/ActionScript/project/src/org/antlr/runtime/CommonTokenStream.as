@@ -334,6 +334,10 @@ package org.antlr.runtime {
 			return _tokenSource;
 		}
 	
+		public function get sourceName():String {
+			return tokenSource.sourceName;
+		}
+		
 		public function toString():String {
 			if ( p == -1 ) {
 				fillBuffer();

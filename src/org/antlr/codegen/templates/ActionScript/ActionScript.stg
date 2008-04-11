@@ -63,7 +63,7 @@ import org.antlr.runtime.*;
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode) ::= <<
-public class <name> extends Lexer {
+public class <grammar.recognizerName> extends Lexer {
     <tokens:{public static const <it.name>:int=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
@@ -75,7 +75,7 @@ public class <name> extends Lexer {
     <grammar.delegators:
          {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
 
-    public function <name>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
+    public function <grammar.recognizerName>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
         super(input, state);
         <cyclicDFAs:cyclicDFACtor()>
 <if(memoize)>
@@ -165,7 +165,7 @@ filteringActionGate() ::= "this.state.backtracking==1"
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members, rewriteElementType) ::= <<
-public class <name> extends <@superClassName><superClass><@end> {
+public class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 <if(grammar.grammarIsRoot)>
     public static const tokenNames:Array = [
         "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
@@ -184,7 +184,7 @@ public class <name> extends <@superClassName><superClass><@end> {
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
    <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
-    public function <name>(input:<inputStreamType>, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
+    public function <grammar.recognizerName>(input:<inputStreamType>, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
         super(input, state);
         <cyclicDFAs:cyclicDFACtor()>
         <parserCtorBody()>
@@ -677,6 +677,8 @@ else {
 <endif>
 }<\n>
 >>
+
+matchRuleBlockSet ::= matchSet
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>

@@ -111,7 +111,7 @@ package org.antlr.runtime.tree {
 			p = 0; // buffer of nodes intialized now
 		}
 	
-		protected function fillBufferTo(t:Object):void {
+		public function fillBufferTo(t:Object):void {
 			var nil:Boolean = adaptor.isNil(t);
 			if ( !nil ) {
 				nodes.push(t); // add this node
@@ -210,6 +210,10 @@ package org.antlr.runtime.tree {
 	
 		public function get treeSource():Object {
 			return root;
+		}
+		
+		public function get sourceName():String {
+			return tokenStream.sourceName;
 		}
 	
 		public function get tokenStream():TokenStream {

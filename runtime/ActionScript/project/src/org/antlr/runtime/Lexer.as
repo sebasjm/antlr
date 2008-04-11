@@ -120,6 +120,10 @@ package org.antlr.runtime {
 			return input;
 		}
 	
+		public override function get sourceName():String {
+			return input.sourceName;
+		}
+		
 		/** Currently does not support multiple emits per nextToken invocation
 		 *  for efficiency reasons.  Subclass and override this method and
 		 *  nextToken (to push tokens into a list and pull from that list rather

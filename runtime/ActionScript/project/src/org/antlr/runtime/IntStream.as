@@ -114,5 +114,11 @@ package org.antlr.runtime {
 		 *  value includes a single EOF.
 		 */
 		function get size():int;
+		
+		/** Where are you getting symbols from?  Normally, implementations will
+		 *  pass the buck all the way to the lexer who can ask its input stream
+		 *  for the file name or whatever.
+		 */
+		function get sourceName():String;
 	}
 }

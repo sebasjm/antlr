@@ -660,6 +660,10 @@ package org.antlr.runtime {
 			return null;
 		}
 	
+		public function get sourceName():String {
+			return null;
+		}
+		
 		/** A convenience method for use most often with template rewrites.
 		 *  Convert a List<Token> to List<String>
 		 */

@@ -35,10 +35,11 @@ public class CommonToken implements Token {
 	protected var _charPositionInLine:int = -1; // set to invalid position
 	protected var _channel:int = TokenConstants.DEFAULT_CHANNEL;
 	protected var _input:CharStream;
+	
 	/** We need to be able to change the text once in a while.  If
 	 *  this is non-null, then getText should return this.  Note that
 	 *  start/stop are not affected by changing this.
-	  */
+	 */
 	protected var _text:String;
 
 	/** What token number is this from 0..n-1 tokens; < 0 implies invalid index */
@@ -153,6 +154,14 @@ public class CommonToken implements Token {
 		_index = index;
 	}
 
+	public function get inputStream():CharStream {
+		return _input;
+	}
+	
+	public function set inputStream(input:CharStream):void {
+		_input = input;
+	}
+	
 	public function toString():String {
 		var channelStr:String = "";
 		if ( channel>0 ) {
