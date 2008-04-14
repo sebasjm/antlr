@@ -2,6 +2,8 @@ package org.antlr.runtime.tree
 {
 	import flash.utils.Dictionary;
 	
+	import mx.utils.ObjectUtil;
+	
 	import org.antlr.runtime.*;
 
 	/** A TreeAdaptor that works with any Tree implementation. */	
@@ -14,7 +16,7 @@ package org.antlr.runtime.tree
 		protected var uniqueNodeID:int = 1;
 	
 		public function nil():Object {
-			return create(null);
+			return createWithPayload(null);
 		}
 	
 		/** create tree node that holds the start and stop tokens associated
@@ -101,7 +103,12 @@ package org.antlr.runtime.tree
 		 *  constructing these nodes so we should have this control for
 		 *  efficiency.
 		 */
-		public function becomeRoot(newRoot:Object, oldRoot:Object):Object {
+		public function becomeRoot(newRoot:Object, oldRoot:Object):Object {			
+			// If new Root is token, then create a Tree.
+			if (newRoot is Token) {
+				newRoot = createWithPayload(Token(newRoot));
+			}
+
 			var newRootTree:Tree = Tree(newRoot);
 			var oldRootTree:Tree = Tree(oldRoot);
 			if ( oldRoot==null ) {
@@ -140,27 +147,18 @@ package org.antlr.runtime.tree
 			return r;
 		}
 	
-		public function becomeRootToken(newRoot:Token, oldRoot:Object):Object {
-			return becomeRoot(create(newRoot), oldRoot);
-		}
-	
-		public function createFromToken(tokenType:int, fromToken:Token):Object {
-			fromToken = createTokenFromToken(fromToken);
-			//((ClassicToken)fromToken).setType(tokenType);
+		public function createFromToken(tokenType:int, fromToken:Token, text:String = null):Object {
+			fromToken = createToken(fromToken);
 			fromToken.type = tokenType;
-			return create(fromToken);
+			if (text != null) {
+				fromToken.text = text;
+			}
+			return createWithPayload(fromToken);
 		}
 	
-		public function createFromTokenString(tokenType:int, fromToken:Token, text:String):Object {
-			fromToken = createTokenFromToken(fromToken);
-			fromToken.type = tokenType;
-			fromToken.text = text;
-			return create(fromToken);
-		}
-	
-		public function createFromString(tokenType:int, text:String):Object {
-			var fromToken:Token = createToken(tokenType, text);
-			return create(fromToken);
+		public function createFromType(tokenType:int, text:String):Object {
+			var fromToken:Token = createTokenFromType(tokenType, text);
+			return createWithPayload(fromToken);
 		}
 	
 		public function getType(t:Object):int {
@@ -222,7 +220,7 @@ package org.antlr.runtime.tree
 		 * 
 		 * GMS - was abstract
 		 */
-		public function createToken(tokenType:int, text:String):Token {
+		public function createTokenFromType(tokenType:int, text:String):Token {
 			throw new Error("Not implemented - abstract function");
 		}
 	
@@ -241,11 +239,11 @@ package org.antlr.runtime.tree
 		 *  override this method and any other createToken variant.
 		 * 
 		 */
-		public function createTokenFromToken(fromToken:Token):Token {
+		public function createToken(fromToken:Token):Token {
 			throw new Error("Not implemented - abstract function");
 		}
 		
-		public function create(payload:Token):Object {
+		public function createWithPayload(payload:Token):Object {
 			throw new Error("Not implemented - abstract function");
 		}
 		
@@ -288,6 +286,29 @@ package org.antlr.runtime.tree
 		public function replaceChildren(parent:Object, startChildIndex:int, stopChildIndex:int, t:Object):void {
 			throw new Error("Not implemented - abstract function");
 		}	
+		
+		public function create(... args):Object {
+			if (args.length == 1 && args[0] is Token) {
+				return createWithPayload(args[0]);
+			}
+			else if (args.length == 2 &&
+					 args[0] is int &&
+					 args[1] is Token) {
+			 	return createFromToken(args[0], args[1]);
+		 	}
+			else if (args.length == 3 &&
+					 args[0] is int &&
+					 args[1] is Token &&
+					 args[2] is String) {
+			 	return createFromToken(args[0], args[1], args[2]);
+			}
+			else if (args.length == 2 &&
+					 args[0] is int &&
+					 args[1] is String) {
+			 	return createFromType(args[0], args[1]);
+			} 					 
+			throw new Error("No methods signature for arguments : " + ObjectUtil.toString(args));
+		}
 	}
 
 

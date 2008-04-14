@@ -38,7 +38,7 @@ package org.antlr.runtime.tree {
     	/** Get next token from stream and make a node for it */
     	public function nextNode():Object {
     		var t:Token = Token(_next());
-    		return adaptor.create(t);
+    		return adaptor.createWithPayload(t);
     	}
     
     	public function nextToken():Token {

@@ -45,7 +45,7 @@ package org.antlr.runtime.tree {
 		 *  then the token just becomes the payload.  This is the most
 		 *  common create call.
 	     */
-		function create(payload:Token):Object;
+		function createWithPayload(payload:Token):Object;
 	
 		/** Duplicate tree recursively, using dupNode() for each node */
 		function dupTree(tree:Object):Object;
@@ -141,50 +141,21 @@ package org.antlr.runtime.tree {
 	
 		// R e w r i t e  R u l e s
 	
-		/** Create a node for newRoot make it the root of oldRoot.
-		 *  If oldRoot is a nil root, just copy or move the children to newRoot.
-		 *  If not a nil root, make oldRoot a child of newRoot.
-		 *
-		 *  Return node created for newRoot.
-		 *
-		 *  Be advised: when debugging ASTs, the DebugTreeAdaptor manually
-		 *  calls create(Token child) and then plain becomeRoot(node, node)
-		 *  because it needs to trap calls to create, but it can't since it delegates
-		 *  to not inherits from the TreeAdaptor.
-		 * 
-		 * // GMS: Renamed from becomeRoot
-		 */
-		function becomeRootToken(newRoot:Token, oldRoot:Object):Object;
-	
 		/** Create a new node derived from a token, with a new token type.
 		 *  This is invoked from an imaginary node ref on right side of a
-		 *  rewrite rule as IMAG[$tokenLabel].
+		 *  rewrite rule as IMAG[$tokenLabel] or IMAG[$tokenLabel, "IMAG"].
 		 *
 		 *  This should invoke createToken(Token).
-		 * 
-		 * GMS : Renamed from create()
 		 */
-		function createFromToken(tokenType:int, fromToken:Token):Object;
-	
-		/** Same as create(tokenType,fromToken) except set the text too.
-		 *  This is invoked from an imaginary node ref on right side of a
-		 *  rewrite rule as IMAG[$tokenLabel, "IMAG"].
-		 *
-		 *  This should invoke createToken(Token).
-		 * 
-		 * Renamed from create
-		 */
-		function createFromTokenString(tokenType:int, fromToken:Token, text:String):Object;
+		function createFromToken(tokenType:int, fromToken:Token, text:String = null):Object;
 	
 		/** Create a new node derived from a token, with a new token type.
 		 *  This is invoked from an imaginary node ref on right side of a
 		 *  rewrite rule as IMAG["IMAG"].
 		 *
 		 *  This should invoke createToken(int,String).
-		 * 
-		 * GMS: Renamed from create()
 		 */
-		function createFromString(tokenType:int, text:String):Object;
+		function createFromType(tokenType:int, text:String):Object;
 	
 	
 		// C o n t e n t
@@ -263,5 +234,16 @@ package org.antlr.runtime.tree {
 		 */
 		function replaceChildren(parent:Object, startChildIndex:int, stopChildIndex:int, t:Object):void;	
 		
+		
+		// Code - generator support - TODO place in separate namespace
+		
+		/**
+		 * Private method used by generated code.  Based on type and number of arguments will call one of:
+		 * 
+		 * 	* createWithPayload
+		 *  * createFromToken
+		 *  * createFromType 
+		 */
+		function create(... args):Object;
 	}
 }

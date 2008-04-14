@@ -1,5 +1,4 @@
-package org.antlr.runtime.tree
-{
+package org.antlr.runtime.tree {
 	import org.antlr.runtime.CommonToken;
 	import org.antlr.runtime.Token;
 	import org.antlr.runtime.TokenConstants;
@@ -27,7 +26,7 @@ package org.antlr.runtime.tree
 			return (Tree(t)).dupNode();
 		}
 	
-		public override function create(payload:Token):Object {
+		public override function createWithPayload(payload:Token):Object {
 			return CommonTree.createFromToken(payload);
 		}
 	
@@ -39,7 +38,7 @@ package org.antlr.runtime.tree
 		 *  If you care what the token payload objects' type is, you should
 		 *  override this method and any other createToken variant.
 		 */
-		public override function createToken(tokenType:int, text:String):Token {
+		public override function createTokenFromType(tokenType:int, text:String):Token {
 			return new CommonToken(tokenType, text);
 		}
 	
@@ -57,7 +56,7 @@ package org.antlr.runtime.tree
 		 *  If you care what the token payload objects' type is, you should
 		 *  override this method and any other createToken variant.
 		 */
-		public override function createTokenFromToken(fromToken:Token):Token {
+		public override function createToken(fromToken:Token):Token {
 			return CommonToken.cloneToken(fromToken);
 		}
 	

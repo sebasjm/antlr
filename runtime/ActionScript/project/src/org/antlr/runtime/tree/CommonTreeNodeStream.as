@@ -97,9 +97,9 @@ package org.antlr.runtime.tree {
 			this.adaptor = adaptor == null ? new CommonTreeAdaptor() : adaptor;
 			
 			nodes = new Array();
-			down = this.adaptor.createFromString(TokenConstants.DOWN, "DOWN");
-			up = this.adaptor.createFromString(TokenConstants.UP, "UP");
-			eof = this.adaptor.createFromString(TokenConstants.EOF, "EOF");
+			down = this.adaptor.createFromType(TokenConstants.DOWN, "DOWN");
+			up = this.adaptor.createFromType(TokenConstants.UP, "UP");
+			eof = this.adaptor.createFromType(TokenConstants.EOF, "EOF");
 		}
 	
 		/** Walk tree with depth-first-search and fill nodes buffer.
@@ -156,7 +156,7 @@ package org.antlr.runtime.tree {
 			var navNode:Object = null;
 			if ( ttype==TokenConstants.DOWN ) {
 				if ( hasUniqueNavigationNodes) {
-					navNode = adaptor.createFromString(TokenConstants.DOWN, "DOWN");
+					navNode = adaptor.createFromType(TokenConstants.DOWN, "DOWN");
 				}
 				else {
 					navNode = down;
@@ -164,7 +164,7 @@ package org.antlr.runtime.tree {
 			}
 			else {
 				if ( hasUniqueNavigationNodes ) {
-					navNode = adaptor.createFromString(TokenConstants.UP, "UP");
+					navNode = adaptor.createFromType(TokenConstants.UP, "UP");
 				}
 				else {
 					navNode = up;

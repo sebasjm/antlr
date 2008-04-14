@@ -383,7 +383,7 @@ ruleLabelDefs() ::= <<
     :{var <it.label.text>:<labelType>=null;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{List list_<it.label.text>=null;}; separator="\n"
+    :{var list_<it.label.text>:Array=null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
 <ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
@@ -399,7 +399,7 @@ lexerRuleLabelDefs() ::= <<
 <[ruleDescriptor.tokenListLabels,
   ruleDescriptor.ruleListLabels,
   ruleDescriptor.ruleListLabels]
-    :{List list_<it.label.text>=null;}; separator="\n"
+    :{var list_<it.label.text>:Array=null;}; separator="\n"
 >
 >>
 
@@ -627,8 +627,8 @@ tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 >>
 
 listLabel(label,elem) ::= <<
-if (list_<label>==null) list_<label>=new ArrayList();
-list_<label>.add(<elem>);<\n>
+if (list_<label>==null) list_<label>=new Array();
+list_<label>.push(<elem>);<\n>
 >>
 
 /** match a character */
