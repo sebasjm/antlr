@@ -36,8 +36,9 @@ public class ActionScriptTarget extends Target {
     public String getTargetCharLiteralFromANTLRCharLiteral(
             CodeGenerator generator,
             String literal) {
-        String newVal = "" + (int) literal.charAt(1);
-        return newVal;
+
+        int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
+        return String.valueOf(c);
     }
 
     public String getTokenTypeAsTargetLabel(CodeGenerator generator,
