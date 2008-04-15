@@ -146,7 +146,7 @@ package org.antlr.runtime {
 			finally {
 				input.rewindTo(mark);
 			}
-			// GMS - not reached -- added due to bug in Flex compiler reachability analysis
+			// not reached -- added due to bug in Flex compiler reachability analysis of while loop with no breaks
 			return -1;
 		}
 	

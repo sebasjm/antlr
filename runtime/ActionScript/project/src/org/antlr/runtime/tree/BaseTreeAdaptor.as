@@ -198,7 +198,6 @@ package org.antlr.runtime.tree
 			if ( treeToUniqueIDMap==null ) {
 				 treeToUniqueIDMap = new Dictionary();
 			}
-			// GMS - check this behavior
 			if (treeToUniqueIDMap.hasOwnProperty(node)) {
 				return treeToUniqueIDMap[node];
 			}
@@ -217,8 +216,6 @@ package org.antlr.runtime.tree
 		 *
 		 *  If you care what the token payload objects' type is, you should
 		 *  override this method and any other createToken variant.
-		 * 
-		 * GMS - was abstract
 		 */
 		public function createTokenFromType(tokenType:int, text:String):Token {
 			throw new Error("Not implemented - abstract function");

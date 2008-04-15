@@ -91,7 +91,6 @@ package org.antlr.runtime {
 		 */
 		public function growToInclude(bit:int):void {
 			var newSize:int = Math.max(bits.length << 1, numWordsToHold(bit));
-			// GMS - FIX need to zero initialize the new bits ?
 			bits.length = newSize;
 		}
 	

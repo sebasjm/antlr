@@ -43,11 +43,10 @@ package org.antlr.runtime {
 		protected var tokens:Array = new Array();
 	
 		/** Map<tokentype, channel> to override some Tokens' channel numbers */
-		protected var channelOverrideMap:Object;
+		protected var channelOverrideMap:Array;
 	
 		/** Set<tokentype>; discard any tokens with this type */
-		// GMS: Note changed from Set to Array need to look at mx Collection classes 
-		protected var discardSet:Object;
+		protected var discardSet:Array;
 	
 		/** Skip tokens on any channel but this one; this is how we skip whitespace... */
 		protected var channel:int = TokenConstants.DEFAULT_CHANNEL;
@@ -87,14 +86,12 @@ package org.antlr.runtime {
 				var discard:Boolean = false;
 				// is there a channel override for token type?
 				if ( channelOverrideMap != null ) {
-					// GMS : Change heavily from Java
-					if (channelOverrideMap.hasOwnProperty(new String(t.type))) {
-						t.channel = channelOverrideMap[new String(t.type)];
+					if (channelOverrideMap[t.type] != undefined) {
+						t.channel = channelOverrideMap[t.type];
 					}
 				}
 				if ( discardSet !=null &&
-					// GMS TODO fix this should be contains tests
-					 discardSet.hasOwnProperty(new String(t.type)) == true)
+					 discardSet[t.type] == true )
 				{
 					discard = true;
 				}
@@ -153,14 +150,14 @@ package org.antlr.runtime {
 		 */
 		public function setTokenTypeChannel(ttype:int, channel:int):void {
 			if ( channelOverrideMap==null ) {
-				channelOverrideMap = new Object();
+				channelOverrideMap = new Array();
 			}
-	        channelOverrideMap[new String(ttype)] = channel;
+	        channelOverrideMap[ttype] = channel;
 		}
 	
 		public function discardTokenType(ttype:int):void {
 			if ( discardSet==null ) {
-				discardSet = new Object();
+				discardSet = new Array();
 			}
 	        discardSet[ttype] = true;
 		}
@@ -176,7 +173,6 @@ package org.antlr.runtime {
 			return tokens;
 		}
 	
-		// GMS - renamed from getTokens
 		public function getTokensRange(start:int, stop:int):Array {
 			return getTokensBitSet(start, stop, null);
 		}

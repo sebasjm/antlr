@@ -107,7 +107,10 @@ package org.antlr.runtime {
 		}
 	
 		/** This is the lexer entry point that sets instance var 'token' */
-		public function mTokens():void {} 	// GMS: made non-abstract
+		public function mTokens():void {
+			// abstract function
+			throw new Error("Not implemented");
+		} 	
 	
 		/** Set the char stream and reset the lexer */
 		public function set charStream(input:CharStream):void {
@@ -128,7 +131,6 @@ package org.antlr.runtime {
 		 *  for efficiency reasons.  Subclass and override this method and
 		 *  nextToken (to push tokens into a list and pull from that list rather
 		 *  than a single variable as this implementation does).
-		 * GMS: renamed from emit()
 		 */
 		public function emitToken(token:Token):void {
 			state.token = token;
@@ -141,7 +143,6 @@ package org.antlr.runtime {
 		 *  custom Token objects.
 		 */
 		public function emit():Token {
-			// GMS changed to remove charIndex subtraction
 			var t:Token = CommonToken.createFromStream(input, state.type, state.channel, state.tokenStartCharIndex, charIndex - 1);
 			t.line = state.tokenStartLine;
 			t.text = state.text;
@@ -150,17 +151,14 @@ package org.antlr.runtime {
 			return t;
 		}
 	
-		// GMS: renamed from match()
 		public function matchString(s:String):void {
 	        var i:int = 0;
 	        while ( i<s.length ) {
-	        	// GMS: Changed charAt to charCodeAt()
 	            if ( input.LA(1) != s.charCodeAt(i) ) {
 					if ( state.backtracking>0 ) {
 						state.failed = true;
 						return;
 					}
-					// GMS: Changed charAt to charCodeAt()
 					var mte:MismatchedTokenException =
 						new MismatchedTokenException(s.charCodeAt(i), input);
 					recover(mte);
@@ -279,7 +277,6 @@ package org.antlr.runtime {
 		}
 	
 		public function getCharErrorDisplay(c:int):String {
-			// GMS: Changed from valueOf to fromCharCode
 			var s:String = String.fromCharCode(c);
 			switch ( c ) {
 				case TokenConstants.EOF :
@@ -314,13 +311,11 @@ package org.antlr.runtime {
 		}
 	
 		public function traceIn(ruleName:String, ruleIndex:int):void {
-			// GMS: changed from cast of input.LT(1) to fromCharCode
 			var inputSymbol:String = String.fromCharCode(input.LT(1))+" line="+ line +":"+ charPositionInLine;
 			super.traceInSymbol(ruleName, ruleIndex, inputSymbol);
 		}
 	
 		public function traceOut(ruleName:String, ruleIndex:int):void {
-			// GMS: changed from cast of input.LT(1) to fromCharCode
 			var inputSymbol:String = String.fromCharCode(input.LT(1))+" line="+ line +":"+ charPositionInLine;
 			super.traceOutSymbol(ruleName, ruleIndex, inputSymbol);
 		}

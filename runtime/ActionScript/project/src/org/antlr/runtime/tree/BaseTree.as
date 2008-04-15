@@ -294,8 +294,7 @@ package org.antlr.runtime.tree {
 			return 0;
 		}
 
-		// "Abstract" functions - GMS
-		// Since no abstract classes in actionscript
+		// "Abstract" functions since there are no abstract classes in actionscript
 		 
 		public function dupNode():Tree {
 			throw new Error("Not implemented");

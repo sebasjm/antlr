@@ -14,9 +14,6 @@ package org.antlr.runtime {
 		public static const MEMO_RULE_UNKNOWN:int = -1;
 		public static const INITIAL_FOLLOW_STACK_SIZE:int = 100;
 	
-		// GMS: need to see where this is used.
-		//public static final Integer MEMO_RULE_FAILED_I = new Integer(MEMO_RULE_FAILED);
-	
 		// copies from Token object for convenience in actions
 		public static const DEFAULT_TOKEN_CHANNEL:int = TokenConstants.DEFAULT_CHANNEL;
 		public static const HIDDEN:int = TokenConstants.HIDDEN_CHANNEL;
@@ -30,7 +27,7 @@ package org.antlr.runtime {
 		 *  inheritance via delegation of methods and shared state.
 		 * 
 		 */
-		public var state:RecognizerSharedState;  // Note - this is public due ActionScript access rules -- GMS
+		public var state:RecognizerSharedState;  // TODO - Place in private Namespace - cannot be private 
 	
 		public function BaseRecognizer(state:RecognizerSharedState = null) {
 			if ( state == null ) { // don't ever let us have a null state
@@ -83,7 +80,6 @@ package org.antlr.runtime {
 			return;
 		}
 	
-		// GMS - renamed from matchAny to matchAnyStream
 		/** Match the wildcard: in a symbol */
 		public function matchAnyStream(input:IntStream):void {
 			state.errorRecovery = false;
@@ -345,7 +341,6 @@ package org.antlr.runtime {
     	 *  token that the match() routine could not recover from.
     	 */
 		public function recoverStream(input:IntStream, re:RecognitionException):void {
-		    // GMS - renamed from recover()
 			if ( state.lastErrorIndex==input.index) {
 				// uh oh, another error at same token index; must be a case
 				// where LT(1) is in the recovery token set so nothing is
@@ -615,7 +610,6 @@ package org.antlr.runtime {
     		return false;
     	}
 	
-		// GMS: Renamed from consumeUntil to consumeUntilToken
 		public function consumeUntilToken(input:IntStream, tokenType:int):void {
 			//System.out.println("consumeUntil "+tokenType);
 			var ttype:int = input.LA(1);
@@ -685,19 +679,16 @@ package org.antlr.runtime {
 		 *  For now we use a hashtable and just the slow Object-based one.
 		 *  Later, we can make a special one for ints and also one that
 		 *  tosses out data after we commit past input position i.
-		 * 
-		 * GMS: converted this to use Associate Arrays for ruleMemos
 		 */
 		public function getRuleMemoization(ruleIndex:int, ruleStartIndex:int):int {
-			if ( state.ruleMemo[ruleIndex]==null ) {
-				state.ruleMemo[ruleIndex] = new Object();
-				state.ruleMemo[ruleIndex].length = 0;
+			if ( state.ruleMemo[ruleIndex]==undefined ) {
+				state.ruleMemo[ruleIndex] = new Array();
 			}
-			var stopIndexI:String =	state.ruleMemo[ruleIndex][new String(ruleStartIndex)];
-			if ( stopIndexI == null ) {
+			var stopIndex:* = state.ruleMemo[ruleIndex][ruleStartIndex];
+			if ( stopIndex == undefined ) {
 				return MEMO_RULE_UNKNOWN;
 			}
-			return int(stopIndexI);
+			return stopIndex as int;
 		}
 	
 		/** Has this rule already parsed input at the current index in the
@@ -741,8 +732,7 @@ package org.antlr.runtime {
     		}
 
 			if ( state.ruleMemo[ruleIndex]!=null ) {
-				state.ruleMemo[ruleIndex][new String(ruleStartIndex)] = new String(stopTokenIndex);
-				state.ruleMemo[ruleIndex].length++;
+				state.ruleMemo[ruleIndex][ruleStartIndex] = stopTokenIndex;
 			}
 		}
 	
@@ -760,7 +750,6 @@ package org.antlr.runtime {
 			return n;
 		}
 	
-	    // GMS : renamed traceInSymbol from traceIn
 		public function traceInSymbol(ruleName:String, ruleIndex:int, inputSymbol:Object):void  {
 			trace("enter "+ruleName+" "+inputSymbol);
 			if ( state.failed ) {
@@ -772,7 +761,6 @@ package org.antlr.runtime {
 			trace();
 		}
 	
-	    // GMS : renamd traceOutSymble from traceOut
 		public function traceOutSymbol(ruleName:String,
 							  ruleIndex:int,
 							  inputSymbol:Object):void

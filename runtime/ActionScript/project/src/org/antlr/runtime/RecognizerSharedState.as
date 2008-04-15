@@ -42,7 +42,7 @@ package org.antlr.runtime {
 		 */
 		public var backtracking:int = 0;
 	
-		/** An array[size num rules] of Map<Integer,Integer> that tracks
+		/** An Array[size num rules] of Arrays that tracks
 		 *  the stop token index for each rule.  ruleMemo[ruleIndex] is
 		 *  the memoization table for ruleIndex.  For key ruleStartIndex, you
 		 *  get back the stop token for associated rule or MEMO_RULE_FAILED.

@@ -61,8 +61,6 @@ package org.antlr.runtime {
 		 *  created after this marker argument, this routine must unroll them
 		 *  like a stack.  Assume the state the stream was in when this marker
 		 *  was created.
-		 * 
-		 * GMS - Renamed from rewind to rewindTo
 		 */
 		function rewindTo(marker:int):void;
 	

@@ -43,7 +43,6 @@ package org.antlr.runtime {
 		 *  sense for you.  Naturally you can't use the rewrite stream feature.
 		 *  I believe DebugTokenStream can easily be altered to not use
 		 *  this method, removing the dependency.
-		 * GMS: Renamed to getToken() from get()
 		 */
 		function getToken(i:int):Token;
 	
@@ -64,8 +63,6 @@ package org.antlr.runtime {
 		 *  indicate the start/end location.  Most often this will just delegate
 		 *  to the other toString(int,int).  This is also parallel with
 		 *  the TreeNodeStream.toString(Object,Object).
-		 * 
-		 * GMS: Renamed from toString()
 		 */
 		function toStringTokenRange(start:Token, stop:Token):String;
 	}
