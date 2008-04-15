@@ -255,6 +255,29 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testSetAttrOfExprInMembers() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+			"options {\n" +
+			"    output=template;\n" +
+			"}\n" +
+			"@members {\n" +
+			"%code.instr = o;" + // must not get null ptr!
+			"}\n" +
+			"a : ID\n" +
+			"  ;\n" +
+			"\n" +
+			"ID : 'a';\n");
+		Tool antlr = newTool();
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer(); // forces load of templates
+
+		assertNoErrors(equeue);
+	}
+
 	public void testCannotHaveSpaceBeforeDot() throws Exception {
 		String action = "%x .y = z;";
 		String expecting = null;

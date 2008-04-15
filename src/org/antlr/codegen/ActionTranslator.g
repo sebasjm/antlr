@@ -97,10 +97,14 @@ public String translate() {
 }
 
 public List translateAction(String action) {
-    ActionTranslator translator =
-        new ActionTranslator(generator,
-                                  enclosingRule.name,
-                                  new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
+	String rname = null;
+	if ( enclosingRule!=null ) {
+		rname = enclosingRule.name;
+	}
+	ActionTranslator translator =
+		new ActionTranslator(generator,
+								  rname,
+								  new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
     return translator.translateToChunks();
 }
 

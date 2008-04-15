@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+April 14, 2008
+
+* %x.y = foo; was not working in @members section
+
 March 29, 2008
 
 * Import couldn't handle A imports B imports C.

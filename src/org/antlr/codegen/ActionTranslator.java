@@ -106,9 +106,13 @@ public class ActionTranslator extends Lexer {
     }
 
     public List translateAction(String action) {
-        ActionTranslator translator =
+		String rname = null;
+		if ( enclosingRule!=null ) {
+			rname = enclosingRule.name;
+		}
+		ActionTranslator translator =
             new ActionTranslator(generator,
-                                      enclosingRule.name,
+                                      rname,
                                       new antlr.CommonToken(ANTLRParser.ACTION,action),outerAltNum);
         return translator.translateToChunks();
     }

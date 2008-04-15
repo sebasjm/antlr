@@ -42,8 +42,11 @@ package org.antlr.runtime;
  *  input streams.
  *
  *  I do not use getters for fields of objects that are used simply to
- *  group values such as this aggregate.
+ *  group values such as this aggregate.  The getters/setters are there to
+ *  satisfy the superclass interface.
  */
 public class ParserRuleReturnScope extends RuleReturnScope {
 	public Token start, stop;
+	public Object getStart() { return start; }
+	public Object getStop() { return stop; }
 }
