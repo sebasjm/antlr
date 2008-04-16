@@ -130,7 +130,7 @@ public override function nextToken():Token {
             <! mTokens backtracks with synpred at backtracking==2
                and we set the synpredgate to allow actions at level 1. !>
             if ( this.state.failed ) {
-                input.rewind(m);
+                input.rewindTo(m);
                 input.consume(); <! advance one char and try again !>
             }
             else {
@@ -144,16 +144,18 @@ public override function nextToken():Token {
             recover(re);
         }
     }
+    // Not reached - For ActionScript compiler
+    throw new Error();
 }
 
-public function memoize(input:IntStream
+public override function memoize(input:IntStream,
 		ruleIndex:int,
 		ruleStartIndex:int):void
 {
 if ( this.state.backtracking>1 ) super.memoize(input, ruleIndex, ruleStartIndex);
 }
 
-public function alreadyParsedRule(IntStream:input, ruleIndex:int):Boolean {
+public override function alreadyParsedRule(input:IntStream, ruleIndex:int):Boolean {
 if ( this.state.backtracking>1 ) return super.alreadyParsedRule(input, ruleIndex);
 return false;
 }
@@ -690,7 +692,7 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 var <label>Start:int = charIndex;
 matchString(<string>); <checkRuleBacktrackFailure()>
-<label> = new CommonToken(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, charIndex-1);
+<label> = CommonToken.createFromStream(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, charIndex-1);
 <else>
 matchString(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -751,7 +753,7 @@ lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 var <label>Start<elementIndex>:int = charIndex;
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-<label> = new CommonToken(input, TokenConstants.INVALID_TOKEN_TYPE, TokenConstants.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
+<label> = CommonToken.createFromStream(input, TokenConstants.INVALID_TOKEN_TYPE, TokenConstants.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
 <else>
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
@@ -768,7 +770,7 @@ lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 var <label>Start<elementIndex>:int = charIndex;
 match(EOF); <checkRuleBacktrackFailure()>
-var <label>:<labelType> = new CommonToken(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
+var <label>:<labelType> = CommonToken.createFromStream(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
 <else>
 match(EOF); <checkRuleBacktrackFailure()>
 <endif>
