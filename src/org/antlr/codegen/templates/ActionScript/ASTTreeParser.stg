@@ -66,15 +66,15 @@ _last = <ASTLabelType>(input.LT(1));
 <root:element()>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
-if ( input.LA(1)==Token.DOWN ) {
-    match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+if ( input.LA(1)==TokenConstants.DOWN ) {
+    match(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
     <children:element()>
-    match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+    match(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
 }
 <else>
-match(input, Token.DOWN, null); <checkRuleBacktrackFailure()>
+match(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
 <children:element()>
-match(input, Token.UP, null); <checkRuleBacktrackFailure()>
+match(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
 <endif>
 <if(!rewriteMode)>
 adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);

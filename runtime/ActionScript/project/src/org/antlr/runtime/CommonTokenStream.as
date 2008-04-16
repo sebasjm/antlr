@@ -353,7 +353,7 @@ package org.antlr.runtime {
 			}
 	 		var buf:String = "";
 			for (var i:int = start; i <= stop; i++) {
-				var t:Token = Token(tokens.get[i]);
+				var t:Token = Token(tokens[i]);
 				buf += t.text;
 			}
 			return buf.toString();

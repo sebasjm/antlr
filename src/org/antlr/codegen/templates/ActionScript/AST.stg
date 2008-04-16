@@ -207,7 +207,7 @@ rewriteOptionalBlock(
 	description) ::=
 <<
 // <fileName>:<description>
-if ( <referencedElementsDeep:{el | stream_<el>.hasNext()}; separator="||"> ) {
+if ( <referencedElementsDeep:{el | stream_<el>.hasNext}; separator="||"> ) {
     <alt>
 }
 <referencedElementsDeep:{el | stream_<el>.reset();<\n>}>
@@ -220,7 +220,7 @@ rewriteClosureBlock(
 	description) ::=
 <<
 // <fileName>:<description>
-while ( <referencedElements:{el | stream_<el>.hasNext()}; separator="||"> ) {
+while ( <referencedElements:{el | stream_<el>.hasNext}; separator="||"> ) {
     <alt>
 }
 <referencedElements:{el | stream_<el>.reset();<\n>}>
@@ -232,10 +232,10 @@ rewritePositiveClosureBlock(
 	referencedElements, // elements in immediately block; no nested blocks
 	description) ::=
 <<
-if ( !(<referencedElements:{el | stream_<el>.hasNext()}; separator="||">) ) {
+if ( !(<referencedElements:{el | stream_<el>.hasNext}; separator="||">) ) {
     throw new RewriteEarlyExitException();
 }
-while ( <referencedElements:{el | stream_<el>.hasNext()}; separator="||"> ) {
+while ( <referencedElements:{el | stream_<el>.hasNext}; separator="||"> ) {
     <alt>
 }
 <referencedElements:{el | stream_<el>.reset();<\n>}>

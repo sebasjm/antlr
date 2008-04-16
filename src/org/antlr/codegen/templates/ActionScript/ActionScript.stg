@@ -692,7 +692,7 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 var <label>Start:int = charIndex;
 matchString(<string>); <checkRuleBacktrackFailure()>
-<label> = CommonToken.createFromStream(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, charIndex-1);
+<label> = CommonToken.createFromStream(input, TokenConstants.INVALID_TOKEN_TYPE, TokenConstants.DEFAULT_CHANNEL, <label>Start, charIndex-1);
 <else>
 matchString(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -770,7 +770,7 @@ lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 var <label>Start<elementIndex>:int = charIndex;
 match(EOF); <checkRuleBacktrackFailure()>
-var <label>:<labelType> = CommonToken.createFromStream(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
+var <label>:<labelType> = CommonToken.createFromStream(input, EOF, TokenConstants.DEFAULT_CHANNEL, <label>Start<elementIndex>, charIndex-1);
 <else>
 match(EOF); <checkRuleBacktrackFailure()>
 <endif>
@@ -782,7 +782,7 @@ tree(root, actionsAfterRoot, children, nullableChildList,
 <root:element()>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
-if ( input.LA(1)==Token.DOWN ) {
+if ( input.LA(1)==TokenConstants.DOWN ) {
     matchStream(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
     <children:element()>
     matchStream(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
@@ -1198,11 +1198,11 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?<labelType>(<scope>.st
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>!=null?<ASTLabelType>(<scope>.tree):null)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(<scope>!=null?(input.tokenStream.toString(
+(<scope>!=null?(input.tokenStream.toStringRange(
   input.treeAdaptor.getTokenStartIndex(<scope>.start),
   input.treeAdaptor.getTokenStopIndex(<scope>.start))):null)
 <else>
-(<scope>!=null?input.toString(<scope>.start,<scope>.stop):null)
+(<scope>!=null?input.toStringRange(<scope>.start,<scope>.stop):null)
 <endif>
 >>
 
@@ -1232,11 +1232,11 @@ rulePropertyRef_stop(scope,attr) ::= "<labelType>(retval.stop)"
 rulePropertyRef_tree(scope,attr) ::= "<ASTLabelType>(retval.tree)"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-input.tokenStream.toString(
+input.tokenStream.toStringRange(
   input.treeAdaptor.getTokenStartIndex(retval.start),
   input.treeAdaptor.getTokenStopIndex(retval.start))
 <else>
-input.toString(retval.start,input.LT(-1))
+input.toStringRange(retval.start,input.LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
