@@ -75,7 +75,7 @@ public class <grammar.recognizerName> extends Lexer {
     <grammar.delegators:
          {g|public var <g:delegateName()>:<g.recognizerName>;}; separator="\n">
 
-    public function <grammar.recognizerName>(input:CharStream = null, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
+    public function <grammar.recognizerName>(<grammar.delegators:{g|<g:delegateName()>:<g.recognizerName>, }>input:CharStream = null, state:RecognizerSharedState = null) {
         super(input, state);
         <cyclicDFAs:cyclicDFACtor()>
 <if(memoize)>
@@ -84,7 +84,7 @@ public class <grammar.recognizerName> extends Lexer {
 <endif>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(this, <grammar.delegators:{g|<g:delegateName()>, }>input, this.state);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
 
@@ -184,12 +184,12 @@ public class <grammar.recognizerName> extends <@superClassName><superClass><@end
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
    <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
-    public function <grammar.recognizerName>(input:<inputStreamType>, state:RecognizerSharedState = null<grammar.delegators:{g|, <g:delegateName()>:<g.recognizerName>}>) {
+    public function <grammar.recognizerName>(<grammar.delegators:{g|<g:delegateName()>:<g.recognizerName>, }>input:<inputStreamType>, state:RecognizerSharedState = null) {
         super(input, state);
         <cyclicDFAs:cyclicDFACtor()>
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(this, <grammar.delegators:{g|<g:delegateName()>, }>input, this.state);}; separator="\n">
     }
     <@end>
 
