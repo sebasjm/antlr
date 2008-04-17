@@ -134,7 +134,6 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 				r = null;
 			}
 			else if ( r.getChildCount()==1 ) {
-				Tree oldParent = r.getParent();
 				r = (Tree)r.getChild(0);
 				// whoever invokes rule will set parent and child index
 				r.setParent(null);
