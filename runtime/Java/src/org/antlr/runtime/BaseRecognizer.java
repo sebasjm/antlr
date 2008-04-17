@@ -214,7 +214,7 @@ public abstract class BaseRecognizer {
 	 *  exception types.
 	 */
 	public String getErrorMessage(RecognitionException e, String[] tokenNames) {
-		String msg = null;
+		String msg = e.getMessage();
 		if ( e instanceof UnwantedTokenException ) {
 			UnwantedTokenException ute = (UnwantedTokenException)e;
 			String tokenName="<unknown>";

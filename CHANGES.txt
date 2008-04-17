@@ -8,6 +8,11 @@ University of San Francisco
 
 CHANGES
 
+April 17, 2008
+
+* Use default msg if unknown recog type in getErrorMessage():
+	String msg = e.getMessage();
+
 April 14, 2008
 
 * %x.y = foo; was not working in @members section
