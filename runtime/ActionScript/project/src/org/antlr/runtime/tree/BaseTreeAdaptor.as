@@ -137,7 +137,6 @@ package org.antlr.runtime.tree
 					r = null;
 				}
 				else if ( r.childCount==1 ) {
-					var oldParent:Tree = r.parent;
 					r = Tree(r.getChild(0));
 					// whoever invokes rule will set parent and child index
 					r.parent = null;

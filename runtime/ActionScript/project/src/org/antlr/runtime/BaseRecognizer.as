@@ -204,7 +204,7 @@ package org.antlr.runtime {
 		 *  exception types.
 		 */
 		public function getErrorMessage(e:RecognitionException, tokenNames:Array):String {
-			var msg:String = null;
+			var msg:String = e.message;
 			var tokenName:String = null;
     		if ( e is UnwantedTokenException ) {
     			var ute:UnwantedTokenException = UnwantedTokenException(e);
