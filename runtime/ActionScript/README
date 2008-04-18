@@ -34,7 +34,7 @@ Include the antlr3.swc from the lib directory into your flex project.
 5) DOCUMENTATION
 ================
 
-API Documentation is available in the "doc" directory.  User documentation
+API Documentation is available in the file "antlr3-asdoc.zip"  User documentation
 (as far as it exists) can be found in the wiki
 <http://www.antlr.org/wiki/display/ANTLR3/Antlr3ActionScriptTarget>
 

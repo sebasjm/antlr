@@ -61,10 +61,12 @@ package org.antlr.runtime {
 	    protected var _lineDelimiter:String;
 	    
 		/** Copy data in string to a local char array */
-		public function ANTLRStringStream(input:String, lineDelimiter:String = "\n") {
-			this.data = input;
-			this.n = input.length;
+		public function ANTLRStringStream(input:String = null, lineDelimiter:String = "\n") {
 			this._lineDelimiter = lineDelimiter;
+			if (input != null) {
+				this.data = input;
+				this.n = input.length;
+			}
 		}
 	
 		/** Reset the stream so that it's in the same state it was
