@@ -56,7 +56,7 @@ package org.antlr.runtime {
 		 *  return "" or null;  Users should not access $ruleLabel.text in
 		 *  an action of course in that case.
 		 */
-		function toStringRange(start:int, stop:int):String;
+		function toStringWithRange(start:int, stop:int):String;
 	
 		/** Because the user is not required to use a token with an index stored
 		 *  in it, we must provide a means for two token objects themselves to
@@ -64,7 +64,7 @@ package org.antlr.runtime {
 		 *  to the other toString(int,int).  This is also parallel with
 		 *  the TreeNodeStream.toString(Object,Object).
 		 */
-		function toStringTokenRange(start:Token, stop:Token):String;
+		function toStringWithTokenRange(start:Token, stop:Token):String;
 	}
 
 }

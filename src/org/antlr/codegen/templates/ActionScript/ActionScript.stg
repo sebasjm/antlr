@@ -1198,11 +1198,11 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>!=null?<labelType>(<scope>.st
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>!=null?<ASTLabelType>(<scope>.tree):null)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(<scope>!=null?(input.tokenStream.toStringRange(
+(<scope>!=null?(input.tokenStream.toStringWithRange(
   input.treeAdaptor.getTokenStartIndex(<scope>.start),
   input.treeAdaptor.getTokenStopIndex(<scope>.start))):null)
 <else>
-(<scope>!=null?input.toStringRange(<scope>.start,<scope>.stop):null)
+(<scope>!=null?input.toStringWithRange(<scope>.start,<scope>.stop):null)
 <endif>
 >>
 
@@ -1232,11 +1232,11 @@ rulePropertyRef_stop(scope,attr) ::= "<labelType>(retval.stop)"
 rulePropertyRef_tree(scope,attr) ::= "<ASTLabelType>(retval.tree)"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-input.tokenStream.toStringRange(
+input.tokenStream.toStringWithRange(
   input.treeAdaptor.getTokenStartIndex(retval.start),
   input.treeAdaptor.getTokenStopIndex(retval.start))
 <else>
-input.toStringRange(retval.start,input.LT(-1))
+input.toStringWithRange(retval.start,input.LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"

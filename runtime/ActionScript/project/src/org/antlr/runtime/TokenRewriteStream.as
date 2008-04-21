@@ -268,10 +268,14 @@ package org.antlr.runtime {
 		}
 	
 		public override function toString():String {
-			return toStringWithRange(MIN_TOKEN_INDEX, size-1, DEFAULT_PROGRAM_NAME);
+			return toStringWithRange(MIN_TOKEN_INDEX, size-1);
 		}
 	
-		public function toStringWithRange(start:int, end:int, programName:String = DEFAULT_PROGRAM_NAME):String {
+		public override function toStringWithRange(start:int, end:int):String {
+			return toStringWithRangeAndProgram(start, end, DEFAULT_PROGRAM_NAME);
+		}
+		
+		public function toStringWithRangeAndProgram(start:int, end:int, programName:String):String {
 			var rewrites:Array = programs[programName] as Array;
 			if ( rewrites==null || rewrites.length==0 ) {
 				return toOriginalStringWithRange(start,end); // no instructions to execute

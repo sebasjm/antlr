@@ -352,7 +352,7 @@ package org.antlr.runtime.tree {
     		return buf;
     	}
 	
-		public function toStringRange(start:Object, stop:Object):String {
+		public function toStringWithRange(start:Object, stop:Object):String {
 			if ( start==null || stop==null ) {
 				return null;
 			}
@@ -380,7 +380,7 @@ package org.antlr.runtime.tree {
 				else if ( adaptor.getType(stop)==TokenConstants.EOF ) {
 					endTokenIndex = size-2; // don't use EOF
 				}
-				return tokens.toStringRange(beginTokenIndex, endTokenIndex);
+				return tokens.toStringWithRange(beginTokenIndex, endTokenIndex);
 			}
 			// walk nodes looking for start
 			var t:Object = null;

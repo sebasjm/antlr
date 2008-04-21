@@ -9,11 +9,9 @@ ANTLR3.
 2) STATUS
 =========
 
-The ActionScript target for ANTLR3 is still in beta. Documentation is lacking, some
-bits of the code is not yet done, some functionality has not been tested yet.
-Also the API might change a bit - it currently mimics the Java implementation,
-but takes advantage of ActionScript constrcuts where possible.
-
+The ActionScript target for ANTLR3 is considered a solid beta at this point.  Most things
+should work, but a comprehensive suite of tests has not been built yet, so some areas may
+be untested.
 
 3) DOWNLOAD
 ===========
@@ -44,7 +42,8 @@ API Documentation is available in the file "antlr3-asdoc.zip"  User documentatio
 
 Please send bug reports to the ANTLR mailing list 
 <http://www.antlr.org:8080/mailman/listinfo/antlr-interest> or
-<george.scott-antrl@gmail.com>
+<george.scott-antrl@gmail.com>.  Direct e-mail is preferable as the antlr-interest
+list is not read on a daily basis by the maintainers.
 
 Existing bugs may appear someday in the bugtracker:
 <http://www.antlr.org:8888/browse/ANTLR>

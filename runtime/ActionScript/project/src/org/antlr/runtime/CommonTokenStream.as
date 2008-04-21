@@ -338,10 +338,10 @@ package org.antlr.runtime {
 			if ( p == -1 ) {
 				fillBuffer();
 			}
-			return toStringRange(0, tokens.length-1);
+			return toStringWithRange(0, tokens.length-1);
 		}
 	
-		public function toStringRange(start:int, stop:int):String {
+		public function toStringWithRange(start:int, stop:int):String {
 			if ( start<0 || stop<0 ) {
 				return null;
 			}
@@ -359,9 +359,9 @@ package org.antlr.runtime {
 			return buf.toString();
 		}
 	
-		public function toStringTokenRange(start:Token, stop:Token):String {
+		public function toStringWithTokenRange(start:Token, stop:Token):String {
 			if ( start!=null && stop!=null ) {
-				return toStringRange(start.tokenIndex, stop.tokenIndex);
+				return toStringWithRange(start.tokenIndex, stop.tokenIndex);
 			}
 			return null;
 		}

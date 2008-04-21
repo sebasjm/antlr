@@ -81,7 +81,7 @@ package org.antlr.runtime.tree {
 		 *  null or "" too, but users should not access $ruleLabel.text in
 		 *  an action of course in that case.
 		 */
-		function toStringRange(start:Object, stop:Object):String;
+		function toStringWithRange(start:Object, stop:Object):String;
 		
 		// REWRITING TREES (used by tree parser)
 

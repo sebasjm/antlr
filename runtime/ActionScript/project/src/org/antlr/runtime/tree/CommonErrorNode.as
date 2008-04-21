@@ -46,10 +46,10 @@ package org.antlr.runtime.tree
     			if ( Token(stop).type == TokenConstants.EOF ) {
     				j = TokenStream(input).size;
     			}
-    			badText = TokenStream(input).toStringRange(i, j);
+    			badText = TokenStream(input).toStringWithRange(i, j);
     		}
     		else if ( start is Tree ) {
-    			badText = TreeNodeStream(input).toStringRange(start, stop);
+    			badText = TreeNodeStream(input).toStringWithRange(start, stop);
     		}
     		else {
     			// people should subclass if they alter the tree type so this
