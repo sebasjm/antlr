@@ -715,7 +715,7 @@ notTerminal
 	;
 
 idList
-	:	(id)+
+	:	id (COMMA! id)*
 	;
 
 id	:	TOKEN_REF {#id.setType(ID);}
