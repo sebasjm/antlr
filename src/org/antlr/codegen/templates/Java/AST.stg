@@ -164,8 +164,9 @@ if ( state.backtracking==0 ) {<\n>
 <rewriteCodeLabels()>
 root_0 = (<ASTLabelType>)adaptor.nil();
 <alts:rewriteAlt(); separator="else ">
-<if(rewriteMode)>
+<! if tree parser and rewrite=true !>
 <if(TREE_PARSER)>
+<if(rewriteMode)>
 <prevRuleRootRef()>.tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
 input.replaceChildren(adaptor.getParent(retval.start),
                       adaptor.getChildIndex(retval.start),
@@ -173,7 +174,13 @@ input.replaceChildren(adaptor.getParent(retval.start),
                       retval.tree);
 <endif>
 <endif>
-<prevRuleRootRef()>.tree = root_0; <! set result root !>
+<! if parser or rewrite!=true, we need to set result !>
+<if(!TREE_PARSER)>
+<prevRuleRootRef()>.tree = root_0;
+<endif>
+<if(!rewriteMode)>
+<prevRuleRootRef()>.tree = root_0;
+<endif>
 <if(backtracking)>
 }
 <endif>
