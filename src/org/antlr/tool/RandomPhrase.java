@@ -35,10 +35,7 @@ import org.antlr.misc.Utils;
 import org.antlr.misc.IntervalSet;
 import org.antlr.Tool;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
@@ -81,6 +78,7 @@ public class RandomPhrase {
 			if ( state.isAcceptState() ) {
 				NFAState invokingState = (NFAState)ruleInvocationStack.pop();
 				if ( debug ) System.out.println("pop invoking state "+invokingState);
+				//System.out.println("leave "+state.enclosingRule.name);
 				RuleClosureTransition invokingTransition =
 					(RuleClosureTransition)invokingState.transition[0];
 				// move to node after state that invoked this rule
@@ -93,6 +91,8 @@ public class RandomPhrase {
 				if ( t0 instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(state);
 					if ( debug ) System.out.println("push state "+state);
+					//System.out.println("call "+((RuleClosureTransition)t0).rule.name);
+					//System.out.println("stack depth="+ruleInvocationStack.size());
 				}
 				else if ( t0.label.isSet() || t0.label.isAtom() ) {
 					tokenTypes.add( getTokenType(t0.label) );
@@ -138,7 +138,7 @@ public class RandomPhrase {
 
 	/** Used to generate random strings */
 	public static void main(String[] args) {
-		if ( args.length == 0 ) {
+		if ( args.length < 2 ) {
 			System.err.println("usage: java org.antlr.tool.RandomPhrase grammarfile startrule");
 			return;
 		}
