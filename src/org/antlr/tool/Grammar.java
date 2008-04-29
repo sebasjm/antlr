@@ -2708,7 +2708,7 @@ outer:
 		return complement(IntervalSet.of(atom));
 	}
 
-	/** Given set tree like ( SET A B ) in lexer, check that A and B
+	/** Given set tree like ( SET A B ), check that A and B
 	 *  are both valid sets themselves, else we must tree like a BLOCK
 	 */
 	public boolean isValidSet(TreeToNFAConverter nfabuilder, GrammarAST t) {

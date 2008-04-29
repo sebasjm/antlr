@@ -392,15 +392,6 @@ Map opts = null;
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
     }
-    /*
-	(	{!currentRuleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME)}?
-		(setNoParens SEMI) => s:setNoParens // try to collapse sets
-		{
-		blk = #(blkRoot,#(#[ALT,"ALT"],#s,#[EOA,"<end-of-alt>"]),eob);
-		}
-	|	b:altList[opts] {blk = #b;}
-	)
-	*/
 	b:altList[opts] {blk = #b;}
 	semi:SEMI
 	( ex:exceptionGroup )?
@@ -458,12 +449,7 @@ block
 GrammarAST save = currentBlockAST;
 Map opts=null;
 }
-    :   /*
-        (set) => s:set  // special block like ('a'|'b'|'0'..'9')
-
-    |	*/
-
-    	lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
+    :   lp:LPAREN^ {#lp.setType(BLOCK); #lp.setText("BLOCK");}
 		(
 			// 2nd alt and optional branch ambig due to
 			// linear approx LL(2) issue.  COLON ACTION
