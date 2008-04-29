@@ -825,6 +825,23 @@ String labelText=null;
 if ( label!=null ) {
     labelText = label.getText();
 }
+if ( grammar.type!=Grammar.LEXER &&
+     (#atom.getType()==RULE_REF||#atom.getType()==TOKEN_REF||
+      #atom.getType()==CHAR_LITERAL||#atom.getType()==STRING_LITERAL) )
+{
+	Rule encRule = grammar.getRule(((GrammarAST)#atom).enclosingRuleName);
+	if ( encRule==null ) {
+		System.err.println("can't find rule for "+((GrammarAST)#atom).getToken());
+	}
+	if ( encRule!=null && encRule.hasRewrite(outerAltNum) && astSuffix!=null ) {
+		ErrorManager.grammarError(ErrorManager.MSG_AST_OP_IN_ALT_WITH_REWRITE,
+								  grammar,
+								  ((GrammarAST)#atom).getToken(),
+								  ((GrammarAST)#atom).enclosingRuleName,
+								  new Integer(outerAltNum));
+		astSuffix = null;
+	}
+}
 }
     :   #( r:RULE_REF (rarg:ARG_ACTION)? )
         {

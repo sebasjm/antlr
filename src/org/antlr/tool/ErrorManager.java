@@ -178,6 +178,7 @@ public class ErrorManager {
 	public static final int MSG_IMPORTED_TOKENS_RULE_EMPTY = 162;
 	public static final int MSG_IMPORT_NAME_CLASH = 163;
 	public static final int MSG_AST_OP_WITH_NON_AST_OUTPUT_OPTION = 164;
+	public static final int MSG_AST_OP_IN_ALT_WITH_REWRITE = 165;
 
 
 	// GRAMMAR WARNINGS

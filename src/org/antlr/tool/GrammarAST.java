@@ -142,8 +142,15 @@ public class GrammarAST extends BaseAST {
     }
 
     public void initialize(AST ast) {
-		this.token = ((GrammarAST)ast).token;
-    }
+		GrammarAST t = ((GrammarAST)ast);
+		this.token = t.token;
+		this.enclosingRuleName = t.enclosingRuleName;
+		this.ruleStartTokenIndex = t.ruleStartTokenIndex;
+		this.ruleStopTokenIndex = t.ruleStopTokenIndex;
+		this.setValue = t.setValue;
+		this.options = t.options;
+		this.outerAltNum = t.outerAltNum;
+	}
 
     public void initialize(Token token) {
         this.token = token;
