@@ -55,6 +55,7 @@ public class Tool {
 	protected boolean printGrammar = false;
 	protected boolean depend = false;
 	protected boolean forceAllFilesToOutputDir = false;
+	protected boolean deleteTempLexer = true;
 
 	// the internal options are for my use on the command line during dev
 
@@ -341,9 +342,11 @@ public class Tool {
 					}
 					finally {
 						// make sure we clean up
-						File outputDir = getOutputDirectory(lexerGrammarFileName);
-						File outputFile = new File(outputDir, lexerGrammarFileName);
-						outputFile.delete();
+						if ( deleteTempLexer ) {
+							File outputDir = getOutputDirectory(lexerGrammarFileName);
+							File outputFile = new File(outputDir, lexerGrammarFileName);
+							outputFile.delete();
+						}
 					}
 				}
 			}
