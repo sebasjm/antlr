@@ -226,6 +226,9 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	public void testCombinedImportsCombined() throws Exception {
+		// for now, we don't allow combined to import combined
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
 		String slave =
 			"grammar S;\n" + // A, B, C token type order
 			"tokens { A; B; C; }\n" +
@@ -239,9 +242,17 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar M;\n" +
 			"import S;\n" +
 			"s : x INT ;\n";
-		String found = execParser("M.g", master, "MParser", "MLexer",
-								  "s", "x 32 1932", debug);
-		assertEquals("S.x\n", found);
+		writeFile(tmpdir, "M.g", master);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
+		composite.setDelegationRoot(g);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+
+		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
+		String expectedError = "error(161): /tmp/antlr3/M.g:2:8: combined grammar M cannot import combined grammar S";
+		assertEquals("unexpected errors: "+equeue, expectedError, equeue.errors.get(0).toString());
 	}
 
 	public void testSameStringTwoNames() throws Exception {

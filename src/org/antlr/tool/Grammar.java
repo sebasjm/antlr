@@ -117,6 +117,8 @@ public class Grammar {
 
 	/** Set of valid imports.  E.g., can only import a tree parser into
 	 *  another tree parser.  Maps delegate to set of delegator grammar types.
+	 *  validDelegations.get(LEXER) gives list of the kinds of delegators
+	 *  that can import lexers.
 	 */
 	public static MultiMap<Integer,Integer> validDelegations =
 		new MultiMap<Integer,Integer>() {
@@ -130,7 +132,8 @@ public class Grammar {
 
 				map(TREE_PARSER, TREE_PARSER);
 
-				map(COMBINED, COMBINED);
+				// TODO: allow COMBINED
+				// map(COMBINED, COMBINED);
 			}
 		};
 
@@ -612,10 +615,10 @@ public class Grammar {
 	/** Many imports are illegal such as lexer into a tree grammar */
 	public boolean validImport(Grammar delegate) {
 		List<Integer> validDelegators = validDelegations.get(delegate.type);
-		return validDelegators.contains(this.type);
+		return validDelegators!=null && validDelegators.contains(this.type);
 	}
 
-	/** If the grammar is a merged grammar, return the text of the implicit
+	/** If the grammar is a combined grammar, return the text of the implicit
 	 *  lexer grammar.
 	 */
 	public String getLexerGrammar() {
