@@ -51,6 +51,9 @@ import java.io.BufferedReader;
  *
  *  If you do not specify a seed then the current time in milliseconds is used
  *  guaranteeing that you'll never see that seed again.
+ *
+ *  NOTE: this does not work well for large grammars...it tends to recurse
+ *  too much and build really long strings.  I need throttle control; later.
  */
 public class RandomPhrase {
 	public static final boolean debug = false;
