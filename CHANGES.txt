@@ -8,6 +8,26 @@ University of San Francisco
 
 CHANGES
 
+April 30, 2008
+
+* Fixed ANTLR-237. updated -depend to know about imported grammars.
+$ a -depend -lib foo T.g
+  ANTLR Parser Generator  Version 3.1b1 (??)  1989-2007
+  T.g: foo/Java.g
+  TParser.java : T.g
+  T.tokens : T.g
+  TLexer.java : T.g
+  T_Java : T.g
+
+April 29, 2008
+
+* Fixed ANTLR-217; scope A,B,C; didn't work
+
+* Fixed ANTLR-224; ! or ^ on item in alt with rewrite gave exception
+
+* Added token options to terminals: ID<node=V; foo="Big bob"> etc...
+  node is default so you can do ID<V> for hetero tree types. most common.
+
 April 17, 2008
 
 * Use default msg if unknown recog type in getErrorMessage():

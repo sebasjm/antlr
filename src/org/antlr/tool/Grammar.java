@@ -1996,17 +1996,15 @@ outer:
 	 */
 	public void importGrammar(GrammarAST grammarNameAST, String label) {
 		String grammarName = grammarNameAST.getText();
-		File gfile = new File(tool.getLibraryDirectory(),
-							  File.separator+
-							  grammarName+
-							  GRAMMAR_FILE_EXTENSION);
 		//System.out.println("import "+gfile.getName());
+		String gname = grammarName + GRAMMAR_FILE_EXTENSION;
 		BufferedReader br = null;
 		try {
-			FileReader fr = new FileReader(gfile);
+			String fullName = tool.getLibraryFile(gname);
+			FileReader fr = new FileReader(fullName);
 			br = new BufferedReader(fr);
 			Grammar delegateGrammar = null;
-			delegateGrammar = new Grammar(tool, gfile.getName(), composite);
+			delegateGrammar = new Grammar(tool, gname, composite);
 			delegateGrammar.label = label;
 
 			addDelegateGrammar(delegateGrammar);
@@ -2046,7 +2044,7 @@ outer:
 		}
 		catch (IOException ioe) {
 			ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
-							   gfile,
+							   gname,
 							   ioe);
 		}
 		finally {
@@ -2056,7 +2054,7 @@ outer:
 				}
 				catch (IOException ioe) {
 					ErrorManager.error(ErrorManager.MSG_CANNOT_CLOSE_FILE,
-									   gfile,
+									   gname,
 									   ioe);
 				}
 			}

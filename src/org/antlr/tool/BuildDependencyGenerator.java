@@ -66,10 +66,10 @@ public class BuildDependencyGenerator {
 	}
 
 	/** From T.g return a list of File objects that
-	 *  names files ANTLR will emit from T.g.
+	 *  name files ANTLR will emit from T.g.
 	 */
 	public List getGeneratedFileList() {
-		List files = new ArrayList();
+		List<File> files = new ArrayList<File>();
 		File outputDir = tool.getOutputDirectory(grammarFileName);
 		if ( outputDir.getName().equals(".") ) {
 			outputDir = null;
@@ -110,6 +110,15 @@ public class BuildDependencyGenerator {
 			// for combined, don't generate TLexer.tokens
 		}
 
+		// handle generated files for imported grammars
+		List<Grammar> imports =
+			grammar.composite.getDelegates(grammar.composite.getRootGrammar());
+		for (Grammar g : imports) {
+			outputDir = tool.getOutputDirectory(g.getFileName());
+			String fname = groomQualifiedFileName(outputDir.toString(), g.getRecognizerName());
+			files.add(new File(fname));
+		}
+
 		if ( files.size()==0 ) {
 			return null;
 		}
@@ -122,24 +131,23 @@ public class BuildDependencyGenerator {
 	 */
 	public List getDependenciesFileList() {
 		List files = new ArrayList();
+
+		// handle token vocabulary loads
 		String vocabName = (String)grammar.getOption("tokenVocab");
-		if ( vocabName == null ) {
-			return null;
+		if ( vocabName != null ) {
+			File vocabFile = grammar.getImportedVocabFileName(vocabName);
+			File outputDir = vocabFile.getParentFile();
+			String fileName = groomQualifiedFileName(outputDir.getName(), vocabFile.getName());
+			files.add(fileName);
 		}
-		File vocabFile = grammar.getImportedVocabFileName(vocabName);
-		File outputDir = vocabFile.getParentFile();
-		if ( outputDir.getName().equals(".") ) {
-			files.add(vocabFile.getName());
-		}
-		else if ( outputDir.getName().indexOf(' ')>=0 ) { // has spaces?
-			String escSpaces = Utils.replace(outputDir.toString(),
-											 " ",
-											 "\\ ");
-			outputDir = new File(escSpaces);
-			files.add(new File(outputDir, vocabFile.getName()));
-		}
-		else {
-			files.add(vocabFile);
+
+		// handle imported grammars
+		List<Grammar> imports =
+			grammar.composite.getDelegates(grammar.composite.getRootGrammar());
+		for (Grammar g : imports) {
+			String libdir = tool.getLibraryDirectory();
+			String fileName = groomQualifiedFileName(libdir, g.fileName);
+			files.add(fileName);
 		}
 
 		if ( files.size()==0 ) {
@@ -192,5 +200,20 @@ public class BuildDependencyGenerator {
 				}
 			}
 		}
+	}
+
+	public String groomQualifiedFileName(String outputDir, String fileName) {
+		if ( outputDir.equals(".") ) {
+			return fileName;
+		}
+		else if ( outputDir.indexOf(' ')>=0 ) { // has spaces?
+			String escSpaces = Utils.replace(outputDir.toString(),
+											 " ",
+											 "\\ ");
+			return escSpaces+File.separator+fileName;
+		}
+		else {
+			return outputDir+File.separator+fileName;
+		}		
 	}
 }

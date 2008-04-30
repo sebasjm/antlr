@@ -593,12 +593,9 @@ public class Tool {
 		return outputDir;
 	}
 
-	/** Open a file in the -lib dir.  Imported grammars and .tokens files */
-	public BufferedReader getLibraryFile(String fileName) throws IOException {
-		String fullName = libDirectory+File.separator+fileName;
-		FileReader fr = new FileReader(fullName);
-		BufferedReader br = new BufferedReader(fr);
-		return br;
+	/** Name a file in the -lib dir.  Imported grammars and .tokens files */
+	public String getLibraryFile(String fileName) throws IOException {
+		return libDirectory+File.separator+fileName;
 	}
 
 	public String getLibraryDirectory() {
