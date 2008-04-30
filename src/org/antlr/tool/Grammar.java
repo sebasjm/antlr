@@ -32,7 +32,6 @@ import org.antlr.misc.Utils;
 import antlr.*;
 import antlr.collections.AST;
 import org.antlr.Tool;
-import org.antlr.runtime.Lexer;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
@@ -1155,7 +1154,7 @@ outer:
 			// First, clean up tracking stuff
 			decisionsWhoseDFAsUsesSynPreds.remove(lookaheadDFA);
 			// TODO: clean up synPredNamesUsedInDFA also (harder)
-			d.blockAST.setOption(this, "k", Utils.integer(1));
+			d.blockAST.setBlockOption(this, "k", Utils.integer(1));
 			if ( composite.watchNFAConversion ) {
 				System.out.print("trying decision "+decision+
 								 " again with k=1; reason: "+
@@ -2292,7 +2291,7 @@ outer:
 	public int getUserMaxLookahead(int decision) {
 		int user_k = 0;
 		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decision);
-		Object k = blockAST.getOption("k");
+		Object k = blockAST.getBlockOption("k");
 		if ( k==null ) {
 			user_k = nfa.grammar.getGrammarMaxLookahead();
 			return user_k;
@@ -2313,7 +2312,7 @@ outer:
 	public boolean getAutoBacktrackMode(int decision) {
 		NFAState decisionNFAStartState = getDecisionNFAStartState(decision);
 		String autoBacktrack =
-			(String)decisionNFAStartState.getAssociatedASTNode().getOption("backtrack");
+			(String)decisionNFAStartState.getAssociatedASTNode().getBlockOption("backtrack");
 		if ( autoBacktrack==null ) {
 			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
 		}

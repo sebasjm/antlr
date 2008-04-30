@@ -389,7 +389,7 @@ rule returns [StringTemplate code=null]
 					Boolean.valueOf(grammar.isEmptyRule(block)));
 			}
 			code.setAttribute("ruleDescriptor", ruleDescr);
-			String memo = (String)#rule.getOption("memoize");
+			String memo = (String)#rule.getBlockOption("memoize");
 			if ( memo==null ) {
 				memo = (String)grammar.getOption("memoize");
 			}
@@ -888,9 +888,10 @@ if ( grammar.type!=Grammar.LEXER &&
 		#r.code = code;
         }
 
-    |   #( t:TOKEN_REF (harg:HETERO_TYPE)? (targ:ARG_ACTION)? )
+    |   #( t:TOKEN_REF (targ:ARG_ACTION)? )
         {
-           if ( currentAltHasASTRewrite && #harg!=null ) {
+           if ( currentAltHasASTRewrite && #t.terminalOptions!=null &&
+                #t.terminalOptions.get(org.antlr.runtime.Token.defaultOption)!=null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_HETERO_ILLEGAL_IN_REWRITE_ALT,
 									  grammar,
 									  ((GrammarAST)(#t)).getToken(),
@@ -934,8 +935,8 @@ if ( grammar.type!=Grammar.LEXER &&
 				String tokenLabel =
 				   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
 				code.setAttribute("token",tokenLabel);
-				if ( !currentAltHasASTRewrite && #harg!=null ) {
-                    code.setAttribute("hetero",#harg.getText());
+				if ( !currentAltHasASTRewrite && #t.terminalOptions!=null ) { 
+                    code.setAttribute("hetero",#t.terminalOptions.get(org.antlr.runtime.Token.defaultOption));
                 }
                 int i = ((TokenWithIndex)#t.getToken()).getIndex();
 			    code.setAttribute("elementIndex", i);
@@ -944,7 +945,7 @@ if ( grammar.type!=Grammar.LEXER &&
 		   #t.code = code;
 		}
 
-    |   #(c:CHAR_LITERAL (harg2:HETERO_TYPE)?)
+    |   c:CHAR_LITERAL 
         {
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("charRef");
@@ -958,8 +959,8 @@ if ( grammar.type!=Grammar.LEXER &&
 			code = getTokenElementST("tokenRef", "char_literal", #c, astSuffix, labelText);
 			String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType(c.getText()));
 			code.setAttribute("token",tokenLabel);
-            if ( #harg2!=null ) {
-                code.setAttribute("hetero",#harg2.getText());
+            if ( #c.terminalOptions!=null ) {
+                code.setAttribute("hetero",#c.terminalOptions.get(org.antlr.runtime.Token.defaultOption));
             }
             int i = ((TokenWithIndex)#c.getToken()).getIndex();
 			code.setAttribute("elementIndex", i);
@@ -967,7 +968,7 @@ if ( grammar.type!=Grammar.LEXER &&
 		}
         }
 
-    |   #(s:STRING_LITERAL (harg3:HETERO_TYPE)?)
+    |   s:STRING_LITERAL
         {
 		if ( grammar.type==Grammar.LEXER ) {
 			code = templates.getInstanceOf("lexerStringRef");
@@ -982,8 +983,8 @@ if ( grammar.type!=Grammar.LEXER &&
 			String tokenLabel =
 			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(#s.getText()));
 			code.setAttribute("token",tokenLabel);
-            if ( #harg3!=null ) {
-                code.setAttribute("hetero",#harg3.getText());
+            if ( #s.terminalOptions!=null ) {
+                code.setAttribute("hetero",#s.terminalOptions.get(org.antlr.runtime.Token.defaultOption));
             }
             int i = ((TokenWithIndex)#s.getToken()).getIndex();
 			code.setAttribute("elementIndex", i);
@@ -1256,12 +1257,10 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 		}
     	}
 
-    |   ( #(tk:TOKEN_REF
-            (harg:HETERO_TYPE)?
-            (arg:ARG_ACTION)?
-           )
-        | #(CHAR_LITERAL (harg2:HETERO_TYPE)?)
-        | #(STRING_LITERAL (harg3:HETERO_TYPE)?)
+    |   {GrammarAST term=(GrammarAST)_t;}
+		( #(tk:TOKEN_REF (arg:ARG_ACTION)?)
+        | cl:CHAR_LITERAL
+        | sl:STRING_LITERAL
         )
     	{
     	String tokenName = #rewrite_atom.getText();
@@ -1269,10 +1268,10 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	Rule rule = grammar.getRule(currentRuleName);
     	Set tokenRefsInAlt = rule.getTokenRefsInAlt(outerAltNum);
     	boolean createNewNode = !tokenRefsInAlt.contains(tokenName) || #arg!=null;
-        String hetero = null;
-        if ( #harg!=null ) { hetero = #harg.getText(); }
-        else if ( #harg2!=null ) { hetero = #harg2.getText(); }
-        else if ( #harg3!=null ) { hetero = #harg3.getText(); }
+        Object hetero = null;
+		if ( term.terminalOptions!=null ) {
+			hetero = term.terminalOptions.get(org.antlr.runtime.Token.defaultOption);
+		}
     	if ( createNewNode ) {
     		stName = "rewriteImaginaryTokenRef";
     	}

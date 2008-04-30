@@ -508,7 +508,7 @@ atom[String scopeName] returns [StateCluster g=null]
         }
         }
 
-    |   #( t:TOKEN_REF (harg:HETERO_TYPE)? (targ:ARG_ACTION)? (as2:ast_suffix)? )
+    |   #( t:TOKEN_REF  (targ:ARG_ACTION)? (as2:ast_suffix)? )
         {
         if ( grammar.type==Grammar.LEXER ) {
             NFAState start = grammar.getRuleStartState(scopeName,t.getText());
@@ -527,7 +527,7 @@ atom[String scopeName] returns [StateCluster g=null]
         }
         }
 
-    |   #( c:CHAR_LITERAL (HETERO_TYPE)? (as3:ast_suffix)? )
+    |   #( c:CHAR_LITERAL  (as3:ast_suffix)? )
     	{
     	if ( grammar.type==Grammar.LEXER ) {
     		g = factory.build_CharLiteralAtom(c.getText());
@@ -539,7 +539,7 @@ atom[String scopeName] returns [StateCluster g=null]
     	}
     	}
 
-    |   #( s:STRING_LITERAL (HETERO_TYPE)? (as4:ast_suffix)? )
+    |   #( s:STRING_LITERAL  (as4:ast_suffix)? )
     	{
      	if ( grammar.type==Grammar.LEXER ) {
      		g = factory.build_StringLiteralAtom(s.getText());

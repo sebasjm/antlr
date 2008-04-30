@@ -953,7 +953,7 @@ public class DFA {
 
     public boolean isGreedy() {
 		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
-		String v = (String)blockAST.getOption("greedy");
+		String v = (String)blockAST.getBlockOption("greedy");
 		if ( v!=null && v.equals("false") ) {
 			return false;
 		}

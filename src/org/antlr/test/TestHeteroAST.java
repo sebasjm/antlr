@@ -418,4 +418,31 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("ROOT<V>@1\n", found); // at line 1; shows copy of ID's stuff
 	}
 
+	public void testTreeParserAutoHeteroAST() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID ';' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"tokens { ROOT; }\n" +
+			"@members {\n" +
+			"class V extends CommonTree {\n" +
+			"  public V(CommonTree t) { super(t); }\n" + // NEEDS SPECIAL CTOR
+			"  public String toString() { return super.toString()+\"<V>\";}\n" +
+			"}\n" +
+			"}\n"+
+			"a : ID<V> ';'<V>\n" +
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+				    treeGrammar, "TP", "TLexer", "a", "a", "abc;");
+		assertEquals("abc<V> ;<V>\n", found);
+	}
+
 }

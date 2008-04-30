@@ -346,7 +346,7 @@ atom
 			   (ast_suffix)?
              )
 		|   #( TOKEN_REF		{out(#atom.toString());} 
-               (harg:HETERO_TYPE    {out("<"+#harg.toString()+">");} )?
+               
 			   (targ:ARG_ACTION	{out("["+#targ.toString()+"]");} )?
 			   (ast_suffix)?
              )
@@ -354,7 +354,6 @@ atom
 			   (ast_suffix)?
              )
 		|   #( STRING_LITERAL	{out(#atom.toString());}
-               (harg2:HETERO_TYPE   {out("<"+#harg2.toString()+">");} )?
 			   (ast_suffix)?
              )
 		|   #( WILDCARD		{out(#atom.toString());}

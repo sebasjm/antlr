@@ -206,7 +206,7 @@ String name=null;
 Map opts=null;
 Rule r = null;
 }
-    :   #( RULE id:ID {opts = #RULE.options;}
+    :   #( RULE id:ID {opts = #RULE.blockOptions;}
            (mod=modifier)?
            #( ARG (args:ARG_ACTION)? )
            #( RET (ret:ARG_ACTION)? )
@@ -243,7 +243,7 @@ Rule r = null;
            {
            // copy rule options into the block AST, which is where
            // the analysis will look for k option etc...
-           #b.options = opts;
+           #b.blockOptions = opts;
            }
          )
     ;
@@ -459,7 +459,7 @@ atom[GrammarAST scope]
             trackInlineAction(#rarg);
         }
         }
-    |   #( t:TOKEN_REF (harg:HETERO_TYPE)? (targ:ARG_ACTION )? )
+    |   #( t:TOKEN_REF  (targ:ARG_ACTION )? )
     	{
 		if ( #targ!=null ) {
             #targ.outerAltNum = this.outerAltNum;
@@ -472,7 +472,7 @@ atom[GrammarAST scope]
     		grammar.altReferencesTokenID(currentRuleName, #t, this.outerAltNum);
     	}
     	}
-    |   #(c:CHAR_LITERAL (harg2:HETERO_TYPE)?)
+    |   c:CHAR_LITERAL
     	{
     	if ( grammar.type!=Grammar.LEXER ) {
     		Rule rule = grammar.getRule(currentRuleName);
@@ -481,7 +481,7 @@ atom[GrammarAST scope]
     		}
     	}
     	}
-    |   #(s:STRING_LITERAL (harg3:HETERO_TYPE)?)
+    |   s:STRING_LITERAL 
     	{
     	if ( grammar.type!=Grammar.LEXER ) {
     		Rule rule = grammar.getRule(currentRuleName);
@@ -587,11 +587,10 @@ if ( !imaginary && grammar.buildAST() &&
 }
     :   RULE_REF 
     |   ( #(TOKEN_REF
-            (harg:HETERO_TYPE)?
             (arg:ARG_ACTION)?
            )
-        | CHAR_LITERAL (harg2:HETERO_TYPE)?
-        | STRING_LITERAL (harg3:HETERO_TYPE)?
+        | CHAR_LITERAL
+        | STRING_LITERAL
         )
         {
         if ( #arg!=null ) {

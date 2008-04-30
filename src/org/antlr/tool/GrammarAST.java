@@ -88,7 +88,7 @@ public class GrammarAST extends BaseAST {
     protected IntSet setValue = null;
 
     /** If this is a BLOCK node, track options here */
-    protected Map options;
+    protected Map<String,Object> blockOptions;
 
 	/** If this is a BLOCK node for a rewrite rule, track referenced
 	 *  elements here.  Don't track elements in nested subrules.
@@ -114,6 +114,8 @@ public class GrammarAST extends BaseAST {
 	/** What are the default options for a subrule? */
     public static final Map defaultBlockOptions =
             new HashMap() {{put("greedy","true");}};
+
+	public Map<String,Object> terminalOptions;
 
 	/** if this is an ACTION node, this is the outermost enclosing
 	 *  alt num in rule.  For actions, define.g sets these (used to
@@ -148,7 +150,7 @@ public class GrammarAST extends BaseAST {
 		this.ruleStartTokenIndex = t.ruleStartTokenIndex;
 		this.ruleStopTokenIndex = t.ruleStopTokenIndex;
 		this.setValue = t.setValue;
-		this.options = t.options;
+		this.blockOptions = t.blockOptions;
 		this.outerAltNum = t.outerAltNum;
 	}
 
@@ -179,8 +181,22 @@ public class GrammarAST extends BaseAST {
 	/** Save the option key/value pair and process it; return the key
 	 *  or null if invalid option.
 	 */
-	public String setOption(Grammar grammar, String key, Object value) {
-		if ( !legalBlockOptions.contains(key) ) {
+	public String setBlockOption(Grammar grammar, String key, Object value) {
+		if ( blockOptions == null ) {
+			blockOptions = new HashMap();
+		}
+		return setOption(blockOptions, legalBlockOptions, grammar, key, value);
+	}
+
+	public String setTerminalOption(Grammar grammar, String key, Object value) {
+		if ( terminalOptions == null ) {
+			terminalOptions = new HashMap<String,Object>();
+		}
+		return setOption(terminalOptions, org.antlr.runtime.Token.legalOptions, grammar, key, value);
+	}
+
+	public String setOption(Map options, Set legalOptions, Grammar grammar, String key, Object value) {
+		if ( !legalOptions.contains(key) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
 									  grammar,
 									  token,
@@ -193,9 +209,6 @@ public class GrammarAST extends BaseAST {
 				value = vs.substring(1,vs.length()-1); // strip quotes
             }
         }
-		if ( options==null ) {
-			options = new HashMap();
-		}
 		if ( key.equals("k") ) {
 			grammar.numberOfManualLookaheadOptions++;
 		}
@@ -203,10 +216,10 @@ public class GrammarAST extends BaseAST {
 		return key;
     }
 
-    public Object getOption(String key) {
+    public Object getBlockOption(String key) {
 		Object value = null;
-		if ( options!=null ) {
-			value = options.get(key);
+		if ( blockOptions != null ) {
+			value = blockOptions.get(key);
 		}
 		if ( value==null ) {
 			value = defaultBlockOptions.get(key);
@@ -216,21 +229,17 @@ public class GrammarAST extends BaseAST {
 
     public void setOptions(Grammar grammar, Map options) {
 		if ( options==null ) {
-			this.options = null;
+			this.blockOptions = null;
 			return;
 		}
 		Set keys = options.keySet();
 		for (Iterator it = keys.iterator(); it.hasNext();) {
 			String optionName = (String) it.next();
-			String stored=setOption(grammar, optionName, options.get(optionName));
+			String stored= setBlockOption(grammar, optionName, options.get(optionName));
 			if ( stored==null ) {
 				it.remove();
 			}
 		}
-    }
-
-    public Map getOptions() {
-        return options;
     }
 
     public String getText() {

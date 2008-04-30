@@ -132,7 +132,7 @@ tokens {
 	 */
 	protected void prefixWithSynPred(GrammarAST alt) {
 		// if they want backtracking and it's not a lexer rule in combined grammar
-		String autoBacktrack = (String)currentBlockAST.getOption("backtrack");
+		String autoBacktrack = (String)currentBlockAST.getBlockOption("backtrack");
 		if ( autoBacktrack==null ) {
 			autoBacktrack = (String)grammar.getOption("backtrack");
 		}
@@ -387,7 +387,7 @@ Map opts = null;
 	colon:COLON
 	{
 	blkRoot = #[BLOCK,"BLOCK"];
-	blkRoot.options = opts;
+	blkRoot.blockOptions = opts;
 	blkRoot.setLine(colon.getLine());
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
@@ -406,7 +406,7 @@ Map opts = null;
 	root.ruleStartTokenIndex = start;
 	root.ruleStopTokenIndex = stop;
 	root.setLine(startLine);
-	root.options = opts;
+	root.blockOptions = opts;
     #rule = #(root,
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
               opt,#scopes,#a,blk,ex,eor);
@@ -485,7 +485,7 @@ Map opts=null;
 altList[Map opts]
 {
 	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
-	blkRoot.options = opts;
+	blkRoot.blockOptions = opts;
 	blkRoot.setLine(LT(0).getLine()); // set to : or (
 	blkRoot.setColumn(LT(0).getColumn());
 	GrammarAST save = currentBlockAST;
@@ -653,16 +653,33 @@ terminal
 {
 GrammarAST ebnfRoot=null, subrule=null;
 }
-    :   cl:CHAR_LITERAL^ ( HETERO_TYPE )? (ROOT^|BANG^)?
+    :   cl:CHAR_LITERAL^ ( elementOptions[#cl]! )? (ROOT^|BANG^)?
 
 	|   tr:TOKEN_REF^
-            ( HETERO_TYPE )?
+            ( elementOptions[#tr]! )?
 			( ARG_ACTION )? // Args are only valid for lexer rules
             (ROOT^|BANG^)?
 
-	|   sl:STRING_LITERAL^ ( HETERO_TYPE )? (ROOT^|BANG^)?
+	|   sl:STRING_LITERAL^ ( elementOptions[#sl]! )? (ROOT^|BANG^)?
 
 	|   wi:WILDCARD (ROOT^|BANG^)?
+	;
+
+elementOptions[GrammarAST terminalAST]
+	:	OPEN_ELEMENT_OPTION^ defaultNodeOption[terminalAST] CLOSE_ELEMENT_OPTION!
+	|	OPEN_ELEMENT_OPTION^ elementOption[terminalAST] (SEMI! elementOption[terminalAST])* CLOSE_ELEMENT_OPTION!
+	;
+
+defaultNodeOption[GrammarAST terminalAST]
+	:	i:id {terminalAST.setTerminalOption(grammar,org.antlr.runtime.Token.defaultOption,#i.getText());}
+	;
+
+elementOption[GrammarAST terminalAST]
+	:	a:id ASSIGN^ (b:id|s:STRING_LITERAL)
+		{
+		Object v = (#b!=null)?#b.getText():#s.getText();
+		terminalAST.setTerminalOption(grammar,#a.getText(),v);
+		}
 	;
 
 ebnfSuffix[GrammarAST elemAST, boolean inRewrite] returns [GrammarAST subrule=null]
@@ -778,10 +795,10 @@ rewrite_atom
 {
 GrammarAST subrule=null;
 }
-    :   tr:TOKEN_REF^ (HETERO_TYPE)? (ARG_ACTION)? // for imaginary nodes
+    :   tr:TOKEN_REF^ (elementOptions[#tr]!)? (ARG_ACTION)? // for imaginary nodes
     |   rr:RULE_REF
-	|   cl:CHAR_LITERAL^ (HETERO_TYPE)?
-	|   sl:STRING_LITERAL^ (HETERO_TYPE)?
+	|   cl:CHAR_LITERAL^ (elementOptions[#cl]!)?
+	|   sl:STRING_LITERAL^ (elementOptions[#sl]!)?
 	|!  d:DOLLAR i:id // reference to a label in a rewrite rule
 		{
 		#rewrite_atom = #[LABEL,i_AST.getText()];
@@ -1034,7 +1051,7 @@ XDIGIT :
 INT	:	('0'..'9')+
 	;
 
-HETERO_TYPE : '<'! ~'<' (~'>')* '>'! ;
+//HETERO_TYPE : '<'! ~'<' (~'>')* '>'! ;
 
 ARG_ACTION
 	:	'['! NESTED_ARG_ACTION ']'!
