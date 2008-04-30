@@ -671,7 +671,6 @@ public class IntervalSet implements IntSet {
 			int b = I.b;
 			for (int v=a; v<=b; v++) {
 				s.add(v);
-				i++;
 			}
 		}
 		return s;
