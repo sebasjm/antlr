@@ -779,10 +779,14 @@ if ( s.member(Label.UP) ) {
 rewriteTreeNestingLevel++;
 code.setAttribute("enclosingTreeLevel", rewriteTreeNestingLevel-1);
 code.setAttribute("treeLevel", rewriteTreeNestingLevel);
-GrammarAST rootSuffix = new GrammarAST(ROOT,"ROOT");
+Rule r = grammar.getRule(currentRuleName);
+GrammarAST rootSuffix = null;
+if ( grammar.buildAST() && !r.hasRewrite(outerAltNum) ) {
+	rootSuffix = new GrammarAST(ROOT,"ROOT");
+}
 }
     :   #( TREE_BEGIN {elAST=(GrammarAST)_t;}
-    	   el=element[null,grammar.buildAST()?rootSuffix:null]
+    	   el=element[null,rootSuffix]
            {
            code.setAttribute("root.{el,line,pos}",
 							  el,
@@ -830,9 +834,6 @@ if ( grammar.type!=Grammar.LEXER &&
       #atom.getType()==CHAR_LITERAL||#atom.getType()==STRING_LITERAL) )
 {
 	Rule encRule = grammar.getRule(((GrammarAST)#atom).enclosingRuleName);
-	if ( encRule==null ) {
-		System.err.println("can't find rule for "+((GrammarAST)#atom).getToken());
-	}
 	if ( encRule!=null && encRule.hasRewrite(outerAltNum) && astSuffix!=null ) {
 		ErrorManager.grammarError(ErrorManager.MSG_AST_OP_IN_ALT_WITH_REWRITE,
 								  grammar,
