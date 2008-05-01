@@ -216,6 +216,18 @@ public class Grammar {
 				}
 			};
 
+	// Token options are here to avoid contaminating Token object in runtime
+	
+	/** Legal options for terminal refs like ID<node=MyVarNode> */
+	public static final Set legalTokenOptions =
+			new HashSet() {
+				{
+				add(defaultTokenOption);
+				}
+			};
+	
+	public static final String defaultTokenOption = "node";
+
 	/** Is there a global fixed lookahead set for this grammar?
 	 *  If 0, nothing specified.  -1 implies we have not looked at
 	 *  the options table yet to set k.
@@ -2238,7 +2250,7 @@ outer:
 	 *  or null if invalid option.
 	 */
 	public String setOption(String key, Object value, antlr.Token optionsStartToken) {
-		if ( !legalOptions.contains(key) ) {
+		if ( !legalTokenOptions.contains(key) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
 									  this,
 									  optionsStartToken,

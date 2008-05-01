@@ -62,16 +62,6 @@ public interface Token {
 	 */
 	public static final int HIDDEN_CHANNEL = 99;
 
-	/** Legal options for terminal refs like ID<node=MyVarNode> */
-	public static final Set legalOptions =
-			new HashSet() {
-				{
-				add(defaultOption);
-				}
-			};
-
-	public static final String defaultOption = "node";
-
 	/** Get the text of the token */
 	public String getText();
 	public void setText(String text);

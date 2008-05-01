@@ -192,7 +192,7 @@ public class GrammarAST extends BaseAST {
 		if ( terminalOptions == null ) {
 			terminalOptions = new HashMap<String,Object>();
 		}
-		return setOption(terminalOptions, org.antlr.runtime.Token.legalOptions, grammar, key, value);
+		return setOption(terminalOptions, Grammar.legalTokenOptions, grammar, key, value);
 	}
 
 	public String setOption(Map options, Set legalOptions, Grammar grammar, String key, Object value) {

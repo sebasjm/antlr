@@ -891,7 +891,7 @@ if ( grammar.type!=Grammar.LEXER &&
     |   #( t:TOKEN_REF (targ:ARG_ACTION)? )
         {
            if ( currentAltHasASTRewrite && #t.terminalOptions!=null &&
-                #t.terminalOptions.get(org.antlr.runtime.Token.defaultOption)!=null ) {
+                #t.terminalOptions.get(Grammar.defaultTokenOption)!=null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_HETERO_ILLEGAL_IN_REWRITE_ALT,
 									  grammar,
 									  ((GrammarAST)(#t)).getToken(),
@@ -936,7 +936,7 @@ if ( grammar.type!=Grammar.LEXER &&
 				   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(t.getText()));
 				code.setAttribute("token",tokenLabel);
 				if ( !currentAltHasASTRewrite && #t.terminalOptions!=null ) { 
-                    code.setAttribute("hetero",#t.terminalOptions.get(org.antlr.runtime.Token.defaultOption));
+                    code.setAttribute("hetero",#t.terminalOptions.get(Grammar.defaultTokenOption));
                 }
                 int i = ((TokenWithIndex)#t.getToken()).getIndex();
 			    code.setAttribute("elementIndex", i);
@@ -960,7 +960,7 @@ if ( grammar.type!=Grammar.LEXER &&
 			String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType(c.getText()));
 			code.setAttribute("token",tokenLabel);
             if ( #c.terminalOptions!=null ) {
-                code.setAttribute("hetero",#c.terminalOptions.get(org.antlr.runtime.Token.defaultOption));
+                code.setAttribute("hetero",#c.terminalOptions.get(Grammar.defaultTokenOption));
             }
             int i = ((TokenWithIndex)#c.getToken()).getIndex();
 			code.setAttribute("elementIndex", i);
@@ -984,7 +984,7 @@ if ( grammar.type!=Grammar.LEXER &&
 			   generator.getTokenTypeAsTargetLabel(grammar.getTokenType(#s.getText()));
 			code.setAttribute("token",tokenLabel);
             if ( #s.terminalOptions!=null ) {
-                code.setAttribute("hetero",#s.terminalOptions.get(org.antlr.runtime.Token.defaultOption));
+                code.setAttribute("hetero",#s.terminalOptions.get(Grammar.defaultTokenOption));
             }
             int i = ((TokenWithIndex)#s.getToken()).getIndex();
 			code.setAttribute("elementIndex", i);
@@ -1270,7 +1270,7 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	boolean createNewNode = !tokenRefsInAlt.contains(tokenName) || #arg!=null;
         Object hetero = null;
 		if ( term.terminalOptions!=null ) {
-			hetero = term.terminalOptions.get(org.antlr.runtime.Token.defaultOption);
+			hetero = term.terminalOptions.get(Grammar.defaultTokenOption);
 		}
     	if ( createNewNode ) {
     		stName = "rewriteImaginaryTokenRef";

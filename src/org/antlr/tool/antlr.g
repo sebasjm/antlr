@@ -671,7 +671,7 @@ elementOptions[GrammarAST terminalAST]
 	;
 
 defaultNodeOption[GrammarAST terminalAST]
-	:	i:id {terminalAST.setTerminalOption(grammar,org.antlr.runtime.Token.defaultOption,#i.getText());}
+	:	i:id {terminalAST.setTerminalOption(grammar,Grammar.defaultTokenOption,#i.getText());}
 	;
 
 elementOption[GrammarAST terminalAST]
