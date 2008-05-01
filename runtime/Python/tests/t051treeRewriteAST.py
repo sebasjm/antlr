@@ -82,7 +82,6 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("34 abc", found)
 
 
-    @testbase.broken("FIXME", Exception)
     def testSimpleTree(self):
         grammar = textwrap.dedent(
         r'''
@@ -118,7 +117,6 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("(34 abc)", found)
 
 
-    @testbase.broken("FIXME", Exception)
     def testCombinedRewriteAndAuto(self):
         grammar = textwrap.dedent(
         r'''
@@ -198,7 +196,6 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("(abc abc)", found)
 
 
-    @testbase.broken("FIXME", Exception)
     def testLoop(self):
         grammar = textwrap.dedent(
         r'''
@@ -738,7 +735,6 @@ class T(testbase.ANTLRTest):
 
     ## REWRITE MODE
 
-    @testbase.broken("FIXME", Exception)
     def testRewriteModeCombinedRewriteAndAuto(self):
         grammar = textwrap.dedent(
         r'''
@@ -824,7 +820,6 @@ class T(testbase.ANTLRTest):
         self.assertEquals("abc", found)
 
 
-    @testbase.broken("FIXME", Exception)
     def testRewriteModeWithPredicatedRewrites(self):
         grammar = textwrap.dedent(
             r'''
