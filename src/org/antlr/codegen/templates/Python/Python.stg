@@ -96,7 +96,7 @@ lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
 <grammar.directDelegates:
  {g|from <g.recognizerName> import <g.recognizerName>}; separator="\n">
 
-class <name>(Lexer):
+class <grammar.recognizerName>(Lexer):
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
     grammarFileName = "<fileName>"
@@ -218,7 +218,7 @@ from <grammar.composite.rootGrammar.recognizerName> import tokenNames<\n>
 
 <rules:{<ruleAttributeScopeClass(scope=it.ruleDescriptor.ruleScope)>}>
 
-class <name>(<superClass>):
+class <grammar.recognizerName>(<superClass>):
     grammarFileName = "<fileName>"
     tokenNames = tokenNames
 
