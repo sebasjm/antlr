@@ -120,7 +120,6 @@ class Token(object):
         raise NotImplementedError
     
 
-
     def getTokenIndex(self):
         """@brief Get the index in the input stream.
 
@@ -135,6 +134,23 @@ class Token(object):
         """@brief Set the index in the input stream.
 
         Using setter/getter methods is deprecated. Use o.index instead."""
+
+        raise NotImplementedError
+
+
+    def getInputStream(self):
+        """@brief From what character stream was this token created.
+
+        You don't have to implement but it's nice to know where a Token
+        comes from if you have include files etc... on the input."""
+
+        raise NotImplementedError
+
+    def setInputStream(self, input):
+        """@brief From what character stream was this token created.
+
+        You don't have to implement but it's nice to know where a Token
+        comes from if you have include files etc... on the input."""
 
         raise NotImplementedError
 
@@ -254,6 +270,13 @@ class CommonToken(Token):
         self.index = index
 
 
+    def getInputStream(self):
+        return self.input
+
+    def setInputStream(self, input):
+        self.input = input
+
+
     def __str__(self):
         channelStr = ""
         if self.channel > 0:
@@ -347,6 +370,13 @@ class ClassicToken(Token):
     
     def setTokenIndex(self, index):
         self.index = index
+
+
+    def getInputStream(self):
+        return None
+
+    def setInputStream(self, input):
+        pass
 
 
     def toString(self):
