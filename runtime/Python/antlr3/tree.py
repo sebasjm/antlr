@@ -1034,7 +1034,6 @@ class BaseTreeAdaptor(TreeAdaptor):
                 root = None
 
             elif root.getChildCount() == 1:
-                oldParent = root.getParent()
                 root = root.getChild(0)
                 # whoever invokes rule will set parent and child index
                 root.setParent(None)

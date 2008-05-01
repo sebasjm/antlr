@@ -330,7 +330,6 @@ class BaseRecognizer(object):
         exception types.
         """
 
-        msg = None
         if isinstance(e, UnwantedTokenException):
             tokenName = "<unknown>"
             if e.expecting == EOF:
@@ -352,9 +351,9 @@ class BaseRecognizer(object):
             else:
                 tokenName = self.tokenNames[e.expecting]
 
-                msg = "missing %s at %s" % (
-                    tokenName, self.getTokenErrorDisplay(e.token)
-                    )
+            msg = "missing %s at %s" % (
+                tokenName, self.getTokenErrorDisplay(e.token)
+                )
 
         elif isinstance(e, MismatchedTokenException):
             tokenName = "<unknown>"
@@ -405,7 +404,9 @@ class BaseRecognizer(object):
                   + e.predicateText \
                   + "}?"
 
-        
+        else:
+            msg = str(e)
+
         return msg
     
 
