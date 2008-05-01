@@ -170,8 +170,9 @@ root_0 = self.adaptor.nil()
 
 <rest(alts):{a | el<rewriteAltRest(a)>}; anchor, separator="\n\n">
 
-<if(rewriteMode)>
+<! if tree parser and rewrite=true !>
 <if(TREE_PARSER)>
+<if(rewriteMode)>
 <prevRuleRootRef()>.tree = self.adaptor.rulePostProcessing(root_0)
 self.input.replaceChildren(
     self.adaptor.getParent(retval.start),
@@ -181,7 +182,15 @@ self.input.replaceChildren(
     )<\n>
 <endif>
 <endif>
-<prevRuleRootRef()>.tree = root_0 <! set result root !>
+
+<! if parser or rewrite!=true, we need to set result !>
+<if(!TREE_PARSER)>
+<prevRuleRootRef()>.tree = root_0<\n>
+<else>
+<if(!rewriteMode)>
+<prevRuleRootRef()>.tree = root_0<\n>
+<endif>
+<endif>
 })>
 >>
 
