@@ -844,6 +844,41 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals("a\n", found);
 	}
 
+	public void testAmbiguousRule() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID a -> a | INT ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"INT: '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("34\n", found);
+	}
+
+	public void testWeirdRuleRef() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID a -> $a | INT ;\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"INT: '0'..'9'+ ;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		Grammar g = new Grammar(grammar);
+		Tool antlr = newTool();
+		antlr.setOutputDirectory(null); // write to /dev/null
+		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+		g.setCodeGenerator(generator);
+		generator.genRecognizer();
+
+		// $a is ambig; is it previous root or ref to a ref in alt?
+		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());		
+	}
+
 	public void testRuleListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +

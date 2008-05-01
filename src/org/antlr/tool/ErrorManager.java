@@ -145,7 +145,7 @@ public class ErrorManager {
 	public static final int MSG_MISSING_RULE_ARGS = 129;
 	public static final int MSG_RULE_HAS_NO_ARGS = 130;
 	public static final int MSG_ARGS_ON_TOKEN_REF = 131;
-	public static final int MSG_AMBIGUOUS_RULE_SCOPE = 132;
+	public static final int MSG_RULE_REF_AMBIG_WITH_RULE_IN_ALT = 132;
 	public static final int MSG_ILLEGAL_OPTION = 133;
 	public static final int MSG_LIST_LABEL_INVALID_UNLESS_RETVAL_STRUCT = 134;
 	public static final int MSG_UNDEFINED_TOKEN_REF_IN_REWRITE = 135;

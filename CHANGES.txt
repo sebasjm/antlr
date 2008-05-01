@@ -11,7 +11,7 @@ CHANGES
 April 30, 2008
 
 * Fixed ANTLR-237. updated -depend to know about imported grammars.
-$ a -depend -lib foo T.g
+$ java org.antlr.Tool -depend -lib foo T.g
   ANTLR Parser Generator  Version 3.1b1 (??)  1989-2007
   T.g: foo/Java.g
   TParser.java : T.g

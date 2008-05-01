@@ -180,8 +180,8 @@ UNKNOWN_DYNAMIC_SCOPE(arg) ::=
   "unknown dynamic scope: <arg>"
 UNKNOWN_DYNAMIC_SCOPE_ATTRIBUTE(arg,arg2) ::=
   "unknown dynamically-scoped attribute for scope <arg>: <arg2>"
-AMBIGUOUS_RULE_SCOPE(arg) ::=
-  "reference $<arg> is ambiguous since rule <arg> is referenced in the production and rule <arg> also has a dynamic scope"
+RULE_REF_AMBIG_WITH_RULE_IN_ALT(arg) ::=
+  "reference $<arg> is ambiguous; rule <arg> is enclosing rule and referenced in the production (assuming enclosing rule)"
 ISOLATED_RULE_ATTRIBUTE(arg) ::=
   "reference to locally-defined rule scope attribute without rule name: <arg>"
 INVALID_ACTION_SCOPE(arg,arg2) ::=

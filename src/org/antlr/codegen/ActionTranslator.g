@@ -224,6 +224,12 @@ ENCLOSING_RULE_SCOPE_ATTR
 	                         enclosingRule.getLocalAttributeScope($y.text)!=null}?
 		//{System.out.println("found \$rule.attr");}
 		{
+		if ( isRuleRefInAlt($x.text)  ) {
+			ErrorManager.grammarError(ErrorManager.MSG_RULE_REF_AMBIG_WITH_RULE_IN_ALT,
+									  grammar,
+									  actionToken,
+									  $x.text);
+		}
 		StringTemplate st = null;
 		AttributeScope scope = enclosingRule.getLocalAttributeScope($y.text);
 		if ( scope.isPredefinedRuleScope ) {
