@@ -825,6 +825,10 @@ class BaseRecognizer(object):
         return self.grammarFileName
 
 
+    def getSourceName(self):
+        raise NotImplementedError
+
+    
     def toStrings(self, tokens):
         """A convenience method for use most often with template rewrites.
 
@@ -1073,6 +1077,10 @@ class Lexer(BaseRecognizer, TokenSource):
         self.input = input
 
 
+    def getSourceName(self):
+        return self.input.getSourceName()
+
+
     def emit(self, token=None):
         """
         The standard method called to automatically emit a token at the
@@ -1298,6 +1306,10 @@ class Parser(BaseRecognizer):
 
     def getTokenStream(self):
         return self.input
+
+
+    def getSourceName(self):
+        return self.input.getSourceName()
 
 
     def traceIn(self, ruleName, ruleIndex):

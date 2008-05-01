@@ -1816,6 +1816,10 @@ class CommonTreeNodeStream(TreeNodeStream):
         return self.root
 
 
+    def getSourceName(self):
+        return self.getTokenStream().getSourceName()
+
+
     def getTokenStream(self):
         return self.tokens
 
@@ -2039,7 +2043,11 @@ class TreeParser(BaseRecognizer):
     def getTreeNodeStream(self):
         return self.input
 
-    
+
+    def getSourceName(self):
+        return self.input.getSourceName()
+
+
     def matchAny(self, ignore): # ignore stream, copy of this.input
         """
         Match '.' in tree parser has special meaning.  Skip node or

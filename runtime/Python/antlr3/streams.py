@@ -56,7 +56,7 @@ class IntStream(object):
     A simple stream of integers used when all I care about is the char
     or token type sequence (such as interpretation).
     """
-    
+
     def consume(self):
         raise NotImplementedError
     
@@ -169,6 +169,15 @@ class IntStream(object):
 
         raise NotImplementedError
 
+
+    def getSourceName(self):
+        """
+        Where are you getting symbols from?  Normally, implementations will
+        pass the buck all the way to the lexer who can ask its input stream
+        for the file name or whatever.
+        """
+
+        raise NotImplementedError
 
 
 class CharStream(IntStream):
@@ -349,7 +358,10 @@ class ANTLRStringStream(CharStream):
         self._markers = [ ]
         self.lastMarker = None
         self.markDepth = 0
-        
+
+        # What is name or source of this char stream?
+        self.name = None
+
 
     def reset(self):
         """
@@ -491,6 +503,10 @@ class ANTLRStringStream(CharStream):
     def setCharPositionInLine(self, pos):
         """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
         self.charPositionInLine = pos
+
+
+    def getSourceName(self):
+        return self.name
 
 
 class ANTLRFileStream(ANTLRStringStream):
@@ -871,6 +887,10 @@ class CommonTokenStream(TokenStream):
 
     def getTokenSource(self):
         return self.tokenSource
+
+
+    def getSourceName(self):
+        return self.tokenSource.getSourceName()
 
 
     def toString(self, start=None, stop=None):
