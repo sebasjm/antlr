@@ -226,6 +226,7 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual(stdout, "u'a + b'")
         
 
+    @testbase.broken("FIXME", Exception)
     def testTreeParserRewrite(self):
         grammar = textwrap.dedent(
             r'''grammar T7;

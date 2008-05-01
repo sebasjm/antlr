@@ -54,7 +54,7 @@ ruleDeclarations() ::= <<
 _last = None<\n>
 >>
 
-/** What to emit when there is no rewrite.  For auto build
+/** What to emit when there is no rewrite rule.  For auto build
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
@@ -137,6 +137,41 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
+// SET AST
+matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
+_last = self.input.LT(1)
+<super.matchSet(..., postmatchCode={
+<if(!rewriteMode)>
+<finishedBacktracking({
+<label>_tree = self.adaptor.dupNode(<label>)
+self.adaptor.addChild(root_<treeLevel>, <label>_tree)
+})>
+<endif>
+})>
+>>
+
+matchRuleBlockSet(s,label,hetero,elementIndex,postmatchCode,treeLevel="0") ::= <<
+<matchSet(...)>
+<noRewrite()> <! set return tree !>
+>>
+
+matchSetBang(s,label,elementIndex,postmatchCode) ::= <<
+FIXME(316)
+_last = self.input.LT(1)
+<super.matchSet(...)>
+>>
+
+matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
+<super.matchSet(..., postmatchCode={
+<if(!rewriteMode)>
+<finishedBacktracking({
+<label>_tree = self.adaptor.dupNode(<label>)
+root_<treeLevel> = self.adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
+})>
+<endif>
+})>
+>>
+
 // RULE REF AST
 
 /** rule auto construct */
@@ -186,11 +221,9 @@ stream_<token>.nextNode()
 
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
-<if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!rewriteMode)>
 <finishedBacktracking({
 retval.tree = self.adaptor.rulePostProcessing(root_0)
 })>
-<endif>
 <endif>
 >>

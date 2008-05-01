@@ -110,12 +110,20 @@ matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
 <super.matchSet(..., postmatchCode={<finishedBacktracking({self.adaptor.addChild(root_0, <createNodeFromToken(...)>)})>})>
 >>
 
+matchRuleBlockSet(s,label,hetero,elementIndex,postmatchCode,treeLevel="0") ::= <<
+<matchSet(...)>
+>>
+
 matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
 
 // note there is no matchSetTrack because -> rewrites force sets to be
 // plain old blocks of alts: (A|B|...|C)
 
 matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
+<if(label)>
+FIXME(317)
+<label> = self.input.LT(1)<\n>
+<endif>
 <super.matchSet(..., postmatchCode={<finishedBacktracking({root_0 = self.adaptor.becomeRoot(<createNodeFromToken(...)>, root_0)})>})>
 >>
 
@@ -184,10 +192,8 @@ self.adaptor.createWithPayload(<label>)
 
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
-<if(ruleDescriptor.hasMultipleReturnValues)>
 <finishedBacktracking({
 retval.tree = self.adaptor.rulePostProcessing(root_0)
 self.adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop)
 })>
-<endif>
 >>
