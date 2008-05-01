@@ -27,9 +27,6 @@
 */
 package org.antlr.runtime;
 
-import java.util.Set;
-import java.util.HashSet;
-
 public interface Token {
 	public static final int EOR_TOKEN_TYPE = 1;
 
