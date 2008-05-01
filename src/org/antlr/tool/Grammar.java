@@ -2250,7 +2250,7 @@ outer:
 	 *  or null if invalid option.
 	 */
 	public String setOption(String key, Object value, antlr.Token optionsStartToken) {
-		if ( !legalTokenOptions.contains(key) ) {
+		if ( !legalOptions.contains(key) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
 									  this,
 									  optionsStartToken,
