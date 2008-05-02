@@ -117,7 +117,6 @@ tokens {
 	 *  labels, tree operators, rewrites are removed.
 	 */
 	protected GrammarAST createBlockFromDupAlt(GrammarAST alt) {
-		//GrammarAST nalt = (GrammarAST)astFactory.dupTree(alt);
 		GrammarAST nalt = GrammarAST.dupTreeNoActions(alt, null);
 		GrammarAST blk = #(#[BLOCK,"BLOCK"],
 						   nalt,
