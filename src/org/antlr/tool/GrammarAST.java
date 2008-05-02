@@ -504,4 +504,14 @@ public class GrammarAST extends BaseAST {
 		return result;
 	}
 
+	public void setTreeEnclosingRuleName(String rname) {
+		GrammarAST t = this;
+		t.enclosingRuleName = rname;
+		t = t.getChild(0);
+		while (t != null) {						// for each sibling of the root
+			t.setTreeEnclosingRuleName(rname);
+			t = (GrammarAST)t.getNextSibling();
+		}
+	}
+
 }

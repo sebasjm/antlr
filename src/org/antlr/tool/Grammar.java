@@ -1302,8 +1302,9 @@ outer:
 		if ( nameToSynpredASTMap==null ) {
 			nameToSynpredASTMap = new LinkedHashMap();
 		}
-		String predName = null;
-		predName = SYNPRED_RULE_PREFIX+(nameToSynpredASTMap.size() + 1)+"_"+name;
+		String predName =
+			SYNPRED_RULE_PREFIX+(nameToSynpredASTMap.size() + 1)+"_"+name;
+		blockAST.setTreeEnclosingRuleName(predName);
 		nameToSynpredASTMap.put(predName, blockAST);
 		return predName;
 	}
