@@ -627,7 +627,7 @@ public class TestSemanticPredicates extends BaseTest {
 			"  ;\n");
 		String expecting =
 			".s0-X->.s1\n" +
-			".s1-{((b&&c)||(a&&c))}?->:s2=>1\n" +
+			".s1-{((a&&c)||(b&&c))}?->:s2=>1\n" +
 			".s1-{c}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
