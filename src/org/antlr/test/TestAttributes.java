@@ -993,7 +993,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testBasicGlobalScope() throws Exception {
 		String action = "$Symbols::names.add($id.text);";
-		String expecting = "((Symbols_stack.size()>0)?((Symbols_scope)Symbols_stack.peek()).names:null).add((id!=null?id.getText():null));";
+		String expecting = "((Symbols_scope)Symbols_stack.peek()).names.add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1052,7 +1052,7 @@ public class TestAttributes extends BaseTest {
 	public void testIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[-1]::names.add($id.text);";
 		String expecting =
-			"((Symbols_stack.size()-1-1)>=0?((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names:null).add((id!=null?id.getText():null));";
+			"((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names.add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1085,7 +1085,7 @@ public class TestAttributes extends BaseTest {
 	public void test0IndexedGlobalScope() throws Exception {
 		String action = "$Symbols[0]::names.add($id.text);";
 		String expecting =
-			"((0<Symbols_stack.size())?((Symbols_scope)Symbols_stack.elementAt(0)).names:null).add((id!=null?id.getText():null));";
+			"((Symbols_scope)Symbols_stack.elementAt(0)).names.add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1116,7 +1116,7 @@ public class TestAttributes extends BaseTest {
 	public void testAbsoluteIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[3]::names.add($id.text);";
 		String expecting =
-			"((3<Symbols_stack.size())?((Symbols_scope)Symbols_stack.elementAt(3)).names:null).add((id!=null?id.getText():null));";
+			"((Symbols_scope)Symbols_stack.elementAt(3)).names.add((id!=null?id.getText():null));";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1146,7 +1146,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testScopeAndAttributeWithUnderscore() throws Exception {
 		String action = "$foo_bar::a_b;";
-		String expecting = "((foo_bar_stack.size()>0)?((foo_bar_scope)foo_bar_stack.peek()).a_b:0);";
+		String expecting = "((foo_bar_scope)foo_bar_stack.peek()).a_b;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1178,7 +1178,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testSharedGlobalScope() throws Exception {
 		String action = "$Symbols::x;";
-		String expecting = "((Symbols_stack.size()>0)?((Symbols_scope)Symbols_stack.peek()).x:null);";
+		String expecting = "((Symbols_scope)Symbols_stack.peek()).x;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1213,7 +1213,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testGlobalScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$Symbols::names.add('foo');}";
-		String expecting = "public void foo() {((Symbols_stack.size()>0)?((Symbols_scope)Symbols_stack.peek()).names:null).add('foo');}";
+		String expecting = "public void foo() {((Symbols_scope)Symbols_stack.peek()).names.add('foo');}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1245,7 +1245,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$a::name;}";
-		String expecting = "public void foo() {((a_stack.size()>0)?((a_scope)a_stack.peek()).name:null);}";
+		String expecting = "public void foo() {((a_scope)a_stack.peek()).name;}";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1276,7 +1276,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testBasicRuleScope() throws Exception {
 		String action = "$a::n;";
-		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:0);";
+		String expecting = "((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1364,7 +1364,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDynamicRuleScopeRefInSubrule() throws Exception {
 		String action = "$a::n;";
-		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:0.0f);";
+		String expecting = "((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1430,7 +1430,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleScopeFromAnotherRule() throws Exception {
 		String action = "$a::n;"; // must be qualified
-		String expecting = "((a_stack.size()>0)?((a_scope)a_stack.peek()).n:false);";
+		String expecting = "((a_scope)a_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -1699,7 +1699,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
 		String action = "$b::n;";
-		String expecting = "((b_stack.size()>0)?((b_scope)b_stack.peek()).n:0);";
+		String expecting = "((b_scope)b_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -2990,8 +2990,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testRuleRefWithDynamicScope() throws Exception {
 		String action = "$field::x = $field.st;";
-		String expecting = "if ( field_stack.size()>0 ) {\n" +
-						   "((field_scope)field_stack.peek()).x = retval.st;}";
+		String expecting = "((field_scope)field_stack.peek()).x = retval.st;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3266,7 +3265,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testDoNotTranslateScopeAttributeCompare() throws Exception {
 		String action = "if ($rule::foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
-		String expecting = "if (((rule_stack.size()>0)?((rule_scope)rule_stack.peek()).foo:null) == \"foo\" || 1) { System.out.println(\"ouch\"); }";
+		String expecting = "if (((rule_scope)rule_stack.peek()).foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -3372,7 +3371,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testTypeOfGuardedAttributeRefIsCorrect() throws Exception {
 		String action = "int x = $b::n;";
-		String expecting = "int x = ((b_stack.size()>0)?((b_scope)b_stack.peek()).n:0);";
+		String expecting = "int x = ((b_scope)b_stack.peek()).n;";
 
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

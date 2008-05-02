@@ -1173,18 +1173,17 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_stack.size()-<negIndex>-1)>=0?((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>:<initValue(attr.type)>)
+((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name>
 <else>
 <if(index)>
-((<index>\<<scope>_stack.size())?((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>:<initValue(attr.type)>)
+((<scope>_scope)<scope>_stack.elementAt(<index>)).<attr.name>
 <else>
-((<scope>_stack.size()>0)?((<scope>_scope)<scope>_stack.peek()).<attr.name>:<initValue(attr.type)>)
+((<scope>_scope)<scope>_stack.peek()).<attr.name>
 <endif>
 <endif>
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-if ( <scope>_stack.size()>0 ) {
 <if(negIndex)>
 ((<scope>_scope)<scope>_stack.elementAt(<scope>_stack.size()-<negIndex>-1)).<attr.name> =<expr>;
 <else>
@@ -1194,7 +1193,6 @@ if ( <scope>_stack.size()>0 ) {
 ((<scope>_scope)<scope>_stack.peek()).<attr.name> =<expr>;
 <endif>
 <endif>
-}
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
