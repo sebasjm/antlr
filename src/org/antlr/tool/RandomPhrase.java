@@ -27,10 +27,7 @@
 */
 package org.antlr.tool;
 
-import org.antlr.analysis.Label;
-import org.antlr.analysis.NFAState;
-import org.antlr.analysis.RuleClosureTransition;
-import org.antlr.analysis.Transition;
+import org.antlr.analysis.*;
 import org.antlr.misc.Utils;
 import org.antlr.misc.IntervalSet;
 import org.antlr.Tool;
@@ -116,12 +113,6 @@ public class RandomPhrase {
 			NFAState altStartState =
 				g.getNFAStateForAltOfDecision(state, randomAlt);
 			Transition t = altStartState.transition[0];
-			/*
-			start of a decision could never be a labeled transition
-			if ( !t.label.isEpsilon() ) {
-				tokenTypes.add( getTokenType(t.label) );
-			}
-			*/
 			state = (NFAState)t.target;
 		}
 	}
