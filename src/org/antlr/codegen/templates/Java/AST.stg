@@ -114,6 +114,10 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
+wildcardTrack(label,elementIndex) ::= <<
+<super.wildcard(...)>
+>>
+
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>

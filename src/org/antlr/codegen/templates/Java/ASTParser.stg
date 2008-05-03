@@ -173,10 +173,6 @@ root_0 = (<ASTLabelType>)adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
 >>
 
-wildcardTrack(label,elementIndex) ::= <<
-<super.wildcard(...)>
->>
-
 createNodeFromToken(label,hetero) ::= <<
 <if(hetero)>
 new <hetero>(<label>) <! new MethodNode(IDLabel) !>
