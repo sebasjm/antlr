@@ -1012,7 +1012,7 @@ CHAR_LITERAL
 	;
 
 DOUBLE_QUOTE_STRING_LITERAL
-	:	'"' ('\\'! '"'|'\n'{newline();}|~'"')* '"'
+	:	'"' ('\\'! '"'|'\\' ~'"'|'\n'{newline();}|~'"')* '"'
 	;
 
 DOUBLE_ANGLE_STRING_LITERAL
