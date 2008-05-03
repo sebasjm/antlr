@@ -12,6 +12,10 @@ May 3, 2008
 
 * Fixed ANTLR-208.  Looks in library or in -o output path.  antlr -o foo T.g U.g where U needs T.tokens won't work unless we look in foo too.  fixed.
 
+* Refactored assign.types.g to move methods to a class called AssignTokenTypesBehavior.
+
+* Fixed ANTLR-207.  Lexers importing vocabs didn't see ';'=4 type aliases in .tokens.
+
 May 2, 2008
 
 * Fixed ANTLR-230; can use \' now in action.

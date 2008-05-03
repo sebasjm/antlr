@@ -2733,7 +2733,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type $line $pos $channel $index $start $stop";
-		String expecting = "getText() _type state.tokenStartLine state.tokenStartCharPositionInLine state.channel -1 state.tokenStartCharIndex (getCharIndex()-1)";
+		String expecting = "getText() _type state.tokenStartLine state.tokenStartCharPositionInLine _channel -1 state.tokenStartCharIndex (getCharIndex()-1)";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2790,7 +2790,7 @@ public class TestAttributes extends BaseTest {
 
 	public void testSettingLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type=1 $line=1 $pos=1 $channel=1 $index";
-		String expecting = "getText() _type=1 state.tokenStartLine=1 state.tokenStartCharPositionInLine=1 state.channel=1 -1";
+		String expecting = "getText() _type=1 state.tokenStartLine=1 state.tokenStartCharPositionInLine=1 _channel=1 -1";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(

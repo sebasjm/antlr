@@ -446,6 +446,10 @@ public class Grammar {
 		this.composite = composite;
 		setTool(tool);
 		setFileName(fileName);
+		// ensure we have the composite set to something
+		if ( composite.delegateGrammarTreeRoot==null ) {
+			composite.setDelegationRoot(this);
+		}		
 	}
 
 	/** Useful for when you are sure that you are not part of a composite

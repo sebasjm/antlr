@@ -313,7 +313,7 @@ public class CompositeGrammar {
 	public void assignTokenTypes() throws antlr.RecognitionException {
 		// ASSIGN TOKEN TYPES for all delegates (same walker)
 		//System.out.println("### assign types");
-		AssignTokenTypesWalker ttypesWalker = new AssignTokenTypesWalker();
+		AssignTokenTypesWalker ttypesWalker = new AssignTokenTypesBehavior();
 		ttypesWalker.setASTNodeClass("org.antlr.tool.GrammarAST");
 		List<Grammar> grammars = delegateGrammarTreeRoot.getPostOrderedGrammarList();
 		for (int i = 0; grammars!=null && i < grammars.size(); i++) {

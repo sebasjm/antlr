@@ -769,6 +769,68 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
+	public void testTokenVocabStringUsedInLexer() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String tokens =
+			"';'=4\n";
+		writeFile(tmpdir, "T.tokens", tokens);
+
+		String importer =
+			"lexer grammar B; \n" +
+			"options\t{tokenVocab=T;} \n" +
+			"SEMI:';' ; \n" ;
+		writeFile(tmpdir, "B.g", importer);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/B.g",composite);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+
+		String expectedTokenIDToTypeMap = "[SEMI=4]";
+		String expectedStringLiteralToTypeMap = "{';'=4}";
+		String expectedTypeToTokenList = "[SEMI]";
+
+		assertEquals(expectedTokenIDToTypeMap,
+					 realElements(g.composite.tokenIDToTypeMap).toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList,
+					 realElements(g.composite.typeToTokenList).toString());
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
+	public void testTokenVocabStringUsedInCombined() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String tokens =
+			"';'=4\n";
+		writeFile(tmpdir, "T.tokens", tokens);
+
+		String importer =
+			"grammar B; \n" +
+			"options\t{tokenVocab=T;} \n" +
+			"SEMI:';' ; \n" ;
+		writeFile(tmpdir, "B.g", importer);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/B.g",composite);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+
+		String expectedTokenIDToTypeMap = "[SEMI=4]";
+		String expectedStringLiteralToTypeMap = "{';'=4}";
+		String expectedTypeToTokenList = "[SEMI]";
+
+		assertEquals(expectedTokenIDToTypeMap,
+					 realElements(g.composite.tokenIDToTypeMap).toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList,
+					 realElements(g.composite.typeToTokenList).toString());
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	protected void checkPlusEqualsLabels(Grammar g,
 										 String ruleName,
 										 String tokenLabelsStr,
