@@ -138,7 +138,6 @@ ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <listLabel(elem=label+".getTree()",...)>
 >>
 
-
 // R e w r i t e
 
 rewriteCode(

@@ -1136,6 +1136,19 @@ public class TestRewriteAST extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
+	public void testWildcard() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID c=. -> $c;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
+				    "a", "abc 34", debug);
+		assertEquals("34\n", found);
+	}
+
 	// E R R O R S
 
 	public void testUnknownRule() throws Exception {

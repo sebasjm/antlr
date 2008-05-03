@@ -556,4 +556,24 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 					 "(root (ick 34))\n", found);
 	}
 
+	public void testWildcard() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT -> ^(ID[\"root\"] INT);\n"+
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+			"s : ^(ID c=.) -> $c\n" +
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+		assertEquals("34\n", found);
+	}
+
 }

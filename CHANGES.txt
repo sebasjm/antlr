@@ -16,6 +16,8 @@ May 3, 2008
 
 * Fixed ANTLR-207.  Lexers importing vocabs didn't see ';'=4 type aliases in .tokens.
 
+* Fixed ANTLR-228.  Couldn't use wildcard in alts with AST rewrites.
+
 May 2, 2008
 
 * Fixed ANTLR-230; can use \' now in action.

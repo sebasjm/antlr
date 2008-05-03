@@ -137,6 +137,10 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
+wildcardTrack(label,elementIndex) ::= <<
+<super.wildcard(...)>
+>>
+
 // SET AST
 
 matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
