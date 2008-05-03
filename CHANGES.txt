@@ -8,6 +8,31 @@ University of San Francisco
 
 CHANGES
 
+May 2, 2008
+
+* Fixed ANTLR-230; can use \' now in action.
+
+* Scope attributes no longer have a stack depth check on front.  If you ref $r::a when r has not invoked you, then you get an exception not a default value.  Back to the way 3.0.1 worked.
+
+* $channel was a global variable in 3.0.1 unlike $type which did not affect an invoking lexer rule.  Now it's local too.  Only $type and $channel are ever set with regularity.  Setting those should not affect an invoking lexer rule as in the following should work:
+
+  X : ID WS? '=' ID ;  // result is X on normal channel
+  WS : ' '+ {$channel = HIDDEN; } ;
+
+  STRING : '"' (ESC|.)* '"' ;  // result is STRING not ESC
+
+  FLOAT : INT '.' INT? ; // should be FLOAT
+  INT : Digit+ ;
+  fragment
+  Digit : '0'..'9' ;
+
+May 1, 2008
+
+* Fixed ANTLR-202.  These now give warnings about ambig ref to $a.
+    a : ID a -> $a | INT ;
+  and
+    a : A a {$a.text} | B ;
+
 April 30, 2008
 
 * Fixed ANTLR-237. updated -depend to know about imported grammars.

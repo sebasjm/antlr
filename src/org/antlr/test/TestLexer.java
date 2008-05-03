@@ -61,6 +61,20 @@ public class TestLexer extends BaseTest {
 		assertEquals("-34\n", found);
 	}
 
+	public void testRefToRuleDoesNotSetChannel() throws Exception {
+		// this must set channel of A to HIDDEN.  $channel is local to rule
+		// like $type.
+		String grammar =
+			"grammar P;\n"+
+			"a : A EOF {System.out.println($A.text+\", channel=\"+$A.channel);} ;\n"+
+			"A : '-' WS I ;\n" +
+			"I : '0'..'9'+ ;\n"+
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;";
+		String found = execParser("P.g", grammar, "PParser", "PLexer",
+				    "a", "- 34", debug);
+		assertEquals("- 34, channel=0\n", found);
+	}
+
 	public void testWeCanSetType() throws Exception {
 		String grammar =
 			"grammar P;\n"+
