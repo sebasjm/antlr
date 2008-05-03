@@ -135,7 +135,7 @@ public class BuildDependencyGenerator {
 		// handle token vocabulary loads
 		String vocabName = (String)grammar.getOption("tokenVocab");
 		if ( vocabName != null ) {
-			File vocabFile = grammar.getImportedVocabFileName(vocabName);
+			File vocabFile = tool.getImportedVocabFile(vocabName);
 			File outputDir = vocabFile.getParentFile();
 			String fileName = groomQualifiedFileName(outputDir.getName(), vocabFile.getName());
 			files.add(fileName);

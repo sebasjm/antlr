@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+May 3, 2008
+
+* Fixed ANTLR-208.  Looks in library or in -o output path.  antlr -o foo T.g U.g where U needs T.tokens won't work unless we look in foo too.  fixed.
+
 May 2, 2008
 
 * Fixed ANTLR-230; can use \' now in action.
@@ -25,6 +29,8 @@ May 2, 2008
   INT : Digit+ ;
   fragment
   Digit : '0'..'9' ;
+
+* Fixed bug in interpreter regarding (...)* loops
 
 May 1, 2008
 

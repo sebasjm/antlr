@@ -692,13 +692,6 @@ public class Grammar {
 		return qualifiedName+suffix;
 	}
 
-	public File getImportedVocabFileName(String vocabName) {
-		return new File(tool.getLibraryDirectory(),
-						File.separator+
-						vocabName+
-						CodeGenerator.VOCAB_FILE_EXTENSION);
-	}
-
 	/** Parse a rule we add artificially that is a list of the other lexer
 	 *  rules like this: "Tokens : ID | INT | SEMI ;"  nextToken() will invoke
 	 *  this to set the current token.  Add char literals before
@@ -2094,7 +2087,7 @@ outer:
 			return composite.maxTokenType;
 		}
 
-		File fullFile = getImportedVocabFileName(vocabName);
+		File fullFile = tool.getImportedVocabFile(vocabName);
 		try {
 			FileReader fr = new FileReader(fullFile);
 			BufferedReader br = new BufferedReader(fr);

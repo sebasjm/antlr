@@ -612,6 +612,25 @@ public class Tool {
 		return f.getParent();
 	}
 
+	/** Return a File descriptor for vocab file.  Look in library or
+	 *  in -o output path.  antlr -o foo T.g U.g where U needs T.tokens
+	 *  won't work unless we look in foo too.
+	 */
+	public File getImportedVocabFile(String vocabName) {
+		File f = new File(getLibraryDirectory(),
+						  File.separator+
+						  vocabName+
+						  CodeGenerator.VOCAB_FILE_EXTENSION);
+		if ( f.exists() ) {
+			return f;
+		}
+
+		return new File(outputDirectory+
+						File.separator+
+						vocabName+
+						CodeGenerator.VOCAB_FILE_EXTENSION);
+	}	
+
 	/** If the tool needs to panic/exit, how do we do that? */
 	public void panic() {
 		throw new Error("ANTLR panic");
