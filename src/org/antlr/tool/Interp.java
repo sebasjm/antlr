@@ -31,8 +31,12 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.ParseTree;
+import org.antlr.Tool;
 
 import java.util.StringTokenizer;
+import java.util.List;
+import java.io.FileReader;
+import java.io.BufferedReader;
 
 /** Interpret any ANTLR grammar:
  *
@@ -56,12 +60,38 @@ public class Interp {
 		String inputFileName = args[3];
 
 		// TODO: using wrong constructor now
-		Grammar parser = new Grammar(null, grammarFileName);
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar parser = new Grammar(new Tool(), grammarFileName, composite);
+		composite.setDelegationRoot(parser);
+		FileReader fr = new FileReader(grammarFileName);
+		BufferedReader br = new BufferedReader(fr);
+		parser.parseAndBuildAST(br);
+		br.close();
+
+		parser.composite.assignTokenTypes();
+		parser.composite.defineGrammarSymbols();
+		parser.composite.createNFAs();
+
+		List leftRecursiveRules = parser.checkAllRulesForLeftRecursion();
+		if ( leftRecursiveRules.size()>0 ) {
+			return;
+		}
+
+		if ( parser.getRule(startRule)==null ) {
+			System.out.println("undefined start rule "+startRule);
+			return;
+		}
 
 		String lexerGrammarText = parser.getLexerGrammar();
 		Grammar lexer = new Grammar();
 		lexer.importTokenVocabulary(parser);
-		lexer.setGrammarContent(lexerGrammarText);
+		lexer.fileName = grammarFileName;
+		if ( lexerGrammarText!=null ) {
+			lexer.setGrammarContent(lexerGrammarText);
+		}
+		else {
+			System.err.println("no lexer grammar found in "+grammarFileName);
+		}
 		CharStream input =
 			new ANTLRFileStream(inputFileName);
 		Interpreter lexEngine = new Interpreter(lexer, input);

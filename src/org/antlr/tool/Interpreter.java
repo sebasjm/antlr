@@ -61,6 +61,7 @@ public class Interpreter implements TokenSource {
 		public LexerActionGetTokenType(Grammar g) {
 			this.g = g;
 		}
+
 		public void exitRule(String grammarFileName, String ruleName) {
 			if ( !ruleName.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME) ){
 				int type = g.getTokenType(ruleName);
@@ -246,9 +247,9 @@ public class Interpreter implements TokenSource {
 					String description = dfa.getNFADecisionStartState().getDescription();
 					NoViableAltException nvae =
 						new NoViableAltException(description,
-												 dfa.getDecisionNumber(),
-												 s.stateNumber,
-												 input);
+													  dfa.getDecisionNumber(),
+													  s.stateNumber,
+													  input);
 					if ( actions!=null ) {
 						actions.recognitionException(nvae);
 					}
@@ -264,7 +265,14 @@ public class Interpreter implements TokenSource {
 									   parseAlt);
 				}
 				*/
-				NFAState alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
+				NFAState alt;
+				if ( parseAlt > grammar.getNumberOfAltsForDecisionNFA(s) ) {
+					// implied branch of loop etc...
+					alt = grammar.nfa.getState( s.endOfBlockStateNumber );
+				}
+				else {
+					alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
+				}
 				s = (NFAState)alt.transition[0].target;
 				continue;
 			}
@@ -426,11 +434,11 @@ public class Interpreter implements TokenSource {
 
 	public void reportScanError(RecognitionException re) {
 		CharStream cs = (CharStream)input;
-		// print as good of a message is we can't, given that we do not have
+		// print as good of a message as we can, given that we do not have
 		// a Lexer object and, hence, cannot call the routine to get a
 		// decent error message.
 		System.err.println("problem matching token at "+
-			cs.getLine()+":"+cs.getCharPositionInLine()+" "+re.getClass().getName());
+			cs.getLine()+":"+cs.getCharPositionInLine()+" "+re);
 	}
 
 	public String getSourceName() {

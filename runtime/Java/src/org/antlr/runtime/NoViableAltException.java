@@ -47,6 +47,11 @@ public class NoViableAltException extends RecognitionException {
 	}
 
 	public String toString() {
-		return "NoViableAltException("+getUnexpectedType()+"!=["+grammarDecisionDescription+"])";
+		if ( input instanceof CharStream ) {
+			return "NoViableAltException('"+(char)getUnexpectedType()+"'@["+grammarDecisionDescription+"])";
+		}
+		else {
+			return "NoViableAltException("+getUnexpectedType()+"@["+grammarDecisionDescription+"])";
+		}
 	}
 }
