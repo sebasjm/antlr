@@ -195,7 +195,6 @@ namespace Antlr.Runtime.Tree
 				}
 				else if (r.ChildCount == 1)
 				{
-					ITree oldParent = r.Parent;
 					r = (ITree)r.GetChild(0);
 					// whoever invokes rule will set parent and child index
 					r.Parent = null;

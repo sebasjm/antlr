@@ -560,12 +560,14 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <block><\n>
 <else>
         int _type = <ruleName>;
+	int _channel = DEFAULT_TOKEN_CHANNEL;
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
         state.type = _type;
+        state.channel = _channel;
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
     }
@@ -1302,18 +1304,17 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> = <expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
 <if(negIndex)>
-((<scope>_stack.Count-<negIndex>-1) >= 0 ? ((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name> : <initValue(attr.type)>)
+((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name>
 <else>
 <if(index)>
-((<index>\<<scope>_stack.Count) ? ((<scope>_scope)<scope>_stack[<index>]).<attr.name> : <initValue(attr.type)>)
+((<scope>_scope)<scope>_stack[<index>]).<attr.name>
 <else>
-((<scope>_stack.Count>0) ? ((<scope>_scope)<scope>_stack.Peek()).<attr.name> : <initValue(attr.type)>)
+((<scope>_scope)<scope>_stack.Peek()).<attr.name>
 <endif>
 <endif>
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-if ( <scope>_stack.Count>0 ) {
 <if(negIndex)>
 ((<scope>_scope)<scope>_stack[<scope>_stack.Count-<negIndex>-1]).<attr.name> = <expr>;
 <else>
@@ -1323,7 +1324,6 @@ if ( <scope>_stack.Count>0 ) {
 ((<scope>_scope)<scope>_stack.Peek()).<attr.name> = <expr>;
 <endif>
 <endif>
-}
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
@@ -1387,7 +1387,7 @@ ruleLabelPropertyRef_text(scope,attr) ::= <<
 ((<scope> != null) ? input.ToString(<scope>.Start,<scope>.Stop) : null)
 <endif>
 >>
-ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> != null) ? <scope>.St : null)"
+ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> != null) ? <scope>.ST : null)"
 
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
@@ -1413,14 +1413,14 @@ input.TokenStream.ToString(
 input.ToString(retval.Start,input.LT(-1))
 <endif>
 >>
-rulePropertyRef_st(scope,attr) ::= "retval.St"
+rulePropertyRef_st(scope,attr) ::= "retval.ST"
 
 lexerRulePropertyRef_text(scope,attr) ::= "Text"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "state.tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
+lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(CharIndex-1)"
 lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.Text)"
@@ -1428,7 +1428,7 @@ lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.Text)"
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.Tree = <expr>;"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.St = <expr>;"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.ST = <expr>;"
 
 
 /** How to execute an action (only when not backtracking) */

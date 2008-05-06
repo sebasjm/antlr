@@ -233,7 +233,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		public virtual string GetErrorMessage(RecognitionException e, string[] tokenNames)
 		{
-			string msg = null;
+			string msg = e.Message;
 			if (e is UnwantedTokenException) {
 				UnwantedTokenException ute = (UnwantedTokenException)e;
 				string tokenName="<unknown>";

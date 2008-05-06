@@ -1,5 +1,6 @@
 /*
  [The "BSD licence"]
+ Copyright (c) 2007-2008 Johannes Luber
  Copyright (c) 2005-2007 Kunle Odutola
  Copyright (c) 2005 Terence Parr
  All rights reserved.
@@ -41,9 +42,10 @@ using Hashtable = System.Collections.Hashtable;
 
 /** Add this to each rule's return value struct */
 @returnScope.ruleReturnMembers() ::= <<
-public StringTemplate St;
-public override object Template 		{ get { return St; } }
-public override string ToString() 		{ return (St == null) ? null : St.ToString(); }
+private StringTemplate st;
+public StringTemplate ST    { get { return st; } set { st = value; } }
+public override object Template 		{ get { return st; } }
+public override string ToString() 		{ return (st == null) ? null : st.ToString(); }
 >>
 
 @genericParser.members() ::= <<
@@ -101,12 +103,12 @@ replaceTextInLine() ::= <<
 ((TokenRewriteStream)input.TokenStream).Replace(
   input.TreeAdaptor.GetTokenStartIndex(retval.Start),
   input.TreeAdaptor.GetTokenStopIndex(retval.Start),
-  retval.St);
+  retval.ST);
 <else>
 ((TokenRewriteStream)input).Replace(
   ((IToken)retval.Start).TokenIndex,
   input.LT(-1).TokenIndex,
-  retval.St);
+  retval.ST);
 <endif>
 >>
 
@@ -114,11 +116,11 @@ rewriteTemplateAlt() ::= <<
 // <it.description>
 <if(it.pred)>
 if (<it.pred>) {
-    retval.St = <it.alt>;
+    retval.ST = <it.alt>;
 }<\n>
 <else>
 {
-    retval.St = <it.alt>;
+    retval.ST = <it.alt>;
 }<\n>
 <endif>
 >>

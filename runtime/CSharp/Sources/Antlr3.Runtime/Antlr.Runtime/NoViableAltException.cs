@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -59,7 +60,12 @@ namespace Antlr.Runtime
 		
 		public override string ToString()
 		{
-			return "NoViableAltException(" + UnexpectedType + "!=[" + grammarDecisionDescription + "])";
+			if (input is ICharStream) {
+				return "NoViableAltException('" + (char)UnexpectedType + "'@[" + grammarDecisionDescription + "])";
+			}
+			else {
+				return "NoViableAltException(" + UnexpectedType + "@[" + grammarDecisionDescription + "])";
+			}
 		}
 	}
 }

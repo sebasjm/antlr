@@ -34,7 +34,6 @@ group Dbg;
 
 @outputFile.imports() ::= <<
 <@super.imports()>
-using Antlr.Runtime.Debug;
 using IOException = System.IO.IOException;
 >>
 
@@ -89,8 +88,8 @@ protected bool EvalPredicate(bool result, string predicate)
 ctorForRootGrammar() ::= <<
 <! bug: can't use <@super.members()> cut-n-paste instead !>
 <! Same except we add port number and profile stuff if root grammar !>
-public <name>(<inputStreamType> input) {
-    this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, new RecognizerSharedState());
+public <name>(<inputStreamType> input)
+    : this(input, DebugEventSocketProxy.DEFAULT_DEBUGGER_PORT, new RecognizerSharedState()) {
 }
 
 public <name>(<inputStreamType> input, int port, RecognizerSharedState state)

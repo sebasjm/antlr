@@ -105,7 +105,11 @@ _last = (<ASTLabelType>)input.LT(1);
 if ( state.backtracking == 0 )
 {
 <endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 	<label>_tree = (<ASTLabelType>)adaptor.DupNode(<label>);
+<endif><\n>
 	adaptor.AddChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>
 }
@@ -128,7 +132,11 @@ _last = (<ASTLabelType>)input.LT(1);
 if ( state.backtracking == 0 )
 {
 <endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 	<label>_tree = (<ASTLabelType>)adaptor.DupNode(<label>);
+<endif><\n>
 	root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_<treeLevel>);
 <if(backtracking)>
 }
@@ -149,7 +157,11 @@ _last = (<ASTLabelType>)input.LT(1);
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 <label>_tree = (<ASTLabelType>)adaptor.DupNode(<label>);
+<endif><\n>
 adaptor.AddChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <endif>
@@ -171,7 +183,11 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 <label>_tree = (<ASTLabelType>)adaptor.DupNode(<label>);
+<endif><\n>
 root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_<treeLevel>);
 <if(backtracking)>}<endif>
 <endif>

@@ -44,14 +44,23 @@ public ITreeAdaptor TreeAdaptor
 
 parserCtorBody() ::= <<
 <super.parserCtorBody()>
-adaptor.setDebugListener(dbg);
+adaptor.DebugListener = dbg;
 >>
 
 createListenerAndHandshake() ::= <<
 DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, adaptor);
-adaptor.DebugEventListener = proxy;
+adaptor.DebugListener = proxy;
 DebugListener = proxy;
+<!
+Original line follows, replaced by the next two ifs:
 set<inputStreamType>(new Debug<inputStreamType>(input,proxy));
+ !>
+<if(PARSER)>
+TokenStream = new DebugTokenStream(input,proxy);<n>
+<endif>
+<if(TREE_PARSER)>
+TokenStream = new DebugTreeNodeStream(input,proxy);<n>
+<endif>
 try {
     proxy.Handshake();
 } catch (IOException ioe) {
