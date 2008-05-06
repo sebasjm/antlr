@@ -1257,18 +1257,17 @@ self.<scope>_stack[-1].<attr.name>
 */
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-if len(self.<scope>_stack) > 0:
-    <if(negIndex)>
-    <!FIXME: this seems not to be used by ActionTranslator...!>
-    self.<scope>_stack[-<negIndex>].<attr.name> = <expr>
-    <else>
-    <if(index)>
-    <!FIXME: this seems not to be used by ActionTranslator...!>
-    self.<scope>_stack[<index>].<attr.name> = <expr>
-    <else>
-    self.<scope>_stack[-1].<attr.name> = <expr>
-    <endif>
-    <endif>
+<if(negIndex)>
+<!FIXME: this seems not to be used by ActionTranslator...!>
+self.<scope>_stack[-<negIndex>].<attr.name> = <expr>
+<else>
+<if(index)>
+<!FIXME: this seems not to be used by ActionTranslator...!>
+self.<scope>_stack[<index>].<attr.name> = <expr>
+<else>
+self.<scope>_stack[-1].<attr.name> = <expr>
+<endif>
+<endif>
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
