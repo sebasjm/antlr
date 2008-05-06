@@ -640,6 +640,25 @@ public class TestSemanticPredicates extends BaseTest {
 					  danglingAlts, numWarnings);
 	}
 
+	public void testSemanticContextPreventsEarlyTerminationOfClosure() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar T;\n" +
+			"a : loop SEMI | ID SEMI\n" +
+			"  ;\n" +
+			"loop\n" +
+			"    : {while}? ID\n" +
+			"    | {do}? ID\n" +
+			"    | {for}? ID\n" +
+			"    ;");
+		String expecting =
+			".s0-ID->.s1\n" +
+			".s1-SEMI->.s2\n" +
+			".s2-{(do||while||for)}?->:s3=>1\n" +
+			".s2-{true}?->:s4=>2\n";
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+	}
+
+
 	// S U P P O R T
 
 	public void _template() throws Exception {

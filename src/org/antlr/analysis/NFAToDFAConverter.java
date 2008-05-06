@@ -776,6 +776,13 @@ public class NFAToDFAConverter {
 	 *  spin until time out because the predicate context kept increasing
 	 *  in size even though it's same boolean value.  This seems faster also
 	 *  because I'm not doing String.equals on the preds all the time.
+	 *
+	 *  05-05-2008: Hmm...well, i think it was a mistake to remove the sem
+	 *  ctx check below...adding back in.  Coincides with report of ANTLR
+	 *  getting super slow: http://www.antlr.org:8888/browse/ANTLR-235
+	 *  This could be because it doesn't properly compute then resolve
+	 *  a predicate expression.  Seems to fix unit test:
+	 *  TestSemanticPredicates.testSemanticContextPreventsEarlyTerminationOfClosure()
 	 */
 	public static boolean closureIsBusy(DFAState d,
 										NFAConfiguration proposedNFAConfiguration)
@@ -787,7 +794,7 @@ public class NFAToDFAConverter {
 			NFAConfiguration c = (NFAConfiguration) d.closureBusy.get(i);
 			if ( proposedNFAConfiguration.state==c.state &&
 				 proposedNFAConfiguration.alt==c.alt &&
-//				 proposedNFAConfiguration.semanticContext.equals(c.semanticContext) &&
+				 proposedNFAConfiguration.semanticContext.equals(c.semanticContext) &&
 				 proposedNFAConfiguration.context.suffix(c.context) )
 			{
 				return true;
