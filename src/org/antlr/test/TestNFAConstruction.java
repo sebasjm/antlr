@@ -879,7 +879,7 @@ public class TestNFAConstruction extends BaseTest {
 				".s1->.s2\n" +
 				".s1->.s8\n" +
 				".s10->.s5\n" +
-				".s2-{synpred1}?->.s3\n" +
+				".s2-{synpred1_t}?->.s3\n" +
 				".s3-'a'->.s4\n" +
 				".s4->.s5\n" +
 				".s5->:s6\n" +
@@ -917,7 +917,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s11->.s6\n" +
 			".s2->.s3\n" +
 			".s2->.s9\n" +
-			".s3-{synpred1}?->.s4\n" +
+			".s3-{synpred1_t}?->.s4\n" +
 			".s4-'a'->.s5\n" +
 			".s5->.s6\n" +
 			".s6->:s7\n" +
@@ -951,7 +951,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s0->.s1\n" +
 				".s1->.s2\n" +
 				".s11->.s12\n" +
-				".s12-{synpred2}?->.s13\n" +
+				".s12-{synpred2_t}?->.s13\n" +
 				".s13-'b'->.s14\n" +
 				".s14->.s7\n" +
 				".s15->.s8\n" +
@@ -959,7 +959,7 @@ public class TestNFAConstruction extends BaseTest {
 				".s2->.s3\n" +
 				".s3->.s11\n" +
 				".s3->.s4\n" +
-				".s4-{synpred1}?->.s5\n" +
+				".s4-{synpred1_t}?->.s5\n" +
 				".s5-'a'->.s6\n" +
 				".s6->.s7\n" +
 				".s7->.s3\n" +
@@ -1000,7 +1000,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s11->.s12\n" +
-			".s12-{synpred2}?->.s13\n" +
+			".s12-{synpred2_t}?->.s13\n" +
 			".s13-'b'->.s14\n" +
 			".s14->.s7\n" +
 			".s15->.s8\n" +
@@ -1008,7 +1008,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s2->.s3\n" +
 			".s3->.s11\n" +
 			".s3->.s4\n" +
-			".s4-{synpred1}?->.s5\n" +
+			".s4-{synpred1_t}?->.s5\n" +
 			".s5-'a'->.s6\n" +
 			".s6->.s7\n" +
 			".s7->.s3\n" +
@@ -1031,7 +1031,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s2->.s10\n" +
 			".s2->.s3\n" +
 			".s3->.s4\n" +
-			".s4-{synpred1}?->.s5\n" +
+			".s4-{synpred1_t}?->.s5\n" +
 			".s5-'a'->.s6\n" +
 			".s6->.s3\n" +
 			".s6->.s7\n" +
@@ -1050,13 +1050,13 @@ public class TestNFAConstruction extends BaseTest {
 			".s0->.s1\n" +
 				".s1->.s2\n" +
 				".s11->.s12\n" +
-				".s12-{synpred2}?->.s13\n" +
+				".s12-{synpred2_t}?->.s13\n" +
 				".s13-'b'->.s14\n" +
 				".s14->.s7\n" +
 				".s2->.s3\n" +
 				".s3->.s11\n" +
 				".s3->.s4\n" +
-				".s4-{synpred1}?->.s5\n" +
+				".s4-{synpred1_t}?->.s5\n" +
 				".s5-'a'->.s6\n" +
 				".s6->.s7\n" +
 				".s7->.s3\n" +
@@ -1076,13 +1076,13 @@ public class TestNFAConstruction extends BaseTest {
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s11->.s12\n" +
-			".s12-{synpred2}?->.s13\n" +
+			".s12-{synpred2_t}?->.s13\n" +
 			".s13-'b'->.s14\n" +
 			".s14->.s7\n" +
 			".s2->.s3\n" +
 			".s3->.s11\n" +
 			".s3->.s4\n" +
-			".s4-{synpred1}?->.s5\n" +
+			".s4-{synpred1_t}?->.s5\n" +
 			".s5-'a'->.s6\n" +
 			".s6->.s7\n" +
 			".s7->.s3\n" +
@@ -1103,7 +1103,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s1->.s2\n" +
 			".s2->.s3\n" +
 			".s3->.s4\n" +
-			".s4-{synpred1}?->.s5\n" +
+			".s4-{synpred1_t}?->.s5\n" +
 			".s5-'a'->.s6\n" +
 			".s6->.s3\n" +
 			".s6->.s7\n" +
@@ -1121,13 +1121,13 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			".s0->.s1\n" +
 				".s1->.s2\n" +
-				".s10-{synpred2}?->.s11\n" +
+				".s10-{synpred2_t}?->.s11\n" +
 				".s11-'b'->.s12\n" +
 				".s12->.s6\n" +
 				".s13->.s6\n" +
 				".s2->.s3\n" +
 				".s2->.s9\n" +
-				".s3-{synpred1}?->.s4\n" +
+				".s3-{synpred1_t}?->.s4\n" +
 				".s4-'a'->.s5\n" +
 				".s5->.s6\n" +
 				".s6->:s7\n" +
@@ -1148,7 +1148,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s1->.s2\n" +
 			".s2->.s3\n" +
 			".s2->.s9\n" +
-			".s3-{synpred1}?->.s4\n" +
+			".s3-{synpred1_t}?->.s4\n" +
 			".s4-'a'->.s5\n" +
 			".s5->.s6\n" +
 			".s6->:s7\n" +
@@ -1168,7 +1168,7 @@ public class TestNFAConstruction extends BaseTest {
 				".s1->.s2\n" +
 				".s1->.s8\n" +
 				".s10->.s5\n" +
-				".s2-{synpred1}?->.s3\n" +
+				".s2-{synpred1_t}?->.s3\n" +
 				".s3-'a'->.s4\n" +
 				".s4->.s5\n" +
 				".s5->:s6\n" +
