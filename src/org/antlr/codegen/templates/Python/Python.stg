@@ -538,6 +538,7 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <block><\n>
 <else>
         _type = <ruleName>
+        _channel = DEFAULT_CHANNEL
 
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
@@ -545,6 +546,7 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <block>
         <ruleCleanUp()>
         self._state.type = _type
+        self._state.channel = _channel
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
 <if(memoize)>
@@ -1357,7 +1359,7 @@ lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "self._state.tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "self._state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "self._state.channel"
+lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "self._state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(self.getCharIndex()-1)"
 lexerRulePropertyRef_int(scope,attr) ::= "int(<scope>.text)"
