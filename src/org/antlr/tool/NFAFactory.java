@@ -265,7 +265,6 @@ public class NFAFactory {
 		int numberUnInvokedRules = 0;
         for (Iterator iterator = rules.iterator(); iterator.hasNext();) {
 			Rule r = (Rule) iterator.next();
-			String ruleName = r.name;
 			NFAState endNFAState = r.stopState;
             // Is this rule a start symbol?  (no follow links)
 			if ( endNFAState.transition[0] ==null ) {
