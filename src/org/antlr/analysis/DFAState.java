@@ -147,11 +147,10 @@ public class DFAState extends State {
 	 *  prevent closures only on states contributed by closure not reach
 	 *  operations.
 	 *
-	 *  Two configurations identical except for semantic context are
+	 *  Two configurations identical including semantic context are
 	 *  considered the same closure computation.  @see NFAToDFAConverter.closureBusy().
      */
-	//protected Set<NFAConfiguration> closureBusy = new HashSet<NFAConfiguration>();
-	protected List<NFAConfiguration> closureBusy = new ArrayList<NFAConfiguration>();
+	protected Set<NFAConfiguration> closureBusy = new HashSet<NFAConfiguration>();
 
 	/** As this state is constructed (i.e., as NFA states are added), we
      *  can easily check for non-epsilon transitions because the only

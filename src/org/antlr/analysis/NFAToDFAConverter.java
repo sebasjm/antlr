@@ -750,24 +750,12 @@ public class NFAToDFAConverter {
 	 *  then clearly the exact same computation is proposed.  If a context
 	 *  is a suffix of the other, then again the computation is in an
 	 *  identical context.  ?$ and ??$ are considered the same stack.
-	 *  We have to walk configurations linearly doing the comparison instead
-	 *  of a set for exact matches.
-	 *
-	 *  We cannot use a set hash table for this lookup as contexts that are
-	 *  suffixes could be !equal() but their hashCode()s would be different;
-	 *  that's a problem for a HashSet.  This costs a lot actually, it
-	 *  takes about 490ms vs 355ms for Java grammar's analysis phase when
-	 *  I moved away from hash lookup.  Argh!  Still it's small.  For newbie
-	 *  generated grammars though this really speeds things up because it
-	 *  avoids chasing its tail during closure operations on highly left-
-	 *  recursive grammars.
-	 *
-	 *  Ok, backing this out to use exact match again for speed.  We will
+	 *  We could walk configurations linearly doing the comparison instead
+	 *  of a set for exact matches but it's much slower because you can't
+	 *  do a Set lookup.  I use exact match as ANTLR
 	 *  always detect the conflict later when checking for context suffixes...
-	 *  I was just trying to prevent unnecessary closures for random crap
-	 *  submitted by newbies.  Instead now I check for left-recursive stuff
-	 *  and terminate before analysis obviates the need to do this more
-	 *  expensive computation.
+	 *  I check for left-recursive stuff and terminate before analysis to
+	 *  avoid need to do this more expensive computation.
 	 *
 	 *  12-31-2007: I had to use the loop again rather than simple
 	 *  closureBusy.contains(proposedNFAConfiguration) lookup.  The
@@ -783,11 +771,14 @@ public class NFAToDFAConverter {
 	 *  This could be because it doesn't properly compute then resolve
 	 *  a predicate expression.  Seems to fix unit test:
 	 *  TestSemanticPredicates.testSemanticContextPreventsEarlyTerminationOfClosure()
+	 *  Changing back to Set from List.  Changed a large grammar from 8 minutes
+	 *  to 11 seconds.  Cool.  Closing ANTLR-235.
 	 */
 	public static boolean closureIsBusy(DFAState d,
 										NFAConfiguration proposedNFAConfiguration)
 	{
-		//boolean busy = d.closureBusy.contains(proposedNFAConfiguration);
+		return d.closureBusy.contains(proposedNFAConfiguration);
+/*
 		int numConfigs = d.closureBusy.size();
 		// Check epsilon cycle (same state, same alt, same context)
 		for (int i = 0; i < numConfigs; i++) {
@@ -801,6 +792,7 @@ public class NFAToDFAConverter {
 			}
 		}
 		return false;
+		*/
 	}
 
 	/** Given the set of NFA states in DFA state d, find all NFA states
