@@ -1586,7 +1586,7 @@ public class NFAToDFAConverter {
 				}
 			}
 			// add a transition to pred target from d
-			d.addTransition(predDFATarget, new Label(c.semanticContext));
+			d.addTransition(predDFATarget, new PredicateLabel(c.semanticContext));
 		}
 	}
 

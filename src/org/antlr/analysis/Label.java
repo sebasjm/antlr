@@ -130,18 +130,6 @@ public class Label implements Comparable, Cloneable {
         this.label = label;
     }
 
-    /** Make a semantic predicate label */
-    public Label(GrammarAST predicateASTNode) {
-        this(SEMPRED);
-        this.semanticContext = new SemanticContext.Predicate(predicateASTNode);
-    }
-
-    /** Make a semantic predicates label */
-    public Label(SemanticContext semCtx) {
-        this(SEMPRED);
-        this.semanticContext = semCtx;
-    }
-
     /** Make a set label */
     public Label(IntSet labelSet) {
 		if ( labelSet==null ) {
@@ -211,7 +199,7 @@ public class Label implements Comparable, Cloneable {
     }
 
     public boolean isSemanticPredicate() {
-        return label==SEMPRED;
+		return false;
     }
 
     public boolean isSet() {

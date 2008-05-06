@@ -103,7 +103,7 @@ public class LL1DFA extends DFA {
 					if ( synpred == null ) {
 						synpred = new SemanticContext.TruePredicate();
 					}
-					s.addTransition(predDFATarget, new Label(synpred));
+					s.addTransition(predDFATarget, new PredicateLabel(synpred));
 				}
 			}
 		}

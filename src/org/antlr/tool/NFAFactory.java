@@ -247,7 +247,7 @@ public class NFAFactory {
 		}
 		NFAState left = newState();
         NFAState right = newState();
-        Transition e = new Transition(new Label(pred), right);
+        Transition e = new Transition(new PredicateLabel(pred), right);
         left.addTransition(e);
         StateCluster g = new StateCluster(left, right);
         return g;
