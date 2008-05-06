@@ -107,7 +107,11 @@ _last = self.input.LT(1)
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <finishedBacktracking({
+<if(hetero)>
+<label>_tree = <hetero>(<label>)
+<else>
 <label>_tree = self.adaptor.dupNode(<label>)
+<endif><\n>
 self.adaptor.addChild(root_<treeLevel>, <label>_tree)
 })>
 <endif>
@@ -125,7 +129,11 @@ _last = self.input.LT(1)
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <finishedBacktracking({
+<if(hetero)>
+<label>_tree = <hetero>(<label>)
+<else>
 <label>_tree = self.adaptor.dupNode(<label>)
+<endif><\n>
 root_<treeLevel> = self.adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
 })>
 <endif>
@@ -143,7 +151,11 @@ _last = self.input.LT(1)
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <finishedBacktracking({
+<if(hetero)>
+<label>_tree = <hetero>(<label>)
+<else>
 <label>_tree = self.adaptor.dupNode(<label>)
+<endif><\n>
 self.adaptor.addChild(root_<treeLevel>, <label>_tree)
 })>
 <endif>
@@ -165,7 +177,11 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <finishedBacktracking({
+<if(hetero)>
+<label>_tree = <hetero>(<label>)
+<else>
 <label>_tree = self.adaptor.dupNode(<label>)
+<endif><\n>
 root_<treeLevel> = self.adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
 })>
 <endif>

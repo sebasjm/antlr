@@ -750,5 +750,49 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("ROOT<V>@1", found)
 
 
+    def testTreeParserAutoHeteroAST(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {
+                language=Python;
+                output=AST;
+            }
+            a : ID ';' ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+        
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {
+                language=Python;
+                output=AST;
+                ASTLabelType=CommonTree;
+                tokenVocab=T;
+            }
+            tokens { ROOT; }
+            @header {
+            class V(CommonTree):
+                def toString(self):
+                    return CommonTree.toString(self) + "<V>"
+                __str__ = toString
+
+            }
+            
+            a : ID<V> ';'<V>;
+            ''')
+            
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            input="abc;"
+            )
+
+        self.failUnlessEqual("abc<V> ;<V>", found)
+
+
 if __name__ == '__main__':
     unittest.main()
