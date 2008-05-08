@@ -347,6 +347,11 @@ public class Rule {
 	}
 
 	public boolean hasRewrite(int i) {
+		if ( i >= altsWithRewrites.length ) {
+			ErrorManager.internalError("alt "+i+" exceeds number of "+name+
+									   "'s alts ("+altsWithRewrites.length+")");
+			return false;
+		}
 		return altsWithRewrites[i];
 	}
 

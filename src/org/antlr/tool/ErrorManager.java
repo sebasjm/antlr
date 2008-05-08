@@ -32,6 +32,7 @@ import org.antlr.Tool;
 import org.antlr.misc.BitSet;
 import org.antlr.analysis.DFAState;
 import org.antlr.analysis.DecisionProbe;
+import org.antlr.analysis.Label;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateErrorListener;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -678,10 +679,11 @@ public class ErrorManager {
 	}
 
 	public static void insufficientPredicates(DecisionProbe probe,
-											  List alts)
+											  DFAState d,
+											  Map<Integer, Set<Token>> altToUncoveredLocations)
 	{
 		getErrorState().warnings++;
-		Message msg = new GrammarInsufficientPredicatesMessage(probe,alts);
+		Message msg = new GrammarInsufficientPredicatesMessage(probe,d,altToUncoveredLocations);
 		getErrorState().warningMsgIDs.add(msg.msgID);
 		getErrorListener().warning(msg);
 	}

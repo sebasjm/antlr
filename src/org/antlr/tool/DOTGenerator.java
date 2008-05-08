@@ -185,7 +185,7 @@ public class DOTGenerator {
         // special case: if decision point, then line up the alt start states
         // unless it's an end of block
 		if ( ((NFAState)s).isDecisionState() ) {
-			GrammarAST n = ((NFAState)s).getAssociatedASTNode();
+			GrammarAST n = ((NFAState)s).associatedASTNode;
 			if ( n!=null && n.getType()!=ANTLRParser.EOB ) {
 				StringTemplate rankST = stlib.getInstanceOf("org/antlr/tool/templates/dot/decision-rank");
 				NFAState alt = (NFAState)s;
@@ -223,8 +223,11 @@ public class DOTGenerator {
 				walkRuleNFACreatingDOT(dot, rr.followState);
                 continue;
             }
-			if ( edge.isEpsilon() ) {
-				edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/epsilon-edge");				
+			if ( edge.isAction() ) {
+				edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/action-edge");
+			}
+			else if ( edge.isEpsilon() ) {
+				edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/epsilon-edge");
 			}
 			else {
 				edgeST = stlib.getInstanceOf("org/antlr/tool/templates/dot/edge");

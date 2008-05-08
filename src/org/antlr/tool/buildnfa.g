@@ -193,7 +193,7 @@ rule
 					// attach start node to block for this rule
                     Rule thisR = grammar.getLocallyDefinedRule(r);
 					NFAState start = thisR.startState;
-					start.setAssociatedASTNode(#id);
+					start.associatedASTNode = #id;
 					start.addTransition(new Transition(Label.EPSILON, b.left));
 
 					// track decision if > 1 alts
@@ -307,8 +307,8 @@ element returns [StateCluster g=null]
     |   g=ebnf
     |   g=tree
     |   #( SYNPRED block )
-    |   ACTION
-    |   FORCED_ACTION
+    |   ACTION {g = factory.build_Action(#ACTION);}
+    |   FORCED_ACTION {g = factory.build_Action(#FORCED_ACTION);}
     |   pred:SEMPRED {g = factory.build_SemanticPredicate(#pred);}
     |   spred:SYN_SEMPRED {g = factory.build_SemanticPredicate(#spred);}
     |   bpred:BACKTRACK_SEMPRED {g = factory.build_SemanticPredicate(#bpred);}
@@ -403,14 +403,14 @@ StateCluster down=null, up=null;
 		   {el=(GrammarAST)_t;}
 		   g=element
 		   {
-           down = factory.build_Atom(Label.DOWN);
+           down = factory.build_Atom(Label.DOWN, el);
            // TODO set following states for imaginary nodes?
            //el.followingNFAState = down.right;
 		   g = factory.build_AB(g,down);
 		   }
 		   ( {el=(GrammarAST)_t;} e=element {g = factory.build_AB(g,e);} )*
 		   {
-           up = factory.build_Atom(Label.UP);
+           up = factory.build_Atom(Label.UP, el);
            //el.followingNFAState = up.right;
 		   g = factory.build_AB(g,up);
 		   // tree roots point at right edge of DOWN for LOOK computation later
@@ -438,7 +438,7 @@ atom_or_notatom returns [StateCluster g=null]
 								              #c.token,
 									          #c.getText());
                 }
-	            g=factory.build_Set(notAtom);
+	            g=factory.build_Set(notAtom,#n);
 	           }
             |  t:TOKEN_REF (ast3:ast_suffix)?
 	           {
@@ -466,7 +466,7 @@ atom_or_notatom returns [StateCluster g=null]
 							              #t.token,
 								          #t.getText());
                }
-	           g=factory.build_Set(notAtom);
+	           g=factory.build_Set(notAtom,#n);
 	           }
             |  g=set
 	           {
@@ -483,7 +483,7 @@ atom_or_notatom returns [StateCluster g=null]
 				  			              grammar,
 							              #n.token);
                }
-	           g=factory.build_Set(s);
+	           g=factory.build_Set(s,#n);
 	           }
             )
         	{#n.followingNFAState = g.right;}
@@ -521,8 +521,7 @@ atom[String scopeName] returns [StateCluster g=null]
             }
         }
         else {
-            int tokenType = grammar.getTokenType(t.getText());
-            g = factory.build_Atom(tokenType);
+            g = factory.build_Atom(t);
             t.followingNFAState = g.right;
         }
         }
@@ -530,11 +529,10 @@ atom[String scopeName] returns [StateCluster g=null]
     |   #( c:CHAR_LITERAL  (as3:ast_suffix)? )
     	{
     	if ( grammar.type==Grammar.LEXER ) {
-    		g = factory.build_CharLiteralAtom(c.getText());
+    		g = factory.build_CharLiteralAtom(c);
     	}
     	else {
-            int tokenType = grammar.getTokenType(c.getText());
-            g = factory.build_Atom(tokenType);
+            g = factory.build_Atom(c);
             c.followingNFAState = g.right;
     	}
     	}
@@ -542,11 +540,10 @@ atom[String scopeName] returns [StateCluster g=null]
     |   #( s:STRING_LITERAL  (as4:ast_suffix)? )
     	{
      	if ( grammar.type==Grammar.LEXER ) {
-     		g = factory.build_StringLiteralAtom(s.getText());
+     		g = factory.build_StringLiteralAtom(s);
      	}
      	else {
-             int tokenType = grammar.getTokenType(s.getText());
-             g = factory.build_Atom(tokenType);
+             g = factory.build_Atom(s);
              s.followingNFAState = g.right;
      	}
      	}
@@ -571,7 +568,7 @@ IntSet elements=new IntervalSet();
            EOB
          )
         {
-        g = factory.build_Set(elements);
+        g = factory.build_Set(elements,#b);
         #b.followingNFAState = g.right;
         #b.setValue = elements; // track set value of this block
         }

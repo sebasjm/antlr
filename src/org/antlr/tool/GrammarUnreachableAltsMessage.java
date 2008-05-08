@@ -77,8 +77,8 @@ public class GrammarUnreachableAltsMessage extends Message {
 				// reset the line/col to the token definition
 				NFAState ruleStart =
 					probe.dfa.nfa.grammar.getRuleStartState(tokenName);
-				line = ruleStart.getAssociatedASTNode().getLine();
-				column = ruleStart.getAssociatedASTNode().getColumn();
+				line = ruleStart.associatedASTNode.getLine();
+				column = ruleStart.associatedASTNode.getColumn();
 				st.setAttribute("tokens", tokenName);
 			}
 		}

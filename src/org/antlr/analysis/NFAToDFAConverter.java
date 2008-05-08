@@ -29,10 +29,16 @@ package org.antlr.analysis;
 
 import org.antlr.misc.OrderedHashSet;
 import org.antlr.misc.Utils;
+import org.antlr.tool.ErrorManager;
 
 import java.util.*;
 
-/** Code that embodies the NFA conversion to DFA. */
+import antlr.Token;
+
+/** Code that embodies the NFA conversion to DFA. A new object is needed
+ *  per DFA (also required for thread safety if multiple conversions
+ *  launched).
+ */
 public class NFAToDFAConverter {
 	/** A list of DFA states we still need to process during NFA conversion */
 	protected List work = new LinkedList();
@@ -60,9 +66,10 @@ public class NFAToDFAConverter {
 	 */
 	public static boolean SINGLE_THREADED_NFA_CONVERSION = true;
 
+	protected boolean computingStartState = false;
+
 	public NFAToDFAConverter(DFA dfa) {
 		this.dfa = dfa;
-		NFAState nfaStartState = dfa.getNFADecisionStartState();
 		int nAlts = dfa.getNumberOfAlts();
 		initContextTrees(nAlts);
 	}
@@ -86,6 +93,11 @@ public class NFAToDFAConverter {
 			if ( k>0 && k==d.getLookaheadDepth() ) {
 				// we've hit max lookahead, make this a stop state
 				//System.out.println("stop state @k="+k+" (terminated early)");
+				/*
+				List<Label> sampleInputLabels = d.dfa.probe.getSampleNonDeterministicInputSequence(d);
+				String input = d.dfa.probe.getInputSequenceDisplay(sampleInputLabels);
+				System.out.println("sample input: "+input);
+				 */
 				resolveNonDeterminisms(d);
 				// Check to see if we need to add any semantic predicate transitions
 				if ( d.isResolvedWithPredicates() ) {
@@ -128,6 +140,7 @@ public class NFAToDFAConverter {
 	protected DFAState computeStartState() {
 		NFAState alt = dfa.decisionNFAStartState;
 		DFAState startState = dfa.newState();
+		computingStartState = true;
 		int i = 0;
 		int altNum = 1;
 		while ( alt!=null ) {
@@ -177,6 +190,7 @@ public class NFAToDFAConverter {
 		// NFA states.
 		dfa.addState(startState); // make sure dfa knows about this state
 		work.add(startState);
+		computingStartState = false;
 		return startState;
 	}
 
@@ -289,7 +303,7 @@ public class NFAToDFAConverter {
 							   "->"+t);
 							   */
 
-			// add if not in DFA yet
+			// add if not in DFA yet and then make d-label->t
 			DFAState targetState = addDFAStateToWorkList(t);
 
 			numberOfEdgesEmanating +=
@@ -683,16 +697,36 @@ public class NFAToDFAConverter {
 		else {
 			// recurse down any epsilon transitions
 			if ( transition0!=null && transition0.isEpsilon() ) {
+				boolean collectPredicatesAfterAction = collectPredicates;
+				if ( transition0.isAction() && collectPredicates ) {
+					collectPredicatesAfterAction = false;
+					/*
+					if ( computingStartState ) {
+						System.out.println("found action during prediction closure "+((ActionLabel)transition0.label).actionAST.token);
+					}
+					 */
+				}
 				closure((NFAState)transition0.target,
 						alt,
 						context,
 						semanticContext,
 						d,
-						collectPredicates
+						collectPredicatesAfterAction
 				);
 			}
 			else if ( transition0!=null && transition0.isSemanticPredicate() ) {
-				dfa.predicateVisible = true;
+				if ( computingStartState ) {
+					if ( collectPredicates ) {
+						// only indicate we can see a predicate if we're collecting preds;
+						// Could be computing start state & seen an action before this.
+						dfa.predicateVisible = true;
+					}
+					else {
+						// this state has a pred, but we can't see it.
+						dfa.hasPredicateBlockedByAction = true;
+						// System.out.println("found pred during prediction but blocked by action found previously");
+					}
+				}
 				// continue closure here too, but add the sem pred to ctx
 				SemanticContext newSemanticContext = semanticContext;
 				if ( collectPredicates ) {
@@ -854,7 +888,7 @@ public class NFAToDFAConverter {
 			if ( Label.intersect(label, edgeLabel) ) {
 				// found a transition with label;
 				// add NFA target to (potentially) new DFA state
-				labelDFATarget.addNFAConfiguration(
+				NFAConfiguration newC = labelDFATarget.addNFAConfiguration(
 					(NFAState)edge.target,
 					c.alt,
 					c.context,
@@ -1320,7 +1354,7 @@ public class NFAToDFAConverter {
 	protected boolean tryToResolveWithSemanticPredicates(DFAState d,
 														 Set nondeterministicAlts)
 	{
-		Map altToPredMap =
+		Map<Integer, SemanticContext> altToPredMap =
 				getPredicatesPerNonDeterministicAlt(d, nondeterministicAlts);
 
 		if ( altToPredMap.size()==0 ) {
@@ -1438,26 +1472,39 @@ public class NFAToDFAConverter {
 	 *  not tell us how to resolve anything.  So, if any NFA configuration
 	 *  in this DFA state does not have a semantic context, the alt cannot
 	 *  be resolved with a predicate.
+	 *
+	 *  If nonnull, incidentEdgeLabel tells us what NFA transition label
+	 *  we did a reach on to compute state d.  d may have insufficient
+	 *  preds, so we really want this for the error message.
 	 */
-	protected Map getPredicatesPerNonDeterministicAlt(DFAState d,
-													  Set nondeterministicAlts)
+	protected Map<Integer, SemanticContext> getPredicatesPerNonDeterministicAlt(DFAState d,
+																				Set nondeterministicAlts)
 	{
 		// map alt to combined SemanticContext
-		Map altToPredicateContextMap = new HashMap();
+		Map<Integer, SemanticContext> altToPredicateContextMap =
+			new HashMap<Integer, SemanticContext>();
 		// init the alt to predicate set map
-		Map altToSetOfContextsMap = new HashMap();
+		Map<Integer, Set<SemanticContext>> altToSetOfContextsMap =
+			new HashMap<Integer, Set<SemanticContext>>();
 		for (Iterator it = nondeterministicAlts.iterator(); it.hasNext();) {
 			Integer altI = (Integer) it.next();
-			altToSetOfContextsMap.put(altI, new HashSet());
+			altToSetOfContextsMap.put(altI, new HashSet<SemanticContext>());
 		}
-		Set altToIncompletePredicateContextSet = new HashSet();
+
+		/*
+		List<Label> sampleInputLabels = d.dfa.probe.getSampleNonDeterministicInputSequence(d);
+		String input = d.dfa.probe.getInputSequenceDisplay(sampleInputLabels);
+		System.out.println("sample input: "+input);
+		*/
+
 		// for each configuration, create a unique set of predicates
 		// Also, track the alts with at least one uncovered configuration
 		// (one w/o a predicate); tracks tautologies like p1||true
+		Map<Integer, Set<Token>> altToLocationsReachableWithoutPredicate = new HashMap<Integer, Set<Token>>();
+		Set<Integer> nondetAltsWithUncoveredConfiguration = new HashSet<Integer>();
 		//System.out.println("configs="+d.nfaConfigurations);
 		//System.out.println("configs with preds?"+d.atLeastOneConfigurationHasAPredicate);
 		//System.out.println("configs with preds="+d.configurationsWithPredicateEdges);
-
 		int numConfigs = d.nfaConfigurations.size();
 		for (int i = 0; i < numConfigs; i++) {
 			NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
@@ -1468,14 +1515,33 @@ public class NFAToDFAConverter {
 				if ( configuration.semanticContext !=
 					 SemanticContext.EMPTY_SEMANTIC_CONTEXT )
 				{
-					Set predSet = (Set)altToSetOfContextsMap.get(altI);
+					Set<SemanticContext> predSet = altToSetOfContextsMap.get(altI);
 					predSet.add(configuration.semanticContext);
 				}
 				else {
 					// if no predicate, but it's part of nondeterministic alt
 					// then at least one path exists not covered by a predicate.
 					// must remove predicate for this alt; track incomplete alts
-					altToIncompletePredicateContextSet.add(altI);
+					nondetAltsWithUncoveredConfiguration.add(altI);
+					/*
+					NFAState s = dfa.nfa.getState(configuration.state);
+					System.out.println("###\ndec "+dfa.decisionNumber+" alt "+configuration.alt+
+									   " enclosing rule for nfa state not covered "+
+									   s.enclosingRule);
+					if ( s.associatedASTNode!=null ) {
+						System.out.println("token="+s.associatedASTNode.token);
+					}
+					System.out.println("nfa state="+s);
+
+					if ( s.incidentEdgeLabel!=null && Label.intersect(incidentEdgeLabel, s.incidentEdgeLabel) ) {
+						Set<Token> locations = altToLocationsReachableWithoutPredicate.get(altI);
+						if ( locations==null ) {
+							locations = new HashSet<Token>();
+							altToLocationsReachableWithoutPredicate.put(altI, locations);
+						}
+						locations.add(s.associatedASTNode.token);
+					}
+					*/
 				}
 			}
 		}
@@ -1485,18 +1551,18 @@ public class NFAToDFAConverter {
 		// Also, track the list of incompletely covered alts: those alts
 		// with at least 1 predicate and at least one configuration w/o a
 		// predicate. We want this in order to report to the decision probe.
-		List incompletelyCoveredAlts = new ArrayList();
+		List<Integer> incompletelyCoveredAlts = new ArrayList<Integer>();
 		for (Iterator it = nondeterministicAlts.iterator(); it.hasNext();) {
 			Integer altI = (Integer) it.next();
-			Set predSet = (Set)altToSetOfContextsMap.get(altI);
-			if ( altToIncompletePredicateContextSet.contains(altI) ) {
-				if ( predSet.size()>0 ) {
-					incompletelyCoveredAlts.add(altI);
+			Set<SemanticContext> contextsForThisAlt = altToSetOfContextsMap.get(altI);
+			if ( nondetAltsWithUncoveredConfiguration.contains(altI) ) { // >= 1 config has no ctx
+				if ( contextsForThisAlt.size()>0 ) {    // && at least one pred
+					incompletelyCoveredAlts.add(altI);  // this alt incompleted covered
 				}
-				continue;
+				continue; // don't include at least 1 config has no ctx
 			}
 			SemanticContext combinedContext = null;
-			for (Iterator itrSet = predSet.iterator(); itrSet.hasNext();) {
+			for (Iterator itrSet = contextsForThisAlt.iterator(); itrSet.hasNext();) {
 				SemanticContext ctx = (SemanticContext) itrSet.next();
 				combinedContext =
 						SemanticContext.or(combinedContext,ctx);
@@ -1505,8 +1571,49 @@ public class NFAToDFAConverter {
 		}
 
 		if ( incompletelyCoveredAlts.size()>0 ) {
+			/*
+			System.out.println("prob in dec "+dfa.decisionNumber+" state="+d);
+			FASerializer serializer = new FASerializer(dfa.nfa.grammar);
+			String result = serializer.serialize(dfa.startState);
+			System.out.println("dfa: "+result);
+			System.out.println("incomplete alts: "+incompletelyCoveredAlts);
+			System.out.println("nondet="+nondeterministicAlts);
+			System.out.println("nondetAltsWithUncoveredConfiguration="+ nondetAltsWithUncoveredConfiguration);
+			System.out.println("altToCtxMap="+altToSetOfContextsMap);
+			System.out.println("altToPredicateContextMap="+altToPredicateContextMap);
+			*/
+			for (int i = 0; i < numConfigs; i++) {
+				NFAConfiguration configuration = (NFAConfiguration)d.nfaConfigurations.get(i);
+				Integer altI = Utils.integer(configuration.alt);
+				if ( incompletelyCoveredAlts.contains(altI) &&
+					 configuration.semanticContext == SemanticContext.EMPTY_SEMANTIC_CONTEXT )
+				{
+					NFAState s = dfa.nfa.getState(configuration.state);
+					/*
+					System.out.print("nondet config w/o context "+configuration+
+									 " incident "+(s.incidentEdgeLabel!=null?s.incidentEdgeLabel.toString(dfa.nfa.grammar):null));
+					if ( s.associatedASTNode!=null ) {
+						System.out.print(" token="+s.associatedASTNode.token);
+					}
+					else System.out.println();
+					*/
+					if ( s.incidentEdgeLabel!=null ) {
+						if ( s.associatedASTNode==null && s.associatedASTNode.token==null ) {
+							ErrorManager.internalError("no AST/token for nonepsilon target w/o predicate");
+						}
+						else {
+							Set<Token> locations = altToLocationsReachableWithoutPredicate.get(altI);
+							if ( locations==null ) {
+								locations = new HashSet<Token>();
+								altToLocationsReachableWithoutPredicate.put(altI, locations);
+							}
+							locations.add(s.associatedASTNode.token);
+						}
+					}
+				}
+			}
 			dfa.probe.reportIncompletelyCoveredAlts(d,
-													incompletelyCoveredAlts);
+													altToLocationsReachableWithoutPredicate);
 		}
 
 		return altToPredicateContextMap;

@@ -34,6 +34,8 @@ import org.antlr.misc.IntervalSet;
 import java.util.Iterator;
 import java.util.List;
 
+import antlr.Token;
+
 /** Routines to construct StateClusters from EBNF grammar constructs.
  *  No optimization is done to remove unnecessary epsilon edges.
  *
@@ -84,11 +86,11 @@ public class NFAFactory {
 				s = ((RuleClosureTransition) t).followState;
 				continue;
 			}
-			if ( t.label.isEpsilon() && s.getNumberOfTransitions()==1 ) {
+			if ( t.label.isEpsilon() && !t.label.isAction() && s.getNumberOfTransitions()==1 ) {
 				// bypass epsilon transition and point to what the epsilon's
 				// target points to unless that epsilon transition points to
 				// a block or loop etc..  Also don't collapse epsilons that
-				// point at the last node of the alt
+				// point at the last node of the alt. Don't collapse action edges
 				NFAState epsilonTarget = (NFAState)t.target;
 				if ( epsilonTarget.endOfBlockStateNumber==State.INVALID_STATE_NUMBER &&
 					 epsilonTarget.transition[0] !=null )
@@ -105,22 +107,29 @@ public class NFAFactory {
 	}
 
 	/** From label A build Graph o-A->o */
-	public StateCluster build_Atom(int label) {
+	public StateCluster build_Atom(int label, GrammarAST associatedAST) {
 		NFAState left = newState();
 		NFAState right = newState();
+		left.associatedASTNode = associatedAST;
+		right.associatedASTNode = associatedAST;
 		transitionBetweenStates(left, right, label);
 		StateCluster g = new StateCluster(left, right);
 		return g;
 	}
 
+	public StateCluster build_Atom(GrammarAST atomAST) {
+		int tokenType = nfa.grammar.getTokenType(atomAST.getText());
+		return build_Atom(tokenType, atomAST);
+	}
+
 	/** From set build single edge graph o->o-set->o.  To conform to
      *  what an alt block looks like, must have extra state on left.
      */
-	public StateCluster build_Set(IntSet set) {
-        //NFAState start = newState();
+	public StateCluster build_Set(IntSet set, GrammarAST associatedAST) {
         NFAState left = newState();
-        //transitionBetweenStates(start, left, Label.EPSILON);
         NFAState right = newState();
+		left.associatedASTNode = associatedAST;
+		right.associatedASTNode = associatedAST;
 		Label label = new Label(set);
 		Transition e = new Transition(label,right);
         left.addTransition(e);
@@ -155,9 +164,9 @@ public class NFAFactory {
 
 	/** From char 'c' build StateCluster o-intValue(c)->o
 	 */
-	public StateCluster build_CharLiteralAtom(String charLiteral) {
-        int c = Grammar.getCharValueFromGrammarCharLiteral(charLiteral);
-		return build_Atom(c);
+	public StateCluster build_CharLiteralAtom(GrammarAST charLiteralAST) {
+        int c = Grammar.getCharValueFromGrammarCharLiteral(charLiteralAST.getText());
+		return build_Atom(c, charLiteralAST);
 	}
 
 	/** From char 'c' build StateCluster o-intValue(c)->o
@@ -177,10 +186,10 @@ public class NFAFactory {
      *  the DFA.  Machine== o-'f'->o-'o'->o-'g'->o and has n+1 states
      *  for n characters.
      */
-    public StateCluster build_StringLiteralAtom(String stringLiteral) {
+    public StateCluster build_StringLiteralAtom(GrammarAST stringLiteralAST) {
         if ( nfa.grammar.type==Grammar.LEXER ) {
 			StringBuffer chars =
-				Grammar.getUnescapedStringFromGrammarStringLiteral(stringLiteral);
+				Grammar.getUnescapedStringFromGrammarStringLiteral(stringLiteralAST.getText());
             NFAState first = newState();
             NFAState last = null;
             NFAState prev = first;
@@ -194,8 +203,8 @@ public class NFAFactory {
         }
 
         // a simple token reference in non-Lexers
-        int tokenType = nfa.grammar.getTokenType(stringLiteral);
-        return build_Atom(tokenType);
+        int tokenType = nfa.grammar.getTokenType(stringLiteralAST.getText());
+		return build_Atom(tokenType, stringLiteralAST);
     }
 
     /** For reference to rule r, build
@@ -234,24 +243,37 @@ public class NFAFactory {
         return g;
     }
 
-    /** Build what amounts to an epsilon transition with a semantic
-     *  predicate action.  The pred is a pointer into the AST of
-     *  the SEMPRED token.
-     */
-    public StateCluster build_SemanticPredicate(GrammarAST pred) {
+	/** Build what amounts to an epsilon transition with a semantic
+	 *  predicate action.  The pred is a pointer into the AST of
+	 *  the SEMPRED token.
+	 */
+	public StateCluster build_SemanticPredicate(GrammarAST pred) {
 		// don't count syn preds
 		if ( !pred.getText().toUpperCase()
-			    .startsWith(Grammar.SYNPRED_RULE_PREFIX.toUpperCase()) )
+				.startsWith(Grammar.SYNPRED_RULE_PREFIX.toUpperCase()) )
 		{
 			nfa.grammar.numberOfSemanticPredicates++;
 		}
 		NFAState left = newState();
-        NFAState right = newState();
-        Transition e = new Transition(new PredicateLabel(pred), right);
-        left.addTransition(e);
-        StateCluster g = new StateCluster(left, right);
-        return g;
-    }
+		NFAState right = newState();
+		Transition e = new Transition(new PredicateLabel(pred), right);
+		left.addTransition(e);
+		StateCluster g = new StateCluster(left, right);
+		return g;
+	}
+
+	/** Build what amounts to an epsilon transition with an action.
+	 *  The action goes into NFA though it is ignored during analysis.
+	 *  It slows things down a bit, but I must ignore predicates after
+	 *  having seen an action (5-5-2008).
+	 */
+	public StateCluster build_Action(GrammarAST action) {
+		NFAState left = newState();
+		NFAState right = newState();
+		Transition e = new Transition(new ActionLabel(action), right);
+		left.addTransition(e);
+		return new StateCluster(left, right);
+	}
 
 	/** add an EOF transition to any rule end NFAState that points to nothing
      *  (i.e., for all those rules not invoked by another rule).  These

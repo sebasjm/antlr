@@ -3419,7 +3419,7 @@ public class TestAttributes extends BaseTest {
 			}
 		}
 		assertTrue("no error; "+expectedMessage.msgID+" expected", equeue.errors.size() > 0);
-		assertNotNull("couldn't find expected error: "+expectedMessage.msgID, foundMsg);
+		assertNotNull("couldn't find expected error: "+expectedMessage.msgID+" in "+equeue, foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
 				   foundMsg instanceof GrammarSemanticsMessage);
 		assertEquals(expectedMessage.arg, foundMsg.arg);

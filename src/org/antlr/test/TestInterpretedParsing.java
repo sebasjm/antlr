@@ -174,7 +174,7 @@ public class TestInterpretedParsing extends BaseTest {
 		ParseTree t = parseEngine.parse("prog");
 		String result = t.toStringTree();
 		String expecting =
-			"(<grammar p> (prog while x { (assign i = (expr NoViableAltException(9!=[4:1: expr : ( INT | FLOAT | ID );])))))";
+			"(<grammar p> (prog while x { (assign i = (expr NoViableAltException(9@[4:1: expr : ( INT | FLOAT | ID );])))))";
 		assertEquals(expecting, result);
 	}
 

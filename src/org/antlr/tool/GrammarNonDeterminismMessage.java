@@ -79,8 +79,8 @@ public class GrammarNonDeterminismMessage extends Message {
 				// reset the line/col to the token definition (pick last one)
 				NFAState ruleStart =
 					probe.dfa.nfa.grammar.getRuleStartState(tokenName);
-				line = ruleStart.getAssociatedASTNode().getLine();
-				column = ruleStart.getAssociatedASTNode().getColumn();
+				line = ruleStart.associatedASTNode.getLine();
+				column = ruleStart.associatedASTNode.getColumn();
 				st.setAttribute("disabled", tokenName);
 			}
 		}
@@ -121,6 +121,7 @@ public class GrammarNonDeterminismMessage extends Message {
 				}
 			}
 		}
+		st.setAttribute("hasPredicateBlockedByAction", problemState.dfa.hasPredicateBlockedByAction);
 		return super.toString(st);
 	}
 

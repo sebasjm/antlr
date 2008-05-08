@@ -152,9 +152,12 @@ public class FASerializer {
             Transition edge = (Transition) s.transition(i);
             StringBuffer buf = new StringBuffer();
             buf.append(stateStr);
-            if ( edge.isEpsilon() ) {
-                buf.append("->");
-            }
+			if ( edge.isAction() ) {
+				buf.append("-{}->");
+			}
+			else if ( edge.isEpsilon() ) {
+				buf.append("->");
+			}
 			else if ( edge.isSemanticPredicate() ) {
 				buf.append("-{"+edge.label.getSemanticContext()+"}?->");
 			}

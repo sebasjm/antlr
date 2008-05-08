@@ -84,7 +84,9 @@ public class NFAConfiguration {
      */
     protected boolean singleAtomTransitionEmanating;
 
-    public NFAConfiguration(int state,
+	//protected boolean addedDuringClosure = true;
+
+	public NFAConfiguration(int state,
                             int alt,
                             NFAContext context,
                             SemanticContext semanticContext)

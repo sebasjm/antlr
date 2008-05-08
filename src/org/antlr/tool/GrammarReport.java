@@ -232,7 +232,7 @@ public class GrammarReport {
 			buf.append(dfa.decisionNumber);
 			buf.append(" location ");
 			GrammarAST decisionAST =
-				dfa.decisionNFAStartState.getAssociatedASTNode();
+				dfa.decisionNFAStartState.associatedASTNode;
 			buf.append(decisionAST.getLine());
 			buf.append(":");
 			buf.append(decisionAST.getColumn());

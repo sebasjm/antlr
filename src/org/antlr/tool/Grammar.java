@@ -1301,7 +1301,7 @@ outer:
 		}
 		String predName =
 			SYNPRED_RULE_PREFIX+(nameToSynpredASTMap.size() + 1)+"_"+name;
-		blockAST.setTreeEnclosingRuleName(predName);
+		blockAST.setTreeEnclosingRuleNameDeeply(predName);
 		nameToSynpredASTMap.put(predName, blockAST);
 		return predName;
 	}
@@ -1846,6 +1846,15 @@ outer:
 		return false;
 	}
 
+	public boolean isAtomTokenType(int ttype) {
+		return ttype == ANTLRParser.WILDCARD||
+			   ttype == ANTLRParser.CHAR_LITERAL||
+			   ttype == ANTLRParser.CHAR_RANGE||
+			   ttype == ANTLRParser.STRING_LITERAL||
+			   ttype == ANTLRParser.NOT||
+			   (type != LEXER && ttype == ANTLRParser.TOKEN_REF);
+	}
+
 	public int getTokenType(String tokenName) {
 		Integer I = null;
 		if ( tokenName.charAt(0)=='\'') {
@@ -2320,7 +2329,7 @@ outer:
 	public boolean getAutoBacktrackMode(int decision) {
 		NFAState decisionNFAStartState = getDecisionNFAStartState(decision);
 		String autoBacktrack =
-			(String)decisionNFAStartState.getAssociatedASTNode().getBlockOption("backtrack");
+			(String)decisionNFAStartState.associatedASTNode.getBlockOption("backtrack");
 		if ( autoBacktrack==null ) {
 			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
 		}
@@ -2610,7 +2619,7 @@ outer:
 	public void setLookaheadDFA(int decision, DFA lookaheadDFA) {
 		Decision d = createDecision(decision);
 		d.dfa = lookaheadDFA;
-		GrammarAST ast = d.startState.getAssociatedASTNode();
+		GrammarAST ast = d.startState.associatedASTNode;
 		ast.setLookaheadDFA(lookaheadDFA);
 	}
 

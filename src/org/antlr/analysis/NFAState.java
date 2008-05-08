@@ -29,6 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.tool.GrammarAST;
 import org.antlr.tool.Rule;
+import org.antlr.tool.ErrorManager;
 
 /** A state within an NFA. At most 2 transitions emanate from any NFA state. */
 public class NFAState extends State {
@@ -45,6 +46,12 @@ public class NFAState extends State {
 	/** How many transitions; 0, 1, or 2 transitions */
 	int numTransitions = 0;
 	public Transition[] transition = new Transition[MAX_TRANSITIONS];
+
+	/** For o-A->o type NFA tranitions, record the label that leads to this
+	 *  state.  Useful for creating rich error messages when we find
+	 *  insufficiently (with preds) covered states.
+	 */
+	public Label incidentEdgeLabel;
 
 	/** Which NFA are we in? */
 	public NFA nfa = null;
@@ -88,7 +95,7 @@ public class NFAState extends State {
 	 *  report line:col info.  Could also be used to track line:col
 	 *  for elements such as token refs.
 	 */
-	protected GrammarAST associatedASTNode;
+	public GrammarAST associatedASTNode;
 
 	/** Is this state the sole target of an EOT transition? */
 	protected boolean EOTTargetState = false;
@@ -116,6 +123,15 @@ public class NFAState extends State {
 		if ( e!=null ) {
 			transition[numTransitions] = e;
 			numTransitions++;
+			// Set the "back pointer" of the target state so that it
+			// knows about the label of the incoming edge.
+			Label label = e.label;
+			if ( label.isAtom() || label.isSet() ) {
+				if ( ((NFAState)e.target).incidentEdgeLabel!=null ) {
+					ErrorManager.internalError("Clobbered incident edge");
+				}
+				((NFAState)e.target).incidentEdgeLabel = e.label;
+			}
 		}
 	}
 
@@ -205,14 +221,6 @@ public class NFAState extends State {
 	public void setDecisionASTNode(GrammarAST decisionASTNode) {
 		decisionASTNode.setNFAStartState(this);
 		this.associatedASTNode = decisionASTNode;
-	}
-
-	public GrammarAST getAssociatedASTNode() {
-		return associatedASTNode;
-	}
-
-	 public void setAssociatedASTNode(GrammarAST ASTNode) {
-		this.associatedASTNode = ASTNode;
 	}
 
 	public String getDescription() {

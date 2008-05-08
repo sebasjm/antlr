@@ -256,12 +256,17 @@ public class DFAState extends State {
 		}
     }
 
-	public void addNFAConfiguration(NFAState state, int alt, NFAContext context, SemanticContext semanticContext) {
+	public NFAConfiguration addNFAConfiguration(NFAState state,
+												int alt,
+												NFAContext context,
+												SemanticContext semanticContext)
+	{
 		NFAConfiguration c = new NFAConfiguration(state.stateNumber,
 												  alt,
 												  context,
 												  semanticContext);
 		addNFAConfiguration(state, c);
+		return c;
 	}
 
 	/** Add label uniquely and disjointly; intersection with

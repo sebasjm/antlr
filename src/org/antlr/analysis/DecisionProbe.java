@@ -36,6 +36,8 @@ import org.antlr.misc.MultiMap;
 
 import java.util.*;
 
+import antlr.Token;
+
 /** Collection of information about what is wrong with a decision as
  *  discovered while building the DFA predictor.
  *
@@ -106,8 +108,8 @@ public class DecisionProbe {
 	 *  For example, p1||true gets reduced to true and so leaves
 	 *  whole alt uncovered.  This maps DFA state to the set of alts
 	 */
-	protected Map<DFAState,List<Integer>> stateToIncompletelyCoveredAltsMap =
-		new HashMap<DFAState,List<Integer>>();
+	protected Map<DFAState,Map<Integer, Set<Token>>> stateToIncompletelyCoveredAltsMap =
+		new HashMap<DFAState,Map<Integer, Set<Token>>>();
 
 	/** The set of states w/o emanating edges and w/o resolving sem preds. */
 	protected Set<DFAState> danglingStates = new HashSet<DFAState>();
@@ -297,10 +299,10 @@ public class DecisionProbe {
 	 *  from the start state of the DFA to the targetState (which is known
 	 *  to have a problem).
 	 */
-	public List getSampleNonDeterministicInputSequence(DFAState targetState) {
+	public List<Label> getSampleNonDeterministicInputSequence(DFAState targetState) {
 		Set dfaStates = getDFAPathStatesToTarget(targetState);
-		statesVisitedDuringSampleSequence = new HashSet();
-		List labels = new ArrayList(); // may access ith element; use array
+		statesVisitedDuringSampleSequence = new HashSet<Integer>();
+		List<Label> labels = new ArrayList<Label>(); // may access ith element; use array
 		if ( dfa==null || dfa.startState==null ) {
 			return labels;
 		}
@@ -406,8 +408,8 @@ public class DecisionProbe {
 	/** Return a list of alts whose predicate context was insufficient to
 	 *  resolve a nondeterminism for state d.
 	 */
-    public List getIncompletelyCoveredAlts(DFAState d) {
-		return (List)stateToIncompletelyCoveredAltsMap.get(d);
+	public Map<Integer, Set<Token>> getIncompletelyCoveredAlts(DFAState d) {
+		return stateToIncompletelyCoveredAltsMap.get(d);
 	}
 
 	public void issueWarnings() {
@@ -437,6 +439,10 @@ public class DecisionProbe {
 				problemStates.iterator();
 			while (	it.hasNext() && !dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() ) {
 				DFAState d = (DFAState) it.next();
+				Map<Integer, Set<Token>> insufficientAltToLocations = getIncompletelyCoveredAlts(d);
+				if ( insufficientAltToLocations!=null && insufficientAltToLocations.size()>0 ) {
+					ErrorManager.insufficientPredicates(this,d,insufficientAltToLocations);
+				}
 				// don't report problem if resolved
 				if ( resolvedStates==null || !resolvedStates.contains(d) ) {
 					// first strip last alt from disableAlts if it's wildcard
@@ -446,10 +452,6 @@ public class DecisionProbe {
 					if ( disabledAlts.size()>0 ) {
 						ErrorManager.nondeterminism(this,d);
 					}
-				}
-				List insufficientAlts = getIncompletelyCoveredAlts(d);
-				if ( insufficientAlts!=null && insufficientAlts.size()>0 ) {
-					ErrorManager.insufficientPredicates(this,insufficientAlts);
 				}
 			}
 		}
@@ -694,9 +696,9 @@ public class DecisionProbe {
 	}
 
 	public void reportIncompletelyCoveredAlts(DFAState d,
-											  List alts)
+											  Map<Integer, Set<Token>> altToLocationsReachableWithoutPredicate)
 	{
-		stateToIncompletelyCoveredAltsMap.put(d, alts);
+		stateToIncompletelyCoveredAltsMap.put(d, altToLocationsReachableWithoutPredicate);
 	}
 
 	// S U P P O R T
@@ -770,7 +772,7 @@ public class DecisionProbe {
 	protected void getSampleInputSequenceUsingStateSet(State startState,
 													   State targetState,
 													   Set states,
-													   List labels)
+													   List<Label> labels)
 	{
 		statesVisitedDuringSampleSequence.add(startState.stateNumber);
 

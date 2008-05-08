@@ -34,6 +34,10 @@ import org.antlr.misc.BitSet;
 import org.antlr.tool.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.Map;
+
+import antlr.Token;
 
 public class TestSemanticPredicates extends BaseTest {
 
@@ -48,7 +52,7 @@ public class TestSemanticPredicates extends BaseTest {
 		String expecting =
 			".s0-A->:s1=>1\n" +
 			".s0-B->:s2=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testLL_1_Pred() throws Exception {
@@ -59,7 +63,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-A->.s1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testLL_1_Pred_forced_k_1() throws Exception {
@@ -71,7 +75,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-A->.s1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testLL_2_Pred() throws Exception {
@@ -83,7 +87,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-B->.s2\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{p2}?->:s4=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testPredicatedLoop() throws Exception {
@@ -95,7 +99,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-EOF->:s1=>3\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{p2}?->:s4=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testPredicatedToStayInLoop() throws Exception {
@@ -116,7 +120,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-A->.s1\n" +
 			".s1-{(p1&&p1a)}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testOrPredicates() throws Exception {
@@ -128,7 +132,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-A->.s1\n" +
 			".s1-{(p1||p1a)}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testIgnoresHoistingDepthGreaterThanZero() throws Exception {
@@ -138,8 +142,46 @@ public class TestSemanticPredicates extends BaseTest {
 		String expecting =
 			".s0-A->:s1=>1\n";
 		checkDecision(g, 1, expecting, new int[] {2},
-					  new int[] {1,2}, "A", null, null, 2);
+					  new int[] {1,2}, "A", null, null, 2, false);
 	}
+
+	public void testIgnoresPredsHiddenByActions() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : {a1} {p1}? A | {a2} {p2}? A ;");
+		String expecting =
+			".s0-A->:s1=>1\n";
+		checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "A", null, null, 2, true);
+	}
+
+	public void testIgnoresPredsHiddenByActionsOneAlt() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : {p1}? A | {a2} {p2}? A ;"); // ok since 1 pred visible
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-{p1}?->:s2=>1\n" +
+			".s1-{true}?->:s3=>2\n";
+		checkDecision(g, 1, expecting, null,
+					  null, null, null, null, 0, true);
+	}
+
+	/*
+	public void testIncompleteSemanticHoistedContextk2() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : b | A B;\n" +
+			"b : {p1}? A B | A B ;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-B->:s2=>1\n";
+		checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "A B", new int[] {1}, null, 3);
+	}	
+	 */
 
 	public void testHoist2() throws Exception {
 		Grammar g = new Grammar(
@@ -151,7 +193,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-A->.s1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testHoistCorrectContext() throws Exception {
@@ -164,7 +206,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-INT->:s2=>1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{p2}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testDefaultPredNakedAltIsLast() throws Exception {
@@ -177,7 +219,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-INT->:s2=>1\n" +
 			".s1-{p1}?->:s2=>1\n" +
 			".s1-{true}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testDefaultPredNakedAltNotLast() throws Exception {
@@ -190,7 +232,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-INT->:s3=>2\n" +
 			".s1-{!(p1)}?->:s2=>1\n" +
 			".s1-{p1}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testLeftRecursivePred() throws Exception {
@@ -247,7 +289,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-{p2}?->:s4=>3\n" +
 			".s1-{p3}?->:s5=>4\n" +
 			".s1-{true}?->:s6=>5\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testIgnorePredFromLL2AltPredUnionNeeded() throws Exception {
@@ -268,7 +310,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-{!((p3||p2))}?->:s5=>4\n" +
 			".s1-{p2}?->:s4=>3\n" +
 			".s1-{p3}?->:s6=>5\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testPredGets2SymbolSyntacticContext() throws Exception {
@@ -282,7 +324,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-B->.s2\n" +
 			".s2-{p1}?->:s3=>1\n" +
 			".s2-{true}?->:s4=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testMatchesLongestThenTestPred() throws Exception {
@@ -296,7 +338,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-B->:s3=>2\n" +
 			".s1-{p}?->:s2=>1\n" +
 			".s1-{q}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testPredsUsedAfterRecursionOverflow() throws Exception {
@@ -325,7 +367,7 @@ public class TestSemanticPredicates extends BaseTest {
 		}
 
 		assertEquals("unexpected number of expected problems", 0, equeue.size());
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testPredsUsedAfterK2FailsNoRecursionOverflow() throws Exception {
@@ -359,7 +401,7 @@ public class TestSemanticPredicates extends BaseTest {
 		}
 
 		assertEquals("unexpected number of expected problems", 0, equeue.size());
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testLexerMatchesLongestThenTestPred() throws Exception {
@@ -374,7 +416,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-<EOT>->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
-		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testLexerMatchesLongestMinusPred() throws Exception {
@@ -387,7 +429,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-'b'->:s3=>2\n" +
 			".s1-'a'..'b'->:s3=>2\n" +
 			".s1-<EOT>->:s2=>1\n";
-		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testGatedPred() throws Exception {
@@ -403,7 +445,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-<EOT>&&{(p||q)}?->.s2\n" +
 			".s2-{p}?->:s3=>1\n" +
 			".s2-{q}?->:s4=>2\n";
-		checkDecision(g, 2, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testGatedPredHoistsAndCanBeInStopState() throws Exception {
@@ -417,7 +459,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-'x'->:s2=>1\n" +
 			".s0-'y'&&{p}?->:s3=>1\n" +
 			".s0-EOF->:s1=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testGatedPredInCyclicDFA() throws Exception {
@@ -434,7 +476,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s2-<EOT>&&{(p||q)}?->.s3\n" +
 			".s3-{p}?->:s4=>1\n" +
 			".s3-{q}?->:s5=>2\n";
-		checkDecision(g, 3, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 3, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testGatedPredNotActuallyUsedOnEdges() throws Exception {
@@ -456,8 +498,8 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-'a'->.s1\n" +
 			".s1-'b'->:s2=>2\n" +
 			".s1-<EOT>->:s3=>1\n";
-		checkDecision(g, 1, expecting1, null, null, null, null, null, 0);
-		checkDecision(g, 2, expecting2, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting1, null, null, null, null, null, 0, false);
+		checkDecision(g, 2, expecting2, null, null, null, null, null, 0, false);
 	}
 
 	public void testGatedPredDoesNotForceAllToBeGated() throws Exception {
@@ -470,7 +512,7 @@ public class TestSemanticPredicates extends BaseTest {
 		String expecting =
 			".s0-B->:s1=>1\n" +
 			".s0-C&&{q}?->:s2=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testGatedPredDoesNotForceAllToBeGated2() throws Exception {
@@ -487,7 +529,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-C&&{(q&&r)}?->:s3=>2\n" +
 			".s1-{p}?->:s2=>1\n" +
 			".s1-{q}?->:s3=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	public void testORGatedPred() throws Exception {
@@ -504,7 +546,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-C&&{(q&&r)}?->:s3=>2\n" +
 			".s1-{(q&&s)}?->:s3=>2\n" +
 			".s1-{p}?->:s2=>1\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
 	/** The following grammar should yield an error that rule 'a' has
@@ -520,7 +562,65 @@ public class TestSemanticPredicates extends BaseTest {
 		String expecting =
 			".s0-B->:s1=>1\n";
 		checkDecision(g, 1, expecting, new int[] {2},
-					  new int[] {1,2}, "B", new int[] {1}, null, 3);
+					  new int[] {1,2}, "B", new int[] {1}, null, 3, false);
+	}
+
+	public void testIncompleteSemanticHoistedContextk2() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : b | A B;\n" +
+			"b : {p1}? A B | A B ;");
+		String expecting =
+			".s0-A->.s1\n" +
+			".s1-B->:s2=>1\n";
+		checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "A B", new int[] {1}, null, 3, false);
+	}
+
+	public void testIncompleteSemanticHoistedContextInFOLLOW() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"options {k=1;}\n" + // limit to k=1 because it's LL(2); force pred hoist
+			"a : A? ;\n" + // need FOLLOW
+			"b : X a {p1}? A | Y a A ;"); // only one A is covered
+		String expecting =
+			".s0-A->:s1=>1\n"; // s0-EOF->s2 branch pruned during optimization
+		checkDecision(g, 1, expecting, new int[] {2},
+					  new int[] {1,2}, "A", new int[] {2}, null, 3, false);
+	}
+
+	public void testIncompleteSemanticHoistedContextInFOLLOWk2() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : (A B)? ;\n" + // need FOLLOW
+			"b : X a {p1}? A B | Y a A B | Z a ;"); // only first alt is covered
+		String expecting =
+			".s0-A->.s1\n" +
+			".s0-EOF->:s3=>2\n" +
+			".s1-B->:s2=>1\n";
+		checkDecision(g, 1, expecting, null,
+					  new int[] {1,2}, "A B", new int[] {2}, null, 2, false);
+	}
+
+	public void testIncompleteSemanticHoistedContextInFOLLOWDueToHiddenPred() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		Grammar g = new Grammar(
+			"parser grammar t;\n"+
+			"a : (A B)? ;\n" + // need FOLLOW
+			"b : X a {p1}? A B | Y a {a1} {p2}? A B | Z a ;"); // only first alt is covered
+		String expecting =
+			".s0-A->.s1\n" +
+			".s0-EOF->:s3=>2\n" +
+			".s1-B->:s2=>1\n";
+		checkDecision(g, 1, expecting, null,
+					  new int[] {1,2}, "A B", new int[] {2}, null, 2, true);
 	}
 
 	/** The following grammar should yield an error that rule 'a' has
@@ -544,7 +644,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-B->:s1=>1\n";
 		checkDecision(g, 1, expecting, new int[] {2},
 					  new int[] {1,2}, "B", new int[] {1},
-					  null, 3);
+					  null, 3, false);
 	}
 
 	public void testTooFewSemanticPredicates() throws Exception {
@@ -555,7 +655,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s0-A->:s1=>1\n";
 		checkDecision(g, 1, expecting, new int[] {2,3},
 					  new int[] {1,2,3}, "A",
-					  null, null, 2);
+					  null, null, 2, false);
 	}
 
 	public void testPredWithK1() throws Exception {
@@ -580,7 +680,7 @@ public class TestSemanticPredicates extends BaseTest {
 		int numWarnings = 0;
 		checkDecision(g, 3, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, insufficientPredAlts,
-					  danglingAlts, numWarnings);
+					  danglingAlts, numWarnings, false);
 	}
 
 	public void testPredWithArbitraryLookahead() throws Exception {
@@ -603,7 +703,7 @@ public class TestSemanticPredicates extends BaseTest {
 		int numWarnings = 0;
 		checkDecision(g, 3, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, insufficientPredAlts,
-					  danglingAlts, numWarnings);
+					  danglingAlts, numWarnings, false);
 	}
 
 
@@ -637,7 +737,7 @@ public class TestSemanticPredicates extends BaseTest {
 		int numWarnings = 0;
 		checkDecision(g, 3, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, insufficientPredAlts,
-					  danglingAlts, numWarnings);
+					  danglingAlts, numWarnings, false);
 	}
 
 	public void testSemanticContextPreventsEarlyTerminationOfClosure() throws Exception {
@@ -655,9 +755,8 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-SEMI->.s2\n" +
 			".s2-{(do||while||for)}?->:s3=>1\n" +
 			".s2-{true}?->:s4=>2\n";
-		checkDecision(g, 1, expecting, null, null, null, null, null, 0);
+		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
-
 
 	// S U P P O R T
 
@@ -675,7 +774,7 @@ public class TestSemanticPredicates extends BaseTest {
 		int numWarnings = 1;
 		checkDecision(g, 1, expecting, unreachableAlts,
 					  nonDetAlts, ambigInput, insufficientPredAlts,
-					  danglingAlts, numWarnings);
+					  danglingAlts, numWarnings, false);
 	}
 
 	protected void checkDecision(Grammar g,
@@ -686,7 +785,8 @@ public class TestSemanticPredicates extends BaseTest {
 								 String expectingAmbigInput,
 								 int[] expectingInsufficientPredAlts,
 								 int[] expectingDanglingAlts,
-								 int expectingNumWarnings)
+								 int expectingNumWarnings,
+								 boolean hasPredHiddenByAction)
 		throws Exception
 	{
 		DecisionProbe.verbose=true; // make sure we get all error info
@@ -729,7 +829,8 @@ public class TestSemanticPredicates extends BaseTest {
 		// check conflicting input
 		if ( expectingAmbigInput!=null ) {
 			// first, find nondet message
-			Message msg = (Message)equeue.warnings.get(0);
+			Message msg = getNonDeterminismMessage(equeue.warnings);
+			assertNotNull("no nondeterminism warning?", msg);
 			assertTrue("expecting nondeterminism; found "+msg.getClass().getName(),
 			msg instanceof GrammarNonDeterminismMessage);
 			GrammarNonDeterminismMessage nondetMsg =
@@ -754,12 +855,39 @@ public class TestSemanticPredicates extends BaseTest {
 			BitSet s2 = new BitSet();
 			s2.addAll(nonDetAlts);
 			assertEquals("nondet alts mismatch", s, s2);
+			assertEquals("mismatch between expected hasPredHiddenByAction", hasPredHiddenByAction,
+						 nondetMsg.problemState.dfa.hasPredicateBlockedByAction);
 		}
 		else {
 			// not expecting any nondet alts, make sure there are none
 			GrammarNonDeterminismMessage nondetMsg =
 				getNonDeterminismMessage(equeue.warnings);
 			assertNull("found nondet alts, but expecting none", nondetMsg);
+		}
+
+		if ( expectingInsufficientPredAlts!=null ) {
+			GrammarInsufficientPredicatesMessage insuffPredMsg =
+				getGrammarInsufficientPredicatesMessage(equeue.warnings);
+			assertNotNull("found no GrammarInsufficientPredicatesMessage alts; expecting: "+
+										str(expectingNonDetAlts), insuffPredMsg);
+			Map<Integer, Set<Token>> locations = insuffPredMsg.altToLocations;
+			Set actualAlts = locations.keySet();
+			BitSet s = new BitSet();
+			s.addAll(expectingInsufficientPredAlts);
+			BitSet s2 = new BitSet();
+			s2.addAll(actualAlts);
+			assertEquals("mismatch between insufficiently covered alts", s, s2);
+			assertEquals("mismatch between expected hasPredHiddenByAction", hasPredHiddenByAction,
+						 insuffPredMsg.problemState.dfa.hasPredicateBlockedByAction);
+		}
+		else {
+			// not expecting any nondet alts, make sure there are none
+			GrammarInsufficientPredicatesMessage nondetMsg =
+				getGrammarInsufficientPredicatesMessage(equeue.warnings);
+			if ( nondetMsg!=null ) {
+				System.out.println(equeue.warnings);
+			}
+			assertNull("found insufficiently covered alts, but expecting none", nondetMsg);
 		}
 
 		assertEquals(expecting, result);
@@ -770,6 +898,16 @@ public class TestSemanticPredicates extends BaseTest {
 			Message m = (Message) warnings.get(i);
 			if ( m instanceof GrammarNonDeterminismMessage ) {
 				return (GrammarNonDeterminismMessage)m;
+			}
+		}
+		return null;
+	}
+
+	protected GrammarInsufficientPredicatesMessage getGrammarInsufficientPredicatesMessage(List warnings) {
+		for (int i = 0; i < warnings.size(); i++) {
+			Message m = (Message) warnings.get(i);
+			if ( m instanceof GrammarInsufficientPredicatesMessage ) {
+				return (GrammarInsufficientPredicatesMessage)m;
 			}
 		}
 		return null;

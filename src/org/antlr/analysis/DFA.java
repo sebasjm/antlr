@@ -123,6 +123,8 @@ public class DFA {
 	 */
 	public boolean predicateVisible = false;
 
+	public boolean hasPredicateBlockedByAction = false;
+
 	/** Each alt in an NFA derived from a grammar must have a DFA state that
      *  predicts it lest the parser not know what to do.  Nondeterminisms can
      *  lead to this situation (assuming no semantic predicates can resolve
@@ -948,7 +950,7 @@ public class DFA {
      *  the loop back of a (...)+ block etc...
      */
     public GrammarAST getDecisionASTNode() {
-        return decisionNFAStartState.getAssociatedASTNode();
+        return decisionNFAStartState.associatedASTNode;
     }
 
     public boolean isGreedy() {

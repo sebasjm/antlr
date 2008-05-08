@@ -317,8 +317,8 @@ tree:   #(TREE_BEGIN  element (element)*  )
     ;
 
 atom
-    :   RULE_REF
-    |   t:TOKEN_REF      {trackToken(t);}
+    :   #( rr:RULE_REF (rarg:ARG_ACTION)? )
+    |   #( t:TOKEN_REF (targ:ARG_ACTION )? ) {trackToken(t);}
     |   c:CHAR_LITERAL   {trackString(c);}
     |   s:STRING_LITERAL {trackString(s);}
     |   WILDCARD

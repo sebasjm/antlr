@@ -33,66 +33,67 @@ import org.antlr.tool.Grammar;
 
 public class TestNFAConstruction extends BaseTest {
 
-    /** Public default constructor used by TestRig */
-    public TestNFAConstruction() {
-    }
+	/** Public default constructor used by TestRig */
+	public TestNFAConstruction() {
+	}
 
-    public void testA() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-				"a : A;");
+	public void testA() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : A;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2-A->.s3\n" +
 			".s3->:s4\n" +
 			":s4-EOF->.s5\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testAB() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : A B ;");
-        String expecting =
-                ".s0->.s1\n" +
+	public void testAB() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : A B ;");
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2-A->.s3\n" +
 			".s3-B->.s4\n" +
 			".s4->:s5\n" +
 			":s5-EOF->.s6\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testAorB() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : A | B {;} ;");
-        /* expecting (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5,end)
-                                |                            ^
-                               (6)--Ep-->(7)--B-->(8)--------|
-         */
-        String expecting =
-                ".s0->.s1\n" +
+	public void testAorB() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : A | B {;} ;");
+		/* expecting (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5,end)
+										|                            ^
+									   (6)--Ep-->(7)--B-->(8)--------|
+				 */
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s1->.s7\n" +
+			".s10->.s4\n" +
 			".s2-A->.s3\n" +
 			".s3->.s4\n" +
 			".s4->:s5\n" +
 			".s7->.s8\n" +
 			".s8-B->.s9\n" +
-			".s9->.s4\n" +
+			".s9-{}->.s10\n" +
 			":s5-EOF->.s6\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
 	public void testRangeOrRange() throws Exception {
 		Grammar g = new Grammar(
-				"lexer grammar P;\n"+
-				"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
+			"lexer grammar P;\n"+
+			"A : ('a'..'c' 'h' | 'q' 'j'..'l') ;"
 		);
-        String expecting =
-                ".s0->.s1\n" +
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s10-'q'->.s11\n" +
 			".s11-'j'..'l'->.s12\n" +
@@ -105,27 +106,27 @@ public class TestNFAConstruction extends BaseTest {
 			".s6->:s7\n" +
 			".s9->.s10\n" +
 			":s7-<EOT>->.s8\n";
-        checkRule(g, "A", expecting);
+		checkRule(g, "A", expecting);
 	}
 
 	public void testRange() throws Exception {
 		Grammar g = new Grammar(
-				"lexer grammar P;\n"+
-				"A : 'a'..'c' ;"
+			"lexer grammar P;\n"+
+			"A : 'a'..'c' ;"
 		);
-        String expecting =
-                ".s0->.s1\n" +
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2-'a'..'c'->.s3\n" +
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
-        checkRule(g, "A", expecting);
+		checkRule(g, "A", expecting);
 	}
 
 	public void testCharSetInParser() throws Exception {
 		Grammar g = new Grammar(
-				"grammar P;\n"+
-				"a : A|'b' ;"
+			"grammar P;\n"+
+			"a : A|'b' ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -137,11 +138,11 @@ public class TestNFAConstruction extends BaseTest {
 	}
 
 	public void testABorCD() throws Exception {
-			Grammar g = new Grammar(
-					"parser grammar P;\n"+
-					"a : A B | C D;");
-        String expecting =
-                ".s0->.s1\n" +
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : A B | C D;");
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s1->.s8\n" +
 			".s10-D->.s11\n" +
@@ -153,14 +154,14 @@ public class TestNFAConstruction extends BaseTest {
 			".s8->.s9\n" +
 			".s9-C->.s10\n" +
 			":s6-EOF->.s7\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testbA() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : b A ;\n"+
-                "b : B ;");
+	public void testbA() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : b A ;\n"+
+			"b : B ;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -173,17 +174,17 @@ public class TestNFAConstruction extends BaseTest {
 			".s9->:s10\n" +
 			":s10-EOF->.s11\n" +
 			":s7->.s8\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testbA_bC() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : b A ;\n"+
-                "b : B ;\n"+
-                "c : b C;");
-        String expecting =
-                ".s0->.s1\n" +
+	public void testbA_bC() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : b A ;\n"+
+			"b : B ;\n"+
+			"c : b C;");
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s12->.s13\n" +
 			".s13-C->.s14\n" +
@@ -199,17 +200,17 @@ public class TestNFAConstruction extends BaseTest {
 			":s15-EOF->.s16\n" +
 			":s7->.s12\n" +
 			":s7->.s8\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testAorEpsilon() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : A | ;");
-        /* expecting (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5,end)
-                                |                            ^
-                               (6)--Ep-->(7)--Ep-->(8)-------|
-         */
+	public void testAorEpsilon() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : A | ;");
+		/* expecting (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5,end)
+										|                            ^
+									   (6)--Ep-->(7)--Ep-->(8)-------|
+				 */
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -221,13 +222,13 @@ public class TestNFAConstruction extends BaseTest {
 			".s8->.s9\n" +
 			".s9->.s4\n" +
 			":s5-EOF->.s6\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
 	public void testAOptional() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : (A)?;");
+			"parser grammar P;\n"+
+			"a : (A)?;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -243,8 +244,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testNakedAoptional() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : A?;");
+			"parser grammar P;\n"+
+			"a : A?;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -258,22 +259,22 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 
-    public void testAorBthenC() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A | B) C;");
-        /* expecting
+	public void testAorBthenC() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : (A | B) C;");
+		/* expecting
 
-        (0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5)--C-->(6)--Ep-->(7,end)
-                   |                            ^
-                  (8)--Ep-->(9)--B-->(10)-------|
-         */
-    }
+				(0)--Ep-->(1)--Ep-->(2)--A-->(3)--Ep-->(4)--Ep-->(5)--C-->(6)--Ep-->(7,end)
+						   |                            ^
+						  (8)--Ep-->(9)--B-->(10)-------|
+				 */
+	}
 
 	public void testAplus() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : (A)+;");
+			"parser grammar P;\n"+
+			"a : (A)+;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -289,8 +290,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testNakedAplus() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : A+;");
+			"parser grammar P;\n"+
+			"a : A+;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -306,8 +307,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAplusNonGreedy() throws Exception {
 		Grammar g = new Grammar(
-				"lexer grammar t;\n"+
-				"A : (options {greedy=false;}:'0'..'9')+ ;\n");
+			"lexer grammar t;\n"+
+			"A : (options {greedy=false;}:'0'..'9')+ ;\n");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -321,16 +322,17 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "A", expecting);
 	}
 
-    public void testAorBplus() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A | B{action})+ ;");
+	public void testAorBplus() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : (A | B{action})+ ;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s10->.s11\n" +
 			".s11-B->.s12\n" +
-			".s12->.s6\n" +
+			".s12-{}->.s13\n" +
+			".s13->.s6\n" +
 			".s2->.s3\n" +
 			".s3->.s10\n" +
 			".s3->.s4\n" +
@@ -340,15 +342,15 @@ public class TestNFAConstruction extends BaseTest {
 			".s6->.s7\n" +
 			".s7->:s8\n" +
 			":s8-EOF->.s9\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testAorBorEmptyPlus() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A | B | )+ ;");
-        String expecting =
-            ".s0->.s1\n" +
+	public void testAorBorEmptyPlus() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : (A | B | )+ ;");
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s10->.s11\n" +
 			".s10->.s13\n" +
@@ -366,13 +368,13 @@ public class TestNFAConstruction extends BaseTest {
 			".s6->.s7\n" +
 			".s7->:s8\n" +
 			":s8-EOF->.s9\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
 	public void testAStar() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : (A)*;");
+			"parser grammar P;\n"+
+			"a : (A)*;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -390,8 +392,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testNestedAstar() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : (A*)*;");
+			"parser grammar P;\n"+
+			"a : (A*)*;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -416,8 +418,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testPlusNestedInStar() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : (A+)*;");
+			"parser grammar P;\n"+
+			"a : (A+)*;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -440,8 +442,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testStarNestedInPlus() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : (A*)+;");
+			"parser grammar P;\n"+
+			"a : (A*)+;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -464,8 +466,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testNakedAstar() throws Exception {
 		Grammar g = new Grammar(
-				"parser grammar P;\n"+
-				"a : A*;");
+			"parser grammar P;\n"+
+			"a : A*;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -481,18 +483,19 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 
-    public void testAorBstar() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : (A | B{action})* ;");
+	public void testAorBstar() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : (A | B{action})* ;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s10->.s11\n" +
 			".s11-B->.s12\n" +
-			".s12->.s6\n" +
-			".s13->.s7\n" +
-			".s2->.s13\n" +
+			".s12-{}->.s13\n" +
+			".s13->.s6\n" +
+			".s14->.s7\n" +
+			".s2->.s14\n" +
 			".s2->.s3\n" +
 			".s3->.s10\n" +
 			".s3->.s4\n" +
@@ -502,15 +505,15 @@ public class TestNFAConstruction extends BaseTest {
 			".s6->.s7\n" +
 			".s7->:s8\n" +
 			":s8-EOF->.s9\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testAorBOptionalSubrule() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : ( A | B )? ;");
-        String expecting =
-            ".s0->.s1\n" +
+	public void testAorBOptionalSubrule() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : ( A | B )? ;");
+		String expecting =
+			".s0->.s1\n" +
 			".s1->.s2\n" +
 			".s2->.s3\n" +
 			".s2->.s8\n" +
@@ -519,13 +522,13 @@ public class TestNFAConstruction extends BaseTest {
 			".s5->:s6\n" +
 			".s8->.s5\n" +
 			":s6-EOF->.s7\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testPredicatedAorB() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : {p1}? A | {p2}? B ;");
+	public void testPredicatedAorB() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : {p1}? A | {p2}? B ;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -539,14 +542,14 @@ public class TestNFAConstruction extends BaseTest {
 			".s8->.s9\n" +
 			".s9-{p2}?->.s10\n" +
 			":s6-EOF->.s7\n";
-        checkRule(g, "a", expecting);
-    }
+		checkRule(g, "a", expecting);
+	}
 
-    public void testMultiplePredicates() throws Exception {
-        Grammar g = new Grammar(
-                "parser grammar P;\n"+
-                "a : {p1}? {p1a}? A | {p2}? B | {p3} b;\n" +
-                "b : {p4}? B ;");
+	public void testMultiplePredicates() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : {p1}? {p1a}? A | {p2}? B | {p3} b;\n" +
+			"b : {p4}? B ;");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -555,23 +558,24 @@ public class TestNFAConstruction extends BaseTest {
 			".s11-B->.s12\n" +
 			".s12->.s6\n" +
 			".s13->.s14\n" +
-			".s14->.s15\n" +
+			".s14-{}->.s15\n" +
 			".s15->.s16\n" +
 			".s16->.s17\n" +
-			".s17-{p4}?->.s18\n" +
-			".s18-B->.s19\n" +
-			".s19->:s20\n" +
+			".s17->.s18\n" +
+			".s18-{p4}?->.s19\n" +
+			".s19-B->.s20\n" +
 			".s2-{p1}?->.s3\n" +
-			".s21->.s6\n" +
+			".s20->:s21\n" +
+			".s22->.s6\n" +
 			".s3-{p1a}?->.s4\n" +
 			".s4-A->.s5\n" +
 			".s5->.s6\n" +
 			".s6->:s7\n" +
 			".s9->.s10\n" +
 			".s9->.s13\n" +
-			":s20->.s21\n" +
+			":s21->.s22\n" +
 			":s7-EOF->.s8\n";
-        checkRule(g, "a", expecting);
+		checkRule(g, "a", expecting);
 	}
 
 	public void testSets() throws Exception {
@@ -598,7 +602,8 @@ public class TestNFAConstruction extends BaseTest {
 			".s1->.s2\n" +
 			".s10->.s11\n" +
 			".s11-B->.s12\n" +
-			".s12->.s6\n" +
+			".s12-{}->.s13\n" +
+			".s13->.s6\n" +
 			".s2->.s3\n" +
 			".s3->.s10\n" +
 			".s3->.s4\n" +
@@ -695,8 +700,8 @@ public class TestNFAConstruction extends BaseTest {
 
 		String expectingGrammarStr =
 			"1:7: lexer grammar P;\n" +
-				"A : ~ '3' ;\n"+
-				"Tokens : A ;";
+			"A : ~ '3' ;\n"+
+			"Tokens : A ;";
 		assertEquals(expectingGrammarStr, g.toString());
 	}
 
@@ -816,8 +821,8 @@ public class TestNFAConstruction extends BaseTest {
 
 		String expectingGrammarStr =
 			"1:7: lexer grammar P;\n" +
-				"A : t=~ '3' ;\n"+
-				"Tokens : A ;";
+			"A : t=~ '3' ;\n"+
+			"Tokens : A ;";
 		assertEquals(expectingGrammarStr, g.toString());
 	}
 
@@ -842,8 +847,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testEscapedCharLiteral() throws Exception {
 		Grammar g = new Grammar(
-				"grammar P;\n"+
-				"a : '\\n';");
+			"grammar P;\n"+
+			"a : '\\n';");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -855,8 +860,8 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testEscapedStringLiteral() throws Exception {
 		Grammar g = new Grammar(
-				"grammar P;\n"+
-				"a : 'a\\nb\\u0030c\\'';");
+			"grammar P;\n"+
+			"a : 'a\\nb\\u0030c\\'';");
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
@@ -870,55 +875,19 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_RuleBlock() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : 'a'{;}|'b';"
-		);
-		String expecting =
-			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s1->.s8\n" +
-				".s10->.s5\n" +
-				".s2-{synpred1_t}?->.s3\n" +
-				".s3-'a'->.s4\n" +
-				".s4->.s5\n" +
-				".s5->:s6\n" +
-				".s8->.s9\n" +
-				".s9-'b'->.s10\n" +
-				":s6-EOF->.s7\n";
-		checkRule(g, "a", expecting);
-	}
-
-	public void testAutoBacktracking_RuleSetBlock() throws Exception {
-		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : 'a'|'b';"
-		);
-		String expecting =
-			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s2-'a'..'b'->.s3\n" +
-				".s3->:s4\n" +
-				":s4-EOF->.s5\n";
-		checkRule(g, "a", expecting);
-	}
-
-	public void testAutoBacktracking_SimpleBlock() throws Exception {
-		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'{;}|'b') ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : 'a'{;}|'b';"
 		);
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
+			".s1->.s9\n" +
 			".s10-'b'->.s11\n" +
 			".s11->.s6\n" +
-			".s2->.s3\n" +
-			".s2->.s9\n" +
-			".s3-{synpred1_t}?->.s4\n" +
-			".s4-'a'->.s5\n" +
+			".s2-{synpred1_t}?->.s3\n" +
+			".s3-'a'->.s4\n" +
+			".s4-{}->.s5\n" +
 			".s5->.s6\n" +
 			".s6->:s7\n" +
 			".s9->.s10\n" +
@@ -926,11 +895,49 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 
+	public void testAutoBacktracking_RuleSetBlock() throws Exception {
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : 'a'|'b';"
+		);
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s2-'a'..'b'->.s3\n" +
+			".s3->:s4\n" +
+			":s4-EOF->.s5\n";
+		checkRule(g, "a", expecting);
+	}
+
+	public void testAutoBacktracking_SimpleBlock() throws Exception {
+		Grammar g = new Grammar(
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'{;}|'b') ;"
+		);
+		String expecting =
+			".s0->.s1\n" +
+			".s1->.s2\n" +
+			".s10->.s11\n" +
+			".s11-'b'->.s12\n" +
+			".s12->.s7\n" +
+			".s2->.s10\n" +
+			".s2->.s3\n" +
+			".s3-{synpred1_t}?->.s4\n" +
+			".s4-'a'->.s5\n" +
+			".s5-{}->.s6\n" +
+			".s6->.s7\n" +
+			".s7->:s8\n" +
+			":s8-EOF->.s9\n";
+		checkRule(g, "a", expecting);
+	}
+
 	public void testAutoBacktracking_SetBlock() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'|'b') ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'|'b') ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -943,37 +950,38 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_StarBlock() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'{;}|'b')* ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'{;}|'b')* ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s11->.s12\n" +
-				".s12-{synpred2_t}?->.s13\n" +
-				".s13-'b'->.s14\n" +
-				".s14->.s7\n" +
-				".s15->.s8\n" +
-				".s2->.s15\n" +
-				".s2->.s3\n" +
-				".s3->.s11\n" +
-				".s3->.s4\n" +
-				".s4-{synpred1_t}?->.s5\n" +
-				".s5-'a'->.s6\n" +
-				".s6->.s7\n" +
-				".s7->.s3\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+			".s1->.s2\n" +
+			".s12->.s13\n" +
+			".s13-{synpred2_t}?->.s14\n" +
+			".s14-'b'->.s15\n" +
+			".s15->.s8\n" +
+			".s16->.s9\n" +
+			".s2->.s16\n" +
+			".s2->.s3\n" +
+			".s3->.s12\n" +
+			".s3->.s4\n" +
+			".s4-{synpred1_t}?->.s5\n" +
+			".s5-'a'->.s6\n" +
+			".s6-{}->.s7\n" +
+			".s7->.s8\n" +
+			".s8->.s3\n" +
+			".s8->.s9\n" +
+			".s9->:s10\n" +
+			":s10-EOF->.s11\n";
 		checkRule(g, "a", expecting);
 	}
 
 	public void testAutoBacktracking_StarSetBlock_IgnoresPreds() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'|'b')* ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'|'b')* ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -992,9 +1000,9 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_StarSetBlock() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'|'b'{;})* ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'|'b'{;})* ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -1002,9 +1010,10 @@ public class TestNFAConstruction extends BaseTest {
 			".s11->.s12\n" +
 			".s12-{synpred2_t}?->.s13\n" +
 			".s13-'b'->.s14\n" +
-			".s14->.s7\n" +
-			".s15->.s8\n" +
-			".s2->.s15\n" +
+			".s14-{}->.s15\n" +
+			".s15->.s7\n" +
+			".s16->.s8\n" +
+			".s2->.s16\n" +
 			".s2->.s3\n" +
 			".s3->.s11\n" +
 			".s3->.s4\n" +
@@ -1020,9 +1029,9 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_StarBlock1Alt() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a')* ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a')* ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -1042,35 +1051,36 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_PlusBlock() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'{;}|'b')+ ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'{;}|'b')+ ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s11->.s12\n" +
-				".s12-{synpred2_t}?->.s13\n" +
-				".s13-'b'->.s14\n" +
-				".s14->.s7\n" +
-				".s2->.s3\n" +
-				".s3->.s11\n" +
-				".s3->.s4\n" +
-				".s4-{synpred1_t}?->.s5\n" +
-				".s5-'a'->.s6\n" +
-				".s6->.s7\n" +
-				".s7->.s3\n" +
-				".s7->.s8\n" +
-				".s8->:s9\n" +
-				":s9-EOF->.s10\n";
+			".s1->.s2\n" +
+			".s12->.s13\n" +
+			".s13-{synpred2_t}?->.s14\n" +
+			".s14-'b'->.s15\n" +
+			".s15->.s8\n" +
+			".s2->.s3\n" +
+			".s3->.s12\n" +
+			".s3->.s4\n" +
+			".s4-{synpred1_t}?->.s5\n" +
+			".s5-'a'->.s6\n" +
+			".s6-{}->.s7\n" +
+			".s7->.s8\n" +
+			".s8->.s3\n" +
+			".s8->.s9\n" +
+			".s9->:s10\n" +
+			":s10-EOF->.s11\n";
 		checkRule(g, "a", expecting);
 	}
 
 	public void testAutoBacktracking_PlusSetBlock() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'|'b'{;})+ ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'|'b'{;})+ ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -1078,7 +1088,8 @@ public class TestNFAConstruction extends BaseTest {
 			".s11->.s12\n" +
 			".s12-{synpred2_t}?->.s13\n" +
 			".s13-'b'->.s14\n" +
-			".s14->.s7\n" +
+			".s14-{}->.s15\n" +
+			".s15->.s7\n" +
 			".s2->.s3\n" +
 			".s3->.s11\n" +
 			".s3->.s4\n" +
@@ -1094,9 +1105,9 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_PlusBlock1Alt() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a')+ ;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a')+ ;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -1114,34 +1125,35 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_OptionalBlock2Alts() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a'{;}|'b')?;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a'{;}|'b')?;"
 		);
 		String expecting =
 			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s10-{synpred2_t}?->.s11\n" +
-				".s11-'b'->.s12\n" +
-				".s12->.s6\n" +
-				".s13->.s6\n" +
-				".s2->.s3\n" +
-				".s2->.s9\n" +
-				".s3-{synpred1_t}?->.s4\n" +
-				".s4-'a'->.s5\n" +
-				".s5->.s6\n" +
-				".s6->:s7\n" +
-				".s9->.s10\n" +
-				".s9->.s13\n" +
-				":s7-EOF->.s8\n";
+			".s1->.s2\n" +
+			".s10->.s11\n" +
+			".s10->.s14\n" +
+			".s11-{synpred2_t}?->.s12\n" +
+			".s12-'b'->.s13\n" +
+			".s13->.s7\n" +
+			".s14->.s7\n" +
+			".s2->.s10\n" +
+			".s2->.s3\n" +
+			".s3-{synpred1_t}?->.s4\n" +
+			".s4-'a'->.s5\n" +
+			".s5-{}->.s6\n" +
+			".s6->.s7\n" +
+			".s7->:s8\n" +
+			":s8-EOF->.s9\n";
 		checkRule(g, "a", expecting);
 	}
 
 	public void testAutoBacktracking_OptionalBlock1Alt() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a')?;"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a')?;"
 		);
 		String expecting =
 			".s0->.s1\n" +
@@ -1159,34 +1171,34 @@ public class TestNFAConstruction extends BaseTest {
 
 	public void testAutoBacktracking_ExistingPred() throws Exception {
 		Grammar g = new Grammar(
-				"grammar t;\n" +
-				"options {backtrack=true;}\n"+
-				"a : ('a')=> 'a' | 'b';"
+			"grammar t;\n" +
+			"options {backtrack=true;}\n"+
+			"a : ('a')=> 'a' | 'b';"
 		);
 		String expecting =
 			".s0->.s1\n" +
-				".s1->.s2\n" +
-				".s1->.s8\n" +
-				".s10->.s5\n" +
-				".s2-{synpred1_t}?->.s3\n" +
-				".s3-'a'->.s4\n" +
-				".s4->.s5\n" +
-				".s5->:s6\n" +
-				".s8->.s9\n" +
-				".s9-'b'->.s10\n" +
-				":s6-EOF->.s7\n";
+			".s1->.s2\n" +
+			".s1->.s8\n" +
+			".s10->.s5\n" +
+			".s2-{synpred1_t}?->.s3\n" +
+			".s3-'a'->.s4\n" +
+			".s4->.s5\n" +
+			".s5->:s6\n" +
+			".s8->.s9\n" +
+			".s9-'b'->.s10\n" +
+			":s6-EOF->.s7\n";
 		checkRule(g, "a", expecting);
 	}
 
 	private void checkRule(Grammar g, String rule, String expecting)
-    {
-        g.buildNFA();
-        State startState = g.getRuleStartState(rule);
-        FASerializer serializer = new FASerializer(g);
-        String result = serializer.serialize(startState);
+	{
+		g.buildNFA();
+		State startState = g.getRuleStartState(rule);
+		FASerializer serializer = new FASerializer(g);
+		String result = serializer.serialize(startState);
 
-        //System.out.print(result);
-        assertEquals(expecting, result);
-    }
+		//System.out.print(result);
+		assertEquals(expecting, result);
+	}
 
 }

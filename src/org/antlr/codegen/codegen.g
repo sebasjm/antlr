@@ -1305,7 +1305,9 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
     	Grammar.LabelElementPair pair = rule.getLabel(labelName);
     	if ( labelName.equals(currentRuleName) ) {
     		// special case; ref to old value via $rule
-    		if ( rule.hasRewrite(outerAltNum) ) {
+			if ( rule.hasRewrite(outerAltNum) &&
+				 rule.getRuleRefsInAlt(outerAltNum).contains(labelName) )
+			{
 				ErrorManager.grammarError(ErrorManager.MSG_RULE_REF_AMBIG_WITH_RULE_IN_ALT,
 										  grammar,
 										  ((GrammarAST)(#LABEL)).getToken(),

@@ -8,6 +8,42 @@ University of San Francisco
 
 CHANGES
 
+May 6-7, 2008
+
+* Insufficiently covered (with semantic predicates) alt warnings are now emitted before
+  nondeterminisms so it's clear the nondeterminism is a result of insufficient preds.
+
+* Improved insufficiently covered alt warnings from:
+    warning(203): T.g:2:3: The following alternatives are insufficiently covered with predicates: 1
+  to:
+    warning(203): T.g:2:3: Input B is insufficiently covered with predicates at loca
+tions: alt 1: line 3:15, alt 2: line 2:9
+
+* Improved nondeterminism warning to have:
+  Semantic predicates were present but were hidden by actions.
+parser grammar U;
+a : (A B)? ;
+b : X a {p1}? A B | Y a {a1} {p2}? A B | Z a ;
+
+To create the prediction DFA for the optional sub rule in 'a', ANTLR must find all references to 'a' to determine what can follow. A B can follow 'a' in the first two alts rule 'b'.   To resolve the conflict between matching A B immediately in the sub rule and exiting rule 'a' to match it in 'b', ANTLR looks for predicates. In this case, there are two predicates that indicate the semantic context in which the surrounding alternatives are valid. The problem is that one of the predicates is hidden by an action. It took me 1.5 days, but I've finally have gotten ANTLR to properly track the insufficiently covered alternatives. Further, I have gotten it to tell you precisely where the uncovered predicates are even if they are simply hidden by actions. I have also updated all of the nondeterminism warnings so that it tells you if there was a predicate but one hidden by an action (this could be a separate condition from insufficiently covered predicates). here are your messages from ANTLR:
+
+ANTLR Parser Generator  Version 3.1b1 (??)  1989-2007
+warning(203): U.g:2:5: Input such as "A B" is insufficiently covered with predicates at locations: alt 2: line 3:38 at B
+Semantic predicates were present but were hidden by actions.
+warning(200): U.g:2:5: Decision can match input such as "A B" using multiple alternatives: 1, 2
+As a result, alternative(s) 2 were disabled for that input
+Semantic predicates were present but were hidden by actions.
+
+* Fixed issue where 
+r41
+   : (INT -> INT) ( ('+' i=INT) -> ^($i $r41) )* ';'
+   ;
+still warned about $r41 being ambig.
+
+* actions are now added to the NFA.
+
+* Fixed ANTLR-222.  ANTLR now ignores preds after actions.
+
 May 5, 2008
 
 * Fixed ANTLR-235 by backing out a change from 12-31-07.

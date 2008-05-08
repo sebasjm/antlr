@@ -230,17 +230,15 @@ AST_OP_IN_ALT_WITH_REWRITE(arg,arg2) ::=
 
 // GRAMMAR WARNINGS
 
-GRAMMAR_NONDETERMINISM(input,conflictingAlts,paths,disabled) ::=
+GRAMMAR_NONDETERMINISM(input,conflictingAlts,paths,disabled,hasPredicateBlockedByAction) ::=
 <<
 <if(paths)>
 Decision can match input such as "<input>" using multiple alternatives:
 <paths:{  alt <it.alt> via NFA path <it.states; separator=","><\n>}>
 <else>
-Decision can match input such as "<input>" using multiple alternatives: <conflictingAlts; separator=", "><\n>
+Decision can match input such as "<input>" using multiple alternatives: <conflictingAlts; separator=", ">
 <endif>
-<if(disabled)>
-As a result, alternative(s) <disabled; separator=","> were disabled for that input
-<endif>
+<if(disabled)><\n>As a result, alternative(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
 
 DANGLING_STATE(danglingAlts,input) ::= <<
@@ -251,8 +249,8 @@ UNREACHABLE_ALTS(alts) ::= <<
 The following alternatives can never be matched: <alts; separator=","><\n>
 >>
 
-INSUFFICIENT_PREDICATES(alts) ::= <<
-The following alternatives are insufficiently covered with predicates: <alts; separator=","><\n>
+INSUFFICIENT_PREDICATES(upon,altToLocations,hasPredicateBlockedByAction) ::= <<
+Input such as "<upon>" is insufficiently covered with predicates at locations: <altToLocations.keys:{alt|alt <alt>: <altToLocations.(alt):{loc| line <loc.line>:<loc.column> at <loc.text>}; separator=", ">}; separator=", "><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
 
 DUPLICATE_SET_ENTRY(arg) ::=
