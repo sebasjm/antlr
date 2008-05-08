@@ -1031,6 +1031,7 @@ outer:
 			}
 			DFA lookaheadDFA = new LL1DFA(decision, decisionStartState, altLook);
 			setLookaheadDFA(decision, lookaheadDFA);
+			updateLineColumnToLookaheadDFAMap(lookaheadDFA);
 			return lookaheadDFA;
 		}
 
@@ -1080,7 +1081,19 @@ outer:
 		// build an LL(1) optimized DFA with edge for each altLook[i]
 		DFA lookaheadDFA = new LL1DFA(decision, decisionStartState, edgeMap);
 		setLookaheadDFA(decision, lookaheadDFA);
+
+		// create map from line:col to decision DFA (for ANTLRWorks)
+		updateLineColumnToLookaheadDFAMap(lookaheadDFA);
+
 		return lookaheadDFA;
+	}
+
+	private void updateLineColumnToLookaheadDFAMap(DFA lookaheadDFA) {
+		GrammarAST decisionAST = nfa.grammar.getDecisionBlockAST(lookaheadDFA.decisionNumber);
+		int line = decisionAST.getLine();
+		int col = decisionAST.getColumn();
+		lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
+										.append(col).toString(), lookaheadDFA);
 	}
 
 	protected List<IntervalSet> makeEdgeSetsDisjoint(List<IntervalSet> edges) {
@@ -1188,11 +1201,7 @@ outer:
 		}
 
 		// create map from line:col to decision DFA (for ANTLRWorks)
-		GrammarAST decisionAST = nfa.grammar.getDecisionBlockAST(lookaheadDFA.decisionNumber);
-		int line = decisionAST.getLine();
-		int col = decisionAST.getColumn();
-		lineColumnToLookaheadDFAMap.put(new StringBuffer().append(line + ":")
-										.append(col).toString(), lookaheadDFA);
+		updateLineColumnToLookaheadDFAMap(lookaheadDFA);
 
 		if ( composite.watchNFAConversion ) {
 			stopDFA = System.currentTimeMillis();

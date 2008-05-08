@@ -8,6 +8,10 @@ University of San Francisco
 
 CHANGES
 
+May 8, 2008
+
+* ANTLR didn't update line/col to DFA map for AW.
+
 May 6-7, 2008
 
 * Insufficiently covered (with semantic predicates) alt warnings are now emitted before
