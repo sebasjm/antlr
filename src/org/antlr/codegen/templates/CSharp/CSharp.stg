@@ -551,8 +551,8 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
 	<if(trace)>TraceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
-    try 
-	{
+		try
+		{
 <if(nakedBlock)>
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
@@ -1066,34 +1066,29 @@ alt<decisionNumber> = dfa<decisionNumber>.Predict(input);
 /* Dump DFA tables.
  */
 cyclicDFA(dfa) ::= <<
-static readonly short[] DFA<dfa.decisionNumber>_eot = {
-    <dfa.eot:{n|<n>}; null="-1", wrap="\n", separator=", ">
-    };
-static readonly short[] DFA<dfa.decisionNumber>_eof = {
-    <dfa.eof:{n|<n>}; null="-1", wrap="\n", separator=", ">
-    };
-static readonly int[] DFA<dfa.decisionNumber>_min = {
-    <dfa.min:{n|<n>}; null="0", wrap="\n", separator=", ">
-    };
-static readonly int[] DFA<dfa.decisionNumber>_max = {
-    <dfa.max:{n|<n>}; null="0", wrap="\n", separator=", ">
-    };
-static readonly short[] DFA<dfa.decisionNumber>_accept = {
-    <dfa.accept:{n|<n>}; null="-1", wrap="\n", separator=", ">
-    };
-static readonly short[] DFA<dfa.decisionNumber>_special = {
-    <dfa.special:{n|<n>}; null="-1", wrap="\n", separator=", ">
-    };
+const string DFA<dfa.decisionNumber>_eotS =
+    "<dfa.javaCompressedEOT; wrap="\"+\n    \"">";
+const string DFA<dfa.decisionNumber>_eofS =
+    "<dfa.javaCompressedEOF; wrap="\"+\n    \"">";
+const string DFA<dfa.decisionNumber>_minS =
+    "<dfa.javaCompressedMin; wrap="\"+\n    \"">";
+const string DFA<dfa.decisionNumber>_maxS =
+    "<dfa.javaCompressedMax; wrap="\"+\n    \"">";
+const string DFA<dfa.decisionNumber>_acceptS =
+    "<dfa.javaCompressedAccept; wrap="\"+\n    \"">";
+const string DFA<dfa.decisionNumber>_specialS =
+    "<dfa.javaCompressedSpecial; wrap="\"+\n    \"">}>";
+static readonly string[] DFA<dfa.decisionNumber>_transitionS = {
+        <dfa.javaCompressedTransition:{s|"<s; wrap="\"+\n\"">"}; separator=",\n">
+};
 
-static readonly short[] dfa<dfa.decisionNumber>_transition_null = null;
-<dfa.edgeTransitionClassMap.keys:{table |
-static readonly short[] dfa<dfa.decisionNumber>_transition<i0> = \{
-	<table; separator=", ", wrap="\n    ", null="-1">
-	\};}>
-
-static readonly short[][] DFA<dfa.decisionNumber>_transition = {
-	<dfa.transitionEdgeTables:{whichTable|dfa<dfa.decisionNumber>_transition<whichTable>}; null="_null", separator=",\n">
-    };
+static readonly short[] DFA<dfa.decisionNumber>_eot = DFA.UnpackEncodedString(DFA<dfa.decisionNumber>_eotS);
+static readonly short[] DFA<dfa.decisionNumber>_eof = DFA.UnpackEncodedString(DFA<dfa.decisionNumber>_eofS);
+static readonly char[] DFA<dfa.decisionNumber>_min = DFA.UnpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_minS);
+static readonly char[] DFA<dfa.decisionNumber>_max = DFA.UnpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_maxS);
+static readonly short[] DFA<dfa.decisionNumber>_accept = DFA.UnpackEncodedString(DFA<dfa.decisionNumber>_acceptS);
+static readonly short[] DFA<dfa.decisionNumber>_special = DFA.UnpackEncodedString(DFA<dfa.decisionNumber>_specialS);
+static readonly short[][] DFA<dfa.decisionNumber>_transition = DFA.UnpackEncodedStringArray(DFA<dfa.decisionNumber>_transitionS);
 
 protected class DFA<dfa.decisionNumber> : DFA
 {
@@ -1287,7 +1282,7 @@ ruleLabelDef(label) ::= <<
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public class <ruleDescriptor:returnStructName()> : <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope 
+public class <ruleDescriptor:returnStructName()> : <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope
 {
     <scope.attributes:{public <it.decl>;}; separator="\n">
     <@ruleReturnMembers()>
@@ -1384,7 +1379,7 @@ ruleLabelPropertyRef_text(scope,attr) ::= <<
   input.TreeAdaptor.GetTokenStartIndex(<scope>.Start),
   input.TreeAdaptor.GetTokenStopIndex(<scope>.Start)) : null)
 <else>
-((<scope> != null) ? input.ToString(<scope>.Start,<scope>.Stop) : null)
+((<scope> != null) ? input.ToString((IToken)(<scope>.Start),(IToken)(<scope>.Stop)) : null)
 <endif>
 >>
 ruleLabelPropertyRef_st(scope,attr) ::= "((<scope> != null) ? <scope>.ST : null)"

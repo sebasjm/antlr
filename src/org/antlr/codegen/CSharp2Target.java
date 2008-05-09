@@ -32,7 +32,7 @@ import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.Grammar;
 
-public class CSharp2Target extends Target 
+public class CSharpTarget extends Target 
 {
 	protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
 													 CodeGenerator generator,
@@ -41,6 +41,17 @@ public class CSharp2Target extends Target
 													 StringTemplate cyclicDFAST)
 	{
 		return recognizerST;
+	}
+
+	public String encodeIntAsCharEscape(int v)
+	{
+		if (v <= 127)
+		{
+			String hex1 = Integer.toHexString(v | 0x10000).substring(3, 5);
+			return "\\x" + hex1;
+		}
+		String hex = Integer.toHexString(v | 0x10000).substring(1, 5);
+		return "\\u" + hex;
 	}
 }
 

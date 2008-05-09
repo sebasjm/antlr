@@ -60,15 +60,15 @@ namespace Antlr.Runtime
 
 		protected short[] eot;
 		protected short[] eof;
-		protected int[] min;
-		protected int[] max;
+		protected char[] min;
+		protected char[] max;
 		protected short[] accept;
 		protected short[] special;
 		protected short[][] transition;
 
 		protected int decisionNumber;
 
-		// HACK: Has to be public to allow generated recognozer to set.
+		// HACK: Has to be public to allow generated recognizer to set.
 		public SpecialStateTransitionHandler specialStateTransitionHandler;
 
 		/// <summary>
@@ -218,6 +218,52 @@ namespace Antlr.Runtime
 		{
 			get { return "n/a"; }
 		}
+
+        public static short[] UnpackEncodedString( string encodedString )
+        {
+            int size = 0;
+            for ( int i = 0; i < encodedString.Length; i += 2 )
+                size += (int)encodedString[i];
+
+            short[] data = new short[size];
+            int di = 0;
+            for ( int i = 0; i < encodedString.Length; i += 2 )
+            {
+                char n = encodedString[i];
+                char v = encodedString[i+1];
+                // add v n times to data
+                for ( int j = 1; j <= n; j++ )
+                    data[di++] = (short)v;
+            }
+
+            return data;
+        }
+        public static short[][] UnpackEncodedStringArray( string[] encodedStrings )
+        {
+            short[][] result = new short[encodedStrings.Length][];
+            for ( int i = 0; i < encodedStrings.Length; i++ )
+                result[i] = UnpackEncodedString( encodedStrings[i] );
+            return result;
+        }
+        public static char[] UnpackEncodedStringToUnsignedChars( string encodedString )
+        {
+            int size = 0;
+            for ( int i = 0; i < encodedString.Length; i += 2 )
+                size += (int)encodedString[i];
+
+            char[] data = new char[size];
+            int di = 0;
+            for ( int i = 0; i < encodedString.Length; i += 2 )
+            {
+                char n = encodedString[i];
+                char v = encodedString[i+1];
+                // add v n times to data
+                for ( int j = 1; j <= n; j++ )
+                    data[di++] = v;
+            }
+
+            return data;
+        }
 
 		public int SpecialTransition(int state, int symbol)
 		{
