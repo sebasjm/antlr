@@ -32,7 +32,7 @@ import org.antlr.Tool;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.Grammar;
 
-public class CSharpTarget extends Target 
+public class CSharp2Target extends Target 
 {
 	protected StringTemplate chooseWhereCyclicDFAsGo(Tool tool,
 													 CodeGenerator generator,
