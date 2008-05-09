@@ -715,9 +715,6 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "*", debug);
-		// finds an error at the first token, 34, and re-syncs.
-		// re-synchronizing does not consume a token because 34 follows
-		// ref to rule b (start of c). It then matches 34 in c.
 		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
 
