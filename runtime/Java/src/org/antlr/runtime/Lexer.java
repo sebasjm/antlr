@@ -143,6 +143,9 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 	 *  char buffer start..stop.  If there is a text override in 'text',
 	 *  use that to set the token's text.  Override this method to emit
 	 *  custom Token objects.
+	 *
+	 *  If you are building trees, then you should also override
+	 *  Parser or TreeParser.getMissingSymbol().
 	 */
 	public Token emit() {
 		Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
