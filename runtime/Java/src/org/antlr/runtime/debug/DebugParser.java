@@ -91,22 +91,7 @@ public class DebugParser extends Parser {
 		dbg.endBacktrack(level,successful);		
 	}
 
-	public void recoverFromMismatchedToken(IntStream input,
-										   RecognitionException mte,
-										   int ttype,
-										   BitSet follow)
-		throws RecognitionException
-	{
-		dbg.recognitionException(mte);
-		super.recoverFromMismatchedToken(input,mte,ttype,follow);
-	}
-
-	public void recoverFromMismatchedSet(IntStream input,
-										 RecognitionException mte,
-										 BitSet follow)
-		throws RecognitionException
-	{
-		dbg.recognitionException(mte);
-		super.recoverFromMismatchedSet(input,mte,follow);
+	public void reportError(RecognitionException e) {
+		dbg.recognitionException(e);
 	}
 }

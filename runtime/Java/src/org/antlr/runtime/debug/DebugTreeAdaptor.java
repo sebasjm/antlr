@@ -27,6 +27,10 @@ public class DebugTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object create(Token payload) {
+		if ( payload.getTokenIndex() < 0 ) {
+			// could be token conjured up during error recovery
+			return create(payload.getType(), payload.getText());
+		}
 		Object node = adaptor.create(payload);
 		dbg.createNode(node, payload);
 		return node;

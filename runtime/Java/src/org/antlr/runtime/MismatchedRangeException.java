@@ -30,6 +30,9 @@ package org.antlr.runtime;
 public class MismatchedRangeException extends RecognitionException {
 	public int a,b;
 
+	/** Used for remote debugger deserialization */
+	public MismatchedRangeException() {;}
+
 	public MismatchedRangeException(int a, int b, IntStream input) {
 		super(input);
 		this.a = a;

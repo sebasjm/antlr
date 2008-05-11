@@ -77,6 +77,20 @@ public class DebugTreeParser extends TreeParser {
 		e.printStackTrace(System.err);
 	}
 
+	public void reportError(RecognitionException e) {
+		dbg.recognitionException(e);
+	}
+
+	protected Object getMissingSymbol(IntStream input,
+									  RecognitionException e,
+									  int expectedTokenType,
+									  BitSet follow)
+	{
+		Object o = super.getMissingSymbol(input, e, expectedTokenType, follow);
+		dbg.consumeNode(o);
+		return o;
+	}
+
 	public void beginResync() {
 		dbg.beginResync();
 	}
@@ -91,24 +105,5 @@ public class DebugTreeParser extends TreeParser {
 
 	public void endBacktrack(int level, boolean successful) {
 		dbg.endBacktrack(level,successful);		
-	}
-
-	public void recoverFromMismatchedToken(IntStream input,
-										   RecognitionException mte,
-										   int ttype,
-										   BitSet follow)
-		throws RecognitionException
-	{
-		dbg.recognitionException(mte);
-		super.recoverFromMismatchedToken(input,mte,ttype,follow);
-	}
-
-	public void recoverFromMismatchedSet(IntStream input,
-										 RecognitionException mte,
-										 org.antlr.runtime.BitSet follow)
-		throws RecognitionException
-	{
-		dbg.recognitionException(mte);
-		super.recoverFromMismatchedSet(input,mte,follow);
 	}
 }

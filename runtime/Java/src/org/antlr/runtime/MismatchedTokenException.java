@@ -29,10 +29,10 @@ package org.antlr.runtime;
 
 /** A mismatched char or Token or tree node */
 public class MismatchedTokenException extends RecognitionException {
-	public int expecting;
+	public int expecting = Token.INVALID_TOKEN_TYPE;
 
-	public MismatchedTokenException() {
-	}
+	/** Used for remote debugger deserialization */
+	public MismatchedTokenException() {;}
 
 	public MismatchedTokenException(int expecting, IntStream input) {
 		super(input);

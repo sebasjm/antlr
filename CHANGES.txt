@@ -7,6 +7,26 @@ University of San Francisco
 
 CHANGES
 
+May 10, 2008
+
+* [BACKWARD INCOMPATIBLE if you override match()]
+  I had turned off single token insertion and deletion because I could not figure
+  out how to work with trees and actions. Figure that out and so I turned it back on.
+  match() returns Object matched now (parser, tree parser) so we can set labels
+  on token refs properly after single token ins/del error recovery.  Allows actions
+  and tree construction to proceed normally even though we recover in the middle of
+  an alternative.  Added methods for conjuring up missing symbols: getMissingSymbol().
+
+* refactored BaseRecognizer error handling routines
+
+* Single token error recovery was not properly taking into consideration EOF.
+
+* ANTLR no longer tries to recover in tree parsers inline using single node deletion or insertion; throw exception.  Trees should be well formed as they are not created by users.
+
+* Added empty constructors to the exception classes that did not have them so that ANTLRWorks can create the exceptions.
+
+* Made debug tree adaptor deal with tokens conjured up during error recovery.
+
 May 8, 2008
 
 * ANTLR didn't update line/col to DFA map for AW.

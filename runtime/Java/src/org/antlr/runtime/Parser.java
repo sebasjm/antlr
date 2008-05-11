@@ -50,6 +50,28 @@ public class Parser extends BaseRecognizer {
 		}
 	}
 
+	protected Object getCurrentInputSymbol(IntStream input) {
+		return ((TokenStream)input).LT(1);
+	}
+
+	protected Object getMissingSymbol(IntStream input,
+									  RecognitionException e,
+									  int expectedTokenType,
+									  BitSet follow)
+	{
+		String tokenText =
+			"<missing "+getTokenNames()[expectedTokenType]+">";
+		CommonToken t = new CommonToken(expectedTokenType, tokenText);
+		Token current = ((TokenStream)input).LT(1);
+		if ( current.getType() == Token.EOF ) {
+			current = ((TokenStream)input).LT(-1);
+		}
+		t.line = current.getLine();
+		t.charPositionInLine = current.getCharPositionInLine();
+		t.channel = DEFAULT_TOKEN_CHANNEL;
+		return t;
+	}
+
 	/** Set the token stream and reset the parser */
 	public void setTokenStream(TokenStream input) {
 		this.input = null;
@@ -64,7 +86,7 @@ public class Parser extends BaseRecognizer {
 	public String getSourceName() {
 		return input.getSourceName();
 	}
-	
+
 	public void traceIn(String ruleName, int ruleIndex)  {
 		super.traceIn(ruleName, ruleIndex, input.LT(1));
 	}

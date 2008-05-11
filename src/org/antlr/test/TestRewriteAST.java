@@ -1320,6 +1320,53 @@ public class TestRewriteAST extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
+	public void testExtraTokenInSimpleDecl() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"tokens {EXPR;}\n" +
+			"decl : type ID '=' INT ';' -> ^(EXPR type ID INT) ;\n" +
+			"type : 'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "decl", "int 34 x=1;", debug);
+		assertEquals("line 1:4 extraneous input '34' expecting ID\n", this.stderr);
+		assertEquals("(EXPR int x 1)\n", found); // tree gets correct x and 1 tokens
+	}
+
+	public void testMissingIDInSimpleDecl() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"tokens {EXPR;}\n" +
+			"decl : type ID '=' INT ';' -> ^(EXPR type ID INT) ;\n" +
+			"type : 'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "decl", "int =1;", debug);
+		assertEquals("line 1:4 missing ID at '='\n", this.stderr);
+		assertEquals("(EXPR int <missing ID> 1)\n", found); // tree gets invented ID token
+	}
+
+	public void testMissingSetInSimpleDecl() throws Exception {
+		String grammar =
+			"grammar foo;\n" +
+			"options {output=AST;}\n" +
+			"tokens {EXPR;}\n" +
+			"decl : type ID '=' INT ';' -> ^(EXPR type ID INT) ;\n" +
+			"type : 'int' | 'float' ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
+								  "decl", "x=1;", debug);
+		assertEquals("line 1:0 mismatched input 'x' expecting set null\n", this.stderr);
+		assertEquals("(EXPR <error: x> x 1)\n", found); // tree gets invented ID token
+	}
 
 	public void testMissingTokenGivesErrorNode() throws Exception {
 		String grammar =
@@ -1331,7 +1378,9 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc", debug);
-		assertEquals("<mismatched token: [@-1,0:0='<no text>',<-1>,0:-1], resync=abc>\n", found);
+		assertEquals("line 0:-1 missing INT at '<EOF>'\n", this.stderr);
+		// doesn't do in-line recovery for sets (yet?)
+		assertEquals("abc <missing INT>\n", found);
 	}
 
 	public void testExtraTokenGivesErrorNode() throws Exception {
@@ -1346,7 +1395,8 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc ick 34", debug);
-		assertEquals("abc <extraneous: [@2,4:6='ick',<4>,1:4], resync=ick 34>\n", found);
+		assertEquals("line 1:4 extraneous input 'ick' expecting INT\n", this.stderr);
+		assertEquals("abc 34\n", found);
 	}
 
 	public void testMissingFirstTokenGivesErrorNode() throws Exception {
@@ -1359,7 +1409,8 @@ public class TestRewriteAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "34", debug);
-		assertEquals("<missing type: 4>\n", found);
+		assertEquals("line 1:0 missing ID at '34'\n", this.stderr);
+		assertEquals("<missing ID> 34\n", found);
 	}
 
 	public void testMissingFirstTokenGivesErrorNode2() throws Exception {
@@ -1377,7 +1428,8 @@ public class TestRewriteAST extends BaseTest {
 		// finds an error at the first token, 34, and re-syncs.
 		// re-synchronizing does not consume a token because 34 follows
 		// ref to rule b (start of c). It then matches 34 in c.
-		assertEquals("<missing type: 4> 34\n", found);
+		assertEquals("line 1:0 missing ID at '34'\n", this.stderr);
+		assertEquals("<missing ID> 34\n", found);
 	}
 
 	public void testNoViableAltGivesErrorNode() throws Exception {
@@ -1396,6 +1448,7 @@ public class TestRewriteAST extends BaseTest {
 		// finds an error at the first token, 34, and re-syncs.
 		// re-synchronizing does not consume a token because 34 follows
 		// ref to rule b (start of c). It then matches 34 in c.
+		assertEquals("line 1:0 no viable alternative at input '*'\n", this.stderr);
 		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
 

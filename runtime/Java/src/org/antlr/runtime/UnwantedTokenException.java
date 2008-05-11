@@ -29,6 +29,9 @@ package org.antlr.runtime;
 
 /** An extra token while parsing a TokenStream */
 public class UnwantedTokenException extends MismatchedTokenException {
+	/** Used for remote debugger deserialization */
+	public UnwantedTokenException() {;}
+
 	public UnwantedTokenException(int expecting, IntStream input) {
 		super(expecting, input);
 	}
@@ -38,7 +41,13 @@ public class UnwantedTokenException extends MismatchedTokenException {
 	}
 
 	public String toString() {
-		return "UnwantedTokenException(found="+token.getText()+", expected "+
-			   expecting+")";
+		String exp = ", expected "+expecting;
+		if ( expecting==Token.INVALID_TOKEN_TYPE ) {
+			exp = "";
+		}
+		if ( token==null ) {
+			return "UnwantedTokenException(found="+null+exp+")";
+		}
+		return "UnwantedTokenException(found="+token.getText()+exp+")";
 	}
 }

@@ -225,6 +225,8 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		return nodes.get(p+k-1);
 	}
 
+	public Object getCurrentSymbol() { return LT(1); }
+
 /*
 	public Object getLastTreeNode() {
 		int i = index();

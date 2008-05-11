@@ -69,6 +69,20 @@ public class TreeParser extends BaseRecognizer {
 		return input.getSourceName();
 	}
 
+	protected Object getCurrentInputSymbol(IntStream input) {
+		return ((TreeNodeStream)input).LT(1);
+	}
+
+	protected Object getMissingSymbol(IntStream input,
+									  RecognitionException e,
+									  int expectedTokenType,
+									  BitSet follow)
+	{
+		String tokenText =
+			"<missing "+getTokenNames()[expectedTokenType]+">";
+		return new CommonTree(new CommonToken(expectedTokenType, tokenText));
+	}	
+
 	/** Match '.' in tree parser has special meaning.  Skip node or
 	 *  entire tree if node has children.  If children, scan until
 	 *  corresponding UP node.
@@ -100,14 +114,13 @@ public class TreeParser extends BaseRecognizer {
 	}
 
 	/** We have DOWN/UP nodes in the stream that have no line info; override.
-	 *  plus we want to alter the exception type.
+	 *  plus we want to alter the exception type.  Don't try to recover
+	 *  from tree parser errors inline...
 	 */
 	protected void mismatch(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
 	{
-		MismatchedTreeNodeException mte =
-			new MismatchedTreeNodeException(ttype, (TreeNodeStream)input);
-		recoverFromMismatchedToken(input, mte, ttype, follow);
+		throw new MismatchedTreeNodeException(ttype, (TreeNodeStream)input);
 	}
 
 	/** Prefix error message with the grammar name because message is
