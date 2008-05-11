@@ -492,7 +492,7 @@ block[String blockTemplateName, DFA dfa]
               	r.getType()==REWRITE &&
               	r.getFirstChild()!=null &&
 		  		r.getFirstChild().getType()==ETC;
-    		  if ( rew!=null && !etc ) {
+    		  if ( r.getType()==REWRITE && !etc ) {
     		  	alt.setAttribute("elements.{el,line,pos}",
     		  		rew, Utils.integer(r.getLine()), Utils.integer(r.getColumn()));
     		  }

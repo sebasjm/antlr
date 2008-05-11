@@ -27,6 +27,8 @@ May 10, 2008
 
 * Made debug tree adaptor deal with tokens conjured up during error recovery.
 
+* Removed extra location() debug element that was emitted.
+
 May 8, 2008
 
 * ANTLR didn't update line/col to DFA map for AW.
