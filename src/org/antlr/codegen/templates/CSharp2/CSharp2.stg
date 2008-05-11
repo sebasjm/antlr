@@ -702,11 +702,12 @@ case <i> :
 >>
 
 /** An alternative is just a list of elements; at outermost level */
-alt(elements,altNum,description,autoAST,outerAlt,treeLevel) ::= <<
+alt(elements,altNum,description,autoAST,outerAlt,treeLevel,rew) ::= <<
 // <fileName>:<description>
 {
 	<@declarations()>
 	<elements:element()>
+	<rew>
 	<@cleanup()>
 }
 >>

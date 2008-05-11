@@ -492,10 +492,7 @@ block[String blockTemplateName, DFA dfa]
               	r.getType()==REWRITE &&
               	r.getFirstChild()!=null &&
 		  		r.getFirstChild().getType()==ETC;
-    		  if ( r.getType()==REWRITE && !etc ) {
-    		  	alt.setAttribute("elements.{el,line,pos}",
-    		  		rew, Utils.integer(r.getLine()), Utils.integer(r.getColumn()));
-    		  }
+    		  if ( rew!=null && !etc ) { alt.setAttribute("rew", rew); }
     		  // add this alt to the list of alts for this block
               code.setAttribute("alts",alt);
               alt.setAttribute("altNum", Utils.integer(altNum));
