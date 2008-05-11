@@ -60,8 +60,9 @@ public class Interp {
 		String inputFileName = args[3];
 
 		// TODO: using wrong constructor now
+		Tool tool = new Tool();
 		CompositeGrammar composite = new CompositeGrammar();
-		Grammar parser = new Grammar(new Tool(), grammarFileName, composite);
+		Grammar parser = new Grammar(tool, grammarFileName, composite);
 		composite.setDelegationRoot(parser);
 		FileReader fr = new FileReader(grammarFileName);
 		BufferedReader br = new BufferedReader(fr);
@@ -86,12 +87,15 @@ public class Interp {
 		Grammar lexer = new Grammar();
 		lexer.importTokenVocabulary(parser);
 		lexer.fileName = grammarFileName;
+		lexer.setTool(tool);
 		if ( lexerGrammarText!=null ) {
 			lexer.setGrammarContent(lexerGrammarText);
 		}
 		else {
 			System.err.println("no lexer grammar found in "+grammarFileName);
 		}
+		lexer.composite.createNFAs();
+		
 		CharStream input =
 			new ANTLRFileStream(inputFileName);
 		Interpreter lexEngine = new Interpreter(lexer, input);

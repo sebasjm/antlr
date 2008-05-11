@@ -217,10 +217,10 @@ public class Interpreter implements TokenSource {
 							   List visitedStates)
 		throws RecognitionException
 	{
-		if ( actions!=null ) {
-			actions.enterRule(grammar.getFileName(), start.enclosingRule.name);
-		}
 		NFAState s = start;
+		if ( actions!=null ) {
+			actions.enterRule(s.nfa.grammar.getFileName(), start.enclosingRule.name);
+		}
 		int t = input.LA(1);
 		while ( s!=stop ) {
 			if ( visitedStates!=null ) {
@@ -228,17 +228,17 @@ public class Interpreter implements TokenSource {
 			}
 			/*
 			System.out.println("parse state "+s.stateNumber+" input="+
-				grammar.getTokenDisplayName(t));
+				s.nfa.grammar.getTokenDisplayName(t));
 				*/
 			// CASE 1: decision state
-			if ( s.getDecisionNumber()>0 && grammar.getNumberOfAltsForDecisionNFA(s)>1 ) {
+			if ( s.getDecisionNumber()>0 && s.nfa.grammar.getNumberOfAltsForDecisionNFA(s)>1 ) {
 				// decision point, must predict and jump to alt
-				DFA dfa = grammar.getLookaheadDFA(s.getDecisionNumber());
+				DFA dfa = s.nfa.grammar.getLookaheadDFA(s.getDecisionNumber());
 				/*
-				if ( grammar.type!=Grammar.LEXER ) {
+				if ( s.nfa.grammar.type!=Grammar.LEXER ) {
 					System.out.println("decision: "+
 								   dfa.getNFADecisionStartState().getDescription()+
-								   " input="+grammar.getTokenDisplayName(t));
+								   " input="+s.nfa.grammar.getTokenDisplayName(t));
 				}
 				*/
 				int m = input.mark();
@@ -260,18 +260,18 @@ public class Interpreter implements TokenSource {
 				int parseAlt =
 					s.translateDisplayAltToWalkAlt(predictedAlt);
 				/*
-				if ( grammar.type!=Grammar.LEXER ) {
+				if ( s.nfa.grammar.type!=Grammar.LEXER ) {
 					System.out.println("predicted alt "+predictedAlt+", parseAlt "+
 									   parseAlt);
 				}
 				*/
 				NFAState alt;
-				if ( parseAlt > grammar.getNumberOfAltsForDecisionNFA(s) ) {
+				if ( parseAlt > s.nfa.grammar.getNumberOfAltsForDecisionNFA(s) ) {
 					// implied branch of loop etc...
-					alt = grammar.nfa.getState( s.endOfBlockStateNumber );
+					alt = s.nfa.grammar.nfa.getState( s.endOfBlockStateNumber );
 				}
 				else {
-					alt = grammar.getNFAStateForAltOfDecision(s, parseAlt);
+					alt = s.nfa.grammar.getNFAStateForAltOfDecision(s, parseAlt);
 				}
 				s = (NFAState)alt.transition[0].target;
 				continue;
@@ -280,7 +280,7 @@ public class Interpreter implements TokenSource {
 			// CASE 2: finished matching a rule
 			if ( s.isAcceptState() ) { // end of rule node
 				if ( actions!=null ) {
-					actions.exitRule(grammar.getFileName(), s.enclosingRule.name);
+					actions.exitRule(s.nfa.grammar.getFileName(), s.enclosingRule.name);
 				}
 				if ( ruleInvocationStack.empty() ) {
 					// done parsing.  Hit the start state.
@@ -314,8 +314,13 @@ public class Interpreter implements TokenSource {
 				if ( trans instanceof RuleClosureTransition ) {
 					ruleInvocationStack.push(s);
 					s = (NFAState)trans.target;
+					//System.out.println("call "+s.enclosingRule.name+" from "+s.nfa.grammar.getFileName());
 					if ( actions!=null ) {
-						actions.enterRule(grammar.getFileName(), s.enclosingRule.name);
+						actions.enterRule(s.nfa.grammar.getFileName(), s.enclosingRule.name);
+					}
+					// could be jumping to new grammar, make sure DFA created
+					if ( !s.nfa.grammar.allDecisionDFAHaveBeenCreated() ) {
+						s.nfa.grammar.createLookaheadDFAs();
 					}
 				}
 				// CASE 3b: plain old epsilon transition, just move
@@ -327,8 +332,8 @@ public class Interpreter implements TokenSource {
 			// CASE 4: match label on transition
 			else if ( label.matches(t) ) {
 				if ( actions!=null ) {
-					if ( grammar.type == Grammar.PARSER ||
-						 grammar.type == Grammar.COMBINED )
+					if ( s.nfa.grammar.type == Grammar.PARSER ||
+						 s.nfa.grammar.type == Grammar.COMBINED )
 					{
 						actions.consumeToken(((TokenStream)input).LT(1));
 					}
@@ -377,7 +382,7 @@ public class Interpreter implements TokenSource {
 		}
 		//System.out.println("hit stop state for "+stop.getEnclosingRule());
 		if ( actions!=null ) {
-			actions.exitRule(grammar.getFileName(), stop.enclosingRule.name);
+			actions.exitRule(s.nfa.grammar.getFileName(), stop.enclosingRule.name);
 		}
 	}
 
