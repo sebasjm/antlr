@@ -31,14 +31,13 @@ package org.antlr.runtime;
  *  is actually what we wanted next.
  */
 public class MissingTokenException extends MismatchedTokenException {
+	public Token inserted;
 	/** Used for remote debugger deserialization */
 	public MissingTokenException() {;}
 
 	public MissingTokenException(int expecting, IntStream input, Token inserted) {
 		super(expecting, input);
-		if ( inserted!=null ) {
-			this.token = inserted;
-		}
+		this.inserted = inserted;
 	}
 
 	public int getMissingType() {
@@ -46,6 +45,12 @@ public class MissingTokenException extends MismatchedTokenException {
 	}
 
 	public String toString() {
-		return "MissingTokenException(inserted"+(token!=null?(" "+token):"")+")";
+		if ( inserted!=null && token!=null ) {
+			return "MissingTokenException(inserted "+inserted.getText()+" at "+token.getText()+")";
+		}
+		if ( token!=null ) {
+			return "MissingTokenException(at "+token.getText()+")";
+		}
+		return "MissingTokenException";
 	}
 }
