@@ -594,10 +594,10 @@ public abstract class BaseRecognizer {
 		}
 		// can't recover with single token deletion, try insertion
 		if ( mismatchIsMissingToken(input, follow) ) {
-			Token t = (Token)getMissingSymbol(input, e, ttype, follow);
-			e = new MissingTokenException(ttype, input, t);
+			Object inserted = getMissingSymbol(input, e, ttype, follow);
+			e = new MissingTokenException(ttype, input, inserted);
 			reportError(e);  // report after inserting so AW sees the token in the exception
-			return t;
+			return inserted;
 		}
 		// even that didn't work; must throw the exception
 		e = new MismatchedTokenException(ttype, input);

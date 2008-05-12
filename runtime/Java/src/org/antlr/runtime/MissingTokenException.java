@@ -28,14 +28,14 @@
 package org.antlr.runtime;
 
 /** We were expecting a token but it's not found.  The current token
- *  is actually what we wanted next.
+ *  is actually what we wanted next.  Used for tree node errors too.
  */
 public class MissingTokenException extends MismatchedTokenException {
-	public Token inserted;
+	public Object inserted;
 	/** Used for remote debugger deserialization */
 	public MissingTokenException() {;}
 
-	public MissingTokenException(int expecting, IntStream input, Token inserted) {
+	public MissingTokenException(int expecting, IntStream input, Object inserted) {
 		super(expecting, input);
 		this.inserted = inserted;
 	}
@@ -46,7 +46,7 @@ public class MissingTokenException extends MismatchedTokenException {
 
 	public String toString() {
 		if ( inserted!=null && token!=null ) {
-			return "MissingTokenException(inserted "+inserted.getText()+" at "+token.getText()+")";
+			return "MissingTokenException(inserted "+inserted+" at "+token.getText()+")";
 		}
 		if ( token!=null ) {
 			return "MissingTokenException(at "+token.getText()+")";
