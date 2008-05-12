@@ -105,16 +105,8 @@ namespace Antlr.Runtime.Debug
 			dbg.EndResync();
 		}
 
-		override public void RecoverFromMismatchedToken(IIntStream input, RecognitionException mte, int ttype, BitSet follow)
-		{
-			dbg.RecognitionException(mte);
-			base.RecoverFromMismatchedToken(input, mte, ttype, follow);
-		}
-
-		override public void RecoverFromMismatchedSet(IIntStream input, RecognitionException mte, BitSet follow)
-		{
-			dbg.RecognitionException(mte);
-			base.RecoverFromMismatchedSet(input, mte, follow);
+		public override void ReportError(RecognitionException e) {
+			dbg.RecognitionException(e);
 		}
 	}
 }

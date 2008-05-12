@@ -14,10 +14,6 @@ are met:
    distribution.
 3. The name of the author may not be used to endorse or promote products
    derived from this software without specific prior WRITTEN permission.
-4. Unless explicitly state otherwise, any contribution intentionally 
-   submitted for inclusion in this work to the copyright owner or licensor
-   shall be under the terms and conditions of this license, without any 
-   additional terms or conditions.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -40,6 +36,12 @@ namespace Antlr.Runtime
 	/// An extra token while parsing a TokenStream.
 	/// </summary>
 	public class UnwantedTokenException : MismatchedTokenException {
+		/// <summary>
+		/// Used for remote debugger deserialization
+		/// </summary>
+		public UnwantedTokenException() {
+		}
+
 		public UnwantedTokenException(int expecting, IIntStream input)
 			: base(expecting, input) {
 		}
@@ -49,8 +51,14 @@ namespace Antlr.Runtime
 		}
 	
 		public override string ToString() {
-			return "UnwantedTokenException(found=" + token.Text + ", expected " +
-				   expecting + ")";
+			string exp = ", expected " + Expecting;
+			if (Expecting == Runtime.Token.INVALID_TOKEN_TYPE) {
+				exp = "";
+			}
+			if (token==null) {
+				return "UnwantedTokenException(found=" + null + exp + ")";
+			}
+			return "UnwantedTokenException(found=" + token.Text + exp + ")";
 		}
 	}
 }

@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -36,9 +37,13 @@ namespace Antlr.Runtime
 {
 	using System;
 
-	[Serializable]
-	public abstract class Token
-	{
+	public sealed class Token {
+		/// <summary>
+		/// Instead of a static modifier for Token.
+		/// </summary>
+		private Token() {
+		}
+		
 		public const int EOR_TOKEN_TYPE = 1;
 
 		/// <summary>imaginary tree navigation type; traverse "get child" link </summary>

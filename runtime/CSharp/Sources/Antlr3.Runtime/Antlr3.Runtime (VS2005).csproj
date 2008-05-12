@@ -1,5 +1,4 @@
-﻿
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -108,7 +107,7 @@
     <Compile Include="Antlr.Runtime\ITokenSource.cs" />
     <Compile Include="Antlr.Runtime\MissingTokenException.cs" />
     <Compile Include="Antlr.Runtime.Tree\CommonErrorNode.cs" />
-    <Compile Include="Antlr.Runtime\UnwantedTokenJava.cs" />
+    <Compile Include="Antlr.Runtime\UnwantedTokenException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Antlr.Runtime.Collections\CollectionUtils.cs" />

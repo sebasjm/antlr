@@ -743,10 +743,7 @@ element() ::= <<
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex,hetero) ::= <<
-<if(label)>
-<label> = (<labelType>)input.LT(1);<\n>
-<endif>
-Match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
+<if(label)><label>=(<labelType>)<endif>Match(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */

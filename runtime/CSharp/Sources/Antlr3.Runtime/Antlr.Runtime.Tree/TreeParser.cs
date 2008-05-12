@@ -71,6 +71,18 @@ namespace Antlr.Runtime.Tree
 			get { return input.SourceName; }
 		}
 
+		protected virtual object GetCurrentInputSymbol(IIntStream input) {
+			return ((ITreeNodeStream)input).LT(1);
+		}
+
+		protected virtual object GetMissingSymbol(IIntStream input,
+										  RecognitionException e,
+										  int expectedTokenType,
+										  BitSet follow) {
+			string tokenText = "<missing " + TokenNames[expectedTokenType] + ">";
+			return new CommonTree(new CommonToken(expectedTokenType, tokenText));
+		}	
+
 		/// <summary>Reset the parser </summary>
 		override public void Reset() 
 		{
@@ -128,12 +140,11 @@ namespace Antlr.Runtime.Tree
 		protected internal ITreeNodeStream input;
 
 		/// <summary>We have DOWN/UP nodes in the stream that have no line info; override.
-		/// plus we want to alter the exception type.
+		/// plus we want to alter the exception type. Don't try to recover
+		/// from tree parser errors inline...
 		/// </summary>
-		protected internal override void Mismatch(IIntStream input, int ttype, BitSet follow)
-		{
-			MismatchedTreeNodeException mte = new MismatchedTreeNodeException(ttype, (ITreeNodeStream) input);
-			RecoverFromMismatchedToken(input, mte, ttype, follow);
+		protected internal override void Mismatch(IIntStream input, int ttype, BitSet follow) {
+			throw new MismatchedTreeNodeException(ttype, (ITreeNodeStream)input);
 		}
 
 		/// <summary>

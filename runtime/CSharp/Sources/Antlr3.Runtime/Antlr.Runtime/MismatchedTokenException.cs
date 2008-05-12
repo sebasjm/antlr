@@ -43,8 +43,16 @@ namespace Antlr.Runtime
 	[Serializable]
 	public class MismatchedTokenException : RecognitionException
 	{
-		public int expecting;
+		private int expecting = Runtime.Token.INVALID_TOKEN_TYPE;
 		
+		public int Expecting {
+			get { return expecting; }
+			set { expecting = value; }
+		}
+		
+		/// <summary>
+		/// Used for remote debugger deserialization
+		/// </summary>
 		public MismatchedTokenException()
 		{
 		}

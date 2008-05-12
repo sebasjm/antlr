@@ -97,6 +97,19 @@ namespace Antlr.Runtime.Debug
 			ErrorManager.InternalError(e);
 		}
 
+		public override void ReportError(RecognitionException e) {
+			dbg.RecognitionException(e);
+		}
+
+		protected override object GetMissingSymbol(IIntStream input,
+										  RecognitionException e,
+										  int expectedTokenType,
+										  BitSet follow) {
+			object o = base.GetMissingSymbol(input, e, expectedTokenType, follow);
+			dbg.ConsumeNode(o);
+			return o;
+		}
+
 		override public void BeginResync()
 		{
 			dbg.BeginResync();
@@ -115,23 +128,6 @@ namespace Antlr.Runtime.Debug
 		override public void EndBacktrack(int level, bool successful)
 		{
 			dbg.EndBacktrack(level, successful);
-		}
-
-		override public void RecoverFromMismatchedToken(IIntStream input,
-											   RecognitionException mte,
-											   int ttype,
-											   BitSet follow)
-		{
-			dbg.RecognitionException(mte);
-			base.RecoverFromMismatchedToken(input, mte, ttype, follow);
-		}
-
-		override public void RecoverFromMismatchedSet(IIntStream input,
-											 RecognitionException mte,
-											 BitSet follow)
-		{
-			dbg.RecognitionException(mte);
-			base.RecoverFromMismatchedSet(input, mte, follow);
 		}
 	}
 }

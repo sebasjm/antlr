@@ -14,10 +14,6 @@ are met:
    distribution.
 3. The name of the author may not be used to endorse or promote products
    derived from this software without specific prior WRITTEN permission.
-4. Unless explicitly state otherwise, any contribution intentionally 
-   submitted for inclusion in this work to the copyright owner or licensor
-   shall be under the terms and conditions of this license, without any 
-   additional terms or conditions.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -38,20 +34,40 @@ namespace Antlr.Runtime
 	
 	/// <summary>
 	/// We were expecting a token but it's not found. The current token
-	/// is actually what we wanted next.
+	/// is actually what we wanted next. Used for tree node errors too.
 	/// </summary>
 	[Serializable]
 	public class MissingTokenException : MismatchedTokenException {
-		public MissingTokenException(int expecting, IIntStream input)
+		private object inserted;		
+		
+		/// <summary>
+		/// Used for remote debugger deserialization
+		/// </summary>
+		public MissingTokenException() {
+		}
+
+		public MissingTokenException(int expecting, IIntStream input, object inserted)
 			: base(expecting, input) {
+			this.inserted = inserted;
 		}
 	
 		public int MissingType {
-			get { return expecting; }
+			get { return Expecting; }
+		}
+		
+		public object Inserted {
+			get { return inserted; }
+			set { inserted = value; }
 		}
 	
 		public override String ToString() {
-			return "MissingTokenException(expected " + expecting + ")";
+			if (inserted != null && token != null) {
+				return "MissingTokenException(inserted " + inserted + " at " + token.Text + ")";
+			}
+			if (token != null) {
+				return "MissingTokenException(at " + token.Text + ")";
+			}
+			return "MissingTokenException";
 		}
 	}
 }

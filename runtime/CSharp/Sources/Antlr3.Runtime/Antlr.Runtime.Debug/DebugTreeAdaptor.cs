@@ -64,6 +64,10 @@ namespace Antlr.Runtime.Debug
 
 		public object Create(IToken payload)
 		{
+			if (payload.TokenIndex < 0) {
+				// could be token conjured up during error recovery
+				return Create(payload.Type, payload.Text);
+			}
 			object node = adaptor.Create(payload);
 			dbg.CreateNode(node, payload);
 			return node;

@@ -353,6 +353,9 @@ namespace Antlr.Runtime.Tree
 			return nodes[p+k-1];
 		}
 
+		public virtual object CurrentSymbol {
+			get { return LT(1); }
+		}
 
 		/// <summary>
 		/// Look backwards k nodes

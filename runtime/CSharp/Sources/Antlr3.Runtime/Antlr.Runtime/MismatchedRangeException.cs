@@ -1,5 +1,6 @@
 /*
 [The "BSD licence"]
+Copyright (c) 2007-2008 Johannes Luber
 Copyright (c) 2005-2007 Kunle Odutola
 All rights reserved.
 
@@ -37,19 +38,32 @@ namespace Antlr.Runtime
 	using System;
 	
 	[Serializable]
-	public class MismatchedRangeException : RecognitionException
-	{
-		public int a, b;
+	public class MismatchedRangeException : RecognitionException {
+		private int a, b;
 		
+		public int A {
+			get { return a; }
+			set { a = value; }
+		}
+
+		public int B {
+			get { return b; }
+			set { b = value; }
+		}
+
+		/// <summary>
+		/// Used for remote debugger deserialization
+		/// </summary>
+		public MismatchedRangeException() {
+		}
+
 		public MismatchedRangeException(int a, int b, IIntStream input)
-			: base(input)
-		{
+			: base(input) {
 			this.a = a;
 			this.b = b;
 		}
 		
-		public override string ToString()
-		{
+		public override string ToString() {
 			return "MismatchedNotSetException(" + UnexpectedType + " not in [" + a + "," + b + "])";
 		}
 	}

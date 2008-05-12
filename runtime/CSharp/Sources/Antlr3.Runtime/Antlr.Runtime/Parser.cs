@@ -63,6 +63,27 @@ namespace Antlr.Runtime
 			}
 		}
 
+		protected virtual object GetCurrentInputSymbol(IIntStream input) {
+			return ((ITokenStream)input).LT(1);
+		}
+
+		protected virtual object GetMissingSymbol(IIntStream input,
+										  RecognitionException e,
+										  int expectedTokenType,
+										  BitSet follow)
+		{
+			String tokenText = "<missing " + TokenNames[expectedTokenType] + ">";
+			CommonToken t = new CommonToken(expectedTokenType, tokenText);
+			IToken current = ((ITokenStream)input).LT(1);
+			if (current.Type == Token.EOF) {
+				current = ((ITokenStream)input).LT(-1);
+			}
+			t.line = current.Line;
+			t.CharPositionInLine = current.CharPositionInLine;
+			t.Channel = DEFAULT_TOKEN_CHANNEL;
+			return t;
+		}
+
 		/// <summary>Set the token stream and reset the parser </summary>
 		virtual public ITokenStream TokenStream
 		{
@@ -76,7 +97,7 @@ namespace Antlr.Runtime
 			}
 			
 		}
-		
+
 		public override string SourceName {
 			get { return input.SourceName; }
 		}

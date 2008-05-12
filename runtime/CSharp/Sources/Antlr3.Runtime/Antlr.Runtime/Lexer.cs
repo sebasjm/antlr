@@ -226,7 +226,10 @@ namespace Antlr.Runtime
 		/// char buffer start..stop.  If there is a text override in 'text', 
 		/// use that to set the token's text. 
 		/// </summary>
-		/// <remarks>Override this method to emit custom Token objects.</remarks>
+		/// <remarks><para>Override this method to emit custom Token objects.</para>
+		/// <para>If you are building trees, then you should also override
+		/// Parser or TreeParser.getMissingSymbol().</para>
+		///</remarks>
 		public virtual IToken Emit()
 		{
 			IToken t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, CharIndex - 1);
@@ -321,7 +324,7 @@ namespace Antlr.Runtime
 			if (e is MismatchedTokenException)
 			{
 				MismatchedTokenException mte = (MismatchedTokenException)e;
-				msg = "mismatched character " + GetCharErrorDisplay(e.Char) + " expecting " + GetCharErrorDisplay(mte.expecting);
+				msg = "mismatched character " + GetCharErrorDisplay(e.Char) + " expecting " + GetCharErrorDisplay(mte.Expecting);
 			}
 			else if (e is NoViableAltException)
 			{
@@ -350,7 +353,7 @@ namespace Antlr.Runtime
 			else if (e is MismatchedRangeException)
 			{
 				MismatchedRangeException mre = (MismatchedRangeException)e;
-				msg = "mismatched character " + GetCharErrorDisplay(mre.Char) + " expecting set " + GetCharErrorDisplay(mre.a) + ".." + GetCharErrorDisplay(mre.b);
+				msg = "mismatched character " + GetCharErrorDisplay(mre.Char) + " expecting set " + GetCharErrorDisplay(mre.A) + ".." + GetCharErrorDisplay(mre.B);
 			}
 			else 
 			{

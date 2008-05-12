@@ -111,33 +111,33 @@ namespace Antlr.Runtime
 		}
 
 		/// <summary>
-		/// Match current input symbol against ttype.  Throw exception upon
-		/// error, bailing out of the current production to the normal error
-		/// exception catch (at the end of the method) by just throwing
-		/// MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
-		/// by resynchronize into the set of symbols the can follow.
+		/// Match current input symbol against ttype.  Attempt
+		/// single token insertion or deletion error recovery.  If
+		/// that fails, throw MismatchedTokenException.
 		/// </summary>
 		/// <remarks>
-		/// Prior to v3.1, this method used to do one token insertion or
-		/// deletion if possible. You can override Mismatch()
-		/// to recover here if you want.
+		/// To turn off single token insertion or deletion error
+		/// recovery, override mismatchRecover() and have it call
+		/// plain mismatch(), which does not recover. Then any error
+		/// in a rule will cause an exception and immediate exit from
+		/// rule. Rule would recover by resynchronizing to the set of
+		/// symbols that can follow rule ref.
 		/// </remarks>
-		public virtual void Match(IIntStream input, int ttype, BitSet follow)
-		{
-			if (input.LA(1) == ttype)
-			{
+		public virtual object Match(IIntStream input, int ttype, BitSet follow) {
+			object matchedSymbol = GetCurrentInputSymbol(input);
+			if (input.LA(1) == ttype) {
 				input.Consume();
 				state.errorRecovery = false;
 				state.failed = false;
-				return;
+				return matchedSymbol;
 			}
-			if (state.backtracking > 0)
-			{
+			if (state.backtracking > 0) {
 				state.failed = true;
-				return;
+				return matchedSymbol;
 			}
 			Mismatch(input, ttype, follow);
-			return;
+			matchedSymbol = RecoverFromMismatchedToken(input, ttype, follow);
+			return matchedSymbol;
 		}
 
 		/// <summary> Match the wildcard: in a symbol</summary>
@@ -158,17 +158,24 @@ namespace Antlr.Runtime
 				// a single token and hope for the best
 				return false;
 			}
+
 			// compute what can follow this grammar element reference
 			if (follow.Member(Token.EOR_TOKEN_TYPE)) {
-				BitSet viableTokensFollowingThisRule =
-					ComputeContextSensitiveRuleFOLLOW();
+				if (state.followingStackPointer >= 0) { // remove EOR if we're not the start symbol
+					follow.Remove(Token.EOR_TOKEN_TYPE);
+				}
+				BitSet viableTokensFollowingThisRule = ComputeContextSensitiveRuleFOLLOW();
 				follow = follow.Or(viableTokensFollowingThisRule);
-				follow.Remove(Token.EOR_TOKEN_TYPE);
 			}
+
 			// if current token is consistent with what could come after set
 			// then we know we're missing a token; error recovery is free to
 			// "insert" the missing token
-			if (follow.Member(input.LA(1))) {
+
+			// BitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
+			// in follow set to indicate that the fall of the start symbol is
+			// in the set (EOF can follow).
+			if ( follow.Member(input.LA(1)) || follow.Member(Token.EOR_TOKEN_TYPE) ) {
 				return true;
 			}
 			return false;
@@ -237,11 +244,11 @@ namespace Antlr.Runtime
 			if (e is UnwantedTokenException) {
 				UnwantedTokenException ute = (UnwantedTokenException)e;
 				string tokenName="<unknown>";
-				if ( ute.expecting== Token.EOF ) {
+				if ( ute.Expecting== Token.EOF ) {
 					tokenName = "EOF";
 				}
 				else {
-					tokenName = tokenNames[ute.expecting];
+					tokenName = tokenNames[ute.Expecting];
 				}
 				msg = "extraneous input " + GetTokenErrorDisplay(ute.UnexpectedToken) +
 					" expecting " + tokenName;
@@ -249,11 +256,11 @@ namespace Antlr.Runtime
 			else if (e is MissingTokenException) {
 				MissingTokenException mte = (MissingTokenException)e;
 				string tokenName="<unknown>";
-				if ( mte.expecting == Token.EOF ) {
+				if (mte.Expecting == Token.EOF) {
 					tokenName = "EOF";
 				}
 				else {
-					tokenName = tokenNames[mte.expecting];
+					tokenName = tokenNames[mte.Expecting];
 				}
 				msg = "missing " + tokenName + " at " + GetTokenErrorDisplay(e.Token);
 			}
@@ -261,13 +268,13 @@ namespace Antlr.Runtime
 			{
 				MismatchedTokenException mte = (MismatchedTokenException)e;
 				string tokenName = "<unknown>";
-				if (mte.expecting == Token.EOF)
+				if (mte.Expecting == Token.EOF)
 				{
 					tokenName = "EOF";
 				}
 				else
 				{
-					tokenName = tokenNames[mte.expecting];
+					tokenName = tokenNames[mte.Expecting];
 				}
 				msg = "mismatched input " + GetTokenErrorDisplay(e.Token) + " expecting " + tokenName;
 
@@ -441,30 +448,41 @@ namespace Antlr.Runtime
 		/// is in the set of tokens that can follow the ')' token
 		/// reference in rule atom.  It can assume that you forgot the ')'.
 		/// </remarks>
-		public virtual void RecoverFromMismatchedToken(IIntStream input, RecognitionException e, int ttype, BitSet follow)
-		{
+		protected virtual Object RecoverFromMismatchedToken(IIntStream input, int ttype, BitSet follow) {
+			RecognitionException e = null;
 			// if next token is what we are looking for then "delete" this token
 			if (MismatchIsUnwantedToken(input, ttype)) {
-				ReportError(e);
+				e = new UnwantedTokenException(ttype, input);
 				BeginResync();
 				input.Consume(); // simply delete extra token
 				EndResync();
+				ReportError(e);  // report after consuming so AW sees the token in the exception
+				// we want to return the token we're actually matching
+				object matchedSymbol = GetCurrentInputSymbol(input);
 				input.Consume(); // move past ttype token as if all were ok
-				return;
+				return matchedSymbol;
 			}
-			if (!RecoverFromMissingElement(input, e, follow))
-			{
-				throw e;
+			// can't recover with single token deletion, try insertion
+			if (MismatchIsMissingToken(input, follow)) {
+				object inserted = GetMissingSymbol(input, e, ttype, follow);
+				e = new MissingTokenException(ttype, input, inserted);
+				ReportError(e);  // report after inserting so AW sees the token in the exception
+				return inserted;
 			}
+			// even that didn't work; must throw the exception
+			e = new MismatchedTokenException(ttype, input);
+			throw e;
 		}
 
-		public virtual void RecoverFromMismatchedSet(IIntStream input, RecognitionException e, BitSet follow)
-		{
-			// TODO do single token deletion like above for Token mismatch
-			if (!RecoverFromMissingElement(input, e, follow))
-			{
-				throw e;
+		/** Not currently used */
+		public virtual object RecoverFromMismatchedSet(IIntStream input, RecognitionException e, BitSet follow) {
+			if (MismatchIsMissingToken(input, follow)) {
+				ReportError(e);
+				// we don't know how to conjure up a token for sets yet
+				return GetMissingSymbol(input, e, Token.INVALID_TOKEN_TYPE, follow);
 			}
+			// TODO do single token deletion like above for Token mismatch
+			throw e;
 		}
 
 		public virtual void ConsumeUntil(IIntStream input, int tokenType)
@@ -705,7 +723,9 @@ namespace Antlr.Runtime
 		/// <summary>
 		/// Factor out what to do upon token mismatch so tree parsers can behave
 		/// differently.  Override and call MismatchRecover(input, ttype, follow)
-	 	/// to get single token insertion and deletion.
+	 	/// to get single token insertion and deletion. Use this to turn off
+		/// single token insertion and deletion. Override mismatchRecover
+		/// to call this instead.
 		/// </summary>
 		protected internal virtual void Mismatch(IIntStream input, int ttype, BitSet follow)
 		{
@@ -713,26 +733,11 @@ namespace Antlr.Runtime
 				throw new UnwantedTokenException(ttype, input);
 			}
 			else if ( MismatchIsMissingToken(input, follow) ) {
-				throw new MissingTokenException(ttype, input);
+				throw new MissingTokenException(ttype, input, null);
 			}
 			throw new MismatchedTokenException(ttype, input);
 		}
 	
-		protected void MismatchRecover(IIntStream input, int ttype, BitSet follow)
-		{
-			MismatchedTokenException mte = null;
-			if ( MismatchIsUnwantedToken(input, ttype) ) {
-				mte = new UnwantedTokenException(ttype, input);
-			}
-			else if ( MismatchIsMissingToken(input, follow) ) {
-				mte = new MissingTokenException(ttype, input);
-			}
-			else {
-				mte = new MismatchedTokenException(ttype, input);
-			}
-			RecoverFromMismatchedToken(input, mte, ttype, follow);
-		}
-		
 		/*  Compute the error recovery set for the current rule.  During
 		*  rule invocation, the parser pushes the set of tokens that can
 		*  follow that rule reference on the stack; this amounts to
@@ -894,43 +899,62 @@ namespace Antlr.Runtime
 			{
 				BitSet localFollowSet = (BitSet)state.following[i];
 				followSet.OrInPlace(localFollowSet);
-				if (exact && !localFollowSet.Member(Token.EOR_TOKEN_TYPE))
-				{
-					break;
+				if (exact) {
+					// can we see end of rule?
+					if (localFollowSet.Member(Token.EOR_TOKEN_TYPE)) {
+						// Only leave EOR in set if at top (start rule); this lets
+						// us know if have to include follow(start rule); i.e., EOF
+						if (i > 0) {
+							followSet.Remove(Token.EOR_TOKEN_TYPE);
+						}
+					}
+					else { // can't see end of rule, quit
+						break;
+					}
 				}
 			}
-			followSet.Remove(Token.EOR_TOKEN_TYPE);
 			return followSet;
 		}
 		
-		/// <summary>This code is factored out from mismatched token and mismatched set
-		/// recovery.  It handles "single token insertion" error recovery for
-		/// both.  No tokens are consumed to Recover from insertions.  Return
-		/// true if recovery was possible else return false.
+		/// <summary>
+		/// Match needs to return the current input symbol, which gets put
+		/// into the label for the associated token ref; e.g., x=ID.  Token
+		/// and tree parsers need to return different objects. Rather than test
+		/// for input stream type or change the IntStream interface, I use
+		/// a simple method to ask the recognizer to tell me what the current
+		/// input symbol is.
 		/// </summary>
-		protected internal virtual bool RecoverFromMissingElement(IIntStream input, RecognitionException e, BitSet follow)
-		{
-			if (MismatchIsMissingToken(input, follow))
-			{
-				// we have no information about the follow; we can only consume
-				// a single token and hope for the best
-				return false;
-			}
-			// compute what can follow this grammar element reference
-			if (follow.Member(Token.EOR_TOKEN_TYPE))
-			{
-				BitSet viableTokensFollowingThisRule = ComputeContextSensitiveRuleFOLLOW();
-				follow = follow.Or(viableTokensFollowingThisRule);
-				follow.Remove(Token.EOR_TOKEN_TYPE);
-			}
-			// if current token is consistent with what could come after set
-			// then it is ok to "insert" the missing token, else throw exception
-			if (follow.Member(input.LA(1)))
-			{
-				ReportError(e);
-				return true;
-			}
-			return false;
+		/// <remarks>This is ignored for lexers.</remarks>
+		protected virtual object GetCurrentInputSymbol(IIntStream input) {
+			return null;
+		}
+
+		/// <summary>
+		/// Conjure up a missing token during error recovery.
+		/// </summary>
+		/// <remarks>
+		/// The recognizer attempts to recover from single missing
+		/// symbols. But, actions might refer to that missing symbol.
+		/// For example, x=ID {f($x);}. The action clearly assumes
+		/// that there has been an identifier matched previously and that
+		/// $x points at that token. If that token is missing, but
+		/// the next token in the stream is what we want we assume that
+		/// this token is missing and we keep going. Because we
+		/// have to return some token to replace the missing token,
+		/// we have to conjure one up. This method gives the user control
+		/// over the tokens returned for missing tokens. Mostly,
+		/// you will want to create something special for identifier
+		/// tokens. For literals such as '{' and ',', the default
+		/// action in the parser or tree parser works. It simply creates
+		/// a CommonToken of the appropriate type. The text will be the token.
+		/// If you change what tokens must be created by the lexer,
+		/// override this method to create the appropriate tokens.
+		/// </remarks>
+		protected virtual object GetMissingSymbol(IIntStream input,
+										  RecognitionException e,
+										  int expectedTokenType,
+										  BitSet follow) {
+			return null;
 		}
 		
 		/// <summary>
