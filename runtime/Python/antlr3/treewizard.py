@@ -131,7 +131,7 @@ class TreePatternLexer(object):
                 while self.c != ']':
                     if self.c == '\\':
                         self.consume()
-                        if self.c!=']':
+                        if self.c != ']':
                             self.sval += '\\'
 
                         self.sval += self.c
@@ -362,7 +362,7 @@ class TreeWizard(object):
 
 
     def index(self, tree):
-	"""Walk the entire tree and make a node name to nodes mapping.
+        """Walk the entire tree and make a node name to nodes mapping.
         
         For now, use recursion but later nonrecursive version may be
         more efficient.  Returns a dict int -> list where the list is
@@ -410,7 +410,7 @@ class TreeWizard(object):
 
 
     def _findTokenType(self, t, ttype):
- 	"""Return a List of tree nodes with token type ttype"""
+        """Return a List of tree nodes with token type ttype"""
 
         nodes = []
 
@@ -423,7 +423,7 @@ class TreeWizard(object):
 
 
     def _findPattern(self, t, pattern):
-	"""Return a List of subtrees matching pattern."""
+        """Return a List of subtrees matching pattern."""
         
         subtrees = []
         
@@ -433,7 +433,8 @@ class TreeWizard(object):
         tpattern = parser.pattern()
         
         # don't allow invalid patterns
-        if tpattern is None or tpattern.isNil() or isinstance(tpattern, WildcardTreePattern):
+        if (tpattern is None or tpattern.isNil()
+            or isinstance(tpattern, WildcardTreePattern)):
             return None
 
         rootTokenType = tpattern.getType()
@@ -444,11 +445,11 @@ class TreeWizard(object):
                 
         self.visit(t, rootTokenType, visitor)
 
-        return subtrees;
+        return subtrees
 
 
     def visit(self, tree, what, visitor):
-	"""Visit every node in tree matching what, invoking the visitor.
+        """Visit every node in tree matching what, invoking the visitor.
 
         If what is a string, it is parsed as a pattern and only matching
         subtrees will be visited.
@@ -474,7 +475,7 @@ class TreeWizard(object):
         
               
     def _visitType(self, t, parent, childIndex, ttype, visitor):
-	"""Do the recursive work for visit"""
+        """Do the recursive work for visit"""
         
         if t is None:
             return
@@ -488,14 +489,18 @@ class TreeWizard(object):
 
 
     def _visitPattern(self, tree, pattern, visitor):
- 	"""For all subtrees that match the pattern, execute the visit action."""
+        """
+        For all subtrees that match the pattern, execute the visit action.
+        """
+
         # Create a TreePattern from the pattern
         tokenizer = TreePatternLexer(pattern)
         parser = TreePatternParser(tokenizer, self, TreePatternTreeAdaptor())
         tpattern = parser.pattern()
         
         # don't allow invalid patterns
-        if tpattern is None or tpattern.isNil() or isinstance(tpattern, WildcardTreePattern):
+        if (tpattern is None or tpattern.isNil()
+            or isinstance(tpattern, WildcardTreePattern)):
             return
 
         rootTokenType = tpattern.getType()
@@ -509,7 +514,7 @@ class TreeWizard(object):
         
 
     def parse(self, t, pattern, labels=None):
-	"""
+        """
         Given a pattern like (ASSIGN %lhs:ID %rhs:.) with optional labels
         on the various nodes and '.' (dot) as the node/subtree wildcard,
         return true if the pattern matches and fill the labels Map with
@@ -528,7 +533,7 @@ class TreeWizard(object):
 
 
     def _parse(self, t1, t2, labels):
-	"""
+        """
         Do the work for parse. Check to see if the t2 pattern fits the
         structure and token types in t1.  Check text if the pattern has
         text arguments on nodes.  Fill labels map with pointers to nodes
@@ -567,8 +572,9 @@ class TreeWizard(object):
 
 
     def equals(self, t1, t2, adaptor=None):
-	"""
-        Compare t1 and t2; return true if token types/text, structure match exactly.
+        """
+        Compare t1 and t2; return true if token types/text, structure match
+        exactly.
         The trees are examined in their entirety so that (A B) does not match
         (A B C) nor (A (B C)). 
         """

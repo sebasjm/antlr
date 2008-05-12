@@ -51,6 +51,7 @@ if self._state.backtracking == 0:
 /** Add a variable to track last element matched */
 ruleDeclarations() ::= <<
 <super.ruleDeclarations()>
+_first_0 = None
 _last = None<\n>
 >>
 
@@ -58,7 +59,13 @@ _last = None<\n>
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
-<if(rewriteMode)>retval.tree = retval.start<endif>
+<finishedBacktracking({
+<if(rewriteMode)>
+retval.tree = _first_0
+if self.adaptor.getParent(retval.tree) is not None and self.adaptor.isNil(self.adaptor.getParent(retval.tree)):
+    retval.tree = self.adaptor.getParent(retval.tree)
+<endif>
+})>
 >>
 
 /** match ^(root children) in tree parser; override here to
@@ -68,10 +75,22 @@ tree(root, actionsAfterRoot, children, nullableChildList,
      enclosingTreeLevel, treeLevel) ::= <<
 _last = self.input.LT(1)
 _save_last_<treeLevel> = _last
+_first_<treeLevel> = None
 <if(!rewriteMode)>
 root_<treeLevel> = self.adaptor.nil()<\n>
 <endif>
 <root:element()>
+<if(rewriteMode)>
+<finishedBacktracking({
+<if(root.el.rule)>
+if _first_<enclosingTreeLevel> is None:
+    _first_<enclosingTreeLevel> = <root.el.label>.tree<\n>
+<else>
+if _first_<enclosingTreeLevel> is None:
+    _first_<enclosingTreeLevel> = <root.el.label><\n>
+<endif>
+})>
+<endif>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
 if self.input.LA(1) == DOWN:
@@ -113,6 +132,11 @@ _last = self.input.LT(1)
 <label>_tree = self.adaptor.dupNode(<label>)
 <endif><\n>
 self.adaptor.addChild(root_<treeLevel>, <label>_tree)
+})>
+<else> <! rewrite mode !>
+<finishedBacktracking({
+if _first_<treeLevel> is None:
+    _first_<treeLevel> = <label><\n>
 })>
 <endif>
 >>
@@ -168,7 +192,6 @@ matchRuleBlockSet(s,label,hetero,elementIndex,postmatchCode,treeLevel="0") ::= <
 >>
 
 matchSetBang(s,label,elementIndex,postmatchCode) ::= <<
-FIXME(316)
 _last = self.input.LT(1)
 <super.matchSet(...)>
 >>
@@ -194,11 +217,14 @@ root_<treeLevel> = self.adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 _last = self.input.LT(1)
 <super.ruleRef(...)>
-<if(!rewriteMode)>
 <finishedBacktracking({
+<if(!rewriteMode)>
 self.adaptor.addChild(root_<treeLevel>, <label>.tree)
-})>
+<else> <! rewrite mode !>
+if _first_<treeLevel> is None:
+    _first_<treeLevel> = <label>.tree<\n>
 <endif>
+})>
 >>
 
 /** x+=rule auto construct */

@@ -4,24 +4,24 @@ options {
 }
 
 @lexer::init {
-    self.foobar = "blarz"
+    self.foobar = 'attribute;'
 }
 
 prog
 @init {
-    print "init prog"
+    self.capture('init;')
 }
 @after {
-    print "after prog"
+    self.capture('after;')
 }
     :   IDENTIFIER EOF
     ;
     catch [ RecognitionException, exc ] {
-        print "Caboom " + str(exc)
+        self.capture('catch;')
         raise
     }
     finally {
-        print "Finally I'm home!"
+        self.capture('finally;')
     }
 
 
@@ -29,10 +29,10 @@ IDENTIFIER
     : ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
         {
             # a comment
-          print "foo"
-            print $text, $type, $line, $pos, $index, $channel, $start, $stop
+          self.capture('action;')
+            self.capture('\%r \%r \%r \%r \%r \%r \%r \%r;' \% ($text, $type, $line, $pos, $index, $channel, $start, $stop))
             if True:
-                print "bar"
+                self.capture(self.foobar)
         }
     ;
 

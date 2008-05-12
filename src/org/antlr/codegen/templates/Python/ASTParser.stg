@@ -121,7 +121,6 @@ matchSetBang(s,label,elementIndex,postmatchCode) ::= "<super.matchSet(...)>"
 
 matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <if(label)>
-FIXME(317)
 <label> = self.input.LT(1)<\n>
 <endif>
 <super.matchSet(..., postmatchCode={<finishedBacktracking({root_0 = self.adaptor.becomeRoot(<createNodeFromToken(...)>, root_0)})>})>

@@ -334,32 +334,37 @@ class T(testbase.ANTLRTest):
         @header {
         class V(CommonTree):
             def __init__(self, *args):
-                if len(args) == 2:
+                if len(args) == 4:
                     ttype = args[0]
                     x = args[1]
+                    y = args[2]
+                    z = args[3]
                     token = CommonToken(type=ttype, text="")
 
                 elif len(args) == 3:
                     ttype = args[0]
                     token = args[1]
                     x = args[2]
+                    y, z = 0, 0
 
                 else:
                     raise TypeError("Invalid args \%r" \% (args,))
 
                 CommonTree.__init__(self, token)
                 self.x = x
+                self.y = y
+                self.z = z
                 
             def toString(self):
                 txt = ""
                 if self.token is not None:
                     txt += self.token.text
-                txt +="<V>;" + str(self.x)
+                txt +="<V>;\%d\%d\%d" \% (self.x, self.y, self.z)
                 return txt
             __str__ = toString
 
         }
-        a : ID -> ID<V>[42] ID<V>[$ID,99];
+        a : ID -> ID<V>[42,19,30] ID<V>[$ID,99];
         ID : 'a'..'z'+ ;
         WS : (' '|'\n') {$channel=HIDDEN;} ;
         ''')
@@ -369,7 +374,7 @@ class T(testbase.ANTLRTest):
             input="a"
             )
 
-        self.failUnlessEqual("<V>;42 a<V>;99", found)
+        self.failUnlessEqual("<V>;421930 a<V>;9900", found)
 
 
     def testRewriteTokenRoot(self):

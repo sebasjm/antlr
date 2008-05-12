@@ -796,7 +796,6 @@ class T(testbase.ANTLRTest):
             WS : (' '|'\n') {$channel=HIDDEN;} ;
             ''')
         
-        # just checking that crash happens.  Can't replace child of flat tree
         treeGrammar = textwrap.dedent(
             r'''
             tree grammar TP18;
@@ -817,7 +816,179 @@ class T(testbase.ANTLRTest):
             treeGrammar, 's',
             "abc 34"
             )
-        self.assertEquals("abc", found)
+        self.assertEquals("abc 1", found)
+
+
+    def testRewriteModeChainRuleFlatTree(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ID INT | INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : a ;
+            a : b ;
+            b : ID INT -> INT ID
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.assertEquals("34 abc", found)
+
+
+    def testRewriteModeChainRuleTree(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ^(ID INT) ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : a ;
+            a : b ; // a.tree must become b.tree
+            b : ^(ID INT) -> INT
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.assertEquals("34", found)
+
+
+    def testRewriteModeChainRuleTree2(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ^(ID INT) ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            tokens { X; }
+            s : a* b ; // only b contributes to tree, but it's after a*; s.tree = b.tree
+            a : X ;
+            b : ^(ID INT) -> INT
+              ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.assertEquals("34", found)
+
+
+    def testRewriteModeChainRuleTree3(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : 'boo' ID INT -> 'boo' ^(ID INT) ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            tokens { X; }
+            s : 'boo' a* b ; // don't reset s.tree to b.tree due to 'boo'
+            a : X ;
+            b : ^(ID INT) -> INT
+              ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "boo abc 34")
+        self.assertEquals("boo 34", found)
+
+
+    def testRewriteModeChainRuleTree4(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : 'boo' ID INT -> ^('boo' ^(ID INT)) ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            tokens { X; }
+            s : ^('boo' a* b) ; // don't reset s.tree to b.tree due to 'boo'
+            a : X ;
+            b : ^(ID INT) -> INT
+              ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "boo abc 34")
+        self.assertEquals("(boo 34)", found)
+
+
+    def testRewriteModeChainRuleTree5(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : 'boo' ID INT -> ^('boo' ^(ID INT)) ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            tokens { X; }
+            s : ^(a b) ; // s.tree is a.tree
+            a : 'boo' ;
+            b : ^(ID INT) -> INT
+              ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "boo abc 34")
+        self.assertEquals("(boo 34)", found)
 
 
     def testRewriteModeWithPredicatedRewrites(self):

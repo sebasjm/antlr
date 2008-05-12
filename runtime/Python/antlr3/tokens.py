@@ -278,6 +278,9 @@ class CommonToken(Token):
 
 
     def __str__(self):
+        if self.type == EOF:
+            return "<EOF>"
+
         channelStr = ""
         if self.channel > 0:
             channelStr = ",channel=" + str(self.channel)

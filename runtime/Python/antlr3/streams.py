@@ -31,7 +31,6 @@
 # end[licence]
 
 import codecs
-import array
 from StringIO import StringIO
 
 from antlr3.constants import DEFAULT_CHANNEL, EOF
@@ -43,7 +42,7 @@ from antlr3.tokens import Token, EOF_TOKEN
 # basic interfaces
 #   IntStream
 #    +- CharStream
-#    \- TokenStream7
+#    \- TokenStream
 #
 # subclasses must implemented all methods
 #
@@ -335,8 +334,6 @@ class ANTLRStringStream(CharStream):
         
   	# The data being scanned
         self.strdata = unicode(data)
-        #self.data = array.array('H') # DFAs are limited to 16 anyway...
-        #self.data.extend(ord(c) for c in self.strdata)
         self.data = [ord(c) for c in self.strdata]
         
 	# How many characters are actually in the buffer

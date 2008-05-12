@@ -38,13 +38,14 @@ This module contains all support classes for AST construction and tree parsers.
 # lot's of docstrings are missing, don't complain for now...
 # pylint: disable-msg=C0111
 
-import warnings
-
 from antlr3.constants import UP, DOWN, EOF, INVALID_TOKEN_TYPE
 from antlr3.recognizers import BaseRecognizer
 from antlr3.streams import IntStream
 from antlr3.tokens import CommonToken, Token, INVALID_TOKEN
-from antlr3.exceptions import MismatchedTreeNodeException
+from antlr3.exceptions import MismatchedTreeNodeException, \
+     MissingTokenException, UnwantedTokenException, MismatchedTokenException, \
+     NoViableAltException
+
 
 ############################################################################
 #
@@ -786,7 +787,6 @@ class BaseTree(Tree):
             newChildren = [newTree]
 
         replacingWithHowMany = len(newChildren)
-        numNewChildren = len(newChildren)
         delta = replacingHowMany - replacingWithHowMany
         
         
@@ -1156,7 +1156,10 @@ class CommonTree(BaseTree):
         self.childIndex = -1
 
         # A single token is the payload
-        if isinstance(payload, CommonTree):
+        if payload is None:
+            self.token = None
+            
+        elif isinstance(payload, CommonTree):
             self.token = payload.token
             self.startIndex = payload.startIndex
             self.stopIndex = payload.stopIndex
@@ -1304,9 +1307,11 @@ class CommonErrorNode(CommonTree):
     """A node representing erroneous token range in token stream"""
 
     def __init__(self, input, start, stop, exc):
+        CommonTree.__init__(self, None)
+
         if (stop is None or
             (stop.getTokenIndex() < start.getTokenIndex() and
-             stop.getType()!=Token.EOF
+             stop.getType() != EOF
              )
             ):
             # sometimes resync does not consume a token (when LT(1) is
@@ -1336,10 +1341,10 @@ class CommonErrorNode(CommonTree):
             if self.stop.getType() == EOF:
                 j = self.input.size()
 
-            badText = input.toString(i, j)
+            badText = self.input.toString(i, j)
 
         elif isinstance(self.start, Tree):
-            badText = self.input.toString(start, stop)
+            badText = self.input.toString(self.start, self.stop)
 
         else:
             # people should subclass if they alter the tree type so this
@@ -1351,16 +1356,24 @@ class CommonErrorNode(CommonTree):
 
     def toString(self):
         if isinstance(self.trappedException, MissingTokenException):
-            return "<missing type: "+ self.trappedException.getMissingType()+ ">"
+            return ("<missing type: "
+                    + str(self.trappedException.getMissingType())
+                    + ">")
 
         elif isinstance(self.trappedException, UnwantedTokenException):
-            return "<extraneous: "+ self.trappedException.getUnexpectedToken() +", resync="+self.getText()+">"
+            return ("<extraneous: "
+                    + str(self.trappedException.getUnexpectedToken())
+                    + ", resync=" + self.getText() + ">")
 
         elif isinstance(self.trappedException, MismatchedTokenException):
-            return "<mismatched token: "+self.trappedException.token+", resync="+self.getText()+">"
+            return ("<mismatched token: "
+                    + str(self.trappedException.token)
+                    + ", resync=" + self.getText() + ">")
 
         elif isinstance(self.trappedException, NoViableAltException):
-            return "<unexpected: "+self.trappedException.token+", resync="+getText()+">"
+            return ("<unexpected: "
+                    + str(self.trappedException.token)
+                    + ", resync=" + self.getText() + ">")
 
         return "<error: "+self.getText()+">"
 
@@ -1799,6 +1812,10 @@ class CommonTreeNodeStream(TreeNodeStream):
         return self.nodes[self.p + k - 1]
     
 
+    def getCurrentSymbol(self):
+        return self.LT(1)
+
+
     def LB(self, k):
         """Look backwards k nodes"""
         
@@ -1970,7 +1987,7 @@ class CommonTreeNodeStream(TreeNodeStream):
             return self.tokens.toString(beginTokenIndex, endTokenIndex)
 
         # walk nodes looking for start
-        t = None
+        i, t = 0, None
         for i, t in enumerate(self.nodes):
             if t == start:
                 break
@@ -2047,6 +2064,15 @@ class TreeParser(BaseRecognizer):
         return self.input.getSourceName()
 
 
+    def getCurrentInputSymbol(self, input):
+        return input.LT(1)
+
+
+    def getMissingSymbol(self, input, e, expectedTokenType, follow):
+        tokenText = "<missing " + self.tokenNames[expectedTokenType] + ">"
+        return CommonTree(CommonToken(type=expectedTokenType, text=tokenText))
+
+
     def matchAny(self, ignore): # ignore stream, copy of this.input
         """
         Match '.' in tree parser has special meaning.  Skip node or
@@ -2081,11 +2107,11 @@ class TreeParser(BaseRecognizer):
     def mismatch(self, input, ttype, follow):
         """
         We have DOWN/UP nodes in the stream that have no line info; override.
-        plus we want to alter the exception type.
+        plus we want to alter the exception type. Don't try to recover
+        from tree parser errors inline...
         """
 
-        mte = MismatchedTreeNodeException(ttype, input)
-        self.recoverFromMismatchedToken(input, mte, ttype, follow)
+        raise MismatchedTreeNodeException(ttype, input)
 
 
     def getErrorHeader(self, e):

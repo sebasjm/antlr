@@ -30,6 +30,8 @@
 #
 # end[licence]
 
+from antlr3.constants import INVALID_TOKEN_TYPE
+
 
 class BacktrackingFailed(Exception):
     """@brief Raised to signal failed backtrack attempt"""
@@ -215,9 +217,14 @@ class UnwantedTokenException(MismatchedTokenException):
 
 
     def __str__(self):
-        return "UnwantedTokenException(found=%s, expected %s)" % (
-            self.token.getText(), self.expecting
-            )
+        exp = ", expected %s" % self.expecting
+        if self.expecting == INVALID_TOKEN_TYPE:
+            exp = ""
+
+        if self.token is None:
+            return "UnwantedTokenException(found=%s%s)" % (None, exp)
+
+        return "UnwantedTokenException(found=%s%s)" % (self.token.text, exp)
     __repr__ = __str__
 
 
@@ -226,13 +233,26 @@ class MissingTokenException(MismatchedTokenException):
     We were expecting a token but it's not found.  The current token
     is actually what we wanted next.
     """
-    
+
+    def __init__(self, expecting, input, inserted):
+        MismatchedTokenException.__init__(self, expecting, input)
+
+        self.inserted = inserted
+
+
     def getMissingType(self):
         return self.expecting
 
 
     def __str__(self):
-        return "MissingTokenException(expected %s)" % self.expecting
+        if self.inserted is not None and self.token is not None:
+            return "MissingTokenException(inserted %r at %r)" % (
+                self.inserted, self.token.text)
+
+        if self.token is not None:
+            return "MissingTokenException(at %r)" % self.token.text
+
+        return "MissingTokenException"
     __repr__ = __str__
 
 

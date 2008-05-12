@@ -709,10 +709,7 @@ element() ::= <<
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex,hetero) ::= <<
-<if(label)>
-<label> = self.input.LT(1)<\n>
-<endif>
-self.match(self.input, <token>, self.FOLLOW_<token>_in_<ruleName><elementIndex>)
+<if(label)><label>=<endif>self.match(self.input, <token>, self.FOLLOW_<token>_in_<ruleName><elementIndex>)
 >>
 
 /** ids+=ID */
@@ -1353,7 +1350,7 @@ rulePropertyRef_start(scope,attr) ::= "retval.start"
 rulePropertyRef_stop(scope,attr) ::= "retval.stop" //mmm... or input.LT(-1)??
 rulePropertyRef_tree(scope,attr) ::= "retval.tree"
 rulePropertyRef_text(scope,attr) ::= "self.input.toString(retval.start, self.input.LT(-1))"
-rulePropertyRef_st(scope,attr) ::= "<!FIXME(203:ST)!>retval.st"
+rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "self.text"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
@@ -1368,7 +1365,7 @@ lexerRulePropertyRef_int(scope,attr) ::= "int(<scope>.text)"
 // setting $st and $tree is allowed in local rule. everything else
 // is flagged as error
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree =<expr>"
-ruleSetPropertyRef_st(scope,attr,expr) ::= "<!FIXME(205:ST)!>retval.st =<expr>"
+ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>"
 
 
 /** How to execute an action (only when not backtracking) */

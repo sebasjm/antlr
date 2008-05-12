@@ -7,6 +7,7 @@ import glob
 import re
 import tempfile
 import shutil
+import inspect
 from distutils.errors import *
 
 
@@ -89,10 +90,9 @@ class ANTLRTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         unittest.TestCase.__init__(self, *args, **kwargs)
 
-        self.baseName = os.path.splitext(os.path.basename(sys.modules[self.__module__].__file__))[0]
-        self.baseDir = os.path.join(tempfile.gettempdir(), self.baseName)
-        if not os.path.isdir(self.baseDir):
-            os.makedirs(self.baseDir)
+        self.moduleName = os.path.splitext(os.path.basename(sys.modules[self.__module__].__file__))[0]
+        self.className = self.__class__.__name__
+        self._baseDir = None
             
         self.lexerModule = None
         self.parserModule = None
@@ -101,6 +101,37 @@ class ANTLRTest(unittest.TestCase):
         self.grammarType = None
 
 
+    @property
+    def baseDir(self):
+        if self._baseDir is None:
+            testName = 'unknownTest'
+            for frame in inspect.stack():
+                code = frame[0].f_code
+                codeMod = inspect.getmodule(code)
+                if codeMod is None:
+                    continue
+
+                # skip frames not in requested module
+                if codeMod is not sys.modules[self.__module__]:
+                    continue
+
+                # skip some unwanted names
+                if code.co_name in ('nextToken', '<module>'):
+                    continue
+
+                if code.co_name.startswith('test'):
+                    testName = code.co_name
+                    break
+
+            self._baseDir = os.path.join(
+                tempfile.gettempdir(),
+                self.moduleName, self.className, testName)
+            if not os.path.isdir(self._baseDir):
+                os.makedirs(self._baseDir)
+
+        return self._baseDir
+
+    
     def _invokeantlr(self, dir, file, options, javaOptions=''):
         cmd = 'cd %s; java %s %s org.antlr.Tool -o . %s %s 2>&1' % (
             dir, javaOptions, classpath, options, file
@@ -127,8 +158,14 @@ class ANTLRTest(unittest.TestCase):
         
     def compileGrammar(self, grammarName=None, options='', javaOptions=''):
         if grammarName is None:
-            grammarName = self.baseName + '.g'
-
+            grammarName = self.moduleName + '.g'
+            
+        self._baseDir = os.path.join(
+            tempfile.gettempdir(),
+            self.moduleName)
+        if not os.path.isdir(self._baseDir):
+            os.makedirs(self._baseDir)
+            
         if self.grammarName is None:
             self.grammarName = os.path.splitext(grammarName)[0]
         

@@ -185,27 +185,30 @@ class BaseRecognizer(object):
 
     def match(self, input, ttype, follow):
         """
-        Match current input symbol against ttype.  Throw exception upon
-        error, bailing out of the current production to the normal error
-        exception catch (at the end of the method) by just throwing
-        MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
-        by resynchronize into the set of symbols the can follow.
+        Match current input symbol against ttype.  Attempt
+        single token insertion or deletion error recovery.  If
+        that fails, throw MismatchedTokenException.
 
-        Prior to v3.1, this method used to do one token
-        insertion or deletion if possible.  You can override mismatch()
-        to recover here if you want.
+        To turn off single token insertion or deletion error
+        recovery, override mismatchRecover() and have it call
+        plain mismatch(), which does not recover.  Then any error
+        in a rule will cause an exception and immediate exit from
+        rule.  Rule would recover by resynchronizing to the set of
+        symbols that can follow rule ref.
         """
         
+        matchedSymbol = self.getCurrentInputSymbol(input)
         if self.input.LA(1) == ttype:
             self.input.consume()
             self._state.errorRecovery = False
-            return
+            return matchedSymbol
 
         if self._state.backtracking > 0:
+            # FIXME: need to return matchedSymbol here as well. damn!!
             raise BacktrackingFailed
 
-        self.mismatch(input, ttype, follow)
-        return
+        matchedSymbol = self.recoverFromMismatchedToken(input, ttype, follow)
+        return matchedSymbol
 
 
     def matchAny(self, input):
@@ -227,14 +230,17 @@ class BaseRecognizer(object):
         
         # compute what can follow this grammar element reference
         if EOR_TOKEN_TYPE in follow:
+            if len(self._state.following) > 0:
+                # remove EOR if we're not the start symbol
+                follow = follow - set([EOR_TOKEN_TYPE])
+
             viableTokensFollowingThisRule = self.computeContextSensitiveRuleFOLLOW()
             follow = follow | viableTokensFollowingThisRule
-            follow = follow - set([EOR_TOKEN_TYPE])
 
         # if current token is consistent with what could come after set
         # then we know we're missing a token; error recovery is free to
         # "insert" the missing token
-        if input.LA(1) in follow:
+        if input.LA(1) in follow or EOR_TOKEN_TYPE in follow:
             return True
 
         return False
@@ -242,31 +248,33 @@ class BaseRecognizer(object):
 
     def mismatch(self, input, ttype, follow):
         """
-        factor out what to do upon token mismatch so tree parsers can behave
+        Factor out what to do upon token mismatch so tree parsers can behave
         differently.  Override and call mismatchRecover(input, ttype, follow)
-        to get single token insertion and deletion.
+        to get single token insertion and deletion. Use this to turn of
+        single token insertion and deletion. Override mismatchRecover
+        to call this instead.
         """
 
         if self.mismatchIsUnwantedToken(input, ttype):
             raise UnwantedTokenException(ttype, input)
 
         elif self.mismatchIsMissingToken(input, follow):
-            raise MissingTokenException(ttype, input)
+            raise MissingTokenException(ttype, input, None)
 
         raise MismatchedTokenException(ttype, input)
 
 
-    def mismatchRecover(self, input, ttype, follow):
-        if self.mismatchIsUnwantedToken(input, ttype):
-            mte = UnwantedTokenException(ttype, input)
+##     def mismatchRecover(self, input, ttype, follow):
+##         if self.mismatchIsUnwantedToken(input, ttype):
+##             mte = UnwantedTokenException(ttype, input)
 
-        elif self.mismatchIsMissingToken(input, follow):
-            mte = MissingTokenException(ttype, input)
+##         elif self.mismatchIsMissingToken(input, follow):
+##             mte = MissingTokenException(ttype, input)
 
-        else:
-            mte = MismatchedTokenException(ttype, input)
+##         else:
+##             mte = MismatchedTokenException(ttype, input)
 
-        self.recoverFromMismatchedToken(input, mte, ttype, follow)
+##         self.recoverFromMismatchedToken(input, mte, ttype, follow)
 
 
     def reportError(self, e):
@@ -411,7 +419,7 @@ class BaseRecognizer(object):
     
 
     def getNumberOfSyntaxErrors(self):
-	"""
+        """
         Get number of recognition errors (lexer, parser, tree parser).  Each
         recognizer tracks its own number.  So parser and lexer each have
         separate count.  Does not count the spurious errors found between
@@ -657,16 +665,24 @@ class BaseRecognizer(object):
 
     def combineFollows(self, exact):
         followSet = set()
-        for localFollowSet in reversed(self._state.following):
+        for idx, localFollowSet in reversed(list(enumerate(self._state.following))):
             followSet |= localFollowSet
-            if exact and EOR_TOKEN_TYPE not in localFollowSet:
-                break
+            if exact:
+                # can we see end of rule?
+                if EOR_TOKEN_TYPE in localFollowSet:
+                    # Only leave EOR in set if at top (start rule); this lets
+                    # us know if have to include follow(start rule); i.e., EOF
+                    if idx > 0:
+                        followSet.remove(EOR_TOKEN_TYPE)
+                        
+                else:
+                    # can't see end of rule, quit
+                    break
 
-        followSet -= set([EOR_TOKEN_TYPE])
         return followSet
 
 
-    def recoverFromMismatchedToken(self, input, e, ttype, follow):
+    def recoverFromMismatchedToken(self, input, ttype, follow):
         """Attempt to recover from a single missing or extra token.
 
         EXTRA TOKEN
@@ -679,8 +695,8 @@ class BaseRecognizer(object):
         MISSING TOKEN
 
         If current token is consistent with what could come after
-        ttype then it is ok to "insert" the missing token, else throw
-        exception For example, Input "i=(3;" is clearly missing the
+        ttype then it is ok to 'insert' the missing token, else throw
+        exception For example, Input 'i=(3;' is clearly missing the
         ')'.  When the parser returns from the nested call to expr, it
         will have call chain:
 
@@ -696,42 +712,106 @@ class BaseRecognizer(object):
         is in the set of tokens that can follow the ')' token
         reference in rule atom.  It can assume that you forgot the ')'.
         """
-                                         
+
+        e = None
+
         # if next token is what we are looking for then "delete" this token
         if self. mismatchIsUnwantedToken(input, ttype):
-            self.reportError(e)
+            e = UnwantedTokenException(ttype, input)
 
             self.beginResync()
             input.consume() # simply delete extra token
             self.endResync()
-            input.consume()  # move past ttype token as if all were ok
-            return
 
-        if not self.recoverFromMissingElement(input, e, follow):
-            raise e
+            # report after consuming so AW sees the token in the exception
+            self.reportError(e)
 
+            # we want to return the token we're actually matching
+            matchedSymbol = self.getCurrentInputSymbol(input)
+
+            # move past ttype token as if all were ok
+            input.consume()
+            return matchedSymbol
+
+        # can't recover with single token deletion, try insertion
+        if self.mismatchIsMissingToken(input, follow):
+            inserted = self.getMissingSymbol(input, e, ttype, follow)
+            e = MissingTokenException(ttype, input, inserted)
+
+            # report after inserting so AW sees the token in the exception
+            self.reportError(e)
+            return inserted
+
+        # even that didn't work; must throw the exception
+        e = MismatchedTokenException(ttype, input)
+        raise e
 
 
     def recoverFromMismatchedSet(self, input, e, follow):
-        # TODO do single token deletion like above for Token mismatch
-        if not self.recoverFromMissingElement(input, e, follow):
-            raise e
+        """Not currently used"""
 
-
-    def recoverFromMissingElement(self, input, e, follow):
-        """
-        This code is factored out from mismatched token and mismatched set
-        recovery.  It handles "single token insertion" error recovery for
-        both.  No tokens are consumed to recover from insertions.  Return
-        true if recovery was possible else return false.
-        """
-        
         if self.mismatchIsMissingToken(input, follow):
             self.reportError(e)
-            return True
+            # we don't know how to conjure up a token for sets yet
+            return self.getMissingSymbol(input, e, INVALID_TOKEN_TYPE, follow)
 
-        # nothing to do; throw exception
-        return False
+        # TODO do single token deletion like above for Token mismatch
+        raise e
+
+
+    def getCurrentInputSymbol(self, input):
+        """
+        Match needs to return the current input symbol, which gets put
+        into the label for the associated token ref; e.g., x=ID.  Token
+        and tree parsers need to return different objects. Rather than test
+        for input stream type or change the IntStream interface, I use
+        a simple method to ask the recognizer to tell me what the current
+        input symbol is.
+
+        This is ignored for lexers.
+        """
+        
+        return None
+
+
+    def getMissingSymbol(self, input, e, expectedTokenType, follow):
+        """Conjure up a missing token during error recovery.
+
+        The recognizer attempts to recover from single missing
+        symbols. But, actions might refer to that missing symbol.
+        For example, x=ID {f($x);}. The action clearly assumes
+        that there has been an identifier matched previously and that
+        $x points at that token. If that token is missing, but
+        the next token in the stream is what we want we assume that
+        this token is missing and we keep going. Because we
+        have to return some token to replace the missing token,
+        we have to conjure one up. This method gives the user control
+        over the tokens returned for missing tokens. Mostly,
+        you will want to create something special for identifier
+        tokens. For literals such as '{' and ',', the default
+        action in the parser or tree parser works. It simply creates
+        a CommonToken of the appropriate type. The text will be the token.
+        If you change what tokens must be created by the lexer,
+        override this method to create the appropriate tokens.
+        """
+
+        return None
+
+
+##     def recoverFromMissingElement(self, input, e, follow):
+##         """
+##         This code is factored out from mismatched token and mismatched set
+##         recovery.  It handles "single token insertion" error recovery for
+##         both.  No tokens are consumed to recover from insertions.  Return
+##         true if recovery was possible else return false.
+##         """
+        
+##         if self.mismatchIsMissingToken(input, follow):
+##             self.reportError(e)
+##             return True
+
+##         # nothing to do; throw exception
+##         return False
 
 
     def consumeUntil(self, input, tokenTypes):
@@ -1087,7 +1167,11 @@ class Lexer(BaseRecognizer, TokenSource):
         The standard method called to automatically emit a token at the
         outermost lexical rule.  The token object should point into the
         char buffer start..stop.  If there is a text override in 'text',
-        use that to set the token's text.
+        use that to set the token's text.  Override this method to emit
+        custom Token objects.
+
+        If you are building trees, then you should also override
+        Parser or TreeParser.getMissingSymbol().
         """
 
         if token is None:
@@ -1109,7 +1193,7 @@ class Lexer(BaseRecognizer, TokenSource):
 
     def match(self, s):
         if isinstance(s, basestring):
-            for i, c in enumerate(s):
+            for c in s:
                 if self.input.LA(1) != ord(c):
                     if self._state.backtracking > 0:
                         raise BacktrackingFailed
@@ -1295,6 +1379,24 @@ class Parser(BaseRecognizer):
         BaseRecognizer.reset(self) # reset all recognizer state variables
         if self.input is not None:
             self.input.seek(0) # rewind the input
+
+
+    def getCurrentInputSymbol(self, input):
+        return input.LT(1)
+
+
+    def getMissingSymbol(self, input, e, expectedTokenType, follow):
+        tokenText = "<missing " + self.tokenNames[expectedTokenType] + ">"
+        t = CommonToken(type=expectedTokenType, text=tokenText)
+        current = input.LT(1)
+        if current.type == EOF:
+            current = input.LT(-1)
+
+        if current is not None:
+            t.line = current.line
+            t.charPositionInLine = current.charPositionInLine
+        t.channel = DEFAULT_CHANNEL
+        return t
 
 
     def setTokenStream(self, input):
