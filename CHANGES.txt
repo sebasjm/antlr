@@ -7,6 +7,12 @@ University of San Francisco
 
 CHANGES
 
+May 11, 2008
+
+* rewrite=true, output=AST for tree grammar was not working.  Altered trees were not
+  propagated back up the rule reference chain.  Required a number of mods to
+  ASTTreeParser.stg.  Added unit tests.
+
 May 10, 2008
 
 * [BACKWARD INCOMPATIBLE if you override match()]

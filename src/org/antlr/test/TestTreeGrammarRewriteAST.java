@@ -520,7 +520,6 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 			"INT : '0'..'9'+;\n" +
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
-		// just checking that crash happens.  Can't replace child of flat tree
 		String treeGrammar =
 			"tree grammar TP;\n"+
 			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
@@ -530,7 +529,143 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 
 		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
 									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
-		assertEquals("abc\n", found);
+		assertEquals("abc 1\n", found);
+	}
+
+	public void testRewriteModeChainRuleFlatTree() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT -> ID INT | INT ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"s : a ;\n" +
+			"a : b ;\n" +
+			"b : ID INT -> INT ID\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+		assertEquals("34 abc\n", found);
+	}
+
+	public void testRewriteModeChainRuleTree() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT -> ^(ID INT) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"s : a ;\n" +
+			"a : b ;\n" + // a.tree must become b.tree
+			"b : ^(ID INT) -> INT\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+		assertEquals("34\n", found);
+	}
+
+	public void testRewriteModeChainRuleTree2() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : ID INT -> ^(ID INT) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"tokens { X; }\n" +
+			"s : a* b ;\n" + // only b contributes to tree, but it's after a*; s.tree = b.tree
+			"a : X ;\n" +
+			"b : ^(ID INT) -> INT\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+		assertEquals("34\n", found);
+	}
+
+	public void testRewriteModeChainRuleTree3() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'boo' ID INT -> 'boo' ^(ID INT) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"tokens { X; }\n" +
+			"s : 'boo' a* b ;\n" + // don't reset s.tree to b.tree due to 'boo'
+			"a : X ;\n" +
+			"b : ^(ID INT) -> INT\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "boo abc 34");
+		assertEquals("boo 34\n", found);
+	}
+
+	public void testRewriteModeChainRuleTree4() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'boo' ID INT -> ^('boo' ^(ID INT)) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"tokens { X; }\n" +
+			"s : ^('boo' a* b) ;\n" + // don't reset s.tree to b.tree due to 'boo'
+			"a : X ;\n" +
+			"b : ^(ID INT) -> INT\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "boo abc 34");
+		assertEquals("(boo 34)\n", found);
+	}
+
+	public void testRewriteModeChainRuleTree5() throws Exception {
+		String grammar =
+			"grammar T;\n" +
+			"options {output=AST;}\n" +
+			"a : 'boo' ID INT -> ^('boo' ^(ID INT)) ;\n" +
+			"ID : 'a'..'z'+ ;\n" +
+			"INT : '0'..'9'+;\n" +
+			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+		String treeGrammar =
+			"tree grammar TP;\n"+
+			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+			"tokens { X; }\n" +
+			"s : ^(a b) ;\n" + // s.tree is a.tree
+			"a : 'boo' ;\n" +
+			"b : ^(ID INT) -> INT\n"+
+			"  ;\n";
+
+		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+									  treeGrammar, "TP", "TLexer", "a", "s", "boo abc 34");
+		assertEquals("(boo 34)\n", found);
 	}
 
 	public void testRewriteModeWithPredicatedRewrites() throws Exception {
