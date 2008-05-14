@@ -71,11 +71,11 @@ namespace Antlr.Runtime.Tree
 			get { return input.SourceName; }
 		}
 
-		protected virtual object GetCurrentInputSymbol(IIntStream input) {
+		protected override object GetCurrentInputSymbol(IIntStream input) {
 			return ((ITreeNodeStream)input).LT(1);
 		}
 
-		protected virtual object GetMissingSymbol(IIntStream input,
+		protected override object GetMissingSymbol(IIntStream input,
 										  RecognitionException e,
 										  int expectedTokenType,
 										  BitSet follow) {

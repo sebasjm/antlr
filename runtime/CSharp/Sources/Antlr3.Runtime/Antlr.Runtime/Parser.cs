@@ -63,11 +63,11 @@ namespace Antlr.Runtime
 			}
 		}
 
-		protected virtual object GetCurrentInputSymbol(IIntStream input) {
+		protected override object GetCurrentInputSymbol(IIntStream input) {
 			return ((ITokenStream)input).LT(1);
 		}
 
-		protected virtual object GetMissingSymbol(IIntStream input,
+		protected override object GetMissingSymbol(IIntStream input,
 										  RecognitionException e,
 										  int expectedTokenType,
 										  BitSet follow)
