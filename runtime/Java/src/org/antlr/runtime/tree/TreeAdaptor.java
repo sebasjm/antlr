@@ -46,14 +46,18 @@ public interface TreeAdaptor {
 	/** Create a tree node from Token object; for CommonTree type trees,
 	 *  then the token just becomes the payload.  This is the most
 	 *  common create call.
+	 *
+	 *  Override if you want another kind of node to be built.
 	 */
 	public Object create(Token payload);
 
+	/** Duplicate a single tree node.
+	 *  Override if you want another kind of node to be built.
+	 */
+	public Object dupNode(Object treeNode);
+
 	/** Duplicate tree recursively, using dupNode() for each node */
 	public Object dupTree(Object tree);
-
-	/** Duplicate a single tree node */
-	public Object dupNode(Object treeNode);
 
 	/** Return a nil node (an empty but non-null node) that can hold
 	 *  a list of element as the children.  If you want a flat tree (a list)

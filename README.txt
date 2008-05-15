@@ -1,6 +1,6 @@
 Early Access ANTLR v3
 ANTLR 3.1
-???, 2007
+May ???, 2008
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -8,26 +8,35 @@ University of San Francisco
 
 INTRODUCTION 
 
-Welcome to ANTLR v3!  I've been working on this for nearly 4 years and it's
-finally ready!  I have lots of features to add later, but this will be
-the first set.
+Welcome to ANTLR v3!  ANTLR (ANother Tool for Language Recognition) is
+a language tool that provides a framework for constructing
+recognizers, interpreters, compilers, and translators from grammatical
+descriptions containing actions in a variety of target
+languages. ANTLR provides excellent support for tree construction,
+tree walking, translation, error recovery, and error reporting. I've
+been working on parser generators for 20 years and on this particular
+version of ANTLR for 5 years.
 
 You should use v3 in conjunction with ANTLRWorks:
 
     http://www.antlr.org/works/index.html 
 
+and gUnit (grammar unit testing tool):
+
+    http://www.antlr.org/wiki/display/ANTLR3/gUnit+-+Grammar+Unit+Testing
+
 The book will also help you a great deal (printed May 15, 2007); you
 can also buy the PDF:
 
-http://www.pragmaticprogrammer.com/titles/tpantlr/index.html
+    http://www.pragmaticprogrammer.com/titles/tpantlr/index.html
 
 See the getting started document:
 
-http://www.antlr.org/wiki/display/ANTLR3/FAQ+-+Getting+Started
+    http://www.antlr.org/wiki/display/ANTLR3/FAQ+-+Getting+Started
 
 You also have the examples plus the source to guide you.
 
-See the new wiki FAQ:
+See the wiki FAQ:
 
     http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
 
@@ -40,10 +49,6 @@ Please help add/update FAQ entries.
 If all else fails, you can buy support or ask the antlr-interest list:
 
     http://www.antlr.org/support.html
-
-I have made very little effort at this point to deal well with
-erroneous input (e.g., bad syntax might make ANTLR crash).  I will clean
-this up after I've rewritten v3 in v3.  v3 is written in v2 at the moment.
 
 Per the license in LICENSE.txt, this software is not guaranteed to
 work and might even destroy all life on this planet:
@@ -109,12 +114,13 @@ Just untar and you'll get:
 antlr-3.1/README.txt (this file)
 antlr-3.1/LICENSE.txt
 antlr-3.1/src/org/antlr/...
-antlr-3.1/lib/stringtemplate-3.0.jar (3.1 needs 3.0)
-antlr-3.1/lib/antlr-2.7.7.jar
+antlr-3.1/lib/stringtemplate-3.1.jar (ST currently written in ANTLR v2)
+antlr-3.1/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
 antlr-3.1/lib/antlr-3.1.jar
+antlr-3.1/lib/gunit-1.0.2.jar
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
 Please see the FAQ
 
-http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
+    http://www.antlr.org/wiki/display/ANTLR3/ANTLR+v3+FAQ
