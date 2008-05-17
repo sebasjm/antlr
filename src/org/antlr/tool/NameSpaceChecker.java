@@ -42,7 +42,7 @@ public class NameSpaceChecker {
 	}
 
 	public void checkConflicts() {
-		for (int i = 0; i < grammar.composite.ruleIndexToRuleList.size(); i++) {
+		for (int i = CompositeGrammar.MIN_RULE_INDEX; i < grammar.composite.ruleIndexToRuleList.size(); i++) {
 			Rule r = grammar.composite.ruleIndexToRuleList.elementAt(i);
 			if ( r==null ) {
 				continue;
@@ -97,7 +97,9 @@ public class NameSpaceChecker {
 		String ruleName = r.name;
 		antlr.Token ruleToken = r.tree.getToken();
 		int msgID = 0;
-		if ( grammar.type==Grammar.PARSER && Character.isUpperCase(ruleName.charAt(0)) ) {
+		if ( (grammar.type==Grammar.PARSER||grammar.type==Grammar.TREE_PARSER) &&
+			 Character.isUpperCase(ruleName.charAt(0)) )
+		{
 			msgID = ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED;
         }
         else if ( grammar.type==Grammar.LEXER &&

@@ -47,6 +47,8 @@ import java.util.*;
  *  to track token types.
  */
 public class CompositeGrammar {
+	public static final int MIN_RULE_INDEX = 1;
+	
 	public CompositeGrammarTree delegateGrammarTreeRoot;
 
 	/** Used during getRuleReferenceClosure to detect computation cycles */
@@ -99,7 +101,7 @@ public class CompositeGrammar {
 	protected Set<String> lexerRules = new HashSet<String>();
 
 	/** Rules are uniquely labeled from 1..n among all grammars */
-	protected int ruleIndex = 1;
+	protected int ruleIndex = MIN_RULE_INDEX;
 
 	/** Map a rule index to its name; use a Vector on purpose as new
 	 *  collections stuff won't let me setSize and make it grow.  :(
@@ -347,6 +349,9 @@ public class CompositeGrammar {
 	}
 
 	public void createNFAs() {
+		if ( ErrorManager.doNotAttemptAnalysis() ) {
+			return;
+		}
 		List<Grammar> grammars = delegateGrammarTreeRoot.getPostOrderedGrammarList();
 		for (int i = 0; grammars!=null && i < grammars.size(); i++) {
 			Grammar g = (Grammar)grammars.get(i);

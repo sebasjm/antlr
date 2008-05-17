@@ -209,6 +209,7 @@ public class ErrorManager {
 			add(MSG_NO_RULES);
 			add(MSG_NO_SUCH_GRAMMAR_SCOPE);
 			add(MSG_NO_SUCH_RULE_IN_SCOPE);
+			add(MSG_LEXER_RULES_NOT_ALLOWED);
 			// TODO: ...
 		}
 	};

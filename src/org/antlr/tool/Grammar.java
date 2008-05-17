@@ -1279,6 +1279,15 @@ outer:
 		if ( getLocallyDefinedRule(ruleName)!=null ) {
 			ErrorManager.grammarError(ErrorManager.MSG_RULE_REDEFINITION,
 									  this, ruleToken, ruleName);
+			return;
+		}
+
+		if ( (type==Grammar.PARSER||type==Grammar.TREE_PARSER) &&
+			 Character.isUpperCase(ruleName.charAt(0)) )
+		{
+			ErrorManager.grammarError(ErrorManager.MSG_LEXER_RULES_NOT_ALLOWED,
+									  this, ruleToken, ruleName);
+			return;
 		}
 
 		Rule r = new Rule(this, ruleName, composite.ruleIndex, numAlts);
