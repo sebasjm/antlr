@@ -621,6 +621,11 @@ alt(elements,altNum,description,autoAST,outerAlt,treeLevel,rew) ::= <<
 }
 >>
 
+/** What to emit when there is no rewrite.  For auto build
+ *  mode, does nothing.
+ */
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
+
 // E L E M E N T S
 
 /** Dump the elements one per line */
@@ -630,15 +635,16 @@ element() ::= <<
 >>
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex) ::= <<
+tokenRef(token,label,elementIndex,hetero) ::= <<
 <if(label)>
-$<label> = $self->input->LT(1);<\n>
+$<label> = (<labelType>)
 <endif>
-$self->match($self->input, <token>, $FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
+$self->match($self->input, <token>, $FOLLOW_<token>_in_<ruleName><elementIndex>);
+<checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex) ::= <<
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRef(...)>
 <listLabel(elem=label,...)>
 >>
