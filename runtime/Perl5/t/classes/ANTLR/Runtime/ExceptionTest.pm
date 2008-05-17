@@ -1,4 +1,4 @@
-package ANTLR::Runtime::Exception::Test;
+package ANTLR::Runtime::ExceptionTest;
 
 use strict;
 use warnings;

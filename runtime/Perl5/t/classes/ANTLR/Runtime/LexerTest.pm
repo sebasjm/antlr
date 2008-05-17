@@ -1,4 +1,4 @@
-package ANTLR::Runtime::Lexer::Test;
+package ANTLR::Runtime::LexerTest;
 
 use strict;
 use warnings;

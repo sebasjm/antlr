@@ -1,4 +1,4 @@
-package ANTLR::Runtime::ANTLRStringStream::Test;
+package ANTLR::Runtime::ANTLRStringStreamTest;
 
 use strict;
 use warnings;

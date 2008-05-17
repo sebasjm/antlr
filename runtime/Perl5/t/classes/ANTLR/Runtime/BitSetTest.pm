@@ -1,4 +1,4 @@
-package ANTLR::Runtime::BitSet::Test;
+package ANTLR::Runtime::BitSetTest;
 
 use strict;
 use warnings;
