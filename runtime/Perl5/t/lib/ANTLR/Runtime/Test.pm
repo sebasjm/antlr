@@ -9,6 +9,7 @@ my $CLASS = __PACKAGE__;
 
 our @EXPORT = qw( g_test_output_is );
 
+use Carp;
 use Cwd;
 use File::Spec;
 use File::Temp qw( tempdir );
@@ -61,14 +62,19 @@ sub g_test_output_is {
 
     my $cwd = cwd;
     chdir $tmpdir;
+    my $test_result;
+    eval {
+        # compile grammar
+        my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', 'antlr'), $grammar_file ]);
+        if ($g_result->{exit_code} >> 8 != 0) {
+            croak $g_result->{err};
+        }
 
-    # compile grammar
-    my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', 'antlr'), $grammar_file ]);
-
-    # run test program
-    my $test_result = run_program([ 'perl', "-Mblib=$cwd", 'test.pl']);
-
+        # run test program
+        $test_result = run_program([ 'perl', "-Mblib=$cwd", 'test.pl']);
+    };
     chdir $cwd;
+    die $@ if $@;
 
     my $actual = $test_result->{out};
 
