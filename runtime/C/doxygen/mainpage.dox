@@ -38,8 +38,8 @@
 ///
 /// \section background Background Information
 ///
-/// The ANTLR 3.1 C runtime and code generation templates were written by <a href="http://www.linkedin.com/in/jimidle"> Jim Idle</a>
-/// (jimi|at|temporal-wave\dott/com) of <a href="http://www.temporal-wave.com">Temporal Wave LLC</a>.
+/// The ANTLR 3 C runtime and code generation templates were written by <a href="http://www.linkedin.com/in/jimidle"> Jim Idle</a>
+/// (jimi|at|temporal-wave|dott/com) of <a href="http://www.temporal-wave.com">Temporal Wave LLC</a>.
 ///
 /// The C runtime and therefore the code generated to utilize the runtime reflects the object model of the 
 /// Java version of the runtime as closely as a language without class structures and inheritance can. 

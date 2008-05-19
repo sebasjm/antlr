@@ -6,6 +6,23 @@
 
 #include    <antlr3.h>
 
+// Not everyone wishes to include the debugger stuff in their final deployment because
+// it will then rely on being linked with the socket libraries. Hence if the programmer turns
+// off the debugging, we do some dummy stuff that satifies compilers etc but means there is
+// no debugger and no reliance on the socket librarires. If you set this flag, then using the -debug
+// option to generate your code will produce code that just crashes, but then I presme you are smart
+// enough to realize that building the libraries without debugger support means you can't call the
+// debugger ;-)
+// 
+#ifdef ANTLR3_NODEBUGGER
+ANTLR3_API pANTLR3_DEBUG_EVENT_LISTENER
+antlr3DebugListenerNew()
+{
+		ANTLR3_PRINTF("C runtime was compiled without debugger support. This program will crash!!");
+		return NULL;
+}
+#else
+
 static	ANTLR3_BOOLEAN	handshake		(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 static	void	enterRule				(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * grammarFileName, const char * ruleName);
 static	void	enterAlt				(pANTLR3_DEBUG_EVENT_LISTENER delboy, int alt);
@@ -1002,5 +1019,5 @@ setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, A
 											);
 	transmit(delboy, buffer);
 }
-
+#endif
 

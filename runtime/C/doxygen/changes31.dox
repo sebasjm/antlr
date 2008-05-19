@@ -20,7 +20,9 @@
 /// \section trees Tree Parser Rewrites
 ///
 /// The 3.1 runtime now supports tree rewrites from tree parsers. See the main ANTLR
-/// documentation for more details.
+/// documentation for more details. This beta version contains \subpage knownissues regarding
+/// the release of mmeory allocated to tree nodes when they are rewritten in some combinations
+/// of re-writing tree parsers. These issues will be corrected before release.
 ///
 /// \section debugger ANTLRWorks Debugger
 ///
@@ -31,5 +33,24 @@
 /// the C code with the -debug option of the ANTLR tool, as per any other target.
 ///
 /// Note that when you invoke your debugging version of the parser, it will appear to hang
-/// but is in fact waiting on a local TCP socket connection from the ANTLRWorks debugger.
+/// but is in fact waiting on a local TCP socket connection from the ANTLRWorks debugger. As the
+/// target environment is unknown, it is not prudent to generate notification status messages
+/// using something like printf, as the target environment may not have a console or implement
+/// printf.
 ///
+/// \section macros Macro Changes
+///
+/// Prior to the 3.1 release, accessing the token source of a lexer required knowledge of where
+/// the token source pointer was located wihtin the lexer. In 3.1, the token source was burried
+/// further in the innards of the C runtime and such knowledge is considerd irreleavant and confusing.
+/// Hence, when creating a token stream from a token source, it is now mandatory to use the new
+/// C macro TOKENSOURCE(lxr), which will expand to point at the token source interface. This MACRO
+/// will be maintained across future versions. You can see how to use it in the downloadable 
+/// examples, avaiable from the downloads page of the ANTLR web site. Here is the relevant code
+/// for creating a token stream, extracted from those examples:
+///
+/// \code
+/// tstream = antlr3CommonTokenStreamSourceNew(ANTLR3_SIZE_HINT, TOKENSOURCE(lxr));
+/// \endcode
+///
+

@@ -26,6 +26,10 @@
 ///
 /// If you are building for Cygwin, or a similar UNIX on Windows System, follow the "Building With Configure" instructions below.
 /// 
+/// Note that the runtime is no longer compatible with the VC6 Microsoft compiler. If you absolutely need to build with
+/// this compiler, you can probably hack the source code to deall with the pieces that VC6 cannot handle such as the
+/// ULL suffix for constants.
+///
 /// If you wish to build the binaries for Windows using Visual Studio 2005, or 2008 you may build using the IDE:
 ///  -# Open the C.sln file
 ///  -# Select batch Build from the Build menu
@@ -64,7 +68,14 @@
 ///
 /// \section configure Building with configure
 ///
-/// The source code should be expanded in a directory of your choice (probably your working directory) using the command:
+/// Before starting, make sure that you are using a source code distribution and not the source code directly from the
+/// Perforce repository. If you use the source from the perforce tree directly, you will find that there is no configure
+/// script as this is generated as part of the distribution build by the maintainers. If you feel the need to build from
+/// the distribution tree then you must have all the autobuild packages available on your system and can generate the
+/// configure script using autoreconf. If you are not familiar with these tools, then please use the tgz files in the
+/// dist subdirectory (or downloaded from the ANTLR web site).
+///
+/// The source code file should be expanded in a directory of your choice (probably your working directory) using the command:
 /// 
 /// \verbatim
 gzip -dc antlrtgzname.tar.gz | tar xvf -

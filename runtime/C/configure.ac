@@ -35,14 +35,16 @@ AC_CONFIG_SRCDIR(src/antlr3parser.c)
 
 
 AC_ARG_ENABLE([debuginfo],
-		[AS_HELP_STRING([--enable-debuginfo], [Compiles debug info into the library (default no)])],
-		 [DEBUGINF=1], [DEBUGINF=0])
+		[AS_HELP_STRING([--enable-debuginfo], [Compiles debug info into the library (default --disable-debuginfo)])],
+		[], [enable_debuginfo=no])
 
 AC_ARG_ENABLE([64bit],
-		[AS_HELP_STRING([--enable-64bit], [Turns on flags that produce 64 bit object code if any are required (default no)])],
-		[BIT64=1], [BIT64=0])
+		[AS_HELP_STRING([--enable-64bit], [Turns on flags that produce 64 bit object code if any are required (default --disable-64bit)])],
+		[], [enable_64bit=no])
 
-
+AC_ARG_ENABLE([antlrdebug],
+		[AS_HELP_STRING([--disable-antlrdebug], [Turns off default flags that include the antlr debugger in the runtime. Specify to remove debugger and the socket dependancies (default --enable-antlrdebug)])],
+		[], [enable_antlrdebug=yes])
 
 AM_INIT_AUTOMAKE(foreign)
 AC_LANG(C)
@@ -60,21 +62,21 @@ AC_MSG_CHECKING([compiler flags required for compiling ANTLR with $CC C compiler
 case $CC in
 xlc*)
  CPPCMNTFLAGS="-qcpluscmt"
- if test "$BIT64" = 1; then
+ if test x"$enable_64bit" = xyes; then
   CCFLAGS64="-q64 -Wl,-b64"
   OBJECT_MODE="64"
  else
   OBJECT_MODE="32"
  fi
  OPTIMFLAGS="-O2"
- if test "$DEBUGINF" = 1; then
+ if test x"$enable_debuginfo" = xyes; then
   DEBUGFLAGS="-g"
  fi
  ;;
 
 aCC*)
  CPPCMNTFLAGS=
- if test "$BIT64" = 1; then
+ if test x"$enable_64bit" = xyes; then
   CCFLAGS64="+DD64"
  fi
  OPTIMFLAGS="-O"
@@ -85,9 +87,13 @@ aCC*)
 
 gcc*)
  CPPCMNTFLAGS=
- CCFLAGS64=
+ if test x"$enable_64bit" = xyes; then
+  CCFLAGS64="-m64"
+ else
+  CCFLAGS64="-m32"
+ fi
  OPTIMFLAGS="-O2"
- if test $DEBUGINF = 1; then
+ if test x"$enable_debuginfo" = xyes; then
   DEBUGFLAGS="-g"
  fi
  ;;
@@ -97,11 +103,11 @@ gcc*)
 case $host in
 sparc*-*solaris*)
  CPPCMNTFLAGS=
- if test "$BIT64" = 1; then
+ if test x"$enable_64bit" = xyes; then
   CCFLAGS64="-fast -xtarget=ultra4 -xarch=v9a"
  fi
  OPTIMFLAGS="-O"
- if test $DEBUGINF = 1; then
+ if test x"$enable_debuginfo" = xyes; then
   DEBUGFLAGS='-g'
  fi
  ;;
@@ -110,7 +116,7 @@ sparc*-*solaris*)
  CPPCMNTFLAGS=
  CCFLAGS64=
  OPTIMFLAGS="-O"
- if test $DEBUGINF = 1; then
+ if test x"$enable_debuginfo" = xyes; then
   DEBUGFLAGS='-g'
  fi
  ;;
@@ -123,7 +129,8 @@ CFLAGS="$CCFLAGS64 $CPPCMNTFLAGS $OPTIMFLAGS $DEBUGFLAGS"
 AC_MSG_RESULT([$CFLAGS])
 AC_SUBST([OBJECT_MODE])
 
-
+AS_IF([test "x$enable_antlrdebug" = xno], [AC_DEFINE([ANTLR3_NODEBUGGER], [1], [Define if ANTLR debugger not required])], [])
+AS_IF([test x"$enable_64bit" = xyes], [AC_DEFINE([ANTLR3_USE_64BIT], [1], [Define if 64 bit mode required])], [])
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
