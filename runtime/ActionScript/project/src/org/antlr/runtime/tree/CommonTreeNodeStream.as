@@ -197,6 +197,8 @@ package org.antlr.runtime.tree {
 			return nodes[p+k-1];
 		}
 		
+		public function get currentSymbol():Object { return LT(1); }
+		
 		/** Look backwards k nodes */
 		protected function LB(k:int):Object {
 			if ( k==0 ) {

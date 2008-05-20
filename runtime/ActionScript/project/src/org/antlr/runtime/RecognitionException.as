@@ -164,7 +164,7 @@ package org.antlr.runtime {
 		}
 	
 		/** Return the token type or char of the unexpected input element */
-		public function getUnexpectedType():int {
+		public function get unexpectedType():int {
 			if ( input is TokenStream ) {
 				return token.type;
 			}

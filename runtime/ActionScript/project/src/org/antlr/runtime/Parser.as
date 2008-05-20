@@ -44,6 +44,27 @@ package org.antlr.runtime {
 			}
 		}
 
+		protected override function getCurrentInputSymbol(input:IntStream):Object {
+			return TokenStream(input).LT(1);
+		}
+	
+		protected override function getMissingSymbol(input:IntStream,
+										    e:RecognitionException,
+										    expectedTokenType:int,
+										    follow:BitSet):Object {
+			var tokenText:String =
+				"<missing "+tokenNames[expectedTokenType]+">";
+			var t:CommonToken = new CommonToken(expectedTokenType, tokenText);
+			var current:Token = TokenStream(input).LT(1);
+			if ( current.type == TokenConstants.EOF ) {
+				current = TokenStream(input).LT(-1);
+			}
+			t.line = current.line;
+			t.charPositionInLine = current.charPositionInLine;
+			t.channel = DEFAULT_TOKEN_CHANNEL;
+			return t;
+		}
+	
 		/** Set the token stream and reset the parser */
 		public function set tokenStream(input:TokenStream):void {
 			this.input = null;

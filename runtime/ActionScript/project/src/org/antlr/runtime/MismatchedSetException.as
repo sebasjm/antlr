@@ -36,7 +36,7 @@ package org.antlr.runtime {
 		}
 	
 		public function toString():String {
-			return "MismatchedSetException("+getUnexpectedType()+"!="+expecting+")";
+			return "MismatchedSetException("+unexpectedType+"!="+expecting+")";
 		}
 	}
 }

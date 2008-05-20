@@ -42,14 +42,21 @@ group ASTTreeParser;
 /** Add a variable to track last element matched */
 ruleDeclarations() ::= <<
 <super.ruleDeclarations()>
-<ASTLabelType> _last = null;<\n>
+var _first_0:<ASTLabelType> = null;
+var _last:<ASTLabelType> = null;<\n>
 >>
 
 /** What to emit when there is no rewrite rule.  For auto build
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
-<if(rewriteMode)>retval.tree = <ASTLabelType>(retval.start);<endif>
+<if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(rewriteMode)>
+retval.tree = <ASTLabelType>(_first_0);
+if ( adaptor.getParent(retval.tree)!=null && adaptor.isNil( adaptor.getParent(retval.tree) ) )
+    retval.tree = <ASTLabelType>(adaptor.getParent(retval.tree));
+<endif>
+<if(backtracking)>}<endif>
 >>
 
 /** match ^(root children) in tree parser; override here to
@@ -59,11 +66,20 @@ tree(root, actionsAfterRoot, children, nullableChildList,
      enclosingTreeLevel, treeLevel) ::= <<
 _last = <ASTLabelType>(input.LT(1));
 {
-<ASTLabelType> _save_last_<treeLevel> = _last;
+var _save_last_<treeLevel>:<ASTLabelType> = _last;
+var _first_<treeLevel>:<ASTLabelType> = null;
 <if(!rewriteMode)>
-<ASTLabelType> root_<treeLevel> = <ASTLabelType>(adaptor.nil());
+var root_<treeLevel>:<ASTLabelType> = <ASTLabelType>(adaptor.nil());
 <endif>
 <root:element()>
+<if(rewriteMode)>
+<if(backtracking)>if ( state.backtracking==0 )<endif>
+<if(root.el.rule)>
+if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = <root.el.label>.tree;
+<else>
+if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = <root.el.label>;
+<endif>
+<endif>
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
 if ( input.LA(1)==TokenConstants.DOWN ) {
@@ -99,9 +115,16 @@ _last = <ASTLabelType>(input.LT(1));
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 <label>_tree = <ASTLabelType>(adaptor.dupNode(<label>));
+<endif><\n>
 adaptor.addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
+<else> <! rewrite mode !>
+<if(backtracking)>if ( state.backtracking==0 )<endif>
+if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>;
 <endif>
 >>
 
@@ -117,7 +140,11 @@ _last = <ASTLabelType>(input.LT(1));
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 <label>_tree = <ASTLabelType>(adaptor.dupNode(<label>));
+<endif><\n>
 root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(<label>_tree, root_<treeLevel>));
 <if(backtracking)>}<endif>
 <endif>
@@ -136,7 +163,11 @@ _last = <ASTLabelType>(input.LT(1));
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 <label>_tree = <ASTLabelType>(adaptor.dupNode(<label>));
+<endif><\n>
 adaptor.addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <endif>
@@ -158,7 +189,11 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
 <if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(hetero)>
+<label>_tree = new <hetero>(<label>);
+<else>
 <label>_tree = <ASTLabelType>(adaptor.dupNode(<label>));
+<endif><\n>
 root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(<label>_tree, root_<treeLevel>));
 <if(backtracking)>}<endif>
 <endif>
@@ -172,8 +207,11 @@ root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(<label>_tree, root_<treeLev
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 _last = <ASTLabelType>(input.LT(1));
 <super.ruleRef(...)>
+<if(backtracking)>if ( state.backtracking==0 ) <endif>
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>adaptor.addChild(root_<treeLevel>, <label>.tree);
+adaptor.addChild(root_<treeLevel>, <label>.getTree());
+<else> <! rewrite mode !>
+if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>.tree;
 <endif>
 >>
 

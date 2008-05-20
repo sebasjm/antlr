@@ -450,12 +450,14 @@ public final function m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(
         <block><\n>
 <else>
         var _type:int = <ruleName>;
+        var _channel:int = DEFAULT_TOKEN_CHANNEL;
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
         this.state.type = _type;
+        this.state.channel = _channel;
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
     }
@@ -617,10 +619,7 @@ element() ::= <<
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex,hetero) ::= <<
-<if(label)>
-<label>=<labelType>(input.LT(1));<\n>
-<endif>
-matchStream(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>); <checkRuleBacktrackFailure()>
+<if(label)><label>=<labelType>(<endif>matchStream(input,<token>,FOLLOW_<token>_in_<ruleName><elementIndex>)<if(label)>)<endif>; <checkRuleBacktrackFailure()>
 >>
 
 /** ids+=ID */
@@ -1121,18 +1120,17 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name> =<expr>;"
 
 scopeAttributeRef(scope,attr,index,negIndex) ::= <<
  <if(negIndex)>
- ((<scope>_stack.length-<negIndex>-1)>=0?<scope>_stack[<scope>_stack.length-<negIndex>-1].<attr.name>:<initValue(attr.type)>)
+ <scope>_stack[<scope>_stack.length-<negIndex>-1].<attr.name>
  <else>
  <if(index)>
- ((<index>\<<scope>_stack.length)?<scope>_stack[<index>].<attr.name>:<initValue(attr.type)>)
+ <scope>_stack[<index>].<attr.name>
  <else>
- ((<scope>_stack.length>0)?<scope>_stack[<scope>_stack.length-1].<attr.name>:<initValue(attr.type)>)
+ <scope>_stack[<scope>_stack.length-1].<attr.name>
  <endif>
  <endif>
 >>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <<
-if ( <scope>_stack.length>0 ) {
 <if(negIndex)>
 <scope>_stack[<scope>_stack.length-<negIndex>-1].<attr.name> =<expr>;
 <else>
@@ -1142,7 +1140,6 @@ if ( <scope>_stack.length>0 ) {
 <scope>_stack[<scope>_stack.length-1].<attr.name> =<expr>;
 <endif>
 <endif>
-}
 >>
 
 /** $x is either global scope or x is rule with dynamic scope; refers
@@ -1247,7 +1244,7 @@ lexerRulePropertyRef_type(scope,attr) ::= "_type"
 lexerRulePropertyRef_line(scope,attr) ::= "state.tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "state.channel"
+lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(charIndex-1)"
 lexerRulePropertyRef_int(scope,attr) ::= "int(<scope>.text)"

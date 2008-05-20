@@ -29,7 +29,7 @@ package org.antlr.runtime {
 
     /** A mismatched char or Token or tree node */
 	public class MismatchedTokenException extends RecognitionException {
-		public var expecting:int;
+		public var expecting:int = TokenConstants.INVALID_TOKEN_TYPE;
 
 		public function MismatchedTokenException(expecting:int, input:IntStream) {
 			super(input);
@@ -37,7 +37,7 @@ package org.antlr.runtime {
 		}
 	
 		public function toString():String {
-			return "MismatchedTokenException("+getUnexpectedType()+"!="+expecting+")";
+			return "MismatchedTokenException("+unexpectedType+"!="+expecting+")";
 		}
 	}
 

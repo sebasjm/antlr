@@ -54,30 +54,32 @@ package org.antlr.runtime {
 			}
 		}
 	
-    	/** Match current input symbol against ttype.  Throw exception upon
-    	 *  error, bailing out of the current production to the normal error
-    	 *  exception catch (at the end of the method) by just throwing
-    	 *  MismatchedTokenException upon input.LA(1)!=ttype.  Rule recovers
-    	 *  by resynchronize into the set of symbols the can follow.
-    	 *
-    	 *  Prior to v3.1, this method used to do one token
-    	 *  insertion or deletion if possible.  You can override mismatch()
-    	 *  to recover here if you want.
-    	 */
-		public function matchStream(input:IntStream, ttype:int, follow:BitSet):void
-		{
+    	/** Match current input symbol against ttype.  Attempt
+		 *  single token insertion or deletion error recovery.  If
+		 *  that fails, throw MismatchedTokenException.
+		 *
+		 *  To turn off single token insertion or deletion error
+		 *  recovery, override mismatchRecover() and have it call
+		 *  plain mismatch(), which does not recover.  Then any error
+		 *  in a rule will cause an exception and immediate exit from
+		 *  rule.  Rule would recover by resynchronizing to the set of
+		 *  symbols that can follow rule ref.
+		 */
+		public function matchStream(input:IntStream, ttype:int, follow:BitSet):Object {
+			//System.out.println("match "+((TokenStream)input).LT(1));
+			var matchedSymbol:Object = getCurrentInputSymbol(input);
 			if ( input.LA(1)==ttype ) {
 				input.consume();
 				state.errorRecovery = false;
 				state.failed = false;
-				return;
+				return matchedSymbol;
 			}
 			if ( state.backtracking>0 ) {
 				state.failed = true;
-				return;
+				return matchedSymbol;
 			}
-			mismatch(input, ttype, follow);
-			return;
+			matchedSymbol = recoverFromMismatchedToken(input, ttype, follow);
+			return matchedSymbol;
 		}
 	
 		/** Match the wildcard: in a symbol */
@@ -99,51 +101,45 @@ package org.antlr.runtime {
     		}
     		// compute what can follow this grammar element reference
     		if ( follow.member(TokenConstants.EOR_TOKEN_TYPE) ) {
-    			var viableTokensFollowingThisRule:BitSet =
-    				computeContextSensitiveRuleFOLLOW();
-    			follow = follow.or(viableTokensFollowingThisRule);
-    			follow.remove(TokenConstants.EOR_TOKEN_TYPE);
+    			if ( state._fsp>=0 ) { // remove EOR if we're not the start symbol
+					follow.remove(TokenConstants.EOR_TOKEN_TYPE);
+				}
+				var viableTokensFollowingThisRule:BitSet = computeContextSensitiveRuleFOLLOW();
+				follow = follow.or(viableTokensFollowingThisRule);
     		}
     		// if current token is consistent with what could come after set
-    		// then we know we're missing a token; error recovery is free to
-    		// "insert" the missing token
-    		//System.out.println("viable tokens="+follow.toString(getTokenNames())+")");
-    		if ( follow.member(input.LA(1)) ) {
-    			//System.out.println("LT(1)=="+input.LT(1)+" is consistent with what follows; inserting...");
-    			return true;
-    		}
-    		return false;
+			// then we know we're missing a token; error recovery is free to
+			// "insert" the missing token
+	
+			//System.out.println("viable tokens="+follow.toString(getTokenNames()));
+			//System.out.println("LT(1)="+((TokenStream)input).LT(1));
+	
+			// BitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
+			// in follow set to indicate that the fall of the start symbol is
+			// in the set (EOF can follow).
+			if ( follow.member(input.LA(1)) || follow.member(TokenConstants.EOR_TOKEN_TYPE) ) {
+				//System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
+				return true;
+			}
+			return false;
     	}
     
-    	/** factor out what to do upon token mismatch so tree parsers can behave
-    	 *  differently.  Override and call mismatchRecover(input, ttype, follow)
-    	 *  to get single token insertion and deletion.
-    	 */
+    	/** Factor out what to do upon token mismatch so tree parsers can behave
+		 *  differently.  Override and call mismatchRecover(input, ttype, follow)
+		 *  to get single token insertion and deletion.  Use this to turn of
+		 *  single token insertion and deletion. Override mismatchRecover
+		 *  to call this instead.
+		 */
 		protected function mismatch(input:IntStream, ttype:int, follow:BitSet):void
 		{
     		if ( mismatchIsUnwantedToken(input, ttype) ) {
     			throw new UnwantedTokenException(ttype, input);
     		}
     		else if ( mismatchIsMissingToken(input, follow) ) {
-    			throw new MissingTokenException(ttype, input);
+    			throw new MissingTokenException(ttype, input, null);
     		}
     		throw new MismatchedTokenException(ttype, input);
 		}
-
-    	protected function mismatchRecover(input:IntStream, ttype:int, follow:BitSet):void
-    	{
-    		var mte:MismatchedTokenException = null;
-    		if ( mismatchIsUnwantedToken(input, ttype) ) {
-    			mte = new UnwantedTokenException(ttype, input);
-    		}
-    		else if ( mismatchIsMissingToken(input, follow) ) {
-    			mte = new MissingTokenException(ttype, input);
-    		}
-    		else {
-    			mte = new MismatchedTokenException(ttype, input);
-    		}
-    		recoverFromMismatchedToken(input, mte, ttype, follow);
-    	}
 	
     	/** Report a recognition problem.
     	 *
@@ -521,11 +517,20 @@ package org.antlr.runtime {
 			for (var i:int=top; i>=0; i--) {
 				var localFollowSet:BitSet = state.following[i];
 				followSet.orInPlace(localFollowSet);
-				if ( exact && !localFollowSet.member(TokenConstants.EOR_TOKEN_TYPE) ) {
-					break;
+				if ( exact ) {
+					// can we see end of rule?
+					if ( localFollowSet.member(TokenConstants.EOR_TOKEN_TYPE) ) {
+						// Only leave EOR in set if at top (start rule); this lets
+						// us know if have to include follow(start rule); i.e., EOF
+						if ( i>0 ) {
+							followSet.remove(TokenConstants.EOR_TOKEN_TYPE);
+						}
+					}
+					else { // can't see end of rule, quit
+						break;
+					}
 				}
 			}
-			followSet.remove(TokenConstants.EOR_TOKEN_TYPE);
 			return followSet;
 		}
 	
@@ -559,57 +564,91 @@ package org.antlr.runtime {
 		 *  reference in rule atom.  It can assume that you forgot the ')'.
 		 */
 		public function recoverFromMismatchedToken(input:IntStream,
-											   e:RecognitionException,
-											   ttype:int,
-											   follow:BitSet):void {	
-    		// if next token is what we are looking for then "delete" this token
-    		if ( mismatchIsUnwantedToken(input, ttype) ) {
-    			reportError(e);
-    			/*
-    			System.err.println("recoverFromMismatchedToken deleting "+input.LT(1)+
-    							   " since "+input.LT(2)+" is what we want");
-    			*/
-    			beginResync();
-    			input.consume(); // simply delete extra token
-    			endResync();
-    			input.consume(); // move past ttype token as if all were ok
-    			return;
-    		}
-    		if ( !recoverFromMissingElement(input,e,follow) ) {
-    			throw e;
-    		}
+											   	   ttype:int,
+											       follow:BitSet):Object {	
+    		var e:RecognitionException = null;
+			// if next token is what we are looking for then "delete" this token
+			if ( mismatchIsUnwantedToken(input, ttype) ) {
+				e = new UnwantedTokenException(ttype, input);
+				/*
+				System.err.println("recoverFromMismatchedToken deleting "+
+								   ((TokenStream)input).LT(1)+
+								   " since "+((TokenStream)input).LT(2)+" is what we want");
+				 */
+				beginResync();
+				input.consume(); // simply delete extra token
+				endResync();
+				reportError(e);  // report after consuming so AW sees the token in the exception
+				// we want to return the token we're actually matching
+				var matchedSymbol:Object = getCurrentInputSymbol(input);
+				input.consume(); // move past ttype token as if all were ok
+				return matchedSymbol;
+			}
+			// can't recover with single token deletion, try insertion
+			if ( mismatchIsMissingToken(input, follow) ) {
+				var inserted:Object = getMissingSymbol(input, e, ttype, follow);
+				e = new MissingTokenException(ttype, input, inserted);
+				reportError(e);  // report after inserting so AW sees the token in the exception
+				return inserted;
+			}
+			// even that didn't work; must throw the exception
+			e = new MismatchedTokenException(ttype, input);
+			throw e;
 		}
 	
+		/** Not currently used */
 		public function recoverFromMismatchedSet(input:IntStream,
-											 e:RecognitionException,
-											 follow:BitSet):RecognitionException
+											     e:RecognitionException,
+											     follow:BitSet):Object
 		{
-    		// TODO do single token deletion like above for Token mismatch
-    		if ( !recoverFromMissingElement(input,e,follow) ) {
-    			throw e;
-    		}
-            else {
-                return e;
-            }
+    		if ( mismatchIsMissingToken(input, follow) ) {
+				// System.out.println("missing token");
+				reportError(e);
+				// we don't know how to conjure up a token for sets yet
+				return getMissingSymbol(input, e, TokenConstants.INVALID_TOKEN_TYPE, follow);
+			}
+			// TODO do single token deletion like above for Token mismatch
+			throw e;
 		}
 	
-    	/** This code is factored out from mismatched token and mismatched set
-    	 *  recovery.  It handles "single token insertion" error recovery for
-    	 *  both.  No tokens are consumed to recover from insertions.  Return
-    	 *  true if recovery was possible else return false.
-    	 */
-    	protected function recoverFromMissingElement(input:IntStream,
-    												e:RecognitionException,
-    												follow:BitSet):Boolean
-    	{
-    		if ( mismatchIsMissingToken(input, follow) ) {
-    			reportError(e);
-    			return true;
-    		}
-    		//System.err.println("nothing to do; throw exception");
-    		return false;
-    	}
+		/** Match needs to return the current input symbol, which gets put
+		 *  into the label for the associated token ref; e.g., x=ID.  Token
+		 *  and tree parsers need to return different objects. Rather than test
+		 *  for input stream type or change the IntStream interface, I use
+		 *  a simple method to ask the recognizer to tell me what the current
+		 *  input symbol is.
+		 * 
+		 *  This is ignored for lexers.
+		 */
+		protected function getCurrentInputSymbol(input:IntStream):Object { return null; }
 	
+		/** Conjure up a missing token during error recovery.
+		 *
+		 *  The recognizer attempts to recover from single missing
+		 *  symbols. But, actions might refer to that missing symbol.
+		 *  For example, x=ID {f($x);}. The action clearly assumes
+		 *  that there has been an identifier matched previously and that
+		 *  $x points at that token. If that token is missing, but
+		 *  the next token in the stream is what we want we assume that
+		 *  this token is missing and we keep going. Because we
+		 *  have to return some token to replace the missing token,
+		 *  we have to conjure one up. This method gives the user control
+		 *  over the tokens returned for missing tokens. Mostly,
+		 *  you will want to create something special for identifier
+		 *  tokens. For literals such as '{' and ',', the default
+		 *  action in the parser or tree parser works. It simply creates
+		 *  a CommonToken of the appropriate type. The text will be the token.
+		 *  If you change what tokens must be created by the lexer,
+		 *  override this method to create the appropriate tokens.
+		 */
+		protected function getMissingSymbol(input:IntStream,
+										    e:RecognitionException,
+										    expectedTokenType:int,
+										    follow:BitSet):Object
+		{
+			return null;
+		}
+		
 		public function consumeUntilToken(input:IntStream, tokenType:int):void {
 			//System.out.println("consumeUntil "+tokenType);
 			var ttype:int = input.LA(1);
@@ -775,27 +814,5 @@ package org.antlr.runtime {
 			trace();
 		}
 	
-		/** A syntactic predicate.  Returns true/false depending on whether
-		 *  the specified grammar fragment matches the current input stream.
-		 *  This resets the failed instance var afterwards.
-		public boolean synpred(IntStream input, GrammarFragmentPtr fragment) {
-			//int i = input.index();
-			//System.out.println("begin backtracking="+backtracking+" @"+i+"="+((CommonTokenStream)input).LT(1));
-			backtracking++;
-			beginBacktrack(backtracking);
-			int start = input.mark();
-			try {fragment.invoke();}
-			catch (RecognitionException re) {
-				System.err.println("impossible: "+re);
-			}
-			boolean success = !failed;
-			input.rewind(start);
-			endBacktrack(backtracking, success);
-			backtracking--;
-			//System.out.println("end backtracking="+backtracking+": "+(failed?"FAILED":"SUCCEEDED")+" @"+input.index()+" should be "+i);
-			failed=false;
-			return success;
-		}
-		 */
 	}
 }

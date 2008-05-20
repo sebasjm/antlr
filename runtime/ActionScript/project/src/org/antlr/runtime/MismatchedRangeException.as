@@ -37,7 +37,7 @@ package org.antlr.runtime
 		}
 	
 		public function toString():String {
-			return "MismatchedNotSetException("+getUnexpectedType()+" not in ["+a+","+b+"])";
+			return "MismatchedNotSetException("+unexpectedType+" not in ["+a+","+b+"])";
 		}
 	}
 

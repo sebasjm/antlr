@@ -44,14 +44,18 @@ package org.antlr.runtime.tree {
 		/** Create a tree node from Token object; for CommonTree type trees,
 		 *  then the token just becomes the payload.  This is the most
 		 *  common create call.
+		 * 
+		 * 	Override if you want another kind of node to be built.
 	     */
 		function createWithPayload(payload:Token):Object;
 	
+		/** Duplicate a single tree node.
+	 	 *  Override if you want another kind of node to be built.
+	 	 */
+	 	function dupNode(treeNode:Object):Object;
+	 	
 		/** Duplicate tree recursively, using dupNode() for each node */
 		function dupTree(tree:Object):Object;
-	
-		/** Duplicate a single tree node */
-		function dupNode(treeNode:Object):Object;
 	
 		/** Return a nil node (an empty but non-null node) that can hold
 		 *  a list of element as the children.  If you want a flat tree (a list)

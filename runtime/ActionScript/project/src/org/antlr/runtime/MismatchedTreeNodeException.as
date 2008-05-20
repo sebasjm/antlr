@@ -10,7 +10,7 @@ package org.antlr.runtime {
 		}
 	
 		public function toString():String {
-			return "MismatchedTreeNodeException("+getUnexpectedType()+"!="+expecting+")";
+			return "MismatchedTreeNodeException("+unexpectedType+"!="+expecting+")";
 		}
 	}
 }

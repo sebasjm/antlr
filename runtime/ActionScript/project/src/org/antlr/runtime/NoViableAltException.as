@@ -44,7 +44,12 @@ package org.antlr.runtime {
 		}
 	
 		public function toString():String {
-			return "NoViableAltException("+getUnexpectedType()+"!=["+grammarDecisionDescription+"])";
+			if ( input is CharStream ) {
+				return "NoViableAltException('"+String.fromCharCode(unexpectedType)+"'@["+grammarDecisionDescription+"])";
+			}
+			else {
+				return "NoViableAltException("+unexpectedType+"@["+grammarDecisionDescription+"])";
+			}
 		}
 	}
 	
