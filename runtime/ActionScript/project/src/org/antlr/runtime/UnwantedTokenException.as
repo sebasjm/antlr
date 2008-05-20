@@ -12,8 +12,14 @@ package org.antlr.runtime
         }
         
         public override function toString():String {
-    		return "UnwantedTokenException(found="+token.text+", expected "+
-    			   expecting+")";
+    		var exp:String = ", expected "+expecting;
+			if ( expecting==TokenConstants.INVALID_TOKEN_TYPE ) {
+				exp = "";
+			}
+			if ( token==null ) {
+				return "UnwantedTokenException(found="+null+exp+")";
+			}
+			return "UnwantedTokenException(found="+token.text+exp+")";
         }
     }
 }
