@@ -106,14 +106,7 @@ public class GrammarAST extends BaseAST {
 	 *
 	 *  If BLOCK then tracks every element at that level and below.
 	 */
-	public Set<GrammarAST> rewriteRefsDeep;	
-
-	public static final Set legalBlockOptions =
-			new HashSet() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
-
-	/** What are the default options for a subrule? */
-    public static final Map defaultBlockOptions =
-            new HashMap() {{put("greedy","true");}};
+	public Set<GrammarAST> rewriteRefsDeep;
 
 	public Map<String,Object> terminalOptions;
 
@@ -185,7 +178,7 @@ public class GrammarAST extends BaseAST {
 		if ( blockOptions == null ) {
 			blockOptions = new HashMap();
 		}
-		return setOption(blockOptions, legalBlockOptions, grammar, key, value);
+		return setOption(blockOptions, Grammar.legalBlockOptions, grammar, key, value);
 	}
 
 	public String setTerminalOption(Grammar grammar, String key, Object value) {
@@ -220,9 +213,6 @@ public class GrammarAST extends BaseAST {
 		Object value = null;
 		if ( blockOptions != null ) {
 			value = blockOptions.get(key);
-		}
-		if ( value==null ) {
-			value = defaultBlockOptions.get(key);
 		}
 		return value;
 	}
@@ -452,10 +442,6 @@ public class GrammarAST extends BaseAST {
 		GrammarAST dup_t = new GrammarAST();
 		dup_t.initialize(t);
 		return dup_t;
-	}
-
-	public static void main(String[] args) {
-		GrammarAST t = new GrammarAST();
 	}
 
 	/** Duplicate tree including siblings of root. */

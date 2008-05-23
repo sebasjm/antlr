@@ -131,7 +131,7 @@ tokens {
 	 */
 	protected void prefixWithSynPred(GrammarAST alt) {
 		// if they want backtracking and it's not a lexer rule in combined grammar
-		String autoBacktrack = (String)currentBlockAST.getBlockOption("backtrack");
+		String autoBacktrack = (String)grammar.getBlockOption(currentBlockAST, "backtrack");
 		if ( autoBacktrack==null ) {
 			autoBacktrack = (String)grammar.getOption("backtrack");
 		}

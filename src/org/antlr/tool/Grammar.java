@@ -216,6 +216,16 @@ public class Grammar {
 				}
 			};
 
+	public static final Set legalBlockOptions =
+			new HashSet() {{add("k"); add("greedy"); add("backtrack"); add("memoize");}};
+
+	/** What are the default options for a subrule? */
+	public static final Map defaultBlockOptions =
+			new HashMap() {{put("greedy","true");}};
+
+	public static final Map defaultLexerBlockOptions =
+			new HashMap() {{put("greedy","true");}};
+
 	// Token options are here to avoid contaminating Token object in runtime
 	
 	/** Legal options for terminal refs like ID<node=MyVarNode> */
@@ -2323,6 +2333,17 @@ outer:
 		return value;
 	}
 
+	public Object getBlockOption(GrammarAST blockAST, String key) {
+		String v = (String)blockAST.getBlockOption(key);
+		if ( v!=null ) {
+			return v;
+		}
+		if ( type==Grammar.LEXER ) {
+			return defaultLexerBlockOptions.get(key);
+		}
+		return defaultBlockOptions.get(key);
+	}
+
 	public int getUserMaxLookahead(int decision) {
 		int user_k = 0;
 		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decision);
@@ -2347,7 +2368,8 @@ outer:
 	public boolean getAutoBacktrackMode(int decision) {
 		NFAState decisionNFAStartState = getDecisionNFAStartState(decision);
 		String autoBacktrack =
-			(String)decisionNFAStartState.associatedASTNode.getBlockOption("backtrack");
+			(String)getBlockOption(decisionNFAStartState.associatedASTNode, "backtrack");
+		
 		if ( autoBacktrack==null ) {
 			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
 		}

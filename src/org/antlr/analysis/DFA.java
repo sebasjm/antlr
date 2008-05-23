@@ -955,12 +955,13 @@ public class DFA {
 
     public boolean isGreedy() {
 		GrammarAST blockAST = nfa.grammar.getDecisionBlockAST(decisionNumber);
-		String v = (String)blockAST.getBlockOption("greedy");
+		Object v = nfa.grammar.getBlockOption(blockAST,"greedy");
 		if ( v!=null && v.equals("false") ) {
 			return false;
 		}
         return true;
-    }
+
+	}
 
     public DFAState newState() {
         DFAState n = new DFAState(this);

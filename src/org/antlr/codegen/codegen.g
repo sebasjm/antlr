@@ -389,7 +389,7 @@ rule returns [StringTemplate code=null]
 					Boolean.valueOf(grammar.isEmptyRule(block)));
 			}
 			code.setAttribute("ruleDescriptor", ruleDescr);
-			String memo = (String)#rule.getBlockOption("memoize");
+			String memo = (String)grammar.getBlockOption(#rule,"memoize");
 			if ( memo==null ) {
 				memo = (String)grammar.getOption("memoize");
 			}
