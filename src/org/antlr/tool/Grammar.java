@@ -318,6 +318,9 @@ public class Grammar {
 	 */
 	protected LinkedHashMap nameToSynpredASTMap;
 
+	/** At least one rule has memoize=true */
+	public boolean atLeastOneRuleMemoizes;
+
 	/** Was this created from a COMBINED grammar? */
 	public boolean implicitLexer;
 

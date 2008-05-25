@@ -361,12 +361,17 @@ public class CodeGenerator {
 
 		outputFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
 		headerFileST.setAttribute("backtracking", Boolean.valueOf(canBacktrack));
+		// turn on memoize attribute at grammar level so we can create ruleMemo.
+		// each rule has memoize attr that hides this one, indicating whether
+		// it needs to save results
 		String memoize = (String)grammar.getOption("memoize");
 		outputFileST.setAttribute("memoize",
-								  Boolean.valueOf(memoize!=null&&memoize.equals("true")&&
+								  (grammar.atLeastOneRuleMemoizes||
+								  Boolean.valueOf(memoize!=null&&memoize.equals("true"))&&
 									          canBacktrack));
 		headerFileST.setAttribute("memoize",
-								  Boolean.valueOf(memoize!=null&&memoize.equals("true")&&
+								  (grammar.atLeastOneRuleMemoizes||
+								  Boolean.valueOf(memoize!=null&&memoize.equals("true"))&&
 									          canBacktrack));
 
 

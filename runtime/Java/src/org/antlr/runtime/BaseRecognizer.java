@@ -846,10 +846,10 @@ public abstract class BaseRecognizer {
 	{
 		int stopTokenIndex = state.failed?MEMO_RULE_FAILED:input.index()-1;
 		if ( state.ruleMemo==null ) {
-			System.out.println("!!!!!!!!! memo array is null for "+ getGrammarFileName());
+			System.err.println("!!!!!!!!! memo array is null for "+ getGrammarFileName());
 		}
 		if ( ruleIndex >= state.ruleMemo.length ) {
-			System.out.println("!!!!!!!!! memo size is "+state.ruleMemo.length+", but rule index is "+ruleIndex);
+			System.err.println("!!!!!!!!! memo size is "+state.ruleMemo.length+", but rule index is "+ruleIndex);
 		}
 		if ( state.ruleMemo[ruleIndex]!=null ) {
 			state.ruleMemo[ruleIndex].put(
