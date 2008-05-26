@@ -830,7 +830,8 @@ public class Grammar {
 	 *  just call buildNFA(), which forces a call to this method if not
 	 *  done already. Works ONLY for single noncomposite grammars.
 	 */
-	public void createNFAAndBuildRuleStartAndStopNFAStates() {
+	public void createRuleStartAndStopNFAStates() {
+		//System.out.println("### createRuleStartAndStopNFAStates "+getGrammarTypeString()+" grammar "+name+" NFAs");
 		if ( nfa!=null ) {
 			return;
 		}
@@ -855,7 +856,7 @@ public class Grammar {
 
 	public void buildNFA() {
 		if ( nfa==null ) {
-			createNFAAndBuildRuleStartAndStopNFAStates();
+			createRuleStartAndStopNFAStates();
 		}
 		if ( nfa.complete ) {
 			// don't let it create more than once; has side-effects
@@ -875,7 +876,6 @@ public class Grammar {
 							   name,
 							   re);
 		}
-		//System.out.println("NFA has "+factory.getNumberOfStates()+" states");
 		nfa.complete = true;
 	}
 

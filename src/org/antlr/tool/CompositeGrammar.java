@@ -353,9 +353,15 @@ public class CompositeGrammar {
 			return;
 		}
 		List<Grammar> grammars = delegateGrammarTreeRoot.getPostOrderedGrammarList();
+		List<String> names = new ArrayList<String>();
+		for (int i = 0; i < grammars.size(); i++) {
+			Grammar g = (Grammar) grammars.get(i);
+			names.add(g.name);
+		}
+		//System.out.println("### createNFAs for composite; grammars: "+names);
 		for (int i = 0; grammars!=null && i < grammars.size(); i++) {
 			Grammar g = (Grammar)grammars.get(i);
-			g.createNFAAndBuildRuleStartAndStopNFAStates();
+			g.createRuleStartAndStopNFAStates();
 		}
 		for (int i = 0; grammars!=null && i < grammars.size(); i++) {
 			Grammar g = (Grammar)grammars.get(i);
