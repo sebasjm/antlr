@@ -323,7 +323,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
-// $ANTLR start <ruleName>
+// $ANTLR start "<ruleName>"
 // <fileName>:<description>
 public final <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
     <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
@@ -362,7 +362,7 @@ public final <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterS
     <@postamble()>
     return <ruleReturnValue()>;
 }
-// $ANTLR end <ruleName>
+// $ANTLR end "<ruleName>"
 >>
 
 catch(decl,action) ::= <<
@@ -452,7 +452,7 @@ if ( state.backtracking>0 ) { memoize(input, <ruleDescriptor.index>, <ruleDescri
  *  fragment rules.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
-// $ANTLR start <ruleName>
+// $ANTLR start "<ruleName>"
 public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) throws RecognitionException {
     <if(trace)>traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
@@ -482,7 +482,7 @@ public final void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scop
         <memoize()>
     }
 }
-// $ANTLR end <ruleName>
+// $ANTLR end "<ruleName>"
 >>
 
 /** How to generate code for the implicitly-defined lexer grammar rule
