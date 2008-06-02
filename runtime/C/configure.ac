@@ -140,7 +140,47 @@ AC_PROG_MAKE_SET
 
 # Checks for header files.
 AC_INCLUDES_DEFAULT()
-AC_CHECK_HEADERS([malloc.h sys/malloc.h stdarg.h sys/stat.h ctype.h sys/socket.h socket.h netinet/tcp.h netinet/in.h resolv.h])
+AC_HEADER_RESOLV
+AC_CHECK_HEADERS([sys/malloc.h malloc.h], [], [],
+[[#ifdef HAVE_SYS_MALLOC_H
+#include <sys/malloc.h>
+#endif
+#ifdef HAVE_MALLOC_H
+#include <malloc.h>
+#endif
+]])
+AC_CHECK_HEADERS([stdarg.h], [], [],
+[[#ifdef HAVE_STDARG_H
+#include <stdarg.h>
+#endif
+]])
+
+AC_CHECK_HEADERS([sys/stat.h], [], [],
+[[#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+]])
+
+AC_CHECK_HEADERS([ctype.h], [], [],
+[[#ifdef HAVE_CTYPE_H
+#include <ctype.h>
+#endif
+]])
+
+AC_CHECK_HEADERS([netinet/tcp.h], [], [],
+[[#ifdef HAVE_NETINET_TCP_H
+#include <netinet/tcp.h>
+#endif
+]])
+
+AC_CHECK_HEADERS([sys/socket.h socket.h], [], [],
+[[#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_SOCKET_H
+#include <socket.h>
+#endif
+]])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
