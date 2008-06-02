@@ -364,7 +364,7 @@ RewriteEarlyExitException() ::=
 <<
 CONSTRUCTEX();
 EXCEPTION->type         = ANTLR3_REWRITE_EARLY_EXCEPTION;
-EXCEPTION->name         = ANTLR3_REWRITE_EARLY_EXCEPTION_NAME;
+EXCEPTION->name         = (void *)ANTLR3_REWRITE_EARLY_EXCEPTION_NAME;
 >>
 rewritePositiveClosureBlock(
 	alt,
