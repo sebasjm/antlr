@@ -767,7 +767,13 @@ mainName() ::= <<
 
 headerReturnScope(ruleDescriptor) ::= "<returnScope(...)>"
 
-headerReturnType(ruleDescriptor) ::= " <ruleDescriptor:returnType()>"
+headerReturnType(ruleDescriptor) ::= <<
+<if(LEXER)>
+ void
+<else>
+ <ruleDescriptor:returnType()>
+<endif>
+>>
 
 // Produce the lexer output
 //
