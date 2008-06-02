@@ -474,7 +474,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<rule>->nextTree(stream_<rul
 >>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<name>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<rule>), root_<treeLevel>);<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
