@@ -97,7 +97,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		/** Execute the rewrite operation by possibly adding to the buffer.
 		 *  Return the index of the next token to operate on.
 		 */
-		public int execute(StringBuilder buf) {
+		public int execute(StringBuffer buf) {
 			return index;
 		}
 		public String toString() {
@@ -112,7 +112,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		public InsertBeforeOp(int index, Object text) {
 			super(index,text);
 		}
-		public int execute(StringBuilder buf) {
+		public int execute(StringBuffer buf) {
 			buf.append(text);
 			buf.append(((Token)tokens.get(index)).getText());			
 			return index+1;
@@ -128,7 +128,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			super(from,text);
 			lastIndex = to;
 		}
-		public int execute(StringBuilder buf) {
+		public int execute(StringBuffer buf) {
 			if ( text!=null ) {
 				buf.append(text);
 			}
@@ -353,7 +353,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		if ( rewrites==null || rewrites.size()==0 ) {
 			return toOriginalString(start,end); // no instructions to execute
 		}
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 
 		// First, optimize instruction stream
 		Map indexToOp = reduceToSingleOperationPerIndex(rewrites);
