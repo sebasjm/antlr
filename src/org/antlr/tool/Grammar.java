@@ -187,7 +187,33 @@ public class Grammar {
 	 */
 	protected Map options;
 
-	public static final Set legalOptions =
+	public static final Set legalLexerOptions =
+			new HashSet() {
+				{
+				add("language"); add("tokenVocab");
+				add("TokenLabelType");
+				add("superClass");
+				add("filter");
+				add("k");
+				add("backtrack");
+				add("memoize");
+				}
+			};
+
+	public static final Set legalParserOptions =
+			new HashSet() {
+				{
+				add("language"); add("tokenVocab");
+				add("output"); add("rewrite"); add("ASTLabelType");
+				add("TokenLabelType");
+				add("superClass");
+				add("k");
+				add("backtrack");
+				add("memoize");
+				}
+			};
+
+	public static final Set legalTreeParserOptions =
 			new HashSet() {
 				{
 				add("language"); add("tokenVocab");
@@ -2288,7 +2314,7 @@ outer:
 	 *  or null if invalid option.
 	 */
 	public String setOption(String key, Object value, antlr.Token optionsStartToken) {
-		if ( !legalOptions.contains(key) ) {
+		if ( legalOption(key) ) {
 			ErrorManager.grammarError(ErrorManager.MSG_ILLEGAL_OPTION,
 									  this,
 									  optionsStartToken,
@@ -2303,6 +2329,19 @@ outer:
 		}
 		options.put(key, value);
 		return key;
+	}
+
+	public boolean legalOption(String key) {
+		switch ( type ) {
+			case LEXER :
+				return !legalLexerOptions.contains(key);
+			case PARSER :
+				return !legalParserOptions.contains(key);
+			case TREE_PARSER :
+				return !legalTreeParserOptions.contains(key);
+			default :
+				return !legalParserOptions.contains(key);
+		}
 	}
 
 	public void setOptions(Map options, antlr.Token optionsStartToken) {
