@@ -430,7 +430,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 	 *  Return a map from token index to operation.
 	 */
 	protected Map reduceToSingleOperationPerIndex(List rewrites) {
-		System.out.println("rewrites="+rewrites);
+		//System.out.println("rewrites="+rewrites);
 
 		// WALK REPLACES
 		for (int i = 0; i < rewrites.size(); i++) {
@@ -498,7 +498,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 				}
 			}
 		}
-		System.out.println("rewrites after="+rewrites);
+		// System.out.println("rewrites after="+rewrites);
 		Map m = new HashMap();
 		for (int i = 0; i < rewrites.size(); i++) {
 			RewriteOperation op = (RewriteOperation)rewrites.get(i);
@@ -508,7 +508,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			}
 			m.put(new Integer(op.index), op);
 		}
-		System.out.println("index to op: "+m);
+		//System.out.println("index to op: "+m);
 		return m;
 	}
 
