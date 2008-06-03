@@ -807,7 +807,9 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			}
 			else
 			{
-				ANTLR3_FPRINTF(stderr, "\n    near %s\n    ", ttext->chars);
+				// Guard against null text in a token
+				//
+				ANTLR3_FPRINTF(stderr, "\n    near %s\n    ", ttext == NULL ? (pANTLR3_UINT8)"<no text for the token>" : ttext->chars);
 			}
 		}
 		break;
