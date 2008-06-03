@@ -143,7 +143,9 @@ tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 <if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
 >>
 
-
+wildcardTrack(label,elementIndex) ::= <<
+<super.wildcard(...)>
+>> 
 
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
