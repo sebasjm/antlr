@@ -499,10 +499,27 @@ public class TestTokenRewriteStream extends BaseTest {
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
-		tokens.replace(0, 2, "foo"); // wipes prior insert
+		tokens.replace(0, 2, "foo");
 		tokens.insertBefore(0, "z"); // combine with left edge of rewrite
 		String result = tokens.toString();
 		String expecting = "zfoo";
+		assertEquals(expecting, result);
+	}
+
+	public void testCombineInsertOnLeftWithDelete() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.delete(0, 2);
+		tokens.insertBefore(0, "z"); // combine with left edge of rewrite
+		String result = tokens.toString();
+		String expecting = "z"; // make sure combo is not znull
 		assertEquals(expecting, result);
 	}
 

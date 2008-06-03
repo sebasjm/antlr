@@ -479,7 +479,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 				if ( prevIop.index == iop.index ) { // combine objects
 					// convert to strings...we're in process of toString'ing
 					// whole token buffer so no lazy eval issue with any templates
-					iop.text = iop.text.toString() + prevIop.text.toString();
+					iop.text = catOpText(iop.text,prevIop.text);
 					rewrites.set(j, null);  // delete redundant prior insert
 				}
 			}
@@ -488,7 +488,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			for (int j = 0; j < prevReplaces.size(); j++) {
 				ReplaceOp rop = (ReplaceOp) prevReplaces.get(j);
 				if ( iop.index == rop.index ) {
-					rop.text = iop.text.toString() + rop.text.toString();
+					rop.text = catOpText(iop.text,rop.text);
 					rewrites.set(i, null);  // delete current insert
 					continue;
 				}
@@ -512,6 +512,13 @@ public class TokenRewriteStream extends CommonTokenStream {
 		return m;
 	}
 
+	protected String catOpText(Object a, Object b) {
+		String x = "";
+		String y = "";
+		if ( a!=null ) x = a.toString();
+		if ( b!=null ) y = b.toString();
+		return x+y;
+	}
 	protected List getKindOfOps(List rewrites, Class kind) {
 		return getKindOfOps(rewrites, kind, rewrites.size());
 	}
