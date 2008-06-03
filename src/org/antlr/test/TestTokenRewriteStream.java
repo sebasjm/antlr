@@ -52,7 +52,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertBefore(0, "0");
 		String result = tokens.toString();
 		String expecting = "0abc";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testInsertAfterLastIndex() throws Exception {
@@ -68,7 +68,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertAfter(2, "x");
 		String result = tokens.toString();
 		String expecting = "abcx";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void test2InsertBeforeAfterMiddleIndex() throws Exception {
@@ -85,7 +85,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertAfter(1, "x");
 		String result = tokens.toString();
 		String expecting = "axbxc";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceIndex0() throws Exception {
@@ -101,7 +101,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(0, "x");
 		String result = tokens.toString();
 		String expecting = "xbc";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceLastIndex() throws Exception {
@@ -117,7 +117,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(2, "x");
 		String result = tokens.toString();
 		String expecting = "abx";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceMiddleIndex() throws Exception {
@@ -133,7 +133,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(1, "x");
 		String result = tokens.toString();
 		String expecting = "axc";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void test2ReplaceMiddleIndex() throws Exception {
@@ -150,7 +150,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(1, "y");
 		String result = tokens.toString();
 		String expecting = "ayc";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceThenDeleteMiddleIndex() throws Exception {
@@ -167,10 +167,10 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.delete(1);
 		String result = tokens.toString();
 		String expecting = "ac";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
-	public void testReplaceThenInsertSameIndex() throws Exception {
+	public void testInsertInPriorReplace() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -180,29 +180,18 @@ public class TestTokenRewriteStream extends BaseTest {
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
-		tokens.replace(0, "x");
-		tokens.insertBefore(0, "0");
-		String result = tokens.toString();
-		String expecting = "0xbc";
-		assertEquals(result, expecting);
-	}
-
-	public void testReplaceThen2InsertSameIndex() throws Exception {
-		Grammar g = new Grammar(
-			"lexer grammar t;\n"+
-			"A : 'a';\n" +
-			"B : 'b';\n" +
-			"C : 'c';\n");
-		CharStream input = new ANTLRStringStream("abc");
-		Interpreter lexEngine = new Interpreter(g, input);
-		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
-		tokens.replace(0, "x");
-		tokens.insertBefore(0, "y");
-		tokens.insertBefore(0, "z");
-		String result = tokens.toString();
-		String expecting = "zyxbc";
-		assertEquals(result, expecting);
+		tokens.replace(0, 2, "x");
+		tokens.insertBefore(1, "0");
+		Exception exc = null;
+		try {
+			tokens.toString();
+		}
+		catch (IllegalArgumentException iae) {
+			exc = iae;
+		}
+		String expecting = "insert op <InsertBeforeOp@1:\"0\"> within boundaries of previous <ReplaceOp@0..2:\"x\">";
+		assertNotNull(exc);
+		assertEquals(expecting, exc.getMessage());
 	}
 
 	public void testInsertThenReplaceSameIndex() throws Exception {
@@ -216,10 +205,10 @@ public class TestTokenRewriteStream extends BaseTest {
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
 		tokens.insertBefore(0, "0");
-		tokens.replace(0, "x");
+		tokens.replace(0, "x"); // supercedes insert at 0
 		String result = tokens.toString();
-		String expecting = "0xbc";
-		assertEquals(result, expecting);
+		String expecting = "xbc";
+		assertEquals(expecting, result);
 	}
 
 	public void test2InsertMiddleIndex() throws Exception {
@@ -236,7 +225,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertBefore(1, "y");
 		String result = tokens.toString();
 		String expecting = "ayxbc";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void test2InsertThenReplaceIndex0() throws Exception {
@@ -253,8 +242,8 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertBefore(0, "y");
 		tokens.replace(0, "z");
 		String result = tokens.toString();
-		String expecting = "yxzbc";
-		assertEquals(result, expecting);
+		String expecting = "zbc";
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceThenInsertBeforeLastIndex() throws Exception {
@@ -271,7 +260,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertBefore(2, "y");
 		String result = tokens.toString();
 		String expecting = "abyx";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testInsertThenReplaceLastIndex() throws Exception {
@@ -287,8 +276,8 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertBefore(2, "y");
 		tokens.replace(2, "x");
 		String result = tokens.toString();
-		String expecting = "abyx";
-		assertEquals(result, expecting);
+		String expecting = "abx";
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceThenInsertAfterLastIndex() throws Exception {
@@ -305,24 +294,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertAfter(2, "y");
 		String result = tokens.toString();
 		String expecting = "abxy";
-		assertEquals(result, expecting);
-	}
-
-	public void testReplaceRangeThenInsertInMiddle() throws Exception {
-		Grammar g = new Grammar(
-			"lexer grammar t;\n"+
-			"A : 'a';\n" +
-			"B : 'b';\n" +
-			"C : 'c';\n");
-		CharStream input = new ANTLRStringStream("abcccba");
-		Interpreter lexEngine = new Interpreter(g, input);
-		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
-		tokens.replace(2, 4, "x");
-		tokens.insertBefore(3, "y"); // no effect; can't insert in middle of replaced region
-		String result = tokens.toString();
-		String expecting = "abxba";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceRangeThenInsertAtLeftEdge() throws Exception {
@@ -339,7 +311,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertBefore(2, "y");
 		String result = tokens.toString();
 		String expecting = "abyxba";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceRangeThenInsertAtRightEdge() throws Exception {
@@ -354,9 +326,16 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.LT(1); // fill buffer
 		tokens.replace(2, 4, "x");
 		tokens.insertBefore(4, "y"); // no effect; within range of a replace
-		String result = tokens.toString();
-		String expecting = "abxba";
-		assertEquals(result, expecting);
+		Exception exc = null;
+		try {
+			tokens.toString();
+		}
+		catch (IllegalArgumentException iae) {
+			exc = iae;
+		}
+		String expecting = "insert op <InsertBeforeOp@4:\"y\"> within boundaries of previous <ReplaceOp@2..4:\"x\">";
+		assertNotNull(exc);
+		assertEquals(expecting, exc.getMessage());
 	}
 
 	public void testReplaceRangeThenInsertAfterRightEdge() throws Exception {
@@ -373,7 +352,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.insertAfter(4, "y");
 		String result = tokens.toString();
 		String expecting = "abxyba";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceAll() throws Exception {
@@ -389,7 +368,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(0, 6, "x");
 		String result = tokens.toString();
 		String expecting = "x";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceSubsetThenFetch() throws Exception {
@@ -405,7 +384,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(2, 4, "xyz");
 		String result = tokens.toString(0,6);
 		String expecting = "abxyzba";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
 	}
 
 	public void testReplaceThenReplaceSuperset() throws Exception {
@@ -419,10 +398,17 @@ public class TestTokenRewriteStream extends BaseTest {
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
 		tokens.replace(2, 4, "xyz");
-		tokens.replace(2, 5, "foo"); // kills previous replace
-		String result = tokens.toString();
-		String expecting = "abfooa";
-		assertEquals(result, expecting);
+		tokens.replace(3, 5, "foo"); // overlaps, error
+		Exception exc = null;
+		try {
+			tokens.toString();
+		}
+		catch (IllegalArgumentException iae) {
+			exc = iae;
+		}
+		String expecting = "replace op boundaries of <ReplaceOp@3..5:\"foo\"> overlap with previous <ReplaceOp@2..4:\"xyz\">";
+		assertNotNull(exc);
+		assertEquals(expecting, exc.getMessage());
 	}
 
 	public void testReplaceThenReplaceLowerIndexedSuperset() throws Exception {
@@ -436,10 +422,17 @@ public class TestTokenRewriteStream extends BaseTest {
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
 		tokens.LT(1); // fill buffer
 		tokens.replace(2, 4, "xyz");
-		tokens.replace(1, 3, "foo"); // executes first since 1<2; then ignores replace@2 as it skips over 1..3
-		String result = tokens.toString();
-		String expecting = "afoocba";
-		assertEquals(result, expecting);
+		tokens.replace(1, 3, "foo"); // overlap, error
+		Exception exc = null;
+		try {
+			tokens.toString();
+		}
+		catch (IllegalArgumentException iae) {
+			exc = iae;
+		}
+		String expecting = "replace op boundaries of <ReplaceOp@1..3:\"foo\"> overlap with previous <ReplaceOp@2..4:\"xyz\">";
+		assertNotNull(exc);
+		assertEquals(expecting, exc.getMessage());
 	}
 
 	public void testReplaceSingleMiddleThenOverlappingSuperset() throws Exception {
@@ -456,7 +449,188 @@ public class TestTokenRewriteStream extends BaseTest {
 		tokens.replace(0, 3, "foo");
 		String result = tokens.toString();
 		String expecting = "fooa";
-		assertEquals(result, expecting);
+		assertEquals(expecting, result);
+	}
+
+	// June 2, 2008 I rewrote core of rewrite engine; just adding lots more tests here
+
+	public void testCombineInserts() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.insertBefore(0, "x");
+		tokens.insertBefore(0, "y");
+		String result = tokens.toString();
+		String expecting = "yxabc";
+		assertEquals(expecting, result);
+	}
+
+	public void testCombine3Inserts() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.insertBefore(1, "x");
+		tokens.insertBefore(0, "y");
+		tokens.insertBefore(1, "z");
+		String result = tokens.toString();
+		String expecting = "yazxbc";
+		assertEquals(expecting, result);
+	}
+
+	public void testCombineInsertOnLeftWithReplace() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(0, 2, "foo"); // wipes prior insert
+		tokens.insertBefore(0, "z"); // combine with left edge of rewrite
+		String result = tokens.toString();
+		String expecting = "zfoo";
+		assertEquals(expecting, result);
+	}
+
+	public void testDisjointInserts() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.insertBefore(1, "x");
+		tokens.insertBefore(2, "y");
+		tokens.insertBefore(0, "z");
+		String result = tokens.toString();
+		String expecting = "zaxbyc";
+		assertEquals(expecting, result);
+	}
+
+	public void testOverlappingReplace() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(1, 2, "foo");
+		tokens.replace(0, 3, "bar"); // wipes prior nested replace
+		String result = tokens.toString();
+		String expecting = "bar";
+		assertEquals(expecting, result);
+	}
+
+	public void testOverlappingReplace2() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(0, 3, "bar");
+		tokens.replace(1, 2, "foo"); // cannot split earlier replace
+		Exception exc = null;
+		try {
+			tokens.toString();
+		}
+		catch (IllegalArgumentException iae) {
+			exc = iae;
+		}
+		String expecting = "replace op boundaries of <ReplaceOp@1..2:\"foo\"> overlap with previous <ReplaceOp@0..3:\"bar\">";
+		assertNotNull(exc);
+		assertEquals(expecting, exc.getMessage());
+	}
+
+	public void testDropIdenticalReplace() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(1, 2, "foo");
+		tokens.replace(1, 2, "foo"); // drop previous, identical
+		String result = tokens.toString();
+		String expecting = "afooc";
+		assertEquals(expecting, result);
+	}
+
+	public void testDropPrevCoveredInsert() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.insertBefore(1, "foo");
+		tokens.replace(1, 2, "foo"); // kill prev insert
+		String result = tokens.toString();
+		String expecting = "afooc";
+		assertEquals(expecting, result);
+	}
+
+	public void testLeaveAloneDisjointInsert() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.insertBefore(1, "x");
+		tokens.replace(2, 3, "foo");
+		String result = tokens.toString();
+		String expecting = "axbfoo";
+		assertEquals(expecting, result);
+	}
+
+	public void testLeaveAloneDisjointInsert2() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(2, 3, "foo");
+		tokens.insertBefore(1, "x");
+		String result = tokens.toString();
+		String expecting = "axbfoo";
+		assertEquals(expecting, result);
 	}
 
 }
