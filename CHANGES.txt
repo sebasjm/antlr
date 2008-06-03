@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+June 3, 2008
+
+* Restrict legality of grammar options; for example you cannot use output option
+  in lexer anymore.
+
 June 2, 2008
 
 * Throw illegal arg exception upon invalid TokenRewriteStream ops. Rewrote
