@@ -61,6 +61,9 @@ public class PredicateLabel extends Label {
 		if ( this == o ) {
 			return true; // equals if same object
 		}
+		if ( !(o instanceof PredicateLabel) ) {
+			return false;
+		}
 		return semanticContext.equals(((PredicateLabel)o).semanticContext);
 	}
 
