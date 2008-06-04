@@ -44,7 +44,7 @@ public abstract class BaseTest extends TestCase {
 	public static final String jikes = null;//"/usr/bin/jikes";
 	public static final String pathSep = System.getProperty("path.separator");
 	public static final String CLASSPATH = System.getProperty("java.class.path");
-	public static final String tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr3").getAbsolutePath();
+	public final String tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr-"+System.currentTimeMillis()).getAbsolutePath();
 
 	/** If error during execution, store stderr here */
 	protected String stderr;
@@ -158,9 +158,6 @@ public abstract class BaseTest extends TestCase {
 							   String input,
 							   boolean debug)
 	{
-		eraseFiles(".class");
-		eraseFiles(".java");
-
 		rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  null,
@@ -185,9 +182,6 @@ public abstract class BaseTest extends TestCase {
 								String startRuleName,
 								String input, boolean debug)
 	{
-		eraseFiles(".class");
-		eraseFiles(".java");
-
 		rawGenerateAndBuildRecognizer(grammarFileName,
 									  grammarStr,
 									  parserName,
@@ -247,9 +241,6 @@ public abstract class BaseTest extends TestCase {
 									String input,
 									boolean debug)
 	{
-		eraseFiles(".class");
-		eraseFiles(".java");
-
 		// build the parser
 		rawGenerateAndBuildRecognizer(parserGrammarFileName,
 									  parserGrammarStr,
@@ -357,7 +348,7 @@ public abstract class BaseTest extends TestCase {
 		compile("Test.java");
 		try {
 			String[] args = new String[] {
-				"java", "-classpath", CLASSPATH+pathSep+tmpdir,
+				"java", "-classpath", tmpdir+pathSep+CLASSPATH,
 				"Test", new File(tmpdir, "input").getAbsolutePath()
 			};
 			String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();

@@ -582,6 +582,40 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, exc.getMessage());
 	}
 
+	public void testOverlappingReplace3() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(1, 2, "foo");
+		tokens.replace(0, 2, "bar"); // wipes prior nested replace
+		String result = tokens.toString();
+		String expecting = "barc";
+		assertEquals(expecting, result);
+	}
+
+	public void testOverlappingReplace4() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abcc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+		tokens.replace(1, 2, "foo");
+		tokens.replace(1, 3, "bar"); // wipes prior nested replace
+		String result = tokens.toString();
+		String expecting = "abar";
+		assertEquals(expecting, result);
+	}
+
 	public void testDropIdenticalReplace() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+

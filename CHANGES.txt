@@ -7,6 +7,16 @@ University of San Francisco
 
 CHANGES
 
+June 4, 2008
+
+* Improved unit testing so that each test suite executes and builds grammars
+  in a separate temporary directory. This means they can execute concurrently.
+  Also seem to be a problem with my class path during execution. Moved
+  tmpdir for ahead of standard CLASSPATH.
+
+* By virtue of an improvement to StringTemplate, output newlines 
+  in generated files should be normalized to whatever your host uses.
+
 June 3, 2008
 
 * Restrict legality of grammar options; for example you cannot use output option
