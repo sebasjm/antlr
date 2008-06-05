@@ -59,6 +59,7 @@ public class BitSet implements Cloneable {
 
 	/** Construction from a list of integers */
 	public BitSet(List items) {
+		this();
 		for (int i = 0; i < items.size(); i++) {
 			Integer v = (Integer) items.get(i);
 			add(v.intValue());
