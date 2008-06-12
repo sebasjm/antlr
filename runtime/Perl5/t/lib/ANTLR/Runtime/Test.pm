@@ -65,13 +65,26 @@ sub g_test_output_is {
     my $test_result;
     eval {
         # compile grammar
-        my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', 'antlr'), $grammar_file ]);
+        my $antlr;
+        if ($^O =~ /linux/) {
+            $antlr = 'antlr.sh';
+        }
+        elsif ($^O =~ /MSWin32/) {
+            $antlr = 'antlr.bat';
+        }
+        else {
+            $antlr = 'antlr';
+        }
+        my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', $antlr), $grammar_file ]);
         if ($g_result->{exit_code} >> 8 != 0) {
             croak $g_result->{err};
         }
 
         # run test program
-        $test_result = run_program([ 'perl', "-Mblib=$cwd", 'test.pl']);
+        $test_result = run_program([ $^X, "-Mblib=$cwd", 'test.pl']);
+        if ($test_result->{exit_code} >> 8 != 0) {
+            croak $test_result->{err};
+        }
     };
     chdir $cwd;
     die $@ if $@;
