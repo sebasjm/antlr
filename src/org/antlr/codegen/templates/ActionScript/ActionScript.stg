@@ -388,7 +388,7 @@ ruleLabelDefs() ::= <<
     :{var list_<it.label.text>:Array=null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|var <ll.label.text>:RuleReturnScope = null;}; separator="\n">
 >>
 
 lexerRuleLabelDefs() ::= <<

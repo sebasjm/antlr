@@ -8,10 +8,6 @@ package org.antlr.runtime
 		public function get stop():Object { return null; }
 		/** Has a value potentially if output=AST; */
 		public function get tree():Object { return null; }
-		/** Has a value potentially if output=template; Don't use StringTemplate
-		 *  type as it then causes a dependency with ST lib.
-		 */
-		public function get template():Object { return null; }
 	}
 
 }

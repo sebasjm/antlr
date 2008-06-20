@@ -1,15 +1,11 @@
 package org.antlr.runtime {
-    import flash.events.ErrorEvent;
-    import flash.events.EventDispatcher;
-    
-	
 	
 	/** A generic recognizer that can handle recognizers generated from
 	 *  lexer, parser, and tree grammars.  This is all the parsing
 	 *  support code essentially; most of it is error recovery stuff and
 	 *  backtracking.
 	 */
-	public class BaseRecognizer extends EventDispatcher {
+	public class BaseRecognizer {
 		public static const MEMO_RULE_FAILED:int = -2;
 		public static const MEMO_RULE_UNKNOWN:int = -1;
 		public static const INITIAL_FOLLOW_STACK_SIZE:int = 100;
@@ -99,7 +95,7 @@ package org.antlr.runtime {
     			// a single token and hope for the best
     			return false;
     		}
-    		// compute what can follow this grammar element reference
+     		// compute what can follow this grammar element reference
     		if ( follow.member(TokenConstants.EOR_TOKEN_TYPE) ) {
     			if ( state._fsp>=0 ) { // remove EOR if we're not the start symbol
 					follow.remove(TokenConstants.EOR_TOKEN_TYPE);
@@ -110,8 +106,7 @@ package org.antlr.runtime {
     		// if current token is consistent with what could come after set
 			// then we know we're missing a token; error recovery is free to
 			// "insert" the missing token
-	
-			//System.out.println("viable tokens="+follow.toString(getTokenNames()));
+
 			//System.out.println("LT(1)="+((TokenStream)input).LT(1));
 	
 			// BitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
@@ -322,12 +317,7 @@ package org.antlr.runtime {
 	
 		/** Override this method to change where error messages go */
 		public function emitErrorMessage(msg:String):void {
-			if (hasEventListener(ErrorEvent.ERROR)) {
-			    dispatchEvent(new ErrorEvent(ErrorEvent.ERROR, false, false, msg));
-			}
-			else {
 			    trace(msg);
-			}
 		}
 	
     	/** Recover from an error found on the input stream.  This is
@@ -660,10 +650,10 @@ package org.antlr.runtime {
 	
 		/** Consume tokens until one matches the given token set */
 		public function consumeUntil(input:IntStream, bitSet:BitSet):void {
-			//System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
+			//trace("consumeUntil("+bitSet.toStringFromTokens(tokenNames)+")");
 			var ttype:int = input.LA(1);
 			while (ttype != TokenConstants.EOF && !bitSet.member(ttype) ) {
-				//System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
+				//trace("consume during recover LA(1)="+tokenNames[input.LA(1)]);
 				input.consume();
 				ttype = input.LA(1);
 			}

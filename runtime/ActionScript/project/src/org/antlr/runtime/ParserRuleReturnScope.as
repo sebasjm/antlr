@@ -17,30 +17,30 @@ package org.antlr.runtime
 	 *  I do not use getters for fields of objects that are used simply to
 	 *  group values such as this aggregate.
 	 */
-	public class ParserRuleReturnScope {
+	public class ParserRuleReturnScope extends RuleReturnScope {
 		private var _startToken:Token;
 		private var _stopToken:Token;
 		private var _tree:Object;  // if output=AST this contains the tree
 		private var _values:Object = new Object(); // contains the return values
 			
-		public function get start():Token {
+		public override function get start():Object {
 			return _startToken;
 		}
 
-		public function set start(token:Token):void {
-			_startToken = token;
+		public function set start(token:Object):void {
+			_startToken = Token(token);
 		}		
 		
-		public function get stop():Token { 
+		public override function get stop():Object { 
 			return _stopToken;
 		}
 		
-		public function set stop(token:Token):void {
-			_stopToken = token;
+		public function set stop(token:Object):void {
+			_stopToken = Token(token);
 		}
 		
 		/** Has a value potentially if output=AST; */
-		public function get tree():Object {
+		public override function get tree():Object {
 			 return _tree;
 		}
 		
