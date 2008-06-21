@@ -26,6 +26,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.runtime {
+	import flash.utils.getQualifiedClassName;
+	
 	
 	/** Useful for dumping out the input stream after doing some
 	 *  augmentation or other manipulations.
@@ -110,72 +112,7 @@ package org.antlr.runtime {
 		/** Reset the program so that no instructions exist */
 		public function deleteProgram(programName:String = DEFAULT_PROGRAM_NAME):void {
 			rollback(MIN_TOKEN_INDEX, programName);
-		}
-	
-		/** Add an instruction to the rewrite instruction list ordered by
-		 *  the instruction number (use a binary search for efficiency).
-		 *  The list is ordered so that toString() can be done efficiently.
-		 *
-		 *  When there are multiple instructions at the same index, the instructions
-		 *  must be ordered to ensure proper behavior.  For example, a delete at
-		 *  index i must kill any replace operation at i.  Insert-before operations
-		 *  must come before any replace / delete instructions.  If there are
-		 *  multiple insert instructions for a single index, they are done in
-		 *  reverse insertion order so that "insert foo" then "insert bar" yields
-		 *  "foobar" in front rather than "barfoo".  This is convenient because
-		 *  I can insert new InsertOp instructions at the index returned by
-		 *  the binary search.  A ReplaceOp kills any previous replace op.  Since
-		 *  delete is the same as replace with null text, i can check for
-		 *  ReplaceOp and cover DeleteOp at same time. :)
-		 */
-		protected function addToSortedRewriteList(op:RewriteOperation, programName:String = DEFAULT_PROGRAM_NAME):void {
-			var rewrites:Array = getProgram(programName);
-			
-			// Note : Modified from Java because of lack of binary search in Flex framework, quick implementation for now.
-			
-			// empty list or op greater than end of list, add to back.
-			if (rewrites.length == 0 || RewriteOperation(rewrites[rewrites.length - 1]).index < op.index) {
-				rewrites.push(op);
-			}
-			else if (op.index < RewriteOperation(rewrites[0]).index) {			
-				// if we are at beginning of list
-				rewrites.unshift(op);
-			}
-			else {
-				// in the middle of the list, find starting point			
-				for (var pos:int = 0; pos < rewrites.length; pos++) {
-					if (op.index <= RewriteOperation(rewrites[pos]).index) {
-						break;
-					}
-				}
-				
-				if ( op is ReplaceOp ) {
-					var replaced:Boolean = false;
-					var i:int;
-					// look for an existing replace
-					for (i=pos; i<rewrites.length; i++) {
-						var prevOp:RewriteOperation = RewriteOperation(rewrites[pos]);
-						if ( prevOp.index!=op.index ) {
-							break;
-						}
-						if ( prevOp is ReplaceOp ) {
-							rewrites[pos] = op; // replace old with new
-							replaced=true;
-							break;
-						}
-						// keep going; must be an insert
-					}
-					if ( !replaced ) {
-						// add replace op to the end of all the inserts
-						rewrites.splice(i, 0, op);
-					}
-				}
-				else {
-					// inserts are added in front of existing inserts
-					rewrites.splice(pos, 0, op);
-				}
-			}
-		}
+		}	
 	
 		public function insertAfterToken(t:Token, text:Object, programName:String = DEFAULT_PROGRAM_NAME):void {
 			insertAfter(t.tokenIndex, text, programName);
@@ -191,7 +128,9 @@ package org.antlr.runtime {
 		}
 	
 		public function insertBefore(index:int, text:Object, programName:String = DEFAULT_PROGRAM_NAME):void {
-			addToSortedRewriteList(new InsertBeforeOp(index, text), programName);
+			var op:RewriteOperation = new InsertBeforeOp(index,text);
+			var rewrites:Array = getProgram(programName);
+			rewrites.push(op);
 		}
 			
 		public function replace(index:int, text:Object, programName:String = DEFAULT_PROGRAM_NAME):void {
@@ -199,10 +138,12 @@ package org.antlr.runtime {
 		}
 	
 		public function replaceRange(fromIndex:int, toIndex:int, text:Object, programName:String = DEFAULT_PROGRAM_NAME):void {
-			if ( fromIndex > toIndex || fromIndex<0 || toIndex<0 ) {
-				return;
+			if ( fromIndex > toIndex || fromIndex<0 || toIndex<0 || toIndex >= tokens.length ) {
+				throw new Error("replace: range invalid: "+fromIndex+".."+toIndex+"(size="+tokens.length+")");
 			}
-			addToSortedRewriteList(new ReplaceOp(fromIndex, toIndex, text), programName);
+			var op:RewriteOperation = new ReplaceOp(fromIndex, toIndex, text);
+			var rewrites:Array = getProgram(programName);
+			rewrites.push(op);
 		}
 	
 		public function replaceToken(indexT:Token, text:Object, programName:String = DEFAULT_PROGRAM_NAME):void {
@@ -281,59 +222,187 @@ package org.antlr.runtime {
 				return toOriginalStringWithRange(start,end); // no instructions to execute
 			}
 			var state:RewriteState = new RewriteState();
+			state.tokens = tokens;
 			
-			state.index = start;
-			
-			/// Index of first rewrite we have not done
-			var rewriteOpIndex:int = 0;
-	
-			while ( state.index>=MIN_TOKEN_INDEX &&
-					state.index<=end &&
-					state.index<tokens.length )
-			{
-				//System.out.println("state.index="+state.index);
-				// execute instructions associated with this token index
-				if ( rewriteOpIndex<rewrites.length ) {
-					var op:RewriteOperation = RewriteOperation(rewrites[rewriteOpIndex]);
-	
-					// skip all ops at lower index
-					while ( op.index<state.index && rewriteOpIndex<rewrites.length ) {
-						rewriteOpIndex++;
-						if ( rewriteOpIndex<rewrites.length ) {
-							op = RewriteOperation(rewrites[rewriteOpIndex]);
-						}
-					}
-	
-					// while we have ops for this token index, exec them
-					while ( state.index==op.index && rewriteOpIndex<rewrites.length ) {
-						//System.out.println("execute "+op+" at instruction "+rewriteOpIndex);
-						op.execute(state);
-						//System.out.println("after execute state.index = "+state.index);
-						rewriteOpIndex++;
-						if ( rewriteOpIndex<rewrites.length ) {
-							op = RewriteOperation(rewrites[rewriteOpIndex]);
-						}
-					}
-				}
-				// dump the token at this index
-				if ( state.index<=end ) {
-					state.buf += getToken(state.index).text;
-					state.index++;
-				}
-			}
-			// now see if there are operations (append) beyond last token index
-			for (var opi:int=rewriteOpIndex; opi<rewrites.length; opi++) {
-				op = RewriteOperation(rewrites[opi]);
-				if ( op.index>=size ) {
-					op.execute(state); // must be insertions if after last token
-				}
-				//System.out.println("execute "+op+" at "+opi);
-				//op.execute(buf); // must be insertions if after last token
-			}
-	
-			return state.buf;
+			// First, optimize instruction stream
+	        var indexToOp:Array = reduceToSingleOperationPerIndex(rewrites);
+
+	        // Walk buffer, executing instructions and emitting tokens
+	        var i:int = 0;
+	        while ( i < tokens.length ) {
+	            var op:RewriteOperation = RewriteOperation(indexToOp[i]);
+	            indexToOp[i] = undefined; // remove so any left have index size-1
+	            var t:Token = Token(tokens[i]);
+	            if ( op==null ) {
+	                // no operation at that index, just dump token
+	                state.buf += t.text;
+	                i++; // move to next token
+	            }
+	            else {
+	                i = op.execute(state); // execute operation and skip
+	            }
+	        }
+	        
+	        // any ops left must be at end of buffer: size-1 index
+	        // in fact, must be inserts
+	        for each (var iop:InsertBeforeOp in indexToOp) {
+	        	if (iop == null) continue;
+                state.buf += iop.text;
+	        }
+	        
+	        return state.buf;
 		}
+		
+	    /** We need to combine operations and report invalid operations (like
+	     *  overlapping replaces that are not completed nested).  Inserts to
+	     *  same index need to be combined etc...   Here are the cases:
+	     *
+	     *  I.i.u I.j.v                             leave alone, nonoverlapping
+	     *  I.i.u I.i.v                             combine: Iivu
+	     *
+	     *  R.i-j.u R.x-y.v | i-j in x-y            delete first R
+	     *  R.i-j.u R.i-j.v                         delete first R
+	     *  R.i-j.u R.x-y.v | x-y in i-j            ERROR
+	     *  R.i-j.u R.x-y.v | boundaries overlap    ERROR
+	     *
+	     *  I.i.u R.x-y.v | i in x-y                delete I
+	     *  I.i.u R.x-y.v | i not in x-y            leave alone, nonoverlapping
+	     *  R.x-y.v I.i.u | i in x-y                ERROR
+	     *  R.x-y.v I.x.u                           R.x-y.uv (combine, delete I)
+	     *  R.x-y.v I.i.u | i not in x-y            leave alone, nonoverlapping
+	     *
+	     *  I.i.u = insert u before op @ index i
+	     *  R.x-y.u = replace x-y indexed tokens with u
+	     *
+	     *  First we need to examine replaces.  For any replace op:
+	     *
+	     *      1. wipe out any insertions before op within that range.
+	     *      2. Drop any replace op before that is contained completely within
+	     *         that range.
+	     *      3. Throw exception upon boundary overlap with any previous replace.
+	     *
+	     *  Then we can deal with inserts:
+	     *
+	     *      1. for any inserts to same index, combine even if not adjacent.
+	     *      2. for any prior replace with same left boundary, combine this
+	     *         insert with replace and delete this replace.
+	     *      3. throw exception if index in same range as previous replace
+	     *
+	     *  Don't actually delete; make op null in list. Easier to walk list.
+	     *  Later we can throw as we add to index -> op map.
+	     *
+	     *  Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
+	     *  inserted stuff would be before the replace range.  But, if you
+	     *  add tokens in front of a method body '{' and then delete the method
+	     *  body, I think the stuff before the '{' you added should disappear too.
+	     *
+	     *  Return a map from token index to operation.
+	     */
+	    protected function reduceToSingleOperationPerIndex(rewrites:Array):Array {
+	        //System.out.println("rewrites="+rewrites);
 	
+	        // WALK REPLACES
+	        for (var i:int = 0; i < rewrites.length; i++) {
+	            var op:RewriteOperation = RewriteOperation(rewrites[i]);
+	            if ( op==null ) continue;
+	            if ( !(op is ReplaceOp) ) continue;
+	            var rop:ReplaceOp = ReplaceOp(rewrites[i]);
+	            // Wipe prior inserts within range
+	            var inserts:Array = getKindOfOps(rewrites, InsertBeforeOp, i);
+	            for (var j:int = 0; j < inserts.length; j++) {
+	                var iop:InsertBeforeOp = InsertBeforeOp(inserts[j]);
+	                if ( iop.index >= rop.index && iop.index <= rop.lastIndex ) {
+	                    rewrites[j] = null;  // delete insert as it's a no-op.
+	                }
+	            }
+	            // Drop any prior replaces contained within
+	            var prevReplaces:Array = getKindOfOps(rewrites, ReplaceOp, i);
+	            for (j = 0; j < prevReplaces.length; j++) {
+	                var prevRop:ReplaceOp = ReplaceOp(prevReplaces[j]);
+	                if ( prevRop.index>=rop.index && prevRop.lastIndex <= rop.lastIndex ) {
+	                    rewrites[j] = null;  // delete replace as it's a no-op.
+	                    continue;
+	                }
+	                // throw exception unless disjoint or identical
+	                var disjoint:Boolean =
+	                    prevRop.lastIndex<rop.index || prevRop.index > rop.lastIndex;
+	                var same:Boolean =
+	                    prevRop.index==rop.index && prevRop.lastIndex==rop.lastIndex;
+	                if ( !disjoint && !same ) {
+	                    throw new Error("replace op boundaries of "+rop+
+	                                                       " overlap with previous "+prevRop);
+	                }
+	            }
+	        }
+	
+	        // WALK INSERTS
+	        for (i = 0; i < rewrites.length; i++) {
+	            op = RewriteOperation(rewrites[i]);
+	            if ( op==null ) continue;
+	            if ( !(op is InsertBeforeOp) ) continue;
+	            iop = InsertBeforeOp(rewrites[i]);
+	            // combine current insert with prior if any at same index
+	            var prevInserts:Array = getKindOfOps(rewrites, InsertBeforeOp, i);
+	            for (j = 0; j < prevInserts.length; j++) {
+	                var prevIop:InsertBeforeOp = InsertBeforeOp(prevInserts[j]);
+	                if ( prevIop.index == iop.index ) { // combine objects
+	                    // convert to strings...we're in process of toString'ing
+	                    // whole token buffer so no lazy eval issue with any templates
+	                    iop.text = catOpText(iop.text,prevIop.text);
+	                    rewrites[j] = null;  // delete redundant prior insert
+	                }
+	            }
+	            // look for replaces where iop.index is in range; error
+	            prevReplaces = getKindOfOps(rewrites, ReplaceOp, i);
+	            for (j = 0; j < prevReplaces.length; j++) {
+	                rop = ReplaceOp(prevReplaces[j]);
+	                if ( iop.index == rop.index ) {
+	                    rop.text = catOpText(iop.text,rop.text);
+	                    rewrites[i] = null;  // delete current insert
+	                    continue;
+	                }
+	                if ( iop.index >= rop.index && iop.index <= rop.lastIndex ) {
+	                    throw new Error("insert op "+iop+
+	                                                       " within boundaries of previous "+rop);
+	                }
+	            }
+	        }
+	        // System.out.println("rewrites after="+rewrites);
+	        var m:Array = new Array();
+	        for (i = 0; i < rewrites.length; i++) {
+	            op = RewriteOperation(rewrites[i]);
+	            if ( op==null ) continue; // ignore deleted ops
+	            if ( m[op.index] != undefined ) {
+	                throw new Error("should only be one op per index");
+	            }
+	            m[op.index] = op;
+	        }
+	        //System.out.println("index to op: "+m);
+	        return m;
+	    }
+	
+	    protected function catOpText(a:Object, b:Object):String {
+	        var x:String = "";
+	        var y:String = "";
+	        if ( a!=null ) x = a.toString();
+	        if ( b!=null ) y = b.toString();
+	        return x+y;
+	    }
+	    
+	    protected function getKindOfOps(rewrites:Array, kind:Class, before:int = -1):Array {
+	    	if (before == -1) {
+	    		before = rewrites.length;
+	    	}
+	    	var ops:Array = new Array();
+	        for (var i:int=0; i<before && i<rewrites.length; i++) {
+	            var op:RewriteOperation = RewriteOperation(rewrites[i]);
+	            if ( op==null ) continue; // ignore deleted
+	            if ( getQualifiedClassName(op) == getQualifiedClassName(kind) ) ops.push(op);
+	        }       
+	        return ops;
+	    }
+
+
 		public function toDebugString():String {
 			return toDebugStringWithRange(MIN_TOKEN_INDEX, size-1);
 		}
@@ -349,14 +418,14 @@ package org.antlr.runtime {
 
 	}
 }
-	import flash.utils.getQualifiedClassName;
+	import org.antlr.runtime.Token;
 	
 
 // Define the rewrite operation hierarchy
 
 class RewriteState {
 	public var buf:String = new String();
-	public var index:int;
+	public var tokens:Array;
 }
 
 class RewriteOperation {
@@ -369,11 +438,8 @@ class RewriteOperation {
 	/** Execute the rewrite operation by possibly adding to the buffer.
 	 *  Return the index of the next token to operate on.
 	 */
-	public function execute(state:RewriteState):void {
-		state.index = index;
-	}
-	public function toString():String {
-		return getQualifiedClassName(this) + "@" + index + '"' + text + '"';
+	public function execute(state:RewriteState):int {
+		return index;
 	}
 }
 
@@ -381,9 +447,15 @@ class InsertBeforeOp extends RewriteOperation {
 	public function InsertBeforeOp(index:int, text:Object) {
 		super(index,text);
 	}
-	public override function execute(state:RewriteState):void {
+	
+	public override function execute(state:RewriteState):int {
 		state.buf += text;
-		state.index = index;
+		state.buf += Token(state.tokens[index]).text;
+		return index + 1;
+	}
+	
+	public function toString():String {
+		return "<InsertBeforeOp@" + index + ":\"" + text + "\">";
 	}
 }
 
@@ -391,21 +463,31 @@ class InsertBeforeOp extends RewriteOperation {
  *  instructions.
  */
 class ReplaceOp extends RewriteOperation {
-	internal var lastIndex:int;
+	public var lastIndex:int;
+	
 	public function ReplaceOp(fromIndex:int, toIndex:int, text:Object) {
 		super(fromIndex, text);
 		lastIndex = toIndex;
 	}
-	public override function execute(state:RewriteState):void {
+	
+	public override function execute(state:RewriteState):int {
 		if ( text!=null ) {
 			state.buf += text;
 		}
-		state.index = lastIndex+1;
+		return lastIndex+1;
+	}
+	
+	public function toString():String {
+		return "<ReplaceOp@" + index + ".." + lastIndex + ":\"" + text + "\">";
 	}
 }
 
 class DeleteOp extends ReplaceOp {
 	public function DeleteOp(fromIndex:int, toIndex:int) {
 		super(fromIndex, toIndex, null);
+	}
+	
+	public override function toString():String {
+		return "<DeleteOp@" + index + ".." + lastIndex + ">";
 	}
 }
