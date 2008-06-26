@@ -127,7 +127,7 @@ ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefTrack(...)>
-<listLabel(elem=label,...)>
+<listLabel(elem=label+".getTree()",...)>
 >>
 
 /** ^(rule ...) rewrite */
