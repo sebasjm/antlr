@@ -84,6 +84,8 @@ public class <grammar.recognizerName> extends Lexer {
     // delegators
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
+    <last(grammar.delegators):
+         {g|public <g.recognizerName> gParent = <g:delegateName()>;}; separator="\n">
 
     public <grammar.recognizerName>() {;} <! needed by subclasses !>
     public <grammar.recognizerName>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
@@ -192,6 +194,8 @@ public class <grammar.recognizerName> extends <@superClassName><superClass><@end
     // delegators
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
+    <last(grammar.delegators):
+         {g|public <g.recognizerName> gParent = <g:delegateName()>;}; separator="\n">
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>

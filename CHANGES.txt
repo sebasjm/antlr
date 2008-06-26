@@ -7,6 +7,14 @@ University of San Francisco
 
 CHANGES
 
+June 26, 2008
+
+* Added gParent ptr that points to immediate parent grammar. E.g.,
+    // delegators
+    public MParser gM; 
+    public M_S gS;
+    public M_S gParent = gS;
+
 June 25, 2008
 
 * List labels in tree construction didn't always track the tree; sometimes
