@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+June 25, 2008
+
+* List labels in tree construction didn't always track the tree; sometimes
+  had a rule result structure.
+
 June 4, 2008
 
 * Improved unit testing so that each test suite executes and builds grammars
