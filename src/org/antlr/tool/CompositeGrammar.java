@@ -214,6 +214,14 @@ public class CompositeGrammar {
 		return grammars;
 	}
 
+	/** Get delegates below direct delegates of g */
+	public List<Grammar> getIndirectDelegates(Grammar g) {
+		List<Grammar> direct = getDirectDelegates(g);
+		List<Grammar> delegates = getDelegates(g);
+		delegates.removeAll(direct);
+		return delegates;
+	}
+
 	/** Return list of delegate grammars from root down to g.
 	 *  Order is root, ..., g.parent.  (g not included).
 	 */

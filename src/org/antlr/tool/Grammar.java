@@ -2502,12 +2502,22 @@ outer:
 	public List<Grammar> getDirectDelegates() {
 		return composite.getDirectDelegates(this);
 	}
+	
+	/** Get delegates below direct delegates */
+	public List<Grammar> getIndirectDelegates() {
+		return composite.getIndirectDelegates(this);
+	}
 
 	/** Get list of all delegators.  This amounts to the grammars on the path
 	 *  to the root of the delegation tree.
 	 */
 	public List<Grammar> getDelegators() {
 		return composite.getDelegators(this);
+	}
+
+	/** Who's my direct parent grammar? */
+	public Grammar getDelegator() {
+		return composite.getDelegator(this);
 	}
 
 	public Set<Rule> getDelegatedRuleReferences() {

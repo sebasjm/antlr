@@ -754,6 +754,74 @@ public class TestCompositeGrammars extends BaseTest {
 					 realElements(g.composite.typeToTokenList).toString());
 
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+
+		boolean ok =
+			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null, false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, ok);
+	}
+
+	public void testBigTreeOfImports() throws Exception {
+		ErrorQueue equeue = new ErrorQueue();
+		ErrorManager.setErrorListener(equeue);
+		String slave =
+			"parser grammar T;\n" +
+			"x : T ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "T.g", slave);
+		slave =
+			"parser grammar S;\n" +
+			"import T;\n" +
+			"y : S ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g", slave);
+
+		slave =
+			"parser grammar C;\n" +
+			"i : C ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "C.g", slave);
+		slave =
+			"parser grammar B;\n" +
+			"j : B ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "B.g", slave);
+		slave =
+			"parser grammar A;\n" +
+			"import B,C;\n" +
+			"k : A ;\n" ;
+		mkdir(tmpdir);
+		writeFile(tmpdir, "A.g", slave);
+
+		String master =
+			"grammar M;\n" +
+			"import S,A;\n" +
+			"a : M ;\n" ;
+		writeFile(tmpdir, "M.g", master);
+		Tool antlr = newTool(new String[] {"-lib", tmpdir});
+		CompositeGrammar composite = new CompositeGrammar();
+		Grammar g = new Grammar(antlr,tmpdir+"/M.g",composite);
+		composite.setDelegationRoot(g);
+		g.parseAndBuildAST();
+		g.composite.assignTokenTypes();
+		g.composite.defineGrammarSymbols();
+
+		String expectedTokenIDToTypeMap = "[A=8, B=6, C=7, M=9, S=5, T=4]";
+		String expectedStringLiteralToTypeMap = "{}";
+		String expectedTypeToTokenList = "[T, S, B, C, A, M]";
+
+		assertEquals(expectedTokenIDToTypeMap,
+					 realElements(g.composite.tokenIDToTypeMap).toString());
+		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+		assertEquals(expectedTypeToTokenList,
+					 realElements(g.composite.typeToTokenList).toString());
+
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+
+		boolean ok =
+			rawGenerateAndBuildRecognizer("M.g", master, "MParser", null, false);
+		boolean expecting = true; // should be ok
+		assertEquals(expecting, ok);
 	}
 
 	public void testRulesVisibleThroughMultilevelImport() throws Exception {

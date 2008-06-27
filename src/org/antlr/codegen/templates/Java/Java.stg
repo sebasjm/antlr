@@ -84,8 +84,7 @@ public class <grammar.recognizerName> extends Lexer {
     // delegators
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
-    <last(grammar.delegators):
-         {g|public <g.recognizerName> gParent = <g:delegateName()>;}; separator="\n">
+    <last(grammar.delegators):{g|public <g.recognizerName> gParent;}>
 
     public <grammar.recognizerName>() {;} <! needed by subclasses !>
     public <grammar.recognizerName>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
@@ -99,9 +98,10 @@ public class <grammar.recognizerName> extends Lexer {
 <endif>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state<trunc(g.delegators):{p|, <p:delegateName()>}>, this);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
+        <last(grammar.delegators):{g|gParent = <g:delegateName()>;}>
     }
     public String getGrammarFileName() { return "<fileName>"; }
 
@@ -194,8 +194,7 @@ public class <grammar.recognizerName> extends <@superClassName><superClass><@end
     // delegators
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
-    <last(grammar.delegators):
-         {g|public <g.recognizerName> gParent = <g:delegateName()>;}; separator="\n">
+    <last(grammar.delegators):{g|public <g.recognizerName> gParent;}>
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
@@ -207,7 +206,9 @@ public class <grammar.recognizerName> extends <@superClassName><superClass><@end
         super(input, state);
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state<trunc(g.delegators):{p|, <p:delegateName()>}>, this);}; separator="\n">         
+        <grammar.indirectDelegates:{g | <g:delegateName()> = <g.delegator:delegateName()>.<g:delegateName()>;}; separator="\n">
+        <last(grammar.delegators):{g|gParent = <g:delegateName()>;}>
     }
     <@end>
 

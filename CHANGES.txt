@@ -13,7 +13,10 @@ June 26, 2008
     // delegators
     public MParser gM; 
     public M_S gS;
-    public M_S gParent = gS;
+    public M_S gParent = gS; // NEW
+
+* Grammar imports didn't set all the delegate pointers...lots of imported
+  grammars would cause a null ptr exception.
 
 June 25, 2008
 
