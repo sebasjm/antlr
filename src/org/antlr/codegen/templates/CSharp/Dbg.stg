@@ -107,7 +107,7 @@ public <name>(<inputStreamType> input) {
     this(input, new Profiler(null), new RecognizerSharedState());
 }
 
-public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedState state)
+public <name>(<inputStreamType> input, IDebugEventListener dbg, RecognizerSharedState state)
     : base(input, dbg, state) {
     Profiler p = (Profiler)dbg;
     p.setParser(this);
@@ -121,7 +121,7 @@ public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedS
 
 /** Basically we don't want to set any dbg listeners are root will have it. */
 ctorForDelegateGrammar() ::= <<
-public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
+public <name>(<inputStreamType> input, IDebugEventListener dbg, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
     : base(input, dbg, state) {
     <parserCtorBody()>
     <grammar.directDelegates:
@@ -130,7 +130,7 @@ public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedS
 >>
 
 ctorForPredefinedListener() ::= <<
-public <name>(<inputStreamType> input, DebugEventListener dbg)
+public <name>(<inputStreamType> input, IDebugEventListener dbg)
     : base(input, dbg, new RecognizerSharedState()) {
 <if(profile)>
     Profiler p = (Profiler)dbg;

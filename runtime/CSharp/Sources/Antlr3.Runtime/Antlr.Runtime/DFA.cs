@@ -110,7 +110,6 @@ namespace Antlr.Runtime
 							NoViableAlt(s,input);
 							return 0;
 						}
-						s = specialStateTransitionHandler(this, specialState, input);
 						input.Consume();
 						continue;
 					}

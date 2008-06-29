@@ -36,7 +36,9 @@ group ST;
 <@super.imports()>
 using Antlr.StringTemplate;
 using Antlr.StringTemplate.Language;
+<if(!backtracking)>
 using Hashtable = System.Collections.Hashtable;
+<endif>
 
 >>
 
