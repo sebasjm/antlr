@@ -7,6 +7,13 @@ University of San Francisco
 
 CHANGES
 
+July 3, 2008
+
+* Fixed ANTLR-267. parse tree added nodes during backtracking and
+  cyclic DFAs.  tracks hidden tokens too now. Added toInputString() to
+  get text back including hidden tokens.  Shows <epsilon> for rules
+  that match nothing.
+
 June 26, 2008
 
 * Added gParent ptr that points to immediate parent grammar. E.g.,
@@ -16,7 +23,7 @@ June 26, 2008
     public M_S gParent = gS; // NEW
 
 * Grammar imports didn't set all the delegate pointers...lots of imported
-  grammars would cause a null ptr exception.
+  grammars would cause a null ptr exception.  Fixes ANTLR-292.
 
 June 25, 2008
 
