@@ -59,8 +59,9 @@ public class Parser extends BaseRecognizer {
 									  int expectedTokenType,
 									  BitSet follow)
 	{
-		String tokenText =
-			"<missing "+getTokenNames()[expectedTokenType]+">";
+		String tokenText = null;
+		if ( expectedTokenType==Token.EOF ) tokenText = "<missing EOF>";
+		else tokenText = "<missing "+getTokenNames()[expectedTokenType]+">";
 		CommonToken t = new CommonToken(expectedTokenType, tokenText);
 		Token current = ((TokenStream)input).LT(1);
 		if ( current.getType() == Token.EOF ) {
