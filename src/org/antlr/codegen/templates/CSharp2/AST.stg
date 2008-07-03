@@ -132,7 +132,7 @@ ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefTrack(...)>
-<listLabel(elem=label,...)>
+<listLabel(elem=label+".Tree",...)>
 >>
 
 /** ^(rule ...) rewrite */
@@ -365,7 +365,7 @@ adaptor.AddChild(root_<treeLevel>, stream_<label>.NextTree());<\n>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-adaptor.AddChild(root_<treeLevel>, ((<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope)stream_<label>.NextTree()).Tree);<\n>
+adaptor.AddChild(root_<treeLevel>, stream_<label>.NextTree());<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */

@@ -57,15 +57,16 @@ namespace Antlr.Runtime.Tree
 		/// then the token just becomes the payload.
 		/// </summary>
 		/// <remarks>
-		/// This is the most common create call.
+		/// This is the most common create call. Override if you want another kind of node to be built.
 		/// </remarks>
 		object Create(IToken payload);
-		
+
+		/// <summary>Duplicate a single tree node </summary>
+		/// <remarks> Override if you want another kind of node to be built.</remarks>
+		object DupNode(object treeNode);
+
 		/// <summary>Duplicate tree recursively, using DupNode() for each node </summary>
 		object DupTree(object tree);
-		
-		/// <summary>Duplicate a single tree node </summary>
-		object DupNode(object treeNode);
 		
 		/// <summary>
 		/// Return a nil node (an empty but non-null node) that can hold

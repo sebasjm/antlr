@@ -926,9 +926,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		/// <remarks>This is ignored for lexers.</remarks>
 		protected virtual object GetCurrentInputSymbol(IIntStream input) {
-#error Find out, if "return null" is correct, and if yes, where the error actually lies
-			// return null;
-			return input.LA(0);
+			return null;
 		}
 
 		/// <summary>

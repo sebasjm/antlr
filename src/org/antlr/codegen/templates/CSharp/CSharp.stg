@@ -104,6 +104,7 @@ public class <grammar.recognizerName> : Lexer
     // delegators
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
+    <last(grammar.delegators):{g|public <g.recognizerName> gParent;}>
 
     public <grammar.recognizerName>() <! needed by subclasses !>
     {
@@ -121,9 +122,10 @@ public class <grammar.recognizerName> : Lexer
 <endif>
 <endif>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state<trunc(g.delegators):{p|, <p:delegateName()>}>, this);}; separator="\n">
         <grammar.delegators:
          {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
+        <last(grammar.delegators):{g|gParent = <g:delegateName()>;}>
     }
     
     override public string GrammarFileName
@@ -245,6 +247,7 @@ public class <grammar.recognizerName> : <@superClassName><superClass><@end>
     // delegators
     <grammar.delegators:
          {g|public <g.recognizerName> <g:delegateName()>;}; separator="\n">
+    <last(grammar.delegators):{g|public <g.recognizerName> gParent;}>
 
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <@members>
@@ -259,8 +262,10 @@ public class <grammar.recognizerName> : <@superClassName><superClass><@end>
 		InitializeCyclicDFAs();
         <parserCtorBody()>
         <grammar.directDelegates:
-         {g|<g:delegateName()> = new <g.recognizerName>(input, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-    }
+         {g|<g:delegateName()> = new <g.recognizerName>(input, state<trunc(g.delegators):{p|, <p:delegateName()>}>, this);}; separator="\n">         
+        <grammar.indirectDelegates:{g | <g:delegateName()> = <g.delegator:delegateName()>.<g:delegateName()>;}; separator="\n">
+        <last(grammar.delegators):{g|gParent = <g:delegateName()>;}>
+   }
     <@end>
 
     override public string[] TokenNames {
@@ -330,7 +335,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-// $ANTLR start <ruleName>
+// $ANTLR start "<ruleName>"
 public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) //throws RecognitionException
 {   
 <if(trace)>
@@ -347,7 +352,7 @@ public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(sc
     <block>
 <endif>
 }
-// $ANTLR end <ruleName>
+// $ANTLR end "<ruleName>"
 >>
 
 synpredDecls(name) ::= <<
@@ -407,7 +412,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 <ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
 <returnScope(scope=ruleDescriptor.returnScope)>
 
-// $ANTLR start <ruleName>
+// $ANTLR start "<ruleName>"
 // <fileName>:<description>
 public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) // throws RecognitionException [1]
 {   
@@ -450,7 +455,7 @@ public <returnType()> <ruleName>(<ruleDescriptor.parameterScope:parameterScope(s
     <@postamble()>
     return <ruleReturnValue()>;
 }
-// $ANTLR end <ruleName>
+// $ANTLR end "<ruleName>"
 >>
 
 catch(decl,action) ::= <<
@@ -544,7 +549,7 @@ if ( state.backtracking > 0 )
  *  fragment rules.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
-// $ANTLR start <ruleName> 
+// $ANTLR start "<ruleName>"
 public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) // throws RecognitionException [2]
 {
  	<ruleAttributeScope(scope=ruleDescriptor.ruleScope)>
@@ -578,7 +583,7 @@ public void m<ruleName>(<ruleDescriptor.parameterScope:parameterScope(scope=it)>
         <memoize()>
     }
 }
-// $ANTLR end <ruleName>
+// $ANTLR end "<ruleName>"
 >>
 
 /** How to generate code for the implicitly-defined lexer grammar rule
