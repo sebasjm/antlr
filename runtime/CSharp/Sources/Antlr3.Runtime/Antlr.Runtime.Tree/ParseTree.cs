@@ -1,6 +1,7 @@
 /*
 [The "BSD licence"]
 Copyright (c) 2005-2007 Kunle Odutola
+Copyright (c) 2007-2008 Johannes Luber
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,6 +36,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Antlr.Runtime.Tree
 {
 	using System;
+	using System.Collections;
+	using System.Text;
 	using IToken = Antlr.Runtime.IToken;
 	
 	/// <summary>
@@ -46,6 +49,8 @@ namespace Antlr.Runtime.Tree
 	public class ParseTree : BaseTree
 	{
 		public object payload;
+		public IList hiddenTokens;
+
 		public ParseTree(object label)
 		{
 			this.payload = label;
@@ -90,6 +95,42 @@ namespace Antlr.Runtime.Tree
 				return t.Text;
 			}
 			return payload.ToString();
+		}
+
+		/** Emit a token and all hidden nodes before.  EOF node holds all
+		 *  hidden tokens after last real token.
+		 */
+		public string ToStringWithHiddenTokens() {
+			StringBuilder buf = new StringBuilder();
+			if ( hiddenTokens!=null ) {
+				for (int i = 0; i < hiddenTokens.Count; i++) {
+					IToken hidden = (IToken) hiddenTokens[i];
+					buf.Append(hidden.Text);
+				}
+			}
+			String nodeText = this.ToString();
+			if ( nodeText != "<EOF>" ) buf.Append(nodeText);
+			return buf.ToString();
+		}
+
+		/** Print out the leaves of this tree, which means printing original
+		 *  input back out.
+		 */
+		public string ToInputString() {
+			StringBuilder buf = new StringBuilder();
+			_ToStringLeaves(buf);
+			return buf.ToString();
+		}
+
+		public void _ToStringLeaves(StringBuilder buf) {
+			if ( payload is IToken ) { // leaf node token?
+				buf.Append(this.ToStringWithHiddenTokens());
+				return;
+			}
+			for (int i = 0; children!=null && i < children.Count; i++) {
+				ParseTree t = (ParseTree)children[i];
+				t._ToStringLeaves(buf);
+			}
 		}
 	}
 }

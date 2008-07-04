@@ -72,7 +72,9 @@ namespace Antlr.Runtime
 										  int expectedTokenType,
 										  BitSet follow)
 		{
-			String tokenText = "<missing " + TokenNames[expectedTokenType] + ">";
+			String tokenText = null;
+			if ( expectedTokenType==Token.EOF ) tokenText = "<missing EOF>";
+			else tokenText = "<missing " + TokenNames[expectedTokenType] + ">";
 			CommonToken t = new CommonToken(expectedTokenType, tokenText);
 			IToken current = ((ITokenStream)input).LT(1);
 			if (current.Type == Token.EOF) {

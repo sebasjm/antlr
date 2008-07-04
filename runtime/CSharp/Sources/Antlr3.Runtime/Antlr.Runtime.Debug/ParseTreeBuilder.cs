@@ -36,6 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Antlr.Runtime.Debug
 {
 	using System;
+	using System.Collections;
 	using Stack					= System.Collections.Stack;
 	using IToken				= Antlr.Runtime.IToken;
 	using RecognitionException	= Antlr.Runtime.RecognitionException;
@@ -48,7 +49,11 @@ namespace Antlr.Runtime.Debug
 	/// </summary>
 	public class ParseTreeBuilder : BlankDebugEventListener
 	{
+		public static readonly String EPSILON_PAYLOAD = "<epsilon>";
+
 		Stack callStack = new Stack();
+		IList hiddenTokens = new ArrayList();
+		int backtracking = 0;
 
 		public ParseTreeBuilder(string grammarName) 
 		{
@@ -56,9 +61,8 @@ namespace Antlr.Runtime.Debug
 			callStack.Push(root);
 		}
 
-		public ParseTree GetTree() 
-		{
-			return (ParseTree)callStack.Peek();
+		public ParseTree Tree {
+			get { return (ParseTree)callStack.Peek(); }
 		}
 
 		/// <summary>
@@ -70,8 +74,16 @@ namespace Antlr.Runtime.Debug
 			return new ParseTree(payload);
 		}
 
-		override public void EnterRule(string filename, string ruleName) 
-		{
+		public ParseTree EpsilonNode() {
+			return Create(EPSILON_PAYLOAD);
+		}
+
+		/** Backtracking or cyclic DFA, don't want to add nodes to tree */
+		public void EnterDecision(int d) { backtracking++; }
+		public void ExitDecision(int i) { backtracking--; }
+
+		override public void EnterRule(string filename, string ruleName) {
+			if ( backtracking>0 ) return;
 			ParseTree parentRuleNode = (ParseTree)callStack.Peek();
 			ParseTree ruleNode = Create(ruleName);
 			parentRuleNode.AddChild(ruleNode);
@@ -80,18 +92,32 @@ namespace Antlr.Runtime.Debug
 
 		override public void ExitRule(string filename, string ruleName) 
 		{
+			if ( backtracking>0 ) return;
+			ParseTree ruleNode = (ParseTree)callStack.Peek();
+			if ( ruleNode.ChildCount==0 ) {
+				ruleNode.AddChild(EpsilonNode());
+			}
 			callStack.Pop();
 		}
 
 		override public void ConsumeToken(IToken token) 
 		{
+			if ( backtracking>0 ) return;
 			ParseTree ruleNode = (ParseTree)callStack.Peek();
 			ParseTree elementNode = Create(token);
+			elementNode.hiddenTokens = this.hiddenTokens;
+			this.hiddenTokens = new ArrayList();
 			ruleNode.AddChild(elementNode);
+		}
+
+		override public void ConsumeHiddenToken(IToken token) {
+			if ( backtracking>0 ) return;
+			hiddenTokens.Add(token);
 		}
 
 		override public void RecognitionException(RecognitionException e) 
 		{
+			if ( backtracking>0 ) return;
 			ParseTree ruleNode = (ParseTree)callStack.Peek();
 			ParseTree errorNode = Create(e);
 			ruleNode.AddChild(errorNode);
