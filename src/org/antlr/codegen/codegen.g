@@ -544,6 +544,7 @@ if ( blockNestingLevel==RULE_BLOCK_NESTING_LEVEL && grammar.buildAST() ) {
         if ( !currentAltHasASTRewrite && grammar.buildAST() ) {
             altcode.setAttribute("autoAST", Boolean.valueOf(true));
         }
+        altcode.setAttribute("treeLevel", rewriteTreeNestingLevel);
         code = altcode;
         }
     ;
