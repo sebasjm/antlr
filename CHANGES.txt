@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+July 5, 2008
+
+* treeLevel not set for setBlock alts; added unit test
+
 July 3, 2008
 
 * Fixed ANTLR-267. parse tree added nodes during backtracking and
