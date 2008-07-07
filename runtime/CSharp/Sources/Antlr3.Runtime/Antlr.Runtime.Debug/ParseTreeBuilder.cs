@@ -79,8 +79,8 @@ namespace Antlr.Runtime.Debug
 		}
 
 		/** Backtracking or cyclic DFA, don't want to add nodes to tree */
-		public void EnterDecision(int d) { backtracking++; }
-		public void ExitDecision(int i) { backtracking--; }
+		override public void EnterDecision(int d) { backtracking++; }
+		override public void ExitDecision(int i) { backtracking--; }
 
 		override public void EnterRule(string filename, string ruleName) {
 			if ( backtracking>0 ) return;

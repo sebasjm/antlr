@@ -182,7 +182,7 @@ namespace Antlr.Runtime
 				return lastIndex + 1;
 			}
 
-			public String toString() {
+			public override string ToString() {
 				return "<ReplaceOp@" + index + ".." + lastIndex + ":\"" + text + "\">";
 			}
 		}
@@ -194,7 +194,7 @@ namespace Antlr.Runtime
 			{
 			}
 
-			public String ToString() {
+			public override string ToString() {
 				return "<DeleteOp@" + index + ".." + lastIndex + ">";
 			}
 		}
@@ -448,7 +448,7 @@ namespace Antlr.Runtime
 			StringBuilder buf = new StringBuilder();
 			
 			// First, optimize instruction stream
-			Hashtable indexToOp = ReduceToSingleOperationPerIndex(rewrites);
+			IDictionary indexToOp = ReduceToSingleOperationPerIndex(rewrites);
 
 			// Walk buffer, executing instructions and emitting tokens
 			int i = 0;
@@ -522,7 +522,7 @@ namespace Antlr.Runtime
 		/// add tokens in front of a method body '{' and then delete the method
 		/// body, I think the stuff before the '{' you added should disappear too.
 		/// </remarks>
-		protected Hashtable ReduceToSingleOperationPerIndex(IList rewrites) {
+		protected IDictionary ReduceToSingleOperationPerIndex(IList rewrites) {
 		
 			// WALK REPLACES
 			for (int i = 0; i < rewrites.Count; i++) {
@@ -531,7 +531,7 @@ namespace Antlr.Runtime
 				if ( !(op is ReplaceOp) ) continue;
 				ReplaceOp rop = (ReplaceOp)rewrites[i];
 				// Wipe prior inserts within range
-				IList inserts = getKindOfOps(rewrites, typeof(InsertBeforeOp), i);
+				IList inserts = GetKindOfOps(rewrites, typeof(InsertBeforeOp), i);
 				for (int j = 0; j < inserts.Count; j++) {
 					InsertBeforeOp iop = (InsertBeforeOp) inserts[j];
 					if ( iop.index >= rop.index && iop.index <= rop.lastIndex ) {
@@ -539,7 +539,7 @@ namespace Antlr.Runtime
 					}
 				}
 				// Drop any prior replaces contained within
-				IList prevReplaces = getKindOfOps(rewrites, typeof(ReplaceOp), i);
+				IList prevReplaces = GetKindOfOps(rewrites, typeof(ReplaceOp), i);
 				for (int j = 0; j < prevReplaces.Count; j++) {
 					ReplaceOp prevRop = (ReplaceOp) prevReplaces[j];
 					if ( prevRop.index>=rop.index && prevRop.lastIndex <= rop.lastIndex ) {
@@ -565,22 +565,22 @@ namespace Antlr.Runtime
 				if ( !(op is InsertBeforeOp) ) continue;
 				InsertBeforeOp iop = (InsertBeforeOp)rewrites[i];
 				// combine current insert with prior if any at same index
-				IList prevInserts = getKindOfOps(rewrites, typeof(InsertBeforeOp), i);
+				IList prevInserts = GetKindOfOps(rewrites, typeof(InsertBeforeOp), i);
 				for (int j = 0; j < prevInserts.Count; j++) {
 					InsertBeforeOp prevIop = (InsertBeforeOp) prevInserts[j];
 					if ( prevIop.index == iop.index ) { // combine objects
 						// convert to strings...we're in process of toString'ing
 						// whole token buffer so no lazy eval issue with any templates
-						iop.text = catOpText(iop.text,prevIop.text);
+						iop.text = CatOpText(iop.text,prevIop.text);
 						rewrites[j] = null;  // delete redundant prior insert
 					}
 				}
 				// look for replaces where iop.index is in range; error
-				IList prevReplaces = getKindOfOps(rewrites, typeof(ReplaceOp), i);
+				IList prevReplaces = GetKindOfOps(rewrites, typeof(ReplaceOp), i);
 				for (int j = 0; j < prevReplaces.Count; j++) {
 					ReplaceOp rop = (ReplaceOp) prevReplaces[j];
 					if ( iop.index == rop.index ) {
-						rop.text = catOpText(iop.text,rop.text);
+						rop.text = CatOpText(iop.text,rop.text);
 						rewrites[i] = null;  // delete current insert
 						continue;
 					}
@@ -591,7 +591,7 @@ namespace Antlr.Runtime
 				}
 			}
 			// System.out.println("rewrites after="+rewrites);
-			Hashtable m = new Hashtable();
+			IDictionary m = new Hashtable();
 			for (int i = 0; i < rewrites.Count; i++) {
 				RewriteOperation op = (RewriteOperation)rewrites[i];
 				if ( op==null ) continue; // ignore deleted ops
@@ -604,7 +604,7 @@ namespace Antlr.Runtime
 			return m;
 		}
 
-		protected String catOpText(Object a, Object b) {
+		protected String CatOpText(Object a, Object b) {
 			String x = "";
 			String y = "";
 			if ( a!=null ) x = a.ToString();
@@ -612,11 +612,11 @@ namespace Antlr.Runtime
 			return x+y;
 		}
 		
-		protected IList getKindOfOps(IList rewrites, Type kind) {
-			return getKindOfOps(rewrites, kind, rewrites.Count);
+		protected IList GetKindOfOps(IList rewrites, Type kind) {
+			return GetKindOfOps(rewrites, kind, rewrites.Count);
 		}
 
-		protected IList getKindOfOps(IList rewrites, Type kind, int before) {
+		protected IList GetKindOfOps(IList rewrites, Type kind, int before) {
 			IList ops = new ArrayList();
 			for (int i=0; i<before && i<rewrites.Count; i++) {
 				RewriteOperation op = (RewriteOperation)rewrites[i];
