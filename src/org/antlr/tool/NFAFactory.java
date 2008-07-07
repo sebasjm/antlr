@@ -567,6 +567,9 @@ public class NFAFactory {
 		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_BLOCK;
 
 		// don't reuse A.right as loopback if it's right edge of another block
+		if ( A==null ) {
+			System.out.println("what?");
+		}
 		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_BLOCK ) {
 			// nested A* so make another tail node to be the loop back
 			// instead of the usual A.right which is the EOB for inner loop
