@@ -580,7 +580,7 @@ setRule returns [IntSet elements=new IntervalSet()]
 	:	#( RULE id:ID (modifier)? ARG RET ( OPTIONS )? ( ruleScopeSpec )?
 		   	(AMPERSAND)*
            	#( BLOCK ( OPTIONS )?
-           	   ( #(ALT setElement[elements] EOA) )+
+           	   ( #(ALT (BACKTRACK_SEMPRED)? setElement[elements] EOA) )+
            	   EOB
            	 )
            	(exceptionGroup)?
