@@ -25,6 +25,8 @@ static void					endBacktrack				(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT
 static void *				match						(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
 static void					matchAny					(pANTLR3_BASE_RECOGNIZER recognizer);
 static void					mismatch					(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static ANTLR3_BOOLEAN		mismatchIsUnwantedToken		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, ANTLR3_UINT32 ttype);
+static ANTLR3_BOOLEAN		mismatchIsMissingToken		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_BITSET follow);
 static void					reportError					(pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_BITSET		computeCSRuleFollow			(pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_BITSET		combineFollows				(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact);
@@ -47,6 +49,7 @@ static void					freeBR						(pANTLR3_BASE_RECOGNIZER recognizer);
 static void *				getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream);
 static void *				getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
 															ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow);
+static ANTLR3_UINT32		getNumberOfSyntaxErrors		(pANTLR3_BASE_RECOGNIZER recognizer);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
 antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
@@ -120,10 +123,13 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
     recognizer->matchAny						= matchAny;
     recognizer->memoize							= memoize;
     recognizer->mismatch						= mismatch;
+	recognizer->mismatchIsUnwantedToken			= mismatchIsUnwantedToken;
+	recognizer->mismatchIsMissingToken			= mismatchIsMissingToken;
     recognizer->recover							= recover;
     recognizer->recoverFromMismatchedElement	= recoverFromMismatchedElement;
     recognizer->recoverFromMismatchedSet		= recoverFromMismatchedSet;
     recognizer->recoverFromMismatchedToken		= recoverFromMismatchedToken;
+	recognizer->getNumberOfSyntaxErrors			= getNumberOfSyntaxErrors;
     recognizer->reportError						= reportError;
     recognizer->reset							= reset;
     recognizer->synpred							= synpred;
@@ -1192,7 +1198,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 
 /// Return how many syntax errors were detected by this recognizer
 ///
-static int
+static ANTLR3_UINT32
 getNumberOfSyntaxErrors(pANTLR3_BASE_RECOGNIZER recognizer)
 {
 	return	recognizer->state->errorCount;
@@ -1360,7 +1366,7 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 	// from the stream by consuming it, then consume this next one along too as
 	// if nothing had happened.
 	//
-	if	( recognizer->mismatchIsUnwantedToken(recognizer, is) == ANTLR3_TRUE)
+	if	( recognizer->mismatchIsUnwantedToken(recognizer, is, ttype) == ANTLR3_TRUE)
 	{
 		recognizer->state->exception->type = ANTLR3_UNWANTED_TOKEN_EXCEPTION;
 
