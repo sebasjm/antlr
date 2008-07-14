@@ -769,7 +769,11 @@ headerReturnScope(ruleDescriptor) ::= "<returnScope(...)>"
 
 headerReturnType(ruleDescriptor) ::= <<
 <if(LEXER)>
+<if(!r.ruleDescriptor.isSynPred)>
  void
+<else>
+ <ruleDescriptor:returnType()>
+<endif>
 <else>
  <ruleDescriptor:returnType()>
 <endif>
