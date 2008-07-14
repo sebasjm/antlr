@@ -32,6 +32,9 @@ static pANTLR3_COMMON_TOKEN nextToken					(pANTLR3_TOKEN_SOURCE toksource);
 
 static void					displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenNames);
 static void					reportError					(pANTLR3_BASE_RECOGNIZER rec);
+static void *				getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream);
+static void *				getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
+															ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow);
 
 static void					reset						(pANTLR3_BASE_RECOGNIZER rec);
 
@@ -64,9 +67,11 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
 	}
 	lexer->rec->super  =  lexer;
 
-	lexer->rec->displayRecognitionError	    =  displayRecognitionError;
-	lexer->rec->reportError		    =  reportError;
-	lexer->rec->reset			    =  reset;
+	lexer->rec->displayRecognitionError	    = displayRecognitionError;
+	lexer->rec->reportError					= reportError;
+	lexer->rec->reset						= reset;
+	lexer->rec->getCurrentInputSymbol		= getCurrentInputSymbol;
+	lexer->rec->getMissingSymbol			= getMissingSymbol;
 
 	/* Now install the token source interface
 	*/
@@ -824,3 +829,15 @@ getText	    (pANTLR3_LEXER lexer)
 
 }
 
+static void *				
+getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream)
+{
+	return NULL;
+}
+
+static void *				
+getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
+									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow)
+{
+	return NULL;
+}

@@ -143,3 +143,71 @@ mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_B
     recognizer->exConstruct(recognizer);
     recognizer->recoverFromMismatchedToken(recognizer, ttype, follow);
 }
+
+#ifdef ANTLR3_WINDOWS
+#pragma warning	(push)
+#pragma warning (disable : 4100)
+#endif
+
+// Default implementation is for parser and assumes a token stream as supplied by the runtime.
+// You MAY need override this function if the standard TOKEN_STREAM is not what you are using.
+//
+static void *				
+getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream)
+{
+	pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(istream->super);
+    ctns    = tns->ctns;
+	return tns->_LT(tns, 1);
+}
+
+
+// Default implementation is for parser and assumes a token stream as supplied by the runtime.
+// You MAY need override this function if the standard BASE_TREE is not what you are using.
+//
+static void *				
+getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
+									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow)
+{
+	pANTLR3_TREE_NODE_STREAM		tns;
+    pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
+	pANTLR3_BASE_TREE				node;
+	pANTLR3_BASE_TREE				current;
+	pANTLR3_COMMON_TOKEN			token;
+	pANTLR3_STRING					text;
+
+	// Dereference the standard pointers
+	//
+    tns	    = (pANTLR3_TREE_NODE_STREAM)(istream->super);
+    ctns    = tns->ctns;
+
+	// Create a new empty node, by stealing the current one, or the previous one if the current one is EOF
+	//
+	current	= tns->_LT(tns, 1);
+
+	if	(current == &ctns->EOF_NODE.baseTree)
+	{
+		current = tns->_LT(tns, -1);
+	}
+	node	= current->dupNode(current);
+
+	// Find the newly dupicated token
+	//
+	token	= node->getToken(node);
+
+	// Create the token text that shows it has been inserted
+	//
+	token->setText8			(token, (pANTLR3_UINT8)"<missing ");
+	text = token->getText	(token);
+	text->append8			(text, (const char *)recognizer->state->tokenNames[expectedTokenType]);
+	text->append8			(text, (const char *)">");
+	
+	// Finally return the pointer to our new node
+	//
+	return	node;
+}
+#ifdef ANTLR3_WINDOWS
+#pragma warning	(pop)
+#endif
