@@ -100,7 +100,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
 static void
 setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input)
 {
-    factory->input	    =  input;
+    factory->input			=  input;
     factory->unTruc.input   =  input;
 }
 

@@ -455,8 +455,16 @@ matchAny(pANTLR3_BASE_RECOGNIZER recognizer)
 static ANTLR3_BOOLEAN
 mismatchIsUnwantedToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, ANTLR3_UINT32 ttype)
 {
-	if	(is->_LA(is, 2) == ttype)
+	ANTLR3_UINT32 nextt;
+
+	nextt = is->_LA(is, 2);
+
+	if	(nextt == ttype)
 	{
+		if	(recognizer->state->exception != NULL)
+		{
+			recognizer->state->exception->expecting = nextt;
+		}
 		return ANTLR3_TRUE;		// This token is unknown, but the next one is the one we wanted
 	}
 	else
@@ -1361,6 +1369,13 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 		break;
 	}
 
+	// Create an exception if we need one
+	//
+	if	(recognizer->state->exception == NULL)
+	{
+		antlr3RecognitionExceptionNew(recognizer);
+	}
+
 	// If the next token after the one we are looking at in the input stream
 	// is what we are looking for then we remove the one we have discovered
 	// from the stream by consuming it, then consume this next one along too as
@@ -1368,7 +1383,8 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 	//
 	if	( recognizer->mismatchIsUnwantedToken(recognizer, is, ttype) == ANTLR3_TRUE)
 	{
-		recognizer->state->exception->type = ANTLR3_UNWANTED_TOKEN_EXCEPTION;
+		recognizer->state->exception->type		= ANTLR3_UNWANTED_TOKEN_EXCEPTION;
+		recognizer->state->exception->message	= ANTLR3_UNWANTED_TOKEN_EXCEPTION_NAME;
 
 		// Call resync hook (for debuggers and so on)
 		//
@@ -1396,7 +1412,7 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 		//
 		recognizer->reportError(recognizer);
 
-		// Return the token we are actaully matching
+		// Return the token we are actually matching
 		//
 		matchedSymbol = recognizer->getCurrentInputSymbol(recognizer, is);
 
@@ -1419,8 +1435,10 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 		// We can fake the missing token and proceed
 		//
 		matchedSymbol = recognizer->getMissingSymbol(recognizer, is, recognizer->state->exception, ttype, follow);
-		recognizer->state->exception->type	= ANTLR3_MISSING_TOKEN_EXCEPTION;
-		recognizer->state->exception->token	= matchedSymbol;
+		recognizer->state->exception->type		= ANTLR3_MISSING_TOKEN_EXCEPTION;
+		recognizer->state->exception->message	= ANTLR3_MISSING_TOKEN_EXCEPTION_NAME;
+		recognizer->state->exception->token		= matchedSymbol;
+		recognizer->state->exception->expecting	= ttype;
 
 		// Print out the error after we insert so that ANTLRWorks sees the
 		// token in the exception.
@@ -2076,11 +2094,7 @@ getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istre
 	ts		= (pANTLR3_TOKEN_STREAM)istream->super;
 	cts		= (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
 	
-	// Create a new empty token
-	//
-	token	= recognizer->state->tokFactory->newToken(recognizer->state->tokFactory);
-
-	// Work out what to use as teh curernt symbol to make a line and offset etc
+	// Work out what to use as the current symbol to make a line and offset etc
 	// If we are at EOF, we use the token before EOF
 	//
 	current	= ts->_LT(ts, 1);
@@ -2089,18 +2103,35 @@ getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istre
 		current = ts->_LT(ts, -1);
 	}
 
+	// Create a new empty token
+	//
+	if	(recognizer->state->tokFactory == NULL)
+	{
+		// We don't yet have a token factory for making tokens
+		// we just need a fake one using the input stream of the current
+		// token.
+		//
+		recognizer->state->tokFactory = antlr3TokenFactoryNew(current->input);
+	}
+	token	= recognizer->state->tokFactory->newToken(recognizer->state->tokFactory);
+
 	// Set some of the token properties based on the current token
 	//
 	token->setLine					(token, current->getLine(current));
 	token->setCharPositionInLine	(token, current->getCharPositionInLine(current));
 	token->setChannel				(token, ANTLR3_TOKEN_DEFAULT_CHANNEL);
+	token->setType					(token, expectedTokenType);
 
 	// Create the token text that shows it has been inserted
 	//
 	token->setText8(token, (pANTLR3_UINT8)"<missing ");
 	text = token->getText(token);
-	text->append8(text, (const char *)recognizer->state->tokenNames[expectedTokenType]);
-	text->append8(text, (const char *)">");
+
+	if	(text != NULL)
+	{
+		text->append8(text, (const char *)recognizer->state->tokenNames[expectedTokenType]);
+		text->append8(text, (const char *)">");
+	}
 	
 	// Finally return the pointer to our new token
 	//
