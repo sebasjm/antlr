@@ -50,8 +50,8 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 
 	ANTLR3_UINT32   numelements;
 
-	/* Allocate memory for the bitset structure itself
-	*/
+	// Allocate memory for the bitset structure itself
+	//
 	bitset  = (pANTLR3_BITSET) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_BITSET));
 
 	if	(bitset == NULL)
@@ -59,17 +59,17 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 		return	NULL;
 	}
 
-	/* Avoid memory thrashing at the up front expense of a few bytes
-	*/
+	// Avoid memory thrashing at the up front expense of a few bytes
+	//
 	if	(numBits < (8 * ANTLR3_BITSET_BITS))
 	{
 		numBits = 8 * ANTLR3_BITSET_BITS;
 	}
 
-	/* No we need to allocate the memory for the number of bits asked for
-	* in multiples of ANTLR3_UINT64. Note, our ANTLR3_MALLOC is actually 
-	* calloc in disguise, so no need to memset to 0
-	*/
+	// No we need to allocate the memory for the number of bits asked for
+	// in multiples of ANTLR3_UINT64. Note, our ANTLR3_MALLOC is actually 
+	// calloc in disguise, so no need to memset to 0
+	//
 	numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
 
 	bitset->bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
@@ -152,21 +152,21 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 {
     pANTLR3_BITSET  bitset;
 
-    /* Allocate memory for the bitset structure itself
-     */
-    bitset  = antlr3BitsetNew(8 * inSet->length);
+    // Allocate memory for the bitset structure itself
+    //
+    bitset  = antlr3BitsetNew(ANTLR3_BITSET_BITS * inSet->length);
 
     if	(bitset == NULL)
     {
-	return	NULL;
+		return	NULL;
     }
 
     /* Install the actual bits in the source set
      */
     ANTLR3_MEMMOVE(bitset->bits, inSet->bits, (ANTLR3_UINT64)(inSet->length * sizeof(ANTLR3_BITWORD)));
 
-    /* All seems good
-     */
+    // All seems good
+    //
     return  bitset;
 }
 
