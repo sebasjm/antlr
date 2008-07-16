@@ -587,12 +587,7 @@ typedef struct <name>_Ctx_struct <name>, * p<name>;
 <recognizer.grammar.delegates: {g|#include	\<<g.recognizerName>.h>}; separator="\n">
          
 <endif>
-<if(recognizer.grammar.delegators)>
-// Include delegator definition header files
-//
-<recognizer.grammar.delegators: {g|#include	\<<g.recognizerName>.h>}; separator="\n">
-         
-<endif>
+
 
 <actions.(actionScope).header>
 
@@ -629,6 +624,13 @@ typedef struct <name>_Ctx_struct <name>, * p<name>;
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeFuncMacro(scope=it)><endif>}>
 <rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
 <rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
+
+<if(recognizer.grammar.delegators)>
+// Include delegator definition header files
+//
+<recognizer.grammar.delegators: {g|#include	\<<g.recognizerName>.h>}; separator="\n">
+         
+<endif>
 
 /** Context tracking structure for <mainName()>
  */
