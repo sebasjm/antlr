@@ -478,8 +478,9 @@ mismatchIsUnwantedToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM i
 static ANTLR3_BOOLEAN
 mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_BITSET follow)
 {
-	pANTLR3_BITSET	viableTokensFollowingThisRule = NULL;
 	ANTLR3_BOOLEAN	retcode;
+	pANTLR3_BITSET	followClone;
+	pANTLR3_BITSET	viableTokensFollowingThisRule;
 
 	if	(follow == NULL)
 	{
@@ -491,23 +492,37 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 		return	ANTLR3_FALSE;
 	}
 
+	followClone						= NULL;
+	viableTokensFollowingThisRule	= NULL;
+
+	// The C bitset maps are laid down at compile time by the
+	// C code generation. Hence we cannot remove things from them
+	// and so on. So, in order to remove EOR (if we need to) then
+	// we clone the static bitset.
+	//
+	followClone = follow->clone(follow);
+	if	(followClone == NULL)
+	{
+		return ANTLR3_FALSE;
+	}
+
 	// Compute what can follow this grammar reference
 	//
-	if	(follow->isMember(follow, ANTLR3_EOR_TOKEN_TYPE))
+	if	(followClone->isMember(followClone, ANTLR3_EOR_TOKEN_TYPE))
 	{
 		// EOR can follow, but if we are not the start symbol, we
 		// need to remove it.
 		//
 		if	(recognizer->state->following->size >= 0)
 		{
-			follow->remove(follow, ANTLR3_EOR_TOKEN_TYPE);
+			followClone->remove(followClone, ANTLR3_EOR_TOKEN_TYPE);
 		}
 
 		// Now compute the visiable tokens that can follow this rule, according to context
 		// and make them part of the follow set.
 		//
 		viableTokensFollowingThisRule = recognizer->computeCSRuleFollow(recognizer);
-		follow = follow->bor(follow, viableTokensFollowingThisRule);
+		followClone->borInPlace(followClone, viableTokensFollowingThisRule);
 	}
 
 	/// if current token is consistent with what could come after set
@@ -518,9 +533,9 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 	/// in follow set to indicate that the fall of the start symbol is
 	/// in the set (EOF can follow).
 	///
-	if	(		follow->isMember(follow, is->_LA(is, 1))
-			||	follow->isMember(follow, ANTLR3_EOR_TOKEN_TYPE)
-			)
+	if	(		followClone->isMember(followClone, is->_LA(is, 1))
+			||	followClone->isMember(followClone, ANTLR3_EOR_TOKEN_TYPE)
+		)
 	{
 		retcode = ANTLR3_TRUE;
 	}
@@ -532,6 +547,10 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 	if	(viableTokensFollowingThisRule != NULL)
 	{
 		viableTokensFollowingThisRule->free(viableTokensFollowingThisRule);
+	}
+	if	(followClone != NULL)
+	{
+		followClone->free(followClone);
 	}
 
 	return retcode;
