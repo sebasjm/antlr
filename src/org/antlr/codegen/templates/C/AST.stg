@@ -440,7 +440,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextNode(stream_<la
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->nextToken(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 /** Gen ^($label ...) where label+=... */
