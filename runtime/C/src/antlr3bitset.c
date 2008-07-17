@@ -67,12 +67,12 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 	}
 
 	// No we need to allocate the memory for the number of bits asked for
-	// in multiples of ANTLR3_UINT64. Note, our ANTLR3_MALLOC is actually 
-	// calloc in disguise, so no need to memset to 0
+	// in multiples of ANTLR3_UINT64. 
 	//
 	numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
 
 	bitset->blist.bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
+	memset(bitset->blist.bits, 0, (size_t)(numelements * sizeof(ANTLR3_BITWORD)));
 	bitset->blist.length  = numelements;
 
 	if	(bitset->blist.bits == NULL)

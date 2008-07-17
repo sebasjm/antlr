@@ -119,14 +119,14 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
     
     /* Initialise the eof token
      */
-    specialT				= &(lexer->rec->state->tokSource->eofToken);	/* Note interfaces allocated with calloc, everything is 0 */
+    specialT				= &(lexer->rec->state->tokSource->eofToken);
     antlr3SetTokenAPI	  (specialT);
     specialT->setType	  (specialT, ANTLR3_TOKEN_EOF);
     specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
 
 	// Initialize the skip token.
 	//
-    specialT				= &(lexer->rec->state->tokSource->skipToken);	/* Note interfaces allocated with calloc, everything is 0 */
+    specialT				= &(lexer->rec->state->tokSource->skipToken);
     antlr3SetTokenAPI	  (specialT);
     specialT->setType	  (specialT, ANTLR3_TOKEN_INVALID);
     specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
