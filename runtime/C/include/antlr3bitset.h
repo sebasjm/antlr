@@ -59,7 +59,7 @@ typedef	struct ANTLR3_BITSET_struct
 {
 	/// The actual bits themselves
 	///
-	pANTLR3_BITSET_LIST				blist;
+	ANTLR3_BITSET_LIST				blist;
 
     pANTLR3_BITSET					(*clone)	    (struct ANTLR3_BITSET_struct  * inSet);
     pANTLR3_BITSET					(*bor)			(struct ANTLR3_BITSET_struct  * bitset1, struct ANTLR3_BITSET_struct * bitset2);

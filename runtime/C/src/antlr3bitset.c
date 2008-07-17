@@ -33,10 +33,10 @@ static	void			antlr3BitsetFree	(pANTLR3_BITSET bitset);
 static void
 antlr3BitsetFree(pANTLR3_BITSET bitset)
 {
-    if	(bitset->blist->bits != NULL)
+    if	(bitset->blist.bits != NULL)
     {
-		ANTLR3_FREE(bitset->blist->bits);
-		bitset->blist->bits = NULL;
+		ANTLR3_FREE(bitset->blist.bits);
+		bitset->blist.bits = NULL;
     }
     ANTLR3_FREE(bitset);
 
@@ -72,10 +72,10 @@ antlr3BitsetNew(ANTLR3_UINT32 numBits)
 	//
 	numelements	= ((numBits -1) >> ANTLR3_BITSET_LOG_BITS) + 1;
 
-	bitset->blist->bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
-	bitset->blist->length  = numelements;
+	bitset->blist.bits    = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(numelements * sizeof(ANTLR3_BITWORD)));
+	bitset->blist.length  = numelements;
 
-	if	(bitset->blist->bits == NULL)
+	if	(bitset->blist.bits == NULL)
 	{
 		ANTLR3_FREE(bitset);
 		return	NULL;
@@ -134,17 +134,17 @@ antlr3BitsetCopy(pANTLR3_BITSET_LIST blist)
 
     // Install the length in ANTLR3_UINT64 units
     //
-    bitset->blist->length  = numElements;
+    bitset->blist.length  = numElements;
 
-    bitset->blist->bits    = (pANTLR3_BITWORD)ANTLR3_MALLOC((size_t)(numElements * sizeof(ANTLR3_BITWORD)));
+    bitset->blist.bits    = (pANTLR3_BITWORD)ANTLR3_MALLOC((size_t)(numElements * sizeof(ANTLR3_BITWORD)));
 
-    if	(bitset->blist->bits == NULL)
+    if	(bitset->blist.bits == NULL)
     {
 		ANTLR3_FREE(bitset);
 		return	NULL;
     }
 
-	ANTLR3_MEMMOVE(bitset->blist->bits, blist->bits, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
+	ANTLR3_MEMMOVE(bitset->blist.bits, blist->bits, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
 
     // All seems good
     //
@@ -158,7 +158,7 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
     // Allocate memory for the bitset structure itself
     //
-    bitset  = antlr3BitsetNew(ANTLR3_BITSET_BITS * inSet->blist->length);
+    bitset  = antlr3BitsetNew(ANTLR3_BITSET_BITS * inSet->blist.length);
 
     if	(bitset == NULL)
     {
@@ -167,7 +167,7 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
     // Install the actual bits in the source set
     //
-    ANTLR3_MEMMOVE(bitset->blist->bits, inSet->blist->bits, (ANTLR3_UINT64)(inSet->blist->length * sizeof(ANTLR3_BITWORD)));
+    ANTLR3_MEMMOVE(bitset->blist.bits, inSet->blist.bits, (ANTLR3_UINT64)(inSet->blist.length * sizeof(ANTLR3_BITWORD)));
 
     // All seems good
     //
@@ -249,12 +249,12 @@ antlr3BitsetLoad(pANTLR3_BITSET_LIST inBits)
 		count=0;
 		while (count < inBits->length)
 		{
-			if  (bitset->blist->length <= count)
+			if  (bitset->blist.length <= count)
 			{
 				bitset->grow(bitset, count+1);
 			}
 
-			bitset->blist->bits[count] = *((inBits->bits)+count);
+			bitset->blist.bits[count] = *((inBits->bits)+count);
 			count++;
 		}
 	}
@@ -353,12 +353,12 @@ antlr3BitsetAdd(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
 
     word    = wordNumber(bit);
 
-    if	(word	> bitset->blist->length)
+    if	(word	> bitset->blist.length)
     {
 		growToInclude(bitset, bit);
     }
 
-    bitset->blist->bits[word] |= bitMask(bit);
+    bitset->blist.bits[word] |= bitMask(bit);
 
 }
 
@@ -372,20 +372,20 @@ grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
     //
     newBits = (pANTLR3_BITWORD) ANTLR3_MALLOC((size_t)(newSize * sizeof(ANTLR3_BITWORD)));
 
-    if	(bitset->blist->bits != NULL)
+    if	(bitset->blist.bits != NULL)
     {
 		// Copy existing bits
 		//
-		ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->blist->bits, (size_t)(bitset->blist->length * sizeof(ANTLR3_BITWORD)));
+		ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->blist.bits, (size_t)(bitset->blist.length * sizeof(ANTLR3_BITWORD)));
 
 		// Out with the old bits... de de de derrr
 		//
-		ANTLR3_FREE(bitset->blist->bits);
+		ANTLR3_FREE(bitset->blist.bits);
     }
 
     // In with the new bits... keerrrang.
     //
-    bitset->blist->bits    = newBits;
+    bitset->blist.bits    = newBits;
 }
 
 static void
@@ -394,7 +394,7 @@ growToInclude(pANTLR3_BITSET bitset, ANTLR3_INT32 bit)
 	ANTLR3_UINT32	bl;
 	ANTLR3_UINT32	nw;
 
-	bl = (bitset->blist->length << 1);
+	bl = (bitset->blist.length << 1);
 	nw = numWordsToHold(bit);
 	if	(bl > nw)
 	{
@@ -421,25 +421,25 @@ antlr3BitsetORInPlace(pANTLR3_BITSET bitset, pANTLR3_BITSET bitset2)
     // First make sure that the target bitset is big enough
     // for the new bits to be ored in.
     //
-    if	(bitset->blist->length < bitset2->blist->length)
+    if	(bitset->blist.length < bitset2->blist.length)
     {
-		growToInclude(bitset, (bitset2->blist->length * sizeof(ANTLR3_BITWORD)));
+		growToInclude(bitset, (bitset2->blist.length * sizeof(ANTLR3_BITWORD)));
     }
     
     // Or the miniimum number of bits after any resizing went on
     //
-    if	(bitset->blist->length < bitset2->blist->length)
+    if	(bitset->blist.length < bitset2->blist.length)
 	{
-		minimum = bitset->blist->length;
+		minimum = bitset->blist.length;
 	}
 	else
 	{
-		minimum = bitset2->blist->length;
+		minimum = bitset2->blist.length;
 	}
 
     for	(i = minimum; i > 0; i--)
     {
-		bitset->blist->bits[i-1] |= bitset2->blist->bits[i-1];
+		bitset->blist.bits[i-1] |= bitset2->blist.bits[i-1];
     }
 }
 
@@ -462,13 +462,13 @@ antlr3BitsetSize(pANTLR3_BITSET bitset)
     // anyway.
     //
     degree  = 0;
-    for	(i = bitset->blist->length - 1; i>= 0; i--)
+    for	(i = bitset->blist.length - 1; i>= 0; i--)
     {
-		if  (bitset->blist->bits[i] != 0)
+		if  (bitset->blist.bits[i] != 0)
 		{
 			for	(bit = ANTLR3_BITSET_BITS - 1; bit >= 0; bit--)
 			{
-				if  ((bitset->blist->bits[i] & (((ANTLR3_BITWORD)1) << bit)) != 0)
+				if  ((bitset->blist.bits[i] & (((ANTLR3_BITWORD)1) << bit)) != 0)
 				{
 					degree++;
 				}
@@ -491,20 +491,20 @@ antlr3BitsetEquals(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2)
 
     // Work out the minimum comparison set
     //
-    if	(bitset1->blist->length < bitset2->blist->length)
+    if	(bitset1->blist.length < bitset2->blist.length)
     {
-		minimum = bitset1->blist->length;
+		minimum = bitset1->blist.length;
     }
     else
     {
-		minimum = bitset2->blist->length;
+		minimum = bitset2->blist.length;
     }
 
     // Make sure explict in common bits are equal
     //
     for	(i = minimum - 1; i >=0 ; i--)
     {
-		if  (bitset1->blist->bits[i] != bitset2->blist->bits[i])
+		if  (bitset1->blist.bits[i] != bitset2->blist.bits[i])
 		{
 			return  ANTLR3_FALSE;
 		}
@@ -513,21 +513,21 @@ antlr3BitsetEquals(pANTLR3_BITSET bitset1, pANTLR3_BITSET bitset2)
     // Now make sure the bits of the larger set are all turned
     // off.
     //
-    if	(bitset1->blist->length > (ANTLR3_UINT32)minimum)
+    if	(bitset1->blist.length > (ANTLR3_UINT32)minimum)
     {
-		for (i = minimum ; (ANTLR3_UINT32)i < bitset1->blist->length; i++)
+		for (i = minimum ; (ANTLR3_UINT32)i < bitset1->blist.length; i++)
 		{
-			if	(bitset1->blist->bits[i] != 0)
+			if	(bitset1->blist.bits[i] != 0)
 			{
 				return	ANTLR3_FALSE;
 			}
 		}
     }
-    else if (bitset2->blist->length > (ANTLR3_UINT32)minimum)
+    else if (bitset2->blist.length > (ANTLR3_UINT32)minimum)
     {
-		for (i = minimum; (ANTLR3_UINT32)i < bitset2->blist->length; i++)
+		for (i = minimum; (ANTLR3_UINT32)i < bitset2->blist.length; i++)
 		{
-			if	(bitset2->blist->bits[i] != 0)
+			if	(bitset2->blist.bits[i] != 0)
 			{
 				return	ANTLR3_FALSE;
 			}
@@ -544,12 +544,12 @@ antlr3BitsetMember(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit)
 
     wordNo  = wordNumber(bit);
 
-    if	(wordNo >= bitset->blist->length)
+    if	(wordNo >= bitset->blist.length)
     {
 		return	ANTLR3_FALSE;
     }
     
-    if	((bitset->blist->bits[wordNo] & bitMask(bit)) == 0)
+    if	((bitset->blist.bits[wordNo] & bitMask(bit)) == 0)
     {
 		return	ANTLR3_FALSE;
     }
@@ -566,9 +566,9 @@ antlr3BitsetRemove(pANTLR3_BITSET bitset, ANTLR3_UINT32 bit)
 
     wordNo  = wordNumber(bit);
 
-    if	(wordNo < bitset->blist->length)
+    if	(wordNo < bitset->blist.length)
     {
-		bitset->blist->bits[wordNo] &= ~(bitMask(bit));
+		bitset->blist.bits[wordNo] &= ~(bitMask(bit));
     }
 }
 static ANTLR3_BOOLEAN
@@ -576,9 +576,9 @@ antlr3BitsetIsNil(pANTLR3_BITSET bitset)
 {
    ANTLR3_INT32    i;
 
-   for	(i = bitset->blist->length -1; i>= 0; i--)
+   for	(i = bitset->blist.length -1; i>= 0; i--)
    {
-       if   (bitset->blist->bits[i] != 0)
+       if   (bitset->blist.bits[i] != 0)
        {
 			return ANTLR3_FALSE;
        }
@@ -602,7 +602,7 @@ wordNumber(ANTLR3_UINT32 bit)
 static ANTLR3_UINT32
 antlr3BitsetNumBits(pANTLR3_BITSET bitset)
 {
-    return  bitset->blist->length << ANTLR3_BITSET_LOG_BITS;
+    return  bitset->blist.length << ANTLR3_BITSET_LOG_BITS;
 }
 
 /** Produce an integer list of all the bits that are turned on
