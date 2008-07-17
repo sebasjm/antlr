@@ -33,22 +33,39 @@ public class TestHeteroAST extends BaseTest {
 
 	// PARSERS -- AUTO AST
 
-	public void testToken() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"@members {static class V extends CommonTree {\n" +
-			"  public V(Token t) { token=t;}\n" +
-			"  public String toString() { return token.getText()+\"<V>\";}\n" +
-			"}\n" +
-			"}\n"+
-			"a : ID<V> ;\n"+
-			"ID : 'a'..'z'+ ;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-				    "a", "a", debug);
-		assertEquals("a<V>\n", found);
-	}
+    public void testToken() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "@members {static class V extends CommonTree {\n" +
+            "  public V(Token t) { token=t;}\n" +
+            "  public String toString() { return token.getText()+\"<V>\";}\n" +
+            "}\n" +
+            "}\n"+
+            "a : ID<V> ;\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+        String found = execParser("T.g", grammar, "TParser", "TLexer",
+                    "a", "a", debug);
+        assertEquals("a<V>\n", found);
+    }
+
+    public void testTokenWithQualifiedType() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "@members {static class V extends CommonTree {\n" +
+            "  public V(Token t) { token=t;}\n" +
+            "  public String toString() { return token.getText()+\"<V>\";}\n" +
+            "}\n" +
+            "}\n"+
+            "a : ID<TParser.V> ;\n"+ // TParser.V is qualified name
+            "ID : 'a'..'z'+ ;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+        String found = execParser("T.g", grammar, "TParser", "TLexer",
+                    "a", "a", debug);
+        assertEquals("a<V>\n", found);
+    }
 
 	public void testTokenWithLabel() throws Exception {
 		String grammar =

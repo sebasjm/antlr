@@ -66,7 +66,7 @@ public class Tool {
 
 	public static void main(String[] args) {
 		ErrorManager.info("ANTLR Parser Generator  Version " +
-						  VERSION + " (May 20, 2008)  1989-2008");
+						  VERSION + " (July 17, 2008)  1989-2008");
 		Tool antlr = new Tool(args);
 		antlr.process();
 		if ( ErrorManager.getNumErrors() > 0 ) {

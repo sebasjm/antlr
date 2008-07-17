@@ -670,7 +670,11 @@ elementOptions[GrammarAST terminalAST]
 	;
 
 defaultNodeOption[GrammarAST terminalAST]
-	:	i:id {terminalAST.setTerminalOption(grammar,Grammar.defaultTokenOption,#i.getText());}
+{
+StringBuffer buf = new StringBuffer();
+}
+	:	i:id {buf.append(#i.getText());} (WILDCARD i2:id {buf.append("."+#i2.getText());})*
+	    {terminalAST.setTerminalOption(grammar,Grammar.defaultTokenOption,buf.toString());}
 	;
 
 elementOption[GrammarAST terminalAST]
