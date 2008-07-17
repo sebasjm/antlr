@@ -721,10 +721,10 @@ extern pANTLR3_UINT8   <recognizer.grammar.composite.rootGrammar.recognizerName>
  */
 /** \} */
 
-#endif
-
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 /* END - Note:Keep extra line feed to satisfy UNIX systems */
