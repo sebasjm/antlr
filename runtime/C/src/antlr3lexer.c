@@ -34,7 +34,7 @@ static void					displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR
 static void					reportError					(pANTLR3_BASE_RECOGNIZER rec);
 static void *				getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream);
 static void *				getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
-															ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow);
+															ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET_LIST follow);
 
 static void					reset						(pANTLR3_BASE_RECOGNIZER rec);
 
@@ -837,7 +837,7 @@ getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM i
 
 static void *				
 getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
-									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow)
+									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET_LIST follow)
 {
 	return NULL;
 }

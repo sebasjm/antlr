@@ -22,19 +22,19 @@ static void					endResync					(pANTLR3_BASE_RECOGNIZER recognizer);
 static void					beginBacktrack				(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 level);
 static void					endBacktrack				(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 level, ANTLR3_BOOLEAN successful);
 
-static void *				match						(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static void *				match						(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
 static void					matchAny					(pANTLR3_BASE_RECOGNIZER recognizer);
-static void					mismatch					(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static void					mismatch					(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
 static ANTLR3_BOOLEAN		mismatchIsUnwantedToken		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, ANTLR3_UINT32 ttype);
-static ANTLR3_BOOLEAN		mismatchIsMissingToken		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_BITSET follow);
+static ANTLR3_BOOLEAN		mismatchIsMissingToken		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_BITSET_LIST follow);
 static void					reportError					(pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_BITSET		computeCSRuleFollow			(pANTLR3_BASE_RECOGNIZER recognizer);
 static pANTLR3_BITSET		combineFollows				(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact);
 static void					displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 * tokenNames);
 static void					recover						(pANTLR3_BASE_RECOGNIZER recognizer);
-static void	*				recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
-static void	*				recoverFromMismatchedSet    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET follow);
-static ANTLR3_BOOLEAN		recoverFromMismatchedElement(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET follow);
+static void	*				recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
+static void	*				recoverFromMismatchedSet    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET_LIST follow);
+static ANTLR3_BOOLEAN		recoverFromMismatchedElement(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET_LIST follow);
 static void					consumeUntil				(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 tokenType);
 static void					consumeUntilSet				(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET set);
 static pANTLR3_STACK		getRuleInvocationStack	    (pANTLR3_BASE_RECOGNIZER recognizer);
@@ -48,7 +48,7 @@ static void					reset						(pANTLR3_BASE_RECOGNIZER recognizer);
 static void					freeBR						(pANTLR3_BASE_RECOGNIZER recognizer);
 static void *				getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream);
 static void *				getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
-															ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow);
+															ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET_LIST follow);
 static ANTLR3_UINT32		getNumberOfSyntaxErrors		(pANTLR3_BASE_RECOGNIZER recognizer);
 
 ANTLR3_API pANTLR3_BASE_RECOGNIZER
@@ -340,7 +340,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 ///
 static void *
 match(	pANTLR3_BASE_RECOGNIZER recognizer,
-		ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+		ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow)
 {
     pANTLR3_PARSER			parser;
     pANTLR3_TREE_PARSER	    tparser;
@@ -476,7 +476,7 @@ mismatchIsUnwantedToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM i
 ///
 ///
 static ANTLR3_BOOLEAN
-mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_BITSET follow)
+mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is, pANTLR3_BITSET_LIST follow)
 {
 	ANTLR3_BOOLEAN	retcode;
 	pANTLR3_BITSET	followClone;
@@ -500,7 +500,7 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 	// and so on. So, in order to remove EOR (if we need to) then
 	// we clone the static bitset.
 	//
-	followClone = follow->clone(follow);
+	followClone = antlr3BitsetLoad(follow);
 	if	(followClone == NULL)
 	{
 		return ANTLR3_FALSE;
@@ -566,7 +566,7 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 /// \remark mismatch only works for parsers and must be overridden for anything else.
 ///
 static	void
-mismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+mismatch(pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow)
 {
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
@@ -874,6 +874,7 @@ combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact)
     top	= recognizer->state->following->size(recognizer->state->following);
 
     followSet	    = antlr3BitsetNew(0);
+	localFollowSet	= NULL;
 
     for (i = top; i>0; i--)
     {
@@ -1358,7 +1359,7 @@ recover			    (pANTLR3_BASE_RECOGNIZER recognizer)
 /// error flag and rules cascade back when this is set.
 ///
 static void *	
-recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow)
 {
 	pANTLR3_PARSER			  parser;
 	pANTLR3_TREE_PARSER	      tparser;
@@ -1489,7 +1490,7 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 }
 
 static void *
-recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET follow)
+recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET_LIST follow)
 {
     pANTLR3_PARSER			parser;
     pANTLR3_TREE_PARSER	    tparser;
@@ -1553,10 +1554,10 @@ recoverFromMismatchedSet	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET
 /// true if recovery was possible else return false.
 ///
 static ANTLR3_BOOLEAN	
-recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET follow)
+recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BITSET_LIST followBits)
 {
     pANTLR3_BITSET	    viableToksFollowingRule;
-    pANTLR3_BITSET	    newFollow;
+    pANTLR3_BITSET	    follow;
     pANTLR3_PARSER	    parser;
     pANTLR3_TREE_PARSER	    tparser;
     pANTLR3_INT_STREAM	    is;
@@ -1587,7 +1588,7 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 	break;
     }
 
-    newFollow	= NULL;
+    follow	= antlr3BitsetLoad(followBits);
 
     if	(follow == NULL)
     {
@@ -1609,17 +1610,12 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 		 */
 		viableToksFollowingRule	= recognizer->computeCSRuleFollow(recognizer);
 
-		/* Knowing that, we can or in the follow set
-		 */
-		newFollow   = follow->bor(follow, viableToksFollowingRule);
-		
 		/* Remove the EOR token, which we do not wish to compute with
 		 */
-		newFollow->remove(newFollow, ANTLR3_EOR_TOKEN_TYPE);
+		follow->remove(follow, ANTLR3_EOR_TOKEN_TYPE);
 		viableToksFollowingRule->free(viableToksFollowingRule);
 		/* We now have the computed set of what can follow the current token
 		 */
-		follow	= newFollow;
     }
 
     /* We can now see if the current token works with the set of tokens
@@ -1632,18 +1628,18 @@ recoverFromMismatchedElement	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_BI
 		/* report the error, but don't cause any rules to abort and stuff
 		 */
 		recognizer->reportError(recognizer);
-		if	(newFollow != NULL)
+		if	(follow != NULL)
 		{
-			newFollow->free(newFollow);
+			follow->free(follow);
 		}
 		recognizer->state->error			= ANTLR3_FALSE;
 		recognizer->state->failed			= ANTLR3_FALSE;
 		return ANTLR3_TRUE;	/* Success in recovery	*/
     }
 
-    if	(newFollow != NULL)
+    if	(follow != NULL)
     {
-		newFollow->free(newFollow);
+		follow->free(follow);
     }
 
     /* We could not find anything viable to do, so this is going to 
@@ -2110,7 +2106,7 @@ getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM i
 //
 static void *				
 getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
-									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow)
+									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET_LIST follow)
 {
 	pANTLR3_TOKEN_STREAM			ts;
 	pANTLR3_COMMON_TOKEN_STREAM		cts;

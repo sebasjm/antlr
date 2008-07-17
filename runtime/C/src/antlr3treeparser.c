@@ -6,7 +6,7 @@
 
 /* BASE Recognizer overrides
  */
-static void				mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow);
+static void				mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow);
 
 /* Tree parser API
  */
@@ -18,7 +18,7 @@ static pANTLR3_COMMON_TREE_NODE_STREAM
 static void			freeParser				(pANTLR3_TREE_PARSER parser);    
 static void *		getCurrentInputSymbol	(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream);
 static void *		getMissingSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
-												ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow);
+												ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET_LIST follow);
 
 
 ANTLR3_API pANTLR3_TREE_PARSER
@@ -144,7 +144,7 @@ getTreeNodeStream	(pANTLR3_TREE_PARSER parser)
  *  plus we want to alter the exception type.
  */
 static void
-mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET follow)
+mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, pANTLR3_BITSET_LIST follow)
 {
     recognizer->exConstruct(recognizer);
     recognizer->recoverFromMismatchedToken(recognizer, ttype, follow);
@@ -175,7 +175,7 @@ getCurrentInputSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM i
 //
 static void *				
 getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
-									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow)
+									ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET_LIST follow)
 {
 	pANTLR3_TREE_NODE_STREAM		tns;
     pANTLR3_COMMON_TREE_NODE_STREAM	ctns;
