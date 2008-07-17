@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libantlr3c, 3.1b2, jimi@idle.ws)
+AC_INIT(libantlr3c, 3.1b3, jimi@idle.ws)
 AC_PREREQ(2.60)
 AC_COPYRIGHT([
  (The "BSD licence")
