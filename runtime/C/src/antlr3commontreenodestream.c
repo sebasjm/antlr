@@ -590,7 +590,7 @@ addNavigationNode	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT32 ttype
 
 	if	(ttype == ANTLR3_TOKEN_DOWN)
 	{
-		if  (ctns->hasUniqueNavigationNodes(ctns))
+		if  (ctns->hasUniqueNavigationNodes(ctns) == ANTLR3_TRUE)
 		{
 			node    = ctns->newDownNode(ctns);
 		}
@@ -601,7 +601,7 @@ addNavigationNode	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns, ANTLR3_UINT32 ttype
 	}
 	else
 	{
-		if  (ctns->hasUniqueNavigationNodes(ctns))
+		if  (ctns->hasUniqueNavigationNodes(ctns) == ANTLR3_TRUE)
 		{
 			node    = ctns->newUpNode(ctns);
 		}

@@ -10,13 +10,17 @@ static void				mismatch	    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 
 /* Tree parser API
  */
-static void			displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenNames);
-static void			recover			    (pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input);
+static void			displayRecognitionError	(pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 * tokenNames);
+static void			recover					(pANTLR3_BASE_RECOGNIZER rec, pANTLR3_INT_STREAM input);
 static void			setTreeNodeStream	    (pANTLR3_TREE_PARSER parser, pANTLR3_COMMON_TREE_NODE_STREAM input);
 static pANTLR3_COMMON_TREE_NODE_STREAM	
-				getTreeNodeStream	    (pANTLR3_TREE_PARSER parser);
-static void			freeParser		    (pANTLR3_TREE_PARSER parser);    
-    
+					getTreeNodeStream	    (pANTLR3_TREE_PARSER parser);
+static void			freeParser				(pANTLR3_TREE_PARSER parser);    
+static void *		getCurrentInputSymbol	(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM istream);
+static void *		getMissingSymbol		(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istream, pANTLR3_EXCEPTION	e,
+												ANTLR3_UINT32 expectedTokenType, pANTLR3_BITSET follow);
+
+
 ANTLR3_API pANTLR3_TREE_PARSER
 antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREAM ctnstream, pANTLR3_RECOGNIZER_SHARED_STATE state)
 {
@@ -49,8 +53,10 @@ antlr3TreeParserNewStream(ANTLR3_UINT32 sizeHint, pANTLR3_COMMON_TREE_NODE_STREA
 
 	/* Install our base recognizer overrides
 	*/
-	parser->rec->mismatch	=  mismatch;
-	parser->rec->exConstruct	=  antlr3MTNExceptionNew;
+	parser->rec->mismatch				= mismatch;
+	parser->rec->exConstruct			= antlr3MTNExceptionNew;
+	parser->rec->getCurrentInputSymbol	= getCurrentInputSymbol;
+	parser->rec->getMissingSymbol		= getMissingSymbol;
 
 	/* Install tree parser API
 	*/
