@@ -1,6 +1,5 @@
-Early Access ANTLR v3
-ANTLR 3.1b1
-May 20, 2008
+ANTLR v3.1b2
+July 17, 2008
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
