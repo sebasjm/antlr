@@ -24,7 +24,7 @@ static	pANTLR3_BASE_TREE	nextNode		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	pANTLR3_BASE_TREE	nextNodeNode	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	pANTLR3_BASE_TREE	nextNodeToken	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	ANTLR3_UINT32		size			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
-static	pANTLR3_STRING		getDescription	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void *				getDescription	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	void				freeRS			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 
 
@@ -71,7 +71,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 
 	// Install the description
 	//
-	stream->elementDescription	= adaptor->strFactory->newStr8(adaptor->strFactory, description);
+	stream->elementDescription	= description;
 
 	// Install the adaptor
 	//
@@ -635,12 +635,12 @@ size	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 
 /// Returns the description string if there is one available (check for NULL).
 ///
-static pANTLR3_STRING	
+static void *	
 getDescription  (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
 	if (stream->elementDescription == NULL)
 	{
-		stream->elementDescription = stream->adaptor->strFactory->newPtr8(stream->adaptor->strFactory, (pANTLR3_UINT8)"<unknown source>", 14);
+		stream->elementDescription = "<unknown source>";
 	}
 
 	return  stream->elementDescription;
