@@ -877,32 +877,38 @@ combineFollows		    (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_BOOLEAN exact)
 
     for (i = top; i>0; i--)
     {
-		localFollowSet = (pANTLR3_BITSET) recognizer->state->following->get(recognizer->state->following, i-1);
+		localFollowSet = antlr3BitsetLoad((pANTLR3_BITSET_LIST) recognizer->state->following->get(recognizer->state->following, i-1));
 
 		if  (localFollowSet != NULL)
 		{
 			followSet->borInPlace(followSet, localFollowSet);
-		}
 
-		if	(exact == ANTLR3_TRUE)
-		{
-			if	(localFollowSet->isMember(localFollowSet, ANTLR3_EOR_TOKEN_TYPE) == ANTLR3_FALSE)
+			if	(exact == ANTLR3_TRUE)
 			{
-				// Only leave EOR in the set if at top (start rule); this lets us know
-				// if we have to include the follow(start rule); I.E., EOF
-				//
-				if	(i>1)
+				if	(localFollowSet->isMember(localFollowSet, ANTLR3_EOR_TOKEN_TYPE) == ANTLR3_FALSE)
 				{
-					followSet->remove(followSet, ANTLR3_EOR_TOKEN_TYPE);
+					// Only leave EOR in the set if at top (start rule); this lets us know
+					// if we have to include the follow(start rule); I.E., EOF
+					//
+					if	(i>1)
+					{
+						followSet->remove(followSet, ANTLR3_EOR_TOKEN_TYPE);
+					}
+				}
+				else
+				{
+					break;	// Cannot see End Of Rule from here, just drop out
 				}
 			}
-			else
-			{
-				break;	// Cannot see End Of Rule from here, just drop out
-			}
+			localFollowSet->free(localFollowSet);
+			localFollowSet = NULL;
 		}
     }
 
+	if	(localFollowSet != NULL)
+	{
+		localFollowSet->free(localFollowSet);
+	}
     return  followSet;
 }
 
@@ -1152,6 +1158,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			ANTLR3_UINT32	  bit;
 			ANTLR3_UINT32	  size;
 			ANTLR3_UINT32	  numbits;
+			pANTLR3_BITSET	  errBits;
 
 			// This means we were able to deal with one of a set of
 			// possible tokens at this point, but we did not see any
@@ -1163,8 +1170,9 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			// parse?
 			//
 			count   = 0;
-			numbits = ex->expectingSet->numBits	(ex->expectingSet);
-			size    = ex->expectingSet->size	(ex->expectingSet);
+			errBits = antlr3BitsetLoad(ex->expectingSet);
+			numbits = errBits->numBits	(ex->expectingSet);
+			size    = errBits->size	(ex->expectingSet);
 
 			if  (size > 0)
 			{
@@ -1175,6 +1183,8 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 				//
 				for	(bit = 1; bit < numbits && count < 8 && count < size; bit++)
 				{
+					// TODO: This doesn;t look right - should be asking if the bit is set!!
+					//
 					if  (tokenNames[bit])
 					{
 						ANTLR3_FPRINTF(stderr, "%%s", count > 0 ? ", " : "", tokenNames[bit]); 

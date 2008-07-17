@@ -1143,9 +1143,6 @@ static void	<name>Free(p<name> ctx);
 
 <endif>
 <endif>
-// Function to initialize bitset APIs
-//
-static	void <name>LoadFollowSets();
 
 /* For use in tree output where we are accumulating rule labels via label += ruleRef
  * we need a function that knows how to free a return scope when the list is destroyed. 
@@ -1273,10 +1270,6 @@ ANTLR3_API p<name>
      */
     PSRSTATE->tokenNames   = <grammar.composite.rootGrammar.recognizerName>TokenNames;
     
-    /* Initialize the follow bit sets
-     */
-    <name>LoadFollowSets();
-    
     <@debugStuff()>
     
     /* Return the newly built parser to the caller
@@ -1346,18 +1339,6 @@ static pANTLR3_UINT8    *getTokenNames()
 <bitsets:bitsetDeclare(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
      
-/** Load up the static bitsets for following set for error recovery.
- *  \remark
- *  These are static after the parser is generated, hence they are static
- *  declarations in the parser and are thread safe after initialization.
- */
-static
-void <name>LoadFollowSets()
-{
-    <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
-                    words64=it.bits)>
-    return;
-}
 
 <if(cyclicDFAs)>
 
@@ -3081,7 +3062,7 @@ bitsetDeclare(name, words64) ::= <<
 
 /** Bitset defining follow set for error recovery in rule state: <name>  */
 static	ANTLR3_BITWORD <name>_bits[]	= { <words64:{ANTLR3_UINT64_LIT(<it>)}; separator=", "> };
-static  ANTLR3_BITSET <name>	= { <name>_bits, <length(words64)>	};
+static  ANTLR3_BITSET_LIST <name>	= { <name>_bits, <length(words64)>	};
 >>
 
 bitset(name, words64) ::= <<
