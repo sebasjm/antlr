@@ -1170,9 +1170,9 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 			// parse?
 			//
 			count   = 0;
-			errBits = antlr3BitsetLoad(ex->expectingSet);
-			numbits = errBits->numBits	(ex->expectingSet);
-			size    = errBits->size	(ex->expectingSet);
+			errBits = antlr3BitsetLoad		(ex->expectingSet);
+			numbits = errBits->numBits		(errBits);
+			size    = errBits->size			(errBits);
 
 			if  (size > 0)
 			{
