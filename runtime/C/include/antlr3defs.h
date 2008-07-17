@@ -366,7 +366,7 @@ typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 /// Default definition of ANTLR3_MALLOC. You can override this before including
 /// antlr3.h if you wish to use your own implementation.
 ///
-#define	ANTLR3_MALLOC(request)					calloc  (1, (size_t)(request))
+#define	ANTLR3_MALLOC(request)					malloc  ((size_t)(request))
 #endif
 #ifndef ANTLR3_REALLOC
 /// Default definition of ANTLR3_REALLOC. You can override this before including
