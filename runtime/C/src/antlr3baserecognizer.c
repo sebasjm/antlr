@@ -99,7 +99,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		// we just always create an empty stack and then just
 		// free it when the base recognizer is freed.
 		//
-		recognizer->state->rStreams			= antlr3StackNew(0);  // We don't know the size.
+		recognizer->state->rStreams			= antlr3VectorNew(0);  // We don't know the size.
 
 		if	(recognizer->state->rStreams == NULL)
 		{

@@ -175,7 +175,7 @@ typedef	struct ANTLR3_RECOGNIZER_SHARED_STATE_struct
 	/// reuse. The streams are then all finally freed when this stack
 	/// is freed.
 	///
-	pANTLR3_STACK					rStreams;
+	pANTLR3_VECTOR		rStreams;
 
 }
 	ANTLR3_RECOGNIZER_SHARED_STATE;

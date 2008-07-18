@@ -45,11 +45,11 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 		stream->elements->clear(stream->elements);
 	}
 
-	// Add the stream into the recongizer stream stack
+	// Add the stream into the recognizer stream stack vector
 	// adding the stream memory free routine so that
-	// it is thrown away when the stack is destroyed
+	// it is thrown away when the stack vector is destroyed
 	//
-	stream->rec->state->rStreams->push(stream->rec->state->rStreams, stream, (void(*)(void *))expungeRS);
+	stream->rec->state->rStreams->add(stream->rec->state->rStreams, stream, (void(*)(void *))expungeRS);
 }
 
 static void
@@ -70,11 +70,16 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
 	// First - do we already have a rewrite stream that was returned
-	// to the pool? If we do, then we will just resuse it by resetting
+	// to the pool? If we do, then we will just reuse it by resetting
 	// the generic interface.
 	//
-	if	((stream = rec->state->rStreams->pop(rec->state->rStreams)) != NULL)
+	if	(rec->state->rStreams->count > 0)
 	{
+		// Remove the entry from the vector. We do not
+		// cause it to be freed by using remove.
+		//
+		stream = rec->state->rStreams->remove(rec->state->rStreams, rec->state->rStreams->count - 1);
+
 		// We found a stream we can reuse, so we need to ensure it is
 		// always a generic stream when returned from this
 		// function. It will become the specific stream that
