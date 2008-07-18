@@ -64,7 +64,7 @@ antlr3TreeNodeStreamNew()
 
     // Memory for the interface structure
     //
-    stream  = (pANTLR3_TREE_NODE_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_TREE_NODE_STREAM));
+    stream  = (pANTLR3_TREE_NODE_STREAM) ANTLR3_CALLOC(1, sizeof(ANTLR3_TREE_NODE_STREAM));
 
     if	(stream == NULL)
     {

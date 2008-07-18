@@ -80,15 +80,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 		//
 		stream = rec->state->rStreams->remove(rec->state->rStreams, rec->state->rStreams->count - 1);
 
-		// We found a stream we can reuse, so we need to ensure it is
-		// always a generic stream when returned from this
-		// function. It will become the specific stream that
-		// is required when it is returned to any caller that is
-		// using this base constructor.
-		//
-		stream->nextNode		= nextNode;
-		stream->toTree			= toTree;
-
+		// We found a stream we can reuse.
 		// If the stream had a vector, then it will have been cleared
 		// when the freeRS was called that put it in this stack
 		//
@@ -104,7 +96,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 		{
 			return	NULL;
 		}
-		
+	}
 		// Populate the generic interface
 		//
 		stream->rec				= rec;
@@ -122,7 +114,6 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 		stream->free			= freeRS;
 		stream->singleElement	= NULL;
 		stream->elements		= NULL;
-	}
 
 	// Reset the stream to empty.
 	//
