@@ -68,6 +68,11 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 	stream->getDescription  = getDescription;
 	stream->toTree			= toTree;
 	stream->free			= freeRS;
+	stream->singleElement	= NULL;
+	stream->elements		= NULL;
+	stream->cursor			= 0;
+	stream->dirty			= ANTLR3_FALSE;
+	stream->freeElements	= ANTLR3_FALSE;
 
 	// Install the description
 	//

@@ -68,7 +68,7 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
     //
     factory->unTruc.factoryMade			= ANTLR3_TRUE;
     factory->unTruc.baseTree.strFactory	= strFactory;
-    
+
     return  factory;
 
 }
@@ -91,7 +91,7 @@ newPool(pANTLR3_ARBORETUM factory)
     //
     factory->pools[factory->thisPool]	=
 			    (pANTLR3_COMMON_TREE) 
-				ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TREE) * ANTLR3_FACTORY_POOL_SIZE));
+				ANTLR3_CALLOC(1, (size_t)(sizeof(ANTLR3_COMMON_TREE) * ANTLR3_FACTORY_POOL_SIZE));
 
 
     // Reset the counters
@@ -263,6 +263,8 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 	tree->baseTree.setParent				= setParent;
 	tree->baseTree.setChildIndex			= setChildIndex;
 	tree->baseTree.getChildIndex			= getChildIndex;
+
+	tree->baseTree.children	= NULL;
 
     tree->token				= NULL;	// No token as yet
     tree->startIndex		= 0;

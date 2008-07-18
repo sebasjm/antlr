@@ -73,7 +73,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 	//
 	if	(state == NULL)
 	{
-		recognizer->state = (pANTLR3_RECOGNIZER_SHARED_STATE) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_RECOGNIZER_SHARED_STATE));
+		recognizer->state = (pANTLR3_RECOGNIZER_SHARED_STATE) ANTLR3_CALLOC(1, (size_t)sizeof(ANTLR3_RECOGNIZER_SHARED_STATE));
 
 		if	(recognizer->state == NULL)
 		{
@@ -92,6 +92,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		recognizer->state->ruleMemo			= NULL;
 		recognizer->state->tokenNames		= NULL;
 		recognizer->state->sizeHint			= sizeHint;
+		recognizer->state->tokSource		= NULL;
 	}
 	else
 	{
@@ -136,6 +137,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
     recognizer->toStrings						= toStrings;
 	recognizer->getCurrentInputSymbol			= getCurrentInputSymbol;
 	recognizer->getMissingSymbol				= getMissingSymbol;
+	recognizer->debugger						= NULL;
 
     recognizer->free							=  freeBR;
 

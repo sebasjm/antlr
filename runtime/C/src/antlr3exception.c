@@ -45,7 +45,7 @@ antlr3ExceptionNew(ANTLR3_UINT32 exception, void * name, void * message, ANTLR3_
 
 	/* Allocate memory for the structure
 	*/
-	ex	= (pANTLR3_EXCEPTION) ANTLR3_MALLOC(sizeof(ANTLR3_EXCEPTION));
+	ex	= (pANTLR3_EXCEPTION) ANTLR3_CALLOC(1, sizeof(ANTLR3_EXCEPTION));
 
 	/* Check for memory allocation
 	*/

@@ -1018,7 +1018,7 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 
 	// Now fill in the defaults
 	//
-	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
+	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_CALLOC(1, (size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
 
 	if	(vector->elements == NULL)
 	{
