@@ -109,7 +109,7 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 
 	// Memory for the interface structure
 	//
-	stream  = (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_COMMON_TREE_NODE_STREAM));
+	stream  = (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_CALLOC(1, sizeof(ANTLR3_COMMON_TREE_NODE_STREAM));
 
 	if	(stream == NULL)
 	{
