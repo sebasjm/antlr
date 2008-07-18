@@ -93,6 +93,22 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		recognizer->state->tokenNames		= NULL;
 		recognizer->state->sizeHint			= sizeHint;
 		recognizer->state->tokSource		= NULL;
+
+		// Rather than check to see if we must initialize
+		// the stack every time we are asked for an new rewrite stream
+		// we just always create an empty stack and then just
+		// free it when the base recognizer is freed.
+		//
+		recognizer->state->rStreams			= antlr3StackNew(0);  // We don't know the size.
+
+		if	(recognizer->state->rStreams == NULL)
+		{
+			// Out of memory
+			//
+			ANTLR3_FREE(recognizer->state);
+			ANTLR3_FREE(recognizer);
+			return	NULL;
+		}
 	}
 	else
 	{
@@ -145,6 +161,7 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
      */
     recognizer->type			= type;
 
+
     return  recognizer;
 }
 static void	
@@ -152,22 +169,40 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 {
     pANTLR3_EXCEPTION thisE;
 
+	// Did we have a state allocated?
+	//
 	if	(recognizer->state != NULL)
 	{
+		// Free any rule memoization we set up
+		//
 		if	(recognizer->state->ruleMemo != NULL)
 		{
 			recognizer->state->ruleMemo->free(recognizer->state->ruleMemo);
 			recognizer->state->ruleMemo = NULL;
 		}
 
+		// Free any exception space we have left around
+		//
 		thisE = recognizer->state->exception;
 		if	(thisE != NULL)
 		{
 			thisE->freeEx(thisE);
 		}
 
+		// Free any rewrite streams we have allocated
+		//
+		if	(recognizer->state->rStreams != NULL)
+		{
+			recognizer->state->rStreams->free(recognizer->state->rStreams);
+		}
+
+		// Free the shared state memory
+		//
 		ANTLR3_FREE(recognizer->state);
 	}
+
+	// Free the actual recognizer space
+	//
     ANTLR3_FREE(recognizer);
 }
 

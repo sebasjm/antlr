@@ -26,10 +26,34 @@ static	pANTLR3_BASE_TREE	nextNodeToken	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stre
 static	ANTLR3_UINT32		size			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	void *				getDescription	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 static	void				freeRS			(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
+static	void				expungeRS		(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream);
 
 
+// Place a now unused rewrite stream back on the rewrite stream pool
+// so we can reuse it if we need to.
+//
 static void
 freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
+{
+	// Before placing the stream back in the pool, we
+	// need to clear any vector it has. This is so any
+	// free pointers that are associated with the
+	// entires are called.
+	//
+	if	(stream->elements != NULL)
+	{
+		stream->elements->clear(stream->elements);
+	}
+
+	// Add the stream into the recongizer stream stack
+	// adding the stream memory free routine so that
+	// it is thrown away when the stack is destroyed
+	//
+	stream->rec->state->rStreams->push(stream->rec->state->rStreams, stream, (void(*)(void *))expungeRS);
+}
+
+static void
+expungeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
 	if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
 	{
@@ -41,35 +65,63 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 // Functions for creating streams
 //
 static  pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
-antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description)
 {
 	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
-	// First job is to create the memory we need.
+	// First - do we already have a rewrite stream that was returned
+	// to the pool? If we do, then we will just resuse it by resetting
+	// the generic interface.
 	//
-	stream	= (pANTLR3_REWRITE_RULE_ELEMENT_STREAM) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_REWRITE_RULE_ELEMENT_STREAM)));
-
-	if	(stream == NULL)
+	if	((stream = rec->state->rStreams->pop(rec->state->rStreams)) != NULL)
 	{
-		return	NULL;
+		// We found a stream we can reuse, so we need to ensure it is
+		// always a generic stream when returned from this
+		// function. It will become the specific stream that
+		// is required when it is returned to any caller that is
+		// using this base constructor.
+		//
+		stream->nextNode		= nextNode;
+		stream->toTree			= toTree;
+
+		// If the stream had a vector, then it will have been cleared
+		// when the freeRS was called that put it in this stack
+		//
+	}
+	else
+	{
+		// Ok, we need to allocate a new one as there were none on the stack.
+		// First job is to create the memory we need.
+		//
+		stream	= (pANTLR3_REWRITE_RULE_ELEMENT_STREAM) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_REWRITE_RULE_ELEMENT_STREAM)));
+
+		if	(stream == NULL)
+		{
+			return	NULL;
+		}
+		
+		// Populate the generic interface
+		//
+		stream->rec				= rec;
+		stream->reset			= reset;
+		stream->add				= add;
+		stream->next			= next;
+		stream->nextTree		= nextTree;
+		stream->nextNode		= nextNode;
+		stream->nextToken		= nextToken;
+		stream->_next			= _next;
+		stream->hasNext			= hasNext;
+		stream->size			= size;
+		stream->getDescription  = getDescription;
+		stream->toTree			= toTree;
+		stream->free			= freeRS;
+		stream->singleElement	= NULL;
+		stream->elements		= NULL;
 	}
 
-	// Populate the generic interface
+	// Reset the stream to empty.
 	//
-	stream->reset			= reset;
-	stream->add				= add;
-	stream->next			= next;
-	stream->nextTree		= nextTree;
-	stream->nextNode		= nextNode;
-	stream->nextToken		= nextToken;
-	stream->_next			= _next;
-	stream->hasNext			= hasNext;
-	stream->size			= size;
-	stream->getDescription  = getDescription;
-	stream->toTree			= toTree;
-	stream->free			= freeRS;
-	stream->singleElement	= NULL;
-	stream->elements		= NULL;
+
 	stream->cursor			= 0;
 	stream->dirty			= ANTLR3_FALSE;
 	stream->freeElements	= ANTLR3_FALSE;
@@ -86,13 +138,13 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 }
 
 static pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
-antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, void * oneElement)
 {
 	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, rec, description);
 
 	if (stream == NULL)
 	{
@@ -106,13 +158,13 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 }
 
 static pANTLR3_REWRITE_RULE_ELEMENT_STREAM 
-antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
 	pANTLR3_REWRITE_RULE_ELEMENT_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, rec, description);
 
 	if (stream == NULL)
 	{
@@ -131,13 +183,13 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 // Token rewrite stream ...
 //
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTOKENStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+antlr3RewriteRuleTOKENStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description)
 {
 	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, rec, description);
 
 	if (stream == NULL)
 	{
@@ -155,13 +207,13 @@ antlr3RewriteRuleTOKENStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UIN
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTOKENStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+antlr3RewriteRuleTOKENStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, void * oneElement)
 {
 	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
+	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, rec, description, oneElement);
 
 	// Install the token based overrides
 	//
@@ -174,13 +226,13 @@ antlr3RewriteRuleTOKENStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UI
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_TOKEN_STREAM 
-antlr3RewriteRuleTOKENStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+antlr3RewriteRuleTOKENStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
 	pANTLR3_REWRITE_RULE_TOKEN_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
+	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, rec, description, vector);
 
 	// Install the token based overrides
 	//
@@ -195,13 +247,13 @@ antlr3RewriteRuleTOKENStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UI
 // Subtree rewrite stream
 //
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
-antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description)
 {
 	pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, rec, description);
 
 	if (stream == NULL)
 	{
@@ -217,13 +269,13 @@ antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_U
 
 }
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
-antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, void * oneElement)
 {
 	pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
+	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, rec, description, oneElement);
 
 	if (stream == NULL)
 	{
@@ -239,13 +291,13 @@ antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_SUBTREE_STREAM 
-antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
 	pANTLR3_REWRITE_RULE_SUBTREE_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
+	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, rec, description, vector);
 
 	if (stream == NULL)
 	{
@@ -262,13 +314,13 @@ antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 // Node rewrite stream ...
 //
 ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
-antlr3RewriteRuleNODEStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description)
+antlr3RewriteRuleNODEStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description)
 {
 	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, description);
+	stream	= antlr3RewriteRuleElementStreamNewAE(adaptor, rec, description);
 
 	if (stream == NULL)
 	{
@@ -285,13 +337,13 @@ antlr3RewriteRuleNODEStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
-antlr3RewriteRuleNODEStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, void * oneElement)
+antlr3RewriteRuleNODEStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, void * oneElement)
 {
 	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, description, oneElement);
+	stream	= antlr3RewriteRuleElementStreamNewAEE(adaptor, rec, description, oneElement);
 
 	// Install the node based overrides
 	//
@@ -303,13 +355,13 @@ antlr3RewriteRuleNODEStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UIN
 }
 
 ANTLR3_API pANTLR3_REWRITE_RULE_NODE_STREAM 
-antlr3RewriteRuleNODEStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
+antlr3RewriteRuleNODEStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_RECOGNIZER rec, pANTLR3_UINT8 description, pANTLR3_VECTOR vector)
 {
 	pANTLR3_REWRITE_RULE_NODE_STREAM	stream;
 
 	// First job is to create the memory we need.
 	//
-	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, description, vector);
+	stream	= antlr3RewriteRuleElementStreamNewAEV(adaptor, rec, description, vector);
 
 	// Install the Node based overrides
 	//

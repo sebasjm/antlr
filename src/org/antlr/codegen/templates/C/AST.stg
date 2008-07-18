@@ -86,9 +86,9 @@ ruleLabelInitializations() ::= <<
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>   = antlr3RewriteRule<rewriteElementType>StreamNewAE(ADAPTOR,(pANTLR3_UINT8)"token <it>"); }; separator="\n">
+    :{stream_<it>   = antlr3RewriteRule<rewriteElementType>StreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"token <it>"); }; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR,(pANTLR3_UINT8)"rule <it>");}; separator="\n">
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"rule <it>");}; separator="\n">
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.tree  = NULL;
 <endif>
@@ -291,19 +291,19 @@ rewriteCodeLabelsDecl() ::= <<
 
 rewriteCodeLabelsInit() ::= <<
 <referencedTokenLabels
-    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEE(ADAPTOR, (pANTLR3_UINT8)"token <it>", <it>);};
+    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>);};
     separator="\n"
 >
 <referencedTokenListLabels
-    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEV(ADAPTOR, (pANTLR3_UINT8)"token <it>", list_<it>); };
+    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>); };
     separator="\n"
 >
 <referencedRuleLabels 
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEE(ADAPTOR, (pANTLR3_UINT8)"token <it>", <it>.tree != NULL ? <it>.tree : NULL);};
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>.tree != NULL ? <it>.tree : NULL);};
     separator="\n"
 >
 <referencedRuleListLabels
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR, (pANTLR3_UINT8)"token <it>", list_<it>);};
+    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>);};
     separator="\n"
 >
 >>
