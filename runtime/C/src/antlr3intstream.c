@@ -14,7 +14,7 @@ antlr3IntStreamNew()
 
 	// Allocate memory
 	//
-	stream  = (pANTLR3_INT_STREAM) ANTLR3_MALLOC(sizeof(ANTLR3_INT_STREAM));
+	stream  = (pANTLR3_INT_STREAM) ANTLR3_CALLOC(1, sizeof(ANTLR3_INT_STREAM));
 
 	if	(stream == NULL)
 	{
