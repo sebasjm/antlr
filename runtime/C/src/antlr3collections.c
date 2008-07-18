@@ -1018,7 +1018,7 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 
 	// Now fill in the defaults
 	//
-	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_CALLOC(1, (size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
+	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
 
 	if	(vector->elements == NULL)
 	{
@@ -1256,7 +1256,10 @@ antlr3VectorSet	    (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry, void * element,
 
 	// Valid request, replace the current one, freeing any prior entry if told to
 	//
-	if	(freeExisting && vector->elements[entry].freeptr != NULL)
+	if	(		entry < vector->count						// If actually replacing an element
+			&&	freeExisting								// And told to free any existing element
+			&&	vector->elements[entry].freeptr != NULL		// And the existing element has a free pointer
+		)
 	{
 		vector->elements[entry].freeptr(vector->elements[entry].element);
 	}
