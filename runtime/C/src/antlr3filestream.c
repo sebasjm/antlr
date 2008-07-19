@@ -41,7 +41,7 @@ antlr3AsciiFileStreamNew(pANTLR3_UINT8 fileName)
 	// Allocate memory for the input stream structure
 	//
 	input   = (pANTLR3_INPUT_STREAM)
-		ANTLR3_MALLOC(sizeof(ANTLR3_INPUT_STREAM));
+		ANTLR3_CALLOC(1, sizeof(ANTLR3_INPUT_STREAM));
 
 	if	(input == NULL)
 	{

@@ -129,37 +129,37 @@ antlr3AsciiGetSourceName(pANTLR3_INT_STREAM is)
 static void
 antlr3InputClose(pANTLR3_INPUT_STREAM input)
 {
-    /* Close any markers in the input stream
-     */
+    // Close any markers in the input stream
+    //
     if	(input->markers != NULL)
     {
-	input->markers->free(input->markers);
-	input->markers = NULL;
+		input->markers->free(input->markers);
+		input->markers = NULL;
     }
 
-    /* Close the string factory
-     */
+    // Close the string factory
+    //
     if	(input->strFactory != NULL)
     {
-	input->strFactory->close(input->strFactory);
+		input->strFactory->close(input->strFactory);
     }
 
-    /* Free the input stream buffer if we allocated it
-     */
+    // Free the input stream buffer if we allocated it
+    //
     if	(input->isAllocated && input->data != NULL)
     {
-	ANTLR3_FREE(input->data);
-	input->data = NULL;
+		ANTLR3_FREE(input->data);
+		input->data = NULL;
     }
     
     input->istream->free(input->istream);
 
-    /* Finally, free the space for the structure itself
-     */
+    // Finally, free the space for the structure itself
+    //
     ANTLR3_FREE(input);
 
-    /* Done
-     */
+    // Done
+    //
 }
 
 static void		
