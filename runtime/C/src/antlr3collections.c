@@ -1186,7 +1186,7 @@ static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 
 	element				    = vector->elements[entry].element;
 
-	if	(entry == vector->count)
+	if	(entry == vector->count - 1)
 	{
 		// Ensure the pointer is never reused by accident, but otherwise just 
 		// decrement the pointer.
