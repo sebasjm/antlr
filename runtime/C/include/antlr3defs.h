@@ -404,7 +404,7 @@ typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 /// Default definition of ANTLR3_MEMMOVE. You can override this before including
 /// antlr3.h if you wish to use your own implementation.
 ///
-#define	ANTLR3_MEMMOVE(target, source, size)	memmove((void *)(target), (const void *)(source), (size_t)(size))
+#define	ANTLR3_MEMMOVE(target, source, size)	memcpy((void *)(target), (const void *)(source), (size_t)(size))
 #endif
 #ifndef ANTLR3_MEMSET
 /// Default definition of ANTLR3_MEMSET. You can override this before including
