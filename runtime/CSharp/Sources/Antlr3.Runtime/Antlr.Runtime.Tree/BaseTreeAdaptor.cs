@@ -66,7 +66,7 @@ namespace Antlr.Runtime.Tree
 		/// if no token payload but you might have to set token type for diff
 		/// node type.
 		/// </remarks>
-		public object ErrorNode(ITokenStream input, IToken start, IToken stop,
+		public virtual object ErrorNode(ITokenStream input, IToken start, IToken stop,
 								RecognitionException e)
 		{
 			CommonErrorNode t = new CommonErrorNode(input, start, stop, e);
