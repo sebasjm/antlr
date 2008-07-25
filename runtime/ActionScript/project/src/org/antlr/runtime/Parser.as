@@ -52,8 +52,9 @@ package org.antlr.runtime {
 										    e:RecognitionException,
 										    expectedTokenType:int,
 										    follow:BitSet):Object {
-			var tokenText:String =
-				"<missing "+tokenNames[expectedTokenType]+">";
+		    var tokenText:String = null;
+            if ( expectedTokenType==TokenConstants.EOF ) tokenText = "<missing EOF>";
+            else tokenText = "<missing "+tokenNames[expectedTokenType]+">";
 			var t:CommonToken = new CommonToken(expectedTokenType, tokenText);
 			var current:Token = TokenStream(input).LT(1);
 			if ( current.type == TokenConstants.EOF ) {
