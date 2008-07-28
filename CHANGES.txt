@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+July 28, 2008
+
+* Fixed bug in TokenRewriteStream.toString(start,stop); it ignored
+  parameters. ;)
+
 July 17, 2008
 
 * allow qualified type names in hetero <...> options like T<a.b.c.Node>

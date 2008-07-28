@@ -359,8 +359,8 @@ public class TokenRewriteStream extends CommonTokenStream {
 		Map indexToOp = reduceToSingleOperationPerIndex(rewrites);
 
 		// Walk buffer, executing instructions and emitting tokens
-		int i = 0;
-		while ( i < tokens.size() ) {
+		int i = start;
+		while ( i <= end && i < tokens.size() ) {
 			RewriteOperation op = (RewriteOperation)indexToOp.get(new Integer(i));
 			indexToOp.remove(new Integer(i)); // remove so any left have index size-1
 			Token t = (Token) tokens.get(i);

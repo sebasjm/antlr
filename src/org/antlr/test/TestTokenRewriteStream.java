@@ -136,7 +136,41 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void test2ReplaceMiddleIndex() throws Exception {
+    public void testToStringStartStop() throws Exception {
+        Grammar g = new Grammar(
+            "lexer grammar t;\n"+
+            "ID : 'a'..'z'+;\n" +
+            "INT : '0'..'9'+;\n" +
+            "SEMI : ';';\n" +
+            "MUL : '*';\n" +
+            "ASSIGN : '=';\n" +
+            "WS : ' '+;\n");
+        // Tokens: 0123456789
+        // Input:  x = 3 * 0;
+        CharStream input = new ANTLRStringStream("x = 3 * 0;");
+        Interpreter lexEngine = new Interpreter(g, input);
+        TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+        tokens.LT(1); // fill buffer
+        tokens.replace(4, 8, "0"); // replace 3 * 0 with 0
+
+        String result = tokens.toOriginalString();
+        String expecting = "x = 3 * 0;";
+        assertEquals(expecting, result);
+
+        result = tokens.toString();
+        expecting = "x = 0;";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(0,9);
+        expecting = "x = 0;";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(4,8);
+        expecting = "0";
+        assertEquals(expecting, result);
+    }
+
+    public void test2ReplaceMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
