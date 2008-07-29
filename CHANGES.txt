@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+July 29, 2008
+
+* Fixed another bug in TokenRewriteStream; didn't like inserts after end.
+
 July 28, 2008
 
 * Fixed bug in TokenRewriteStream.toString(start,stop); it ignored

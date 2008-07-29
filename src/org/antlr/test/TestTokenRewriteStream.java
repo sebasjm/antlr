@@ -170,6 +170,59 @@ public class TestTokenRewriteStream extends BaseTest {
         assertEquals(expecting, result);
     }
 
+    public void testToStringStartStop2() throws Exception {
+        Grammar g = new Grammar(
+            "lexer grammar t;\n"+
+            "ID : 'a'..'z'+;\n" +
+            "INT : '0'..'9'+;\n" +
+            "SEMI : ';';\n" +
+            "ASSIGN : '=';\n" +
+            "PLUS : '+';\n" +
+            "MULT : '*';\n" +
+            "WS : ' '+;\n");
+        // Tokens: 012345678901234567
+        // Input:  x = 3 * 0 + 2 * 0;
+        CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
+        Interpreter lexEngine = new Interpreter(g, input);
+        TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+        tokens.LT(1); // fill buffer
+
+        String result = tokens.toOriginalString();
+        String expecting = "x = 3 * 0 + 2 * 0;";
+        assertEquals(expecting, result);
+
+        tokens.replace(4, 8, "0"); // replace 3 * 0 with 0
+        result = tokens.toString();
+        expecting = "x = 0 + 2 * 0;";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(0,17);
+        expecting = "x = 0 + 2 * 0;";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(4,8);
+        expecting = "0";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(0,8);
+        expecting = "x = 0";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(12,16);
+        expecting = "2 * 0";
+        assertEquals(expecting, result);
+
+        tokens.insertAfter(17, "// comment");
+        result = tokens.toString(12,17);
+        expecting = "2 * 0;// comment";
+        assertEquals(expecting, result);
+
+        result = tokens.toString(0,8); // try again after insert at end
+        expecting = "x = 0";
+        assertEquals(expecting, result);
+    }
+
+
     public void test2ReplaceMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+

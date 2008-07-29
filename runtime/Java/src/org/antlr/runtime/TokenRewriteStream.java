@@ -350,7 +350,12 @@ public class TokenRewriteStream extends CommonTokenStream {
 
 	public String toString(String programName, int start, int end) {
 		List rewrites = (List)programs.get(programName);
-		if ( rewrites==null || rewrites.size()==0 ) {
+
+        // ensure start/end are in range
+        if ( end>tokens.size()-1 ) end = tokens.size()-1;
+        if ( start<0 ) start = 0;
+
+        if ( rewrites==null || rewrites.size()==0 ) {
 			return toOriginalString(start,end); // no instructions to execute
 		}
 		StringBuffer buf = new StringBuffer();
@@ -358,9 +363,9 @@ public class TokenRewriteStream extends CommonTokenStream {
 		// First, optimize instruction stream
 		Map indexToOp = reduceToSingleOperationPerIndex(rewrites);
 
-		// Walk buffer, executing instructions and emitting tokens
-		int i = start;
-		while ( i <= end && i < tokens.size() ) {
+        // Walk buffer, executing instructions and emitting tokens
+        int i = start;
+        while ( i <= end && i < tokens.size() ) {
 			RewriteOperation op = (RewriteOperation)indexToOp.get(new Integer(i));
 			indexToOp.remove(new Integer(i)); // remove so any left have index size-1
 			Token t = (Token) tokens.get(i);
@@ -373,15 +378,20 @@ public class TokenRewriteStream extends CommonTokenStream {
 				i = op.execute(buf); // execute operation and skip
 			}
 		}
-		
-		// any ops left must be at end of buffer: size-1 index
-		// in fact, must be inserts
-		Iterator it = indexToOp.values().iterator();
-		while (it.hasNext()) {
-			InsertBeforeOp iop = (InsertBeforeOp)it.next();
-			buf.append(iop.text);
-		}
-		return buf.toString();
+
+        // include stuff after end if it's last index in buffer
+        // So, if they did an insertAfter(lastValidIndex, "foo"), include
+        // foo if end==lastValidIndex.
+        if ( end==tokens.size()-1 ) {
+            // Scan any remaining operations after last token
+            // should be included (they will be inserts).
+            Iterator it = indexToOp.values().iterator();
+            while (it.hasNext()) {
+                RewriteOperation op = (RewriteOperation)it.next();
+                if ( op.index >= tokens.size()-1 ) buf.append(op.text);
+            }
+        }
+        return buf.toString();
 	}
 
 	/** We need to combine operations and report invalid operations (like
