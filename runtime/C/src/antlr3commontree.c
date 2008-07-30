@@ -287,6 +287,9 @@ antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree)
 {
 	pANTLR3_COMMON_TREE	newTree;
 
+	// Not factory made, so it should be freed when the tree it belongs
+	// to is freed.
+	//
 	newTree = antlr3CommonTreeNew();
 
 	if	(newTree == NULL)
@@ -356,8 +359,7 @@ freeTree(pANTLR3_BASE_TREE tree)
 	if	(((pANTLR3_COMMON_TREE)(tree->super))->factoryMade == ANTLR3_FALSE)
 	{
 		// Now we can free this structure memory, which contains the base tree
-		// structure also. Later I will expand this to call an public function to release
-		// the base node, so people overriding it will be able to use it more freely.
+		// structure also.
 		//
 		ANTLR3_FREE(tree->super);
 	}
