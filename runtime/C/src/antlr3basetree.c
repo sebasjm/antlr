@@ -46,6 +46,7 @@ antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
 	tree->freshenPACIndexes		= freshenPACIndexes;
     tree->getFirstChildWithType	= (void *(*)(pANTLR3_BASE_TREE, ANTLR3_UINT32))(getFirstChildWithType);
     tree->children				= NULL;
+	tree->strFactory			= NULL;
 
     /* Rest must be filled in by caller.
      */

@@ -129,9 +129,10 @@ newPoolTree	    (pANTLR3_ARBORETUM factory)
 	// We have our token pointer now, so we can initialize it to the predefined model.
 	//
 	ANTLR3_MEMMOVE((void *)tree, (const void *)&(factory->unTruc), (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TREE));
+
 	// The super points to the common tree so we must override the one used by
 	// by the pre-built tree as otherwise we will always poitn to the same initial
-	// common tree and we might spend 3 hours trying to debug why - this woudl never
+	// common tree and we might spend 3 hours trying to debug why - this would never
 	// happen to me of course! :-(
 	//
 	tree->baseTree.super	= tree;
@@ -294,8 +295,9 @@ antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree)
 
 	// Pick up the payload we had in the supplied tree
 	//
-	newTree->token			= tree->token;
-	newTree->baseTree.u	    = tree->baseTree.u;	/* Copy any user pointer */
+	newTree->token					= tree->token;
+	newTree->baseTree.u				= tree->baseTree.u;				// Copy any user pointer
+	newTree->baseTree.strFactory	= tree->baseTree.strFactory;	// Use the same string factory
 
 	return  newTree;
 }
@@ -315,7 +317,6 @@ antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN token)
 	//Pick up the payload we had in the supplied tree
 	//
 	newTree->token = token;
-
 	return newTree;
 }
 
@@ -323,7 +324,6 @@ ANTLR3_API pANTLR3_COMMON_TREE
 antlr3CommonTreeNew()
 {
 	pANTLR3_COMMON_TREE	tree;
-
 	tree    = ANTLR3_MALLOC(sizeof(ANTLR3_COMMON_TREE));
 
 	if	(tree == NULL)
