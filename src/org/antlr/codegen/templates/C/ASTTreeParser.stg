@@ -143,7 +143,7 @@ _last = (<ASTLabelType>)LT(1);
 <if(!rewriteMode)>
 <if(backtracking)>if ( BACKTRACKING == 0 ) {<endif>
 <label>_tree = (<ASTLabelType>)ADAPTOR->dupNode(ADAPTOR, <label>);
-ADPTOR->addChild(ADAPTOR, root_<treeLevel>, <label>_tree);
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <endif>
 }
