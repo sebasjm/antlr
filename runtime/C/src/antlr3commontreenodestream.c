@@ -332,7 +332,7 @@ fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 /// Determine the stream index for a particular node.
 /// NB: This uses internal knowledge of the Antlr3 Vector for the
 /// sake of efficiency. Don't do this in application code. 
-/// This seems to be just an internal debugging type interface so does not need to be improved.
+/// This is just an internal debugging type interface so does not need to be improved.
 ///
 static ANTLR3_INT32
 getNodeIndex(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
