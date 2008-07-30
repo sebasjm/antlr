@@ -272,6 +272,7 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
     tree->stopIndex			= 0;
 	tree->parent			= NULL;	// No parent yet
 	tree->childIndex		= -1;
+	tree->factoryMade		= ANTLR3_FALSE;
 
     return;
 }
