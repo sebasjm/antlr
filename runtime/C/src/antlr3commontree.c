@@ -21,7 +21,6 @@ static void					setParent				(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE parent);
 static void    				setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT32 i);
 static ANTLR3_INT32			getChildIndex			(pANTLR3_BASE_TREE tree );
 
-static void					freeTree			(pANTLR3_BASE_TREE tree);
 
 // Factory functions for the Arboretum
 //
@@ -250,7 +249,7 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 
     // Common tree overrides
 
-    tree->baseTree.free						= freeTree;
+    tree->baseTree.free						= antlr3FreeCTree;
     tree->baseTree.isNil					= isNil;
     tree->baseTree.toString					= toString;
     tree->baseTree.dupNode					= (void *(*)(pANTLR3_BASE_TREE))(dupNode);
@@ -340,8 +339,8 @@ antlr3CommonTreeNew()
 	return tree;
 }
 
-static void
-freeTree(pANTLR3_BASE_TREE tree)
+ANTLR3_API void
+antlr3FreeCTree(void * tree)
 {
 	// Call free on all the nodes.
 	// We install all the nodes as base nodes with a pointer to a function that
@@ -350,18 +349,18 @@ freeTree(pANTLR3_BASE_TREE tree)
 	// child nodes, which will delete thier child nodes, and so on
 	// recursively until they are all gone :-)
 	//
-	if	(tree->children != NULL)
+	if	(((pANTLR3_BASE_TREE)tree)->children != NULL)
 	{
-		tree->children->free(tree->children);
-		tree->children = NULL;
+		((pANTLR3_BASE_TREE)tree)->children->free(((pANTLR3_BASE_TREE)tree)->children);
+		((pANTLR3_BASE_TREE)tree)->children = NULL;
 	}
 
-	if	(((pANTLR3_COMMON_TREE)(tree->super))->factoryMade == ANTLR3_FALSE)
+	if	(((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)tree)->super))->factoryMade == ANTLR3_FALSE)
 	{
 		// Now we can free this structure memory, which contains the base tree
 		// structure also.
 		//
-		ANTLR3_FREE(tree->super);
+		ANTLR3_FREE(((pANTLR3_BASE_TREE)tree)->super);
 	}
 
 	return;

@@ -45,7 +45,7 @@ static	void		ctaFree			(pANTLR3_BASE_TREE_ADAPTOR adaptor);
  *  creating a new COMMON_TREE adaptor, we return the address of the
  *  BASE_TREE interface, as should any other adaptor that wishes to be 
  *  used as the tree element of a tree parse/build. It needs to be given the
- *  address of a valid string factory as we do not known that the originating
+ *  address of a valid string factory as we do not know what the originating
  *  input stream encoding type was. This way we can rely on just using
  *  the original input stream's string factory or one of the correct type
  *  which the user supplies us.

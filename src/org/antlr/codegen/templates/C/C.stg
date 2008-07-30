@@ -372,6 +372,14 @@ outputFile( LEXER,
 #define     ADAPTOR                         ctx->adaptor
 #define		RULEMEMO						PSRSTATE->ruleMemo
 #define		DBG								RECOGNIZER->debugger
+
+// This is the default method to free pANTLR3_COMMON_TREE nodes. If you are not using
+// these nodes, you should either define it to NULL (if you track node allocations
+// yourself), or to a function that knows how to fre your tree node type.
+//
+#ifndef	ANTLR3_CTREE_FREE
+#define	ANTLR3_CTREE_FREE antlr3FreeCTree
+#endif
 <endif>
 
 <if(TREE_PARSER)>
@@ -445,6 +453,14 @@ outputFile( LEXER,
 #define		SEEK(n)							ISTREAM->seek(ISTREAM, n)
 #define		INDEX()							ISTREAM->index(ISTREAM)
 #define		DBG								RECOGNIZER->debugger
+
+// This is the default method to free pANTLR3_COMMON_TREE nodes. If you are not using
+// these nodes, you should either define it to NULL (if you track node allocations
+// yourself), or to a function that knows how to fre your tree node type.
+//
+#ifndef	ANTLR3_CTREE_FREE
+#define	ANTLR3_CTREE_FREE antlr3FreeCTree
+#endif
 
 <endif>
 
