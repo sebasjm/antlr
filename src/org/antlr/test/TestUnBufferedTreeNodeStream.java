@@ -31,13 +31,6 @@ import org.antlr.runtime.tree.*;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
-/**
- * Created by IntelliJ IDEA.
- * User: parrt
- * Date: Dec 22, 2006
- * Time: 11:47:55 AM
- * To change this template use File | Settings | File Templates.
- */
 public class TestUnBufferedTreeNodeStream extends TestTreeNodeStream {
 
 	public TreeNodeStream newStream(Object t) {
