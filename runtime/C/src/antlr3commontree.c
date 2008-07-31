@@ -65,6 +65,7 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
     // Set some initial variables for future copying, including a string factory
     // that we can use later for converting trees to strings.
     //
+	factory->unTruc.factory				= factory;
     factory->unTruc.factoryMade			= ANTLR3_TRUE;
     factory->unTruc.baseTree.strFactory	= strFactory;
 
@@ -82,7 +83,7 @@ newPool(pANTLR3_ARBORETUM factory)
     // Ensure we have enough pointers allocated
     //
     factory->pools = (pANTLR3_COMMON_TREE *)
-		     ANTLR3_REALLOC(	(void *)factory->pools,											// Current pools pointer (starts at NULL)
+					ANTLR3_REALLOC(	(void *)factory->pools,										// Current pools pointer (starts at NULL)
 					(ANTLR3_UINT32)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TREE *))	// Memory for new pool pointers
 					);
 
@@ -280,29 +281,20 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 // Non factory node constructors.
 //
 
-
-ANTLR3_API pANTLR3_COMMON_TREE	    
-antlr3CommonTreeNewFromTree(pANTLR3_COMMON_TREE tree)
+ANTLR3_API pANTLR3_COMMON_TREE
+antlr3CommonTreeNew()
 {
-	pANTLR3_COMMON_TREE	newTree;
+	pANTLR3_COMMON_TREE	tree;
+	tree    = ANTLR3_MALLOC(sizeof(ANTLR3_COMMON_TREE));
 
-	// Not factory made, so it should be freed when the tree it belongs
-	// to is freed.
-	//
-	newTree = antlr3CommonTreeNew();
-
-	if	(newTree == NULL)
+	if	(tree == NULL)
 	{
-		return	NULL;
+		return NULL;
 	}
 
-	// Pick up the payload we had in the supplied tree
-	//
-	newTree->token					= tree->token;
-	newTree->baseTree.u				= tree->baseTree.u;				// Copy any user pointer
-	newTree->baseTree.strFactory	= tree->baseTree.strFactory;	// Use the same string factory
+	antlr3SetCTAPI(tree);
 
-	return  newTree;
+	return tree;
 }
 
 ANTLR3_API pANTLR3_COMMON_TREE	    
@@ -323,50 +315,6 @@ antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN token)
 	return newTree;
 }
 
-ANTLR3_API pANTLR3_COMMON_TREE
-antlr3CommonTreeNew()
-{
-	pANTLR3_COMMON_TREE	tree;
-	tree    = ANTLR3_MALLOC(sizeof(ANTLR3_COMMON_TREE));
-
-	if	(tree == NULL)
-	{
-		return NULL;
-	}
-
-	antlr3SetCTAPI(tree);
-
-	return tree;
-}
-
-ANTLR3_API void
-antlr3FreeCTree(void * tree)
-{
-	// Call free on all the nodes.
-	// We install all the nodes as base nodes with a pointer to a function that
-	// knows how to free itself. A function that calls this function in fact. So if we just
-	// delete the hash table, then this function will be called for all
-	// child nodes, which will delete thier child nodes, and so on
-	// recursively until they are all gone :-)
-	//
-	if	(((pANTLR3_BASE_TREE)tree)->children != NULL)
-	{
-		((pANTLR3_BASE_TREE)tree)->children->free(((pANTLR3_BASE_TREE)tree)->children);
-		((pANTLR3_BASE_TREE)tree)->children = NULL;
-	}
-
-	if	(((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)tree)->super))->factoryMade == ANTLR3_FALSE)
-	{
-		// Now we can free this structure memory, which contains the base tree
-		// structure also.
-		//
-		ANTLR3_FREE(((pANTLR3_BASE_TREE)tree)->super);
-	}
-
-	return;
-}
-
-
 static pANTLR3_COMMON_TOKEN 
 getToken			(pANTLR3_BASE_TREE tree)
 {
@@ -383,16 +331,15 @@ static pANTLR3_BASE_TREE
 dupNode			(pANTLR3_BASE_TREE tree)
 {
     // The node we are duplicating is in fact the common tree (that's why we are here)
-    // so we use the me pointer to duplicate.
+    // so we use the super pointer to duplicate.
     //
-    pANTLR3_COMMON_TREE	    theNew;
+    pANTLR3_COMMON_TREE	    theOld;
     
-    theNew  = antlr3CommonTreeNewFromTree((pANTLR3_COMMON_TREE)(tree->super));
+	theOld	= (pANTLR3_COMMON_TREE)(tree->super);
 
-    // The pointer we return is the base implementation of course
+	// The pointer we return is the base implementation of course
     //
-    return &(theNew->baseTree);
-
+	return  theOld->factory->newFromTree(theOld->factory, theOld);
 }
 
 static ANTLR3_BOOLEAN	    
