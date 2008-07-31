@@ -315,6 +315,33 @@ antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN token)
 	return newTree;
 }
 
+ANTLR3_API void
+antlr3FreeCTree(void * tree)
+{
+	// Call free on all the nodes.
+	// We install all the nodes as base nodes with a pointer to a function that
+	// knows how to free itself. A function that calls this function in fact. So if we just
+	// delete the hash table, then this function will be called for all
+	// child nodes, which will delete thier child nodes, and so on
+	// recursively until they are all gone :-)
+	//
+	if	(((pANTLR3_BASE_TREE)tree)->children != NULL)
+	{
+		((pANTLR3_BASE_TREE)tree)->children->free(((pANTLR3_BASE_TREE)tree)->children);
+		((pANTLR3_BASE_TREE)tree)->children = NULL;
+	}
+
+	if	(((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)tree)->super))->factoryMade == ANTLR3_FALSE)
+	{
+		// Now we can free this structure memory, which contains the base tree
+		// structure also.
+		//
+		ANTLR3_FREE(((pANTLR3_BASE_TREE)tree)->super);
+	}
+
+	return;
+}
+
 static pANTLR3_COMMON_TOKEN 
 getToken			(pANTLR3_BASE_TREE tree)
 {
