@@ -377,6 +377,7 @@ outputFile( LEXER,
 // these nodes, you should either define it to NULL (if you track node allocations
 // yourself), or to a function that knows how to fre your tree node type.
 //
+#define	ANTLR3_CTREE_FREE NULL
 #ifndef	ANTLR3_CTREE_FREE
 #define	ANTLR3_CTREE_FREE antlr3FreeCTree
 #endif
@@ -458,6 +459,7 @@ outputFile( LEXER,
 // these nodes, you should either define it to NULL (if you track node allocations
 // yourself), or to a function that knows how to fre your tree node type.
 //
+#define	ANTLR3_CTREE_FREE NULL
 #ifndef	ANTLR3_CTREE_FREE
 #define	ANTLR3_CTREE_FREE antlr3FreeCTree
 #endif
