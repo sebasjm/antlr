@@ -352,7 +352,7 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 	}
 
 	public void reset() {
-		p = -1;
+		p = 0;
 		lastMarker = 0;
         if (calls != null) {
             calls.clear();

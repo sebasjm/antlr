@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+July 30, 2008
+
+* CommonTreeNodeStream / CommonTokenStream did not reset properly.
+
 July 29, 2008
 
 * Fixed another bug in TokenRewriteStream; didn't like inserts after end.

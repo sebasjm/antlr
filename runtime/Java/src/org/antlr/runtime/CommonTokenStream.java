@@ -329,7 +329,7 @@ public class CommonTokenStream implements TokenStream {
 	}
 
 	public void reset() {
-		p = -1;
+		p = 0;
 		lastMarker = 0;
 	}
 	
