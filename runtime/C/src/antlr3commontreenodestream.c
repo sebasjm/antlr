@@ -208,22 +208,27 @@ antlr3CommonTreeNodeStreamNewStream(pANTLR3_COMMON_TREE_NODE_STREAM inStream)
 
 	// Install the navigation nodes     
 	//
+	
+	// Install the navigation nodes     
+	//
 	antlr3SetCTAPI(&(stream->UP));
 	antlr3SetCTAPI(&(stream->DOWN));
 	antlr3SetCTAPI(&(stream->EOF_NODE));
 	antlr3SetCTAPI(&(stream->INVALID_NODE));
 
 	stream->UP.token			= inStream->UP.token;
-	stream->DOWN.token			= inStream->DOWN.token	;
-	stream->EOF_NODE.token		= inStream->EOF_NODE.token	;
-	stream->INVALID_NODE.token	= inStream->INVALID_NODE.token	;
+	stream->DOWN.token			= inStream->DOWN.token;
+	stream->EOF_NODE.token		= inStream->EOF_NODE.token;
+	stream->INVALID_NODE.token	= inStream->INVALID_NODE.token;
 
 	// Reuse the root tree of the originating stream
 	//
 	stream->root		= inStream->root;
 
 	// Signal that this is a rewriting stream so we don't
-	// free the oringiating tree.
+	// free the originating tree. Anything that we rewrite or
+	// duplicate here will be done through the adaptor or 
+	// the original tree factory.
 	//
 	stream->isRewriter	= ANTLR3_TRUE;
 	return stream;
@@ -370,25 +375,38 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	return  stream;
 }
 
+/// Free up any resources that belong to this common tree node stream.
+///
 static	void			    antlr3CommonTreeNodeStreamFree  (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
-    ctns->adaptor			->free  (ctns->adaptor);
-    ctns->tnstream->istream ->free  (ctns->tnstream->istream);
-    ctns->tnstream			->free  (ctns->tnstream);
 
+	// If this is a rewrting stream, then certain resources
+	// belong to the originating node stream and we do not
+	// free them here.
+	//
+	if	(ctns->isRewriter != ANTLR3_TRUE)
+	{
+		ctns->adaptor			->free  (ctns->adaptor);
+
+		if	(ctns->nodeStack != NULL)
+		{
+			ctns->nodeStack->free(ctns->nodeStack);
+		}
+
+		ANTLR3_FREE(ctns->INVALID_NODE.token);
+		ANTLR3_FREE(ctns->EOF_NODE.token);
+		ANTLR3_FREE(ctns->DOWN.token);
+		ANTLR3_FREE(ctns->UP.token);
+	}
+	
 	if	(ctns->nodes != NULL)
 	{
-		ctns->nodes				->free  (ctns->nodes);
+		ctns->nodes			->free  (ctns->nodes);
 	}
-	if	(ctns->nodeStack != NULL)
-	{
-		ctns->nodeStack->free(ctns->nodeStack);
-	}
-    
-    ANTLR3_FREE(ctns->INVALID_NODE.token);
-    ANTLR3_FREE(ctns->EOF_NODE.token);
-    ANTLR3_FREE(ctns->DOWN.token);
-    ANTLR3_FREE(ctns->UP.token);
+	ctns->tnstream->istream ->free  (ctns->tnstream->istream);
+    ctns->tnstream			->free  (ctns->tnstream);
+
+
     ANTLR3_FREE(ctns);
 }
 

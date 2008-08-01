@@ -248,7 +248,8 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 	tree->baseTree.setChildIndex			= setChildIndex;
 	tree->baseTree.getChildIndex			= getChildIndex;
 	tree->baseTree.createChildrenList		= createChildrenList;
-
+	tree->baseTree.free						= NULL;	// Factory trees have no free function
+	
 	tree->baseTree.children	= NULL;
 
     tree->token				= NULL;	// No token as yet
