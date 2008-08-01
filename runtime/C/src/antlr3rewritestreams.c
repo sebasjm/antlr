@@ -149,7 +149,10 @@ antlr3RewriteRuleElementStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 
 	// Stream seems good so we need to add the supplied element
 	//
-	stream->add(stream, oneElement, NULL);
+	if	(oneElement != NULL)
+	{
+		stream->add(stream, oneElement, NULL);
+	}
 	return stream;
 }
 

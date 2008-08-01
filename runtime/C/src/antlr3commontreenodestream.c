@@ -102,6 +102,134 @@ antlr3CommonTreeNodeStreamNewTree(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 hint)
 }
 
 ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
+antlr3CommonTreeNodeStreamNewStream(pANTLR3_COMMON_TREE_NODE_STREAM inStream)
+{
+	pANTLR3_COMMON_TREE_NODE_STREAM stream;
+
+	// Memory for the interface structure
+	//
+	stream  = (pANTLR3_COMMON_TREE_NODE_STREAM) ANTLR3_CALLOC(1, sizeof(ANTLR3_COMMON_TREE_NODE_STREAM));
+
+	if	(stream == NULL)
+	{
+		return	NULL;
+	}
+
+	// Copy in all the reusable parts of the originating stream and create new
+	// pieces where necessary.
+	//
+
+	// String factory for tree walker
+	//
+	stream->stringFactory		= inStream->stringFactory;
+
+	// Create an adaptor for the common tree node stream
+	//
+	stream->adaptor				= inStream->adaptor;
+
+	// Create space for the tree node stream interface
+	//
+	stream->tnstream	    = antlr3TreeNodeStreamNew();
+
+	if	(stream->tnstream == NULL)
+	{
+		stream->free				(stream);
+
+		return	NULL;
+	}
+
+	// Create space for the INT_STREAM interface
+	//
+	stream->tnstream->istream		    =  antlr3IntStreamNew();
+
+	if	(stream->tnstream->istream == NULL)
+	{
+		stream->tnstream->free		(stream->tnstream);
+		stream->free				(stream);
+
+		return	NULL;
+	}
+
+	// Install the common tree node stream API
+	//
+	stream->addNavigationNode		    =  addNavigationNode;
+	stream->hasUniqueNavigationNodes    =  hasUniqueNavigationNodes;
+	stream->newDownNode					=  newDownNode;
+	stream->newUpNode					=  newUpNode;
+	stream->reset						=  reset;
+	stream->push						=  push;
+	stream->pop							=  pop;
+
+	stream->free			    =  antlr3CommonTreeNodeStreamFree;
+
+	// Install the tree node stream API
+	//
+	stream->tnstream->getTreeAdaptor			=  getTreeAdaptor;
+	stream->tnstream->getTreeSource				=  getTreeSource;
+	stream->tnstream->_LT						=  _LT;
+	stream->tnstream->setUniqueNavigationNodes	=  setUniqueNavigationNodes;
+	stream->tnstream->toString					=  toString;
+	stream->tnstream->toStringSS				=  toStringSS;
+	stream->tnstream->toStringWork				=  toStringWork;
+	stream->tnstream->get						=  get;
+
+	// Install INT_STREAM interface
+	//
+	stream->tnstream->istream->consume	    =  consume;
+	stream->tnstream->istream->index	    =  tindex;
+	stream->tnstream->istream->_LA			=  _LA;
+	stream->tnstream->istream->mark			=  mark;
+	stream->tnstream->istream->release	    =  release;
+	stream->tnstream->istream->rewind	    =  rewindMark;
+	stream->tnstream->istream->rewindLast   =  rewindLast;
+	stream->tnstream->istream->seek			=  seek;
+	stream->tnstream->istream->size			=  size;
+
+	// Initialize data elements of INT stream
+	//
+	stream->tnstream->istream->type			= ANTLR3_COMMONTREENODE;
+	stream->tnstream->istream->super	    =  (stream->tnstream);
+
+	// Initialize data elements of TREE stream
+	//
+	stream->tnstream->ctns =  stream;
+
+	// Initialize data elements of the COMMON TREE NODE stream
+	//
+	stream->super					= NULL;
+	stream->uniqueNavigationNodes	= ANTLR3_FALSE;
+	stream->markers					= NULL;
+	stream->nodeStack				= inStream->nodeStack;
+
+	// Create the node list map
+	//
+	stream->nodes	= antlr3VectorNew(DEFAULT_INITIAL_BUFFER_SIZE);
+	stream->p		= -1;
+
+	// Install the navigation nodes     
+	//
+	antlr3SetCTAPI(&(stream->UP));
+	antlr3SetCTAPI(&(stream->DOWN));
+	antlr3SetCTAPI(&(stream->EOF_NODE));
+	antlr3SetCTAPI(&(stream->INVALID_NODE));
+
+	stream->UP.token			= inStream->UP.token;
+	stream->DOWN.token			= inStream->DOWN.token	;
+	stream->EOF_NODE.token		= inStream->EOF_NODE.token	;
+	stream->INVALID_NODE.token	= inStream->INVALID_NODE.token	;
+
+	// Reuse the root tree of the originating stream
+	//
+	stream->root		= inStream->root;
+
+	// Signal that this is a rewriting stream so we don't
+	// free the oringiating tree.
+	//
+	stream->isRewriter	= ANTLR3_TRUE;
+	return stream;
+}
+
+ANTLR3_API pANTLR3_COMMON_TREE_NODE_STREAM
 antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 hint)
 {
 	pANTLR3_COMMON_TREE_NODE_STREAM stream;

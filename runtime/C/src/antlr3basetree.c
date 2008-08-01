@@ -38,7 +38,6 @@ antlr3BaseTreeNew(pANTLR3_BASE_TREE  tree)
 	tree->deleteChild			= deleteChild;
 	tree->dupTree				= dupTree;
 	tree->toStringTree			= toStringTree;
-	tree->createChildrenList	= createChildrenList;
 	tree->getCharPositionInLine	= getCharPositionInLine;
 	tree->getLine				= getLine;
 	tree->replaceChildren		= replaceChildren;
@@ -118,6 +117,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 {
 	ANTLR3_UINT32   n;
 	ANTLR3_UINT32   i;
+	pANTLR3_BASE_TREE newChild;
 
 	if	(child == NULL)
 	{
@@ -140,7 +140,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 		{
 			if	(tree->children == NULL)
 			{
-				tree->children = antlr3VectorNew(32);
+				tree->createChildrenList(tree);
 			}
 
 			// Need to copy the children 
@@ -170,9 +170,11 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 			// No children in the tree we are adding to, so create a new list on
 			// the fly to hold them.
 			//
-			tree->createChildrenList((void *)tree);
+			tree->createChildrenList(tree);
 		}
-		tree->children->add(tree->children, child->dupTree(child), (void (ANTLR3_CDECL *)(void *))child->free);
+		newChild = child->dupTree(child);
+		tree->children->add(tree->children, newChild, (void (ANTLR3_CDECL *)(void *))child->free);
+		
 	}
 }
 
@@ -191,13 +193,6 @@ addChildren	(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids)
 	}
 }
 
-/* Can override in a child 'class' to do something different
-*/
-static void
-createChildrenList  (pANTLR3_BASE_TREE tree)
-{
-	tree->children = antlr3VectorNew(32);
-}
 
 static    void
 setChild	(pANTLR3_BASE_TREE tree, ANTLR3_UINT32 i, void * child)
@@ -242,7 +237,7 @@ dupTree		(pANTLR3_BASE_TREE tree)
 
 			if  (t!= NULL)
 			{
-				newNode	    = t->dupNode(t);
+				newNode	    = t->dupTree(t);
 				newTree->addChild(newTree, newNode);
 			}
 		}

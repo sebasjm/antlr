@@ -150,7 +150,7 @@ wildcardTrack(label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, ANTLR3_CTREE_FREE);
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -162,7 +162,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, ANTLR3_CTREE_FREE);
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -192,7 +192,7 @@ if (list_<label> == NULL)
 {
     list_<label>=ctx->vectors->newVector(ctx->vectors);
 }
-list_<label>->add(list_<label>, <label>.tree, ANTLR3_CTREE_FREE);
+list_<label>->add(list_<label>, <label>.tree, NULL);
 >>
 
 /* How to accumulate lists of rule outputs (only allowed with AST

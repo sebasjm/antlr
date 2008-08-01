@@ -288,6 +288,10 @@ antlr3SetTokenAPI(pANTLR3_COMMON_TOKEN token)
     token->line			    = 0;
     token->index		    = 0;
     token->input		    = NULL;
+	token->user1			= 0;
+	token->user2			= 0;
+	token->user3			= 0;
+	token->custom			= NULL;
 
     return;
 }

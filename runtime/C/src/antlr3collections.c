@@ -1424,7 +1424,7 @@ newVector	    (pANTLR3_VECTOR_FACTORY factory)
 
     if	(vector == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
     {
-	return vector;
+		return vector;
     }
 
     // Now add this vector to the factory vector, which will

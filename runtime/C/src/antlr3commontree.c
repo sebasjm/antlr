@@ -19,8 +19,8 @@ static pANTLR3_STRING	    toString				(pANTLR3_BASE_TREE tree);
 static pANTLR3_BASE_TREE	getParent				(pANTLR3_BASE_TREE tree);
 static void					setParent				(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE parent);
 static void    				setChildIndex			(pANTLR3_BASE_TREE tree, ANTLR3_INT32 i);
-static ANTLR3_INT32			getChildIndex			(pANTLR3_BASE_TREE tree );
-
+static ANTLR3_INT32			getChildIndex			(pANTLR3_BASE_TREE tree);
+static void					createChildrenList		(pANTLR3_BASE_TREE tree);
 
 // Factory functions for the Arboretum
 //
@@ -38,11 +38,20 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
     // Allocate memory
     //
     factory	= (pANTLR3_ARBORETUM) ANTLR3_MALLOC((size_t)sizeof(ANTLR3_ARBORETUM));
-
     if	(factory == NULL)
     {
-	return	NULL;
+		return	NULL;
     }
+
+	// Install a vector factory to create, track and free() any child
+	// node lists.
+	//
+	factory->vFactory					= antlr3VectorFactoryNew(32);
+	if	(factory->vFactory == NULL)
+	{
+		free(factory);
+		return	NULL;
+	}
 
     // Install factory API
     //
@@ -66,7 +75,6 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
     // that we can use later for converting trees to strings.
     //
 	factory->unTruc.factory				= factory;
-    factory->unTruc.factoryMade			= ANTLR3_TRUE;
     factory->unTruc.baseTree.strFactory	= strFactory;
 
     return  factory;
@@ -108,8 +116,7 @@ newPoolTree	    (pANTLR3_ARBORETUM factory)
 {
 	pANTLR3_COMMON_TREE    tree;
 
-	// See if we need a new token pool before allocating a new
-	// one
+	// See if we need a new tree pool before allocating a new tree
 	//
 	if	(factory->nextTree >= ANTLR3_FACTORY_POOL_SIZE)
 	{
@@ -118,10 +125,8 @@ newPoolTree	    (pANTLR3_ARBORETUM factory)
 		newPool(factory);
 	}
 
-	// Assuming everything went well (we are trying for performance here so doing minimal
-	// error checking - we might introduce a DEBUG flag set that turns on tracing and things
-	// later, but I have typed this entire runtime in in 3 days so far :-(), <breath>, then
-	// we can work out what the pointer is to the next token.
+	// Assuming everything went well - we are trying for performance here so doing minimal
+	// error checking - then we can work out what the pointer is to the next commontree.
 	//
 	tree   = factory->pools[factory->thisPool] + factory->nextTree;
 	factory->nextTree++;
@@ -187,34 +192,13 @@ factoryClose	    (pANTLR3_ARBORETUM factory)
 {
 	ANTLR3_INT32	    poolCount;
 
-	// We iterate the token pools one at a time
+	// First close the vector factory that supplied all the child pointer
+	// vectors.
 	//
-	for	(poolCount = 0; poolCount <= factory->thisPool; poolCount++)
-	{
-		ANTLR3_UINT32	tree;
+	factory->vFactory->close(factory->vFactory);
 
-		// We must free any child vectors or anything else that requires
-		// freeing by calling the free method on each member of the pool.
-		// The free method will not release itself as it is factoryMade. So
-		// we just release them en masse ici.
-		//
-		for (tree=0; tree< ANTLR3_FACTORY_POOL_SIZE; tree++)
-		{
-			pANTLR3_BASE_TREE thisTree;
-
-			thisTree    = &(factory->pools[poolCount][tree].baseTree);
-
-			if	(thisTree->free == NULL)
-			{
-				break;	// Found the last allocation in this pool
-			}
-			thisTree->free(thisTree);
-		}
-	}
-
-	// We must free the pools after we have traversed all the entries in all the
-	// the pools as we cannot guarantee that the trees in the pool will not be referenced as children
-	// of other trees until all have been asked to free themselves.
+	// We now JUST free the pools because the C runtime CommonToken based tree
+	// cannot contain anything that was not made by this factory.
 	//
 	for	(poolCount = 0; poolCount <= factory->thisPool; poolCount++)
 	{
@@ -250,7 +234,6 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 
     // Common tree overrides
 
-    tree->baseTree.free						= antlr3FreeCTree;
     tree->baseTree.isNil					= isNil;
     tree->baseTree.toString					= toString;
     tree->baseTree.dupNode					= (void *(*)(pANTLR3_BASE_TREE))(dupNode);
@@ -264,6 +247,7 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 	tree->baseTree.setParent				= setParent;
 	tree->baseTree.setChildIndex			= setChildIndex;
 	tree->baseTree.getChildIndex			= getChildIndex;
+	tree->baseTree.createChildrenList		= createChildrenList;
 
 	tree->baseTree.children	= NULL;
 
@@ -272,7 +256,6 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
     tree->stopIndex			= 0;
 	tree->parent			= NULL;	// No parent yet
 	tree->childIndex		= -1;
-	tree->factoryMade		= ANTLR3_FALSE;
 
     return;
 }
@@ -315,32 +298,15 @@ antlr3CommonTreeNewFromToken(pANTLR3_COMMON_TOKEN token)
 	return newTree;
 }
 
-ANTLR3_API void
-antlr3FreeCTree(void * tree)
+/// Create a new vector for holding child nodes using the inbuilt
+/// vector factory.
+///
+static void
+createChildrenList  (pANTLR3_BASE_TREE tree)
 {
-	// Call free on all the nodes.
-	// We install all the nodes as base nodes with a pointer to a function that
-	// knows how to free itself. A function that calls this function in fact. So if we just
-	// delete the hash table, then this function will be called for all
-	// child nodes, which will delete thier child nodes, and so on
-	// recursively until they are all gone :-)
-	//
-	if	(((pANTLR3_BASE_TREE)tree)->children != NULL)
-	{
-		((pANTLR3_BASE_TREE)tree)->children->free(((pANTLR3_BASE_TREE)tree)->children);
-		((pANTLR3_BASE_TREE)tree)->children = NULL;
-	}
-
-	if	(((pANTLR3_COMMON_TREE)(((pANTLR3_BASE_TREE)tree)->super))->factoryMade == ANTLR3_FALSE)
-	{
-		// Now we can free this structure memory, which contains the base tree
-		// structure also.
-		//
-		ANTLR3_FREE(((pANTLR3_BASE_TREE)tree)->super);
-	}
-
-	return;
+	tree->children = ((pANTLR3_COMMON_TREE)(tree->super))->factory->vFactory->newVector(((pANTLR3_COMMON_TREE)(tree->super))->factory->vFactory);
 }
+
 
 static pANTLR3_COMMON_TOKEN 
 getToken			(pANTLR3_BASE_TREE tree)
@@ -373,9 +339,6 @@ static ANTLR3_BOOLEAN
 isNil			(pANTLR3_BASE_TREE tree)
 {
 	// This is a Nil tree if it has no payload (Token in our case)
-	// This is C, and you should never return the result of a comparison
-	// so we can't do the same as Java (no emails about this, I am correct and
-	// you know it ;-)
 	//
 	if	(((pANTLR3_COMMON_TREE)(tree->super))->token == NULL)
 	{
