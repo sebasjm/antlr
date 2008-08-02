@@ -8,7 +8,7 @@ This module contains all support classes for AST construction and tree parsers.
 # begin[licence]
 #
 # [The "BSD licence"]
-# Copyright (c) 2005-2007 Terence Parr
+# Copyright (c) 2005-2008 Terence Parr
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -266,19 +266,23 @@ class TreeAdaptor(object):
         Create a tree node from Token object; for CommonTree type trees,
         then the token just becomes the payload.  This is the most
         common create call.
+
+        Override if you want another kind of node to be built.
         """
 
         raise NotImplementedError
     
 
-    def dupTree(self, tree):
-        """Duplicate tree recursively, using dupNode() for each node"""
+    def dupNode(self, treeNode):
+        """Duplicate a single tree node.
+
+        Override if you want another kind of node to be built."""
 
         raise NotImplementedError
 
 
-    def dupNode(self, treeNode):
-        """Duplicate a single tree node"""
+    def dupTree(self, tree):
+        """Duplicate tree recursively, using dupNode() for each node"""
 
         raise NotImplementedError
 

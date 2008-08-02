@@ -298,7 +298,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
  */
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
-# $ANTLR start <ruleName>
+# $ANTLR start "<ruleName>"
 def <ruleName>_fragment(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
     self.traceIn("<ruleName>_fragment", <ruleDescriptor.index>)
@@ -311,7 +311,7 @@ def <ruleName>_fragment(self, <ruleDescriptor.parameterScope:parameterScope(scop
 <else>
     <block>
 <endif>
-# $ANTLR end <ruleName>
+# $ANTLR end "<ruleName>"
 
 
 >>
@@ -364,7 +364,7 @@ if self._state.backtracking > 0:
 rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memoize) ::= <<
 <returnScope(scope=ruleDescriptor.returnScope)>
 
-# $ANTLR start <ruleName>
+# $ANTLR start "<ruleName>"
 # <fileName>:<description>
 <ruleDescriptor.actions.decorate>
 def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
@@ -424,7 +424,7 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
     <@postamble()>
     return <ruleReturnValue()>
 
-# $ANTLR end <ruleName>
+# $ANTLR end "<ruleName>"
 >>
 
 catch(decl,action) ::= <<
@@ -518,7 +518,7 @@ if self._state.backtracking > 0:
  *  fragment rules.
  */
 lexerRule(ruleName,nakedBlock,ruleDescriptor,block,memoize) ::= <<
-# $ANTLR start <ruleName>
+# $ANTLR start "<ruleName>"
 def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
 <if(trace)>
     self.traceIn("<ruleName>", <ruleDescriptor.index>)<\n>
@@ -563,7 +563,7 @@ def m<ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
         <memoize()>
         pass
 
-# $ANTLR end <ruleName>
+# $ANTLR end "<ruleName>"
 
 
 >>
