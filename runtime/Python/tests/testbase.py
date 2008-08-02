@@ -19,6 +19,11 @@ def unlink(path):
             raise
 
 
+# At least on MacOSX tempdir (/tmp) is a symlink. It's sometimes dereferences,
+# sometimes not, breaking the inspect.getmodule() function.
+testbasedir = os.path.realpath(tempfile.gettempdir())
+
+
 class BrokenTest(unittest.TestCase.failureException):
     def __repr__(self):
         name, reason = self.args
@@ -124,7 +129,7 @@ class ANTLRTest(unittest.TestCase):
                     break
 
             self._baseDir = os.path.join(
-                tempfile.gettempdir(),
+                testbasedir,
                 self.moduleName, self.className, testName)
             if not os.path.isdir(self._baseDir):
                 os.makedirs(self._baseDir)
@@ -161,7 +166,7 @@ class ANTLRTest(unittest.TestCase):
             grammarName = self.moduleName + '.g'
             
         self._baseDir = os.path.join(
-            tempfile.gettempdir(),
+            testbasedir,
             self.moduleName)
         if not os.path.isdir(self._baseDir):
             os.makedirs(self._baseDir)
