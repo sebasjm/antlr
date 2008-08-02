@@ -9,7 +9,7 @@ import tempfile
 import shutil
 import inspect
 from distutils.errors import *
-
+import antlr3
 
 def unlink(path):
     try:
@@ -21,7 +21,9 @@ def unlink(path):
 
 # At least on MacOSX tempdir (/tmp) is a symlink. It's sometimes dereferences,
 # sometimes not, breaking the inspect.getmodule() function.
-testbasedir = os.path.realpath(tempfile.gettempdir())
+testbasedir = os.path.join(
+    os.path.realpath(tempfile.gettempdir()),
+    'antlr3-test')
 
 
 class BrokenTest(unittest.TestCase.failureException):
@@ -104,6 +106,9 @@ class ANTLRTest(unittest.TestCase):
 
         self.grammarName = None
         self.grammarType = None
+
+        self.antlr_version = antlr3.version_str_to_tuple(
+            os.environ.get('ANTLRVERSION', 'HEAD'))
 
 
     @property
@@ -293,7 +298,7 @@ class ANTLRTest(unittest.TestCase):
     def getLexer(self, *args, **kwargs):
         """Build lexer instance. Arguments are passed to lexer.__init__()."""
 
-        if self.grammarType == 'lexer':
+        if self.grammarType == 'lexer' and self.antlr_version >= (3, 1, 0, 0):
             self.lexerModule = self.__load_module(self.grammarName)
             cls = getattr(self.lexerModule, self.grammarName)
         else:

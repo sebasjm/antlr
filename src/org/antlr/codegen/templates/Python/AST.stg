@@ -134,7 +134,7 @@ ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefTrack(...)>
-<listLabel(elem=label,...)>
+<listLabel(elem=label+".tree",...)>
 >>
 
 /** ^(rule ...) rewrite */
@@ -380,7 +380,7 @@ self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree().tree)<\n>
+self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
@@ -390,7 +390,7 @@ root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.nextNode(), root_<tree
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.nextNode().tree, root_<treeLevel>)<\n>
+root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<

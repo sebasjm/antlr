@@ -14,7 +14,10 @@ class TestDFA(unittest.TestCase):
 
         """
 
-        self.recog = antlr3.BaseRecognizer()
+        class TRecognizer(antlr3.BaseRecognizer):
+            antlr_version = antlr3.runtime_version
+        
+        self.recog = TRecognizer()
         
         
     def testInit(self):

@@ -138,7 +138,30 @@ bug in your grammar, it can only be detected at runtime.
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__version__ = '3.1b1'
+__version__ = '3.1b2'
+
+def version_str_to_tuple(version_str):
+    import re
+    import sys
+
+    if version_str == 'HEAD':
+        return (sys.maxint, sys.maxint, sys.maxint, sys.maxint)
+
+    m = re.match(r'(\d+)\.(\d+)(\.(\d+))?(b(\d+))?', version_str)
+    if m is None:
+        raise ValueError("Bad version string %r" % version_str)
+
+    major = int(m.group(1))
+    minor = int(m.group(2))
+    patch = int(m.group(4) or 0)
+    beta = int(m.group(6) or sys.maxint)
+
+    return (major, minor, patch, beta)
+
+
+runtime_version_str = __version__
+runtime_version = version_str_to_tuple(runtime_version_str)
+
 
 from constants import *
 from dfa import *

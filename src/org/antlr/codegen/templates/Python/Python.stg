@@ -100,6 +100,8 @@ class <grammar.recognizerName>(Lexer):
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
     grammarFileName = "<fileName>"
+    antlr_version = version_str_to_tuple("<ANTLRVersion>")
+    antlr_version_str = "<ANTLRVersion>"
 
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input=None, state=None):
         if state is None:
@@ -112,9 +114,11 @@ class <grammar.recognizerName>(Lexer):
 <endif>
 
         <grammar.directDelegates:
-         {g|self.<g:delegateName()> = <g.recognizerName>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state)}; separator="\n">
+         {g|self.<g:delegateName()> = <g.recognizerName>(<trunc(g.delegators):{p|<p:delegateName()>, }>self, input, state)}; separator="\n">
         <grammar.delegators:
          {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
+        <last(grammar.delegators):
+    	 {g|self.gParent = <g:delegateName()>}; separator="\n">
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
@@ -220,6 +224,8 @@ from <grammar.composite.rootGrammar.recognizerName> import tokenNames<\n>
 
 class <grammar.recognizerName>(<superClass>):
     grammarFileName = "<fileName>"
+    antlr_version = version_str_to_tuple("<ANTLRVersion>")
+    antlr_version_str = "<ANTLRVersion>"
     tokenNames = tokenNames
 
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state=None):
@@ -236,6 +242,8 @@ class <grammar.recognizerName>(<superClass>):
 
         <grammar.delegators:
          {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
+        <last(grammar.delegators):
+    	 {g|self.gParent = self.<g:delegateName()>}; separator="\n">
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
@@ -245,7 +253,9 @@ class <grammar.recognizerName>(<superClass>):
         <init>
 
         <grammar.directDelegates:
-         {g|self.<g:delegateName()> = <g.recognizerName>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state)}; separator="\n">
+         {g|self.<g:delegateName()> = <g.recognizerName>(<trunc(g.delegators):{p|<p:delegateName()>, }>self, input, state)}; separator="\n">
+        <!grammar.directDelegates:
+         {g|self.<g:delegateName()> = <g.recognizerName>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state)}; separator="\n"!>
 
         <@init>
         <@end>

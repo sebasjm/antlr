@@ -647,7 +647,7 @@ class CommonTokenStream(TokenStream):
 
 
     def reset(self):
-        self.p = -1
+        self.p = 0
         self.lastMarker = None
 
 

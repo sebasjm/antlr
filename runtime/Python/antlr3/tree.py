@@ -1926,7 +1926,7 @@ class CommonTreeNodeStream(TreeNodeStream):
 
 
     def reset(self):
-        self.p = -1
+        self.p = 0
         self.lastMarker = 0
         self.calls = []
 

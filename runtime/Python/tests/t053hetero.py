@@ -125,6 +125,33 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("a<V>", found)
 
 
+    def testTokenWithQualifiedType(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {
+                language=Python;
+                output=AST;
+            }
+            @members {
+            class V(CommonTree):
+                def toString(self):
+                    return self.token.text + "<V>"
+                __str__ = toString
+            }
+            a : ID<TParser.V> ; // TParser.V is qualified name
+            ID : 'a'..'z'+ ;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+        
+        found = self.execParser(
+            grammar, 'a',
+            input="a"
+            )
+
+        self.failUnlessEqual("a<V>", found)
+
+
     def testTokenWithLabel(self):
         grammar = textwrap.dedent(
         r'''

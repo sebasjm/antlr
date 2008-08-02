@@ -56,8 +56,11 @@ class TestLexer(unittest.TestCase):
     def testInit(self):
         """Lexer.__init__()"""
 
+        class TLexer(antlr3.Lexer):
+            antlr_version = antlr3.runtime_version
+
         stream = antlr3.StringStream('foo')
-        antlr3.Lexer(stream)
+        TLexer(stream)
 
             
 if __name__ == "__main__":

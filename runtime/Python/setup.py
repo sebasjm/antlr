@@ -13,15 +13,6 @@ from distutils import log
 
 from distutils.core import setup
 
-classpath = [c for c in os.environ.get('CLASSPATH', '').split(':') if c != '']
-
-rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-classpath[0:0] = [
-    os.path.join(rootDir, 'build', 'classes'),
-    os.path.join(rootDir, 'build', 'rtclasses'),
-    os.path.join(rootDir, 'build', 'antlr.jar')
-    ]
-os.environ['CLASSPATH'] = ':'.join(classpath)
 
 class clean(_clean):
     """Also cleanup local temp files."""
@@ -157,19 +148,28 @@ class functest(Command):
     user_options = [
         ('testcase=', None,
          "testcase to run [default: run all]"),
+        ('antlr-version=', None,
+         "ANTLR version to use [default: HEAD (in ../../build)]"),
         ]
     
     boolean_options = []
 
     def initialize_options(self):
         self.testcase = None
-        
+        self.antlr_version = 'HEAD'
+
     
     def finalize_options(self):
         pass
 
     
     def run(self):
+        import glob
+        import imp
+        import unittest
+        import traceback
+        import StringIO
+        
         testDir = os.path.join(os.path.dirname(__file__), 'tests')
         if not os.path.isdir(testDir):
             raise DistutilsFileError(
@@ -179,12 +179,28 @@ class functest(Command):
         # make sure, relative imports from testcases work
         sys.path.insert(0, testDir)
 
-        import glob
-        import imp
-        import unittest
-        import traceback
-        import StringIO
-        
+        rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+        if self.antlr_version == 'HEAD':
+            classpath = [
+                os.path.join(rootDir, 'build', 'classes'),
+                os.path.join(rootDir, 'build', 'rtclasses')
+                ]
+        else:
+            classpath = [
+                os.path.join(rootDir, 'archive',
+                             'antlr-%s.jar' % self.antlr_version)
+                ]
+
+        classpath.extend([
+            os.path.join(rootDir, 'lib', 'antlr-2.7.7.jar'),
+            os.path.join(rootDir, 'lib', 'stringtemplate-3.2.jar'),
+            os.path.join(rootDir, 'lib', 'junit-4.2.jar')
+            ])
+        os.environ['CLASSPATH'] = ':'.join(classpath)
+
+        os.environ['ANTLRVERSION'] = self.antlr_version
+
         suite = unittest.TestSuite()
         loadFailures = []
         

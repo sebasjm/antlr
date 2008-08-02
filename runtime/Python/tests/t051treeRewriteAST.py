@@ -663,6 +663,40 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("abc 34", found)
 
       
+    def testSetOptionalMatchNoRewrite(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {
+                language=Python;
+                output=AST;
+            }
+            a : ID INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {
+                language=Python;
+                output=AST;
+                ASTLabelType=CommonTree;
+                tokenVocab=T;
+            }
+            a : (ID|INT)? INT ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "abc 34")
+        
+        self.failUnlessEqual("abc 34", found)
+
+
     def testSetMatchNoRewriteLevel2(self):
         grammar = textwrap.dedent(
             r'''
