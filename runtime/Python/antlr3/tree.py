@@ -39,7 +39,7 @@ This module contains all support classes for AST construction and tree parsers.
 # pylint: disable-msg=C0111
 
 from antlr3.constants import UP, DOWN, EOF, INVALID_TOKEN_TYPE
-from antlr3.recognizers import BaseRecognizer
+from antlr3.recognizers import BaseRecognizer, RuleReturnScope
 from antlr3.streams import IntStream
 from antlr3.tokens import CommonToken, Token, INVALID_TOKEN
 from antlr3.exceptions import MismatchedTreeNodeException, \
@@ -2422,3 +2422,25 @@ class RewriteRuleNodeStream(RewriteRuleElementStream):
         # we dup every node, so don't have to worry about calling dup; short-
         #circuited next() so it doesn't call.
         raise TypeError("dup can't be called for a node stream.")
+
+
+class TreeRuleReturnScope(RuleReturnScope):
+    """
+    This is identical to the ParserRuleReturnScope except that
+    the start property is a tree nodes not Token object
+    when you are parsing trees.  To be generic the tree node types
+    have to be Object.
+    """
+
+    def __init__(self):
+        self.start = None
+        self.tree = None
+        
+    
+    def getStart(self):
+        return self.start
+
+    
+    def getTree(self):
+        return self.tree
+

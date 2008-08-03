@@ -1218,12 +1218,12 @@ returnStructName() ::= "<it.name>_return"
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-class <ruleDescriptor:returnStructName()>(object):
+class <ruleDescriptor:returnStructName()>(<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope):
     def __init__(self):
-        self.start = None
-        self.stop = None
         <if(TREE_PARSER)>
-        self.tree = None
+        TreeRuleReturnScope.__init__(self)
+        <else>
+        ParserRuleReturnScope.__init__(self)
         <endif>
 
         <scope.attributes:{self.<it.decl> = None}; separator="\n">
