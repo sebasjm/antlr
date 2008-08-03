@@ -240,6 +240,24 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
+    public void test2ReplaceMiddleIndex1InsertBefore() throws Exception {
+		Grammar g = new Grammar(
+			"lexer grammar t;\n"+
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"C : 'c';\n");
+		CharStream input = new ANTLRStringStream("abc");
+		Interpreter lexEngine = new Interpreter(g, input);
+		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
+		tokens.LT(1); // fill buffer
+        tokens.insertBefore(0, "_");
+        tokens.replace(1, "x");
+		tokens.replace(1, "y");
+		String result = tokens.toString();
+		String expecting = "_ayc";
+		assertEquals(expecting, result);
+	}
+
 	public void testReplaceThenDeleteMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
