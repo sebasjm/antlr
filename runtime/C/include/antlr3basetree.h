@@ -16,8 +16,8 @@ extern "C" {
 /// A generic tree implementation with no payload.  You must subclass to
 /// actually have any user data.  ANTLR v3 uses a list of children approach
 /// instead of the child-sibling approach in v2.  A flat tree (a list) is
-/// an empty node whose children represent the list.  An empty, but
-/// non-null node is called "nil".
+/// an empty node whose children represent the list.  An empty (as in it does not
+/// have payload itself), but non-null node is called "nil".
 ///
 typedef	struct ANTLR3_BASE_TREE_struct
 {

@@ -67,7 +67,7 @@ _last = (<ASTLabelType>)LT(1);
 {
 <ASTLabelType> _save_last_<treeLevel> = _last;
 <if(!rewriteMode)>
-<ASTLabelType> root_<treeLevel> = ADAPTOR->nil(ADAPTOR);
+<ASTLabelType> root_<treeLevel> = ADAPTOR->nilNode(ADAPTOR);
 <endif>
 <root:element()>
 <actionsAfterRoot:element()>

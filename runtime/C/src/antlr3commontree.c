@@ -422,11 +422,11 @@ static pANTLR3_STRING	    toString			(pANTLR3_BASE_TREE tree)
 {
 	if  (tree->isNilNode(tree) == ANTLR3_TRUE)
 	{
-		pANTLR3_STRING  nil;
+		pANTLR3_STRING  nilNode;
 
-		nil	= tree->strFactory->newPtr(tree->strFactory, (pANTLR3_UINT8)"nil", 3);
+		nilNode	= tree->strFactory->newPtr(tree->strFactory, (pANTLR3_UINT8)"nil", 3);
 
-		return nil;
+		return nilNode;
 	}
 
 	return	((pANTLR3_COMMON_TREE)(tree->super))->token->getText(((pANTLR3_COMMON_TREE)(tree->super))->token);

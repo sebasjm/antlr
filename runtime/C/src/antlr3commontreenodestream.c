@@ -433,16 +433,16 @@ fillBufferRoot(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 static void
 fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 {
-	ANTLR3_BOOLEAN	nil;
+	ANTLR3_BOOLEAN	nilNode;
 	ANTLR3_UINT32	nCount;
 	ANTLR3_UINT32	c;
 
-	nil = ctns->adaptor->isNilNode(ctns->adaptor, t);
+	nilNode = ctns->adaptor->isNilNode(ctns->adaptor, t);
 
 	// If the supplied node is not a nil (list) node then we
 	// add in the node itself to the vector
 	//
-	if	(nil == ANTLR3_FALSE)
+	if	(nilNode == ANTLR3_FALSE)
 	{
 		ctns->nodes->add(ctns->nodes, t, NULL);	
 	}
@@ -452,7 +452,7 @@ fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 	//
 	nCount = t->getChildCount(t);
 
-	if	(nil == ANTLR3_FALSE && nCount>0)
+	if	(nilNode == ANTLR3_FALSE && nCount>0)
 	{
 		ctns->addNavigationNode(ctns, ANTLR3_TOKEN_DOWN);
 	}
@@ -469,7 +469,7 @@ fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 	// If the tree had children and was not a nil (list) node, then we
 	// we need to add an UP node here to match the DOWN node
 	//
-	if	(nil == ANTLR3_FALSE && nCount > 0)
+	if	(nilNode == ANTLR3_FALSE && nCount > 0)
 	{
 		ctns->addNavigationNode(ctns, ANTLR3_TOKEN_UP);
 	}

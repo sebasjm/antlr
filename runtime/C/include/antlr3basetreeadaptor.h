@@ -41,7 +41,7 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 	///
 	pANTLR3_DEBUG_EVENT_LISTENER	debugger;
 
-    pANTLR3_BASE_TREE	    (*nil)					(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor);
+    pANTLR3_BASE_TREE	    (*nilNode)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor);
 
 
     pANTLR3_BASE_TREE	    (*dupTree)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_BASE_TREE tree);

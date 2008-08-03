@@ -11,7 +11,7 @@
 
 /* Interface functions
  */
-static	pANTLR3_BASE_TREE	nil						(pANTLR3_BASE_TREE_ADAPTOR adaptor);
+static	pANTLR3_BASE_TREE	nilNode						(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 static	pANTLR3_BASE_TREE	dbgNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 static	pANTLR3_BASE_TREE	dupTree					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	pANTLR3_BASE_TREE	dbgDupTree				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
@@ -56,7 +56,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 	//
 	if	(debugger == NULL)
 	{
-		adaptor->nil					= nil;
+		adaptor->nilNode				= nilNode;
 		adaptor->addChild				= addChild;
 		adaptor->becomeRoot				= becomeRoot;
 		adaptor->addChildToken			= addChildToken;
@@ -68,7 +68,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 	}
 	else
 	{
-		adaptor->nil					= dbgNil;
+		adaptor->nilNode					= dbgNil;
 		adaptor->addChild				= dbgAddChild;
 		adaptor->becomeRoot				= dbgBecomeRoot;
 		adaptor->addChildToken			= dbgAddChildToken;
@@ -101,7 +101,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 /** Create and return a nil tree node (no token payload)
  */
 static	pANTLR3_BASE_TREE	
-nil	    (pANTLR3_BASE_TREE_ADAPTOR adaptor)
+nilNode	    (pANTLR3_BASE_TREE_ADAPTOR adaptor)
 {
 	return	adaptor->create(adaptor, NULL);
 }

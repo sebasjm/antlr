@@ -115,7 +115,7 @@ ruleLabelInitVal(label) ::= <<
 @alt.initializations() ::= <<
 <if(autoAST)>
 <if(outerAlt)>
-root_0 = ADAPTOR->nil(ADAPTOR);<\n>
+root_0 = ADAPTOR->nilNode(ADAPTOR);<\n>
 <endif>
 <endif>
 >>
@@ -252,7 +252,7 @@ if ( BACKTRACKING==0 ) <\n>
 {
 	<rewriteCodeLabelsDecl()>
 	<rewriteCodeLabelsInit()>
-	root_0			    = ADAPTOR->nil(ADAPTOR);
+	root_0			    = ADAPTOR->nilNode(ADAPTOR);
 	<prevRuleRootRef()>.tree    = root_0;
 	<alts:rewriteAlt(); separator="else ">
 	<if(rewriteMode)>
@@ -408,7 +408,7 @@ rewriteEmptyAlt() ::= "root_0 = NULL; /* \<-- rewriteEmptyAlt()) */"
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
-    pANTLR3_BASE_TREE root_<treeLevel> = ADAPTOR->nil(ADAPTOR);
+    pANTLR3_BASE_TREE root_<treeLevel> = ADAPTOR->nilNode(ADAPTOR);
     <root:rewriteElement()>
     <children:rewriteElement()>
     ADAPTOR->addChild(ADAPTOR, root_<enclosingTreeLevel>, root_<treeLevel>);
