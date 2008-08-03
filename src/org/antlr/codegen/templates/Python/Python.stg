@@ -700,6 +700,7 @@ if alt<decisionNumber> == <i>:
 /** An alternative is just a list of elements; at outermost level */
 alt(elements,altNum,description,autoAST,outerAlt, treeLevel,rew) ::= <<
 # <fileName>:<description>
+pass <! so empty alternatives are a valid block !>
 <@declarations()>
 <elements:element()>
 <rew>

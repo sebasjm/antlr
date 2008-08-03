@@ -8,7 +8,6 @@ class t031emptyAlt(testbase.ANTLRTest):
         self.compileGrammar()
         
 
-    @testbase.broken("Syntax error in generated code", Exception)
     def testValid1(self):
         cStream = antlr3.StringStream('foo')
         lexer = self.getLexer(cStream)
