@@ -759,7 +759,7 @@ matchSet(s,label,elementIndex,postmatchCode="") ::= <<
 <label> = self.input.LT(1)<\n>
 <endif>
 if <s>:
-    self.input.consume();
+    self.input.consume()
     <postmatchCode>
 <if(!LEXER)>
     self._state.errorRecovery = False<\n>
