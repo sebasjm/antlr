@@ -81,7 +81,8 @@ class unittest(Command):
         testDir = os.path.join(os.path.dirname(__file__), 'unittests')
         if not os.path.isdir(testDir):
             raise DistutilsFileError(
-                "There is not 'unittests' directory. Did you fetch the development version?",
+                "There is not 'unittests' directory. Did you fetch the "
+                "development version?",
                 )
 
         import glob
@@ -173,13 +174,15 @@ class functest(Command):
         testDir = os.path.join(os.path.dirname(__file__), 'tests')
         if not os.path.isdir(testDir):
             raise DistutilsFileError(
-                "There is not 'tests' directory. Did you fetch the development version?",
+                "There is not 'tests' directory. Did you fetch the "
+                "development version?",
                 )
 
         # make sure, relative imports from testcases work
         sys.path.insert(0, testDir)
 
-        rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        rootDir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '..', '..'))
 
         if self.antlr_version == 'HEAD':
             classpath = [
@@ -264,7 +267,7 @@ class functest(Command):
             
 
 setup(name='antlr_python_runtime',
-      version='3.1b1',
+      version='3.1',
       packages=['antlr3'],
 
       author="Benjamin Niemann",
