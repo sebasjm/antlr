@@ -10,7 +10,7 @@
 
 static pANTLR3_COMMON_TOKEN getToken				(pANTLR3_BASE_TREE tree);
 static pANTLR3_BASE_TREE    dupNode					(pANTLR3_BASE_TREE tree);
-static ANTLR3_BOOLEAN	    isNil					(pANTLR3_BASE_TREE tree);
+static ANTLR3_BOOLEAN	    isNilNode					(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT32	    getType					(pANTLR3_BASE_TREE tree);
 static pANTLR3_STRING	    getText					(pANTLR3_BASE_TREE tree);
 static ANTLR3_UINT32	    getLine					(pANTLR3_BASE_TREE tree);
@@ -234,7 +234,7 @@ antlr3SetCTAPI(pANTLR3_COMMON_TREE tree)
 
     // Common tree overrides
 
-    tree->baseTree.isNil					= isNil;
+    tree->baseTree.isNilNode					= isNilNode;
     tree->baseTree.toString					= toString;
     tree->baseTree.dupNode					= (void *(*)(pANTLR3_BASE_TREE))(dupNode);
     tree->baseTree.getLine					= getLine;
@@ -337,7 +337,7 @@ dupNode			(pANTLR3_BASE_TREE tree)
 }
 
 static ANTLR3_BOOLEAN	    
-isNil			(pANTLR3_BASE_TREE tree)
+isNilNode			(pANTLR3_BASE_TREE tree)
 {
 	// This is a Nil tree if it has no payload (Token in our case)
 	//
@@ -420,7 +420,7 @@ static ANTLR3_UINT32	    getCharPositionInLine	(pANTLR3_BASE_TREE tree)
 
 static pANTLR3_STRING	    toString			(pANTLR3_BASE_TREE tree)
 {
-	if  (tree->isNil(tree) == ANTLR3_TRUE)
+	if  (tree->isNilNode(tree) == ANTLR3_TRUE)
 	{
 		pANTLR3_STRING  nil;
 

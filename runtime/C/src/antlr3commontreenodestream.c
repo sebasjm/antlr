@@ -427,7 +427,7 @@ fillBufferRoot(pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 }
 
 /// Walk tree with depth-first-search and fill nodes buffer.
-/// Don't add in DOWN, UP nodes if the supplied tree is a list (t is isNil)
+/// Don't add in DOWN, UP nodes if the supplied tree is a list (t is isNilNode)
 // such as the root tree is.
 ///
 static void
@@ -437,7 +437,7 @@ fillBuffer(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 	ANTLR3_UINT32	nCount;
 	ANTLR3_UINT32	c;
 
-	nil = ctns->adaptor->isNil(ctns->adaptor, t);
+	nil = ctns->adaptor->isNilNode(ctns->adaptor, t);
 
 	// If the supplied node is not a nil (list) node then we
 	// add in the node itself to the vector
@@ -812,7 +812,7 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 	ANTLR3_UINT32   n;
 	ANTLR3_UINT32   c;
 
-	if	(!p->isNil(p) )
+	if	(!p->isNilNode(p) )
 	{
 		pANTLR3_STRING	text;
 
@@ -836,7 +836,7 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 
 	n = p->getChildCount(p);
 
-	if	(n > 0 && ! p->isNil(p) )
+	if	(n > 0 && ! p->isNilNode(p) )
 	{
 		buf->addc   (buf, ' ');
 		buf->addi   (buf, ANTLR3_TOKEN_DOWN);
@@ -850,7 +850,7 @@ toStringWork	(pANTLR3_TREE_NODE_STREAM tns, pANTLR3_BASE_TREE p, pANTLR3_BASE_TR
 		tns->toStringWork(tns, child, stop, buf);
 	}
 
-	if	(n > 0 && ! p->isNil(p) )
+	if	(n > 0 && ! p->isNilNode(p) )
 	{
 		buf->addc   (buf, ' ');
 		buf->addi   (buf, ANTLR3_TOKEN_UP);

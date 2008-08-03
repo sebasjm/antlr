@@ -87,7 +87,7 @@ typedef	struct ANTLR3_BASE_TREE_struct
 
     pANTLR3_STRING			(*getText)					(struct ANTLR3_BASE_TREE_struct * tree);
 
-    ANTLR3_BOOLEAN			(*isNil)					(struct ANTLR3_BASE_TREE_struct * tree);
+    ANTLR3_BOOLEAN			(*isNilNode)					(struct ANTLR3_BASE_TREE_struct * tree);
 
     void					(*setChild)					(struct ANTLR3_BASE_TREE_struct * tree, ANTLR3_UINT32 i, void * child);
 

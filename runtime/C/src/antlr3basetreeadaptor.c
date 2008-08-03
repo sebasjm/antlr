@@ -39,7 +39,7 @@ static	void				setText8				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
 static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 static	ANTLR3_UINT32		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_BOOLEAN		isNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_BOOLEAN		isNilNode					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static  pANTLR3_BASE_TREE	setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT32 i);
 static  ANTLR3_INT32		getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 static  void				setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child);
@@ -90,7 +90,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 	adaptor->getChild				=  getChild;
 	adaptor->getChildCount			=  getChildCount;
 	adaptor->getUniqueID			=  getUniqueID;
-	adaptor->isNil					=  isNil;
+	adaptor->isNilNode					=  isNilNode;
 
 	
 	/* Remaining functions filled in by the caller.
@@ -200,7 +200,7 @@ dbgDupTree		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE tree)
 
 /** Add a child to the tree t.  If child is a flat tree (a list), make all
  *  in list children of t. Warning: if t has no children, but child does
- *  and child isNil then it is ok to move children to t via
+ *  and child isNilNode then it is ok to move children to t via
  *  t.children = child.children; i.e., without copying the array.  This
  *  is for construction and I'm not sure it's completely general for
  *  a tree's addChild method to work this way.  Make sure you differentiate
@@ -263,7 +263,7 @@ dbgAddChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTL
  *    old=^(a b c), new=^(nil r) yields ^(r ^(a b c))
  * \endcode
  *
- *  If oldRoot was null, it's ok, just return newRoot (even if isNil).
+ *  If oldRoot was null, it's ok, just return newRoot (even if isNilNode).
  *
  * \code
  *    old=null, new=r yields r
@@ -301,7 +301,7 @@ becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pA
 
 	/* Produce ^(nil real-node)
 	 */
-	if	(newRootTree->isNil(newRootTree))
+	if	(newRootTree->isNilNode(newRootTree))
 	{
 		if	(newRootTree->getChildCount(newRootTree) > 1)
 		{
@@ -343,7 +343,7 @@ dbgBecomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree,
 static	pANTLR3_BASE_TREE	
    rulePostProcessing	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root)
 {
-	if (root != NULL && root->isNil(root))
+	if (root != NULL && root->isNilNode(root))
 	{
 		if	(root->getChildCount(root) == 0)
 		{
@@ -540,7 +540,7 @@ static	ANTLR3_UINT32
 }
 
 static	ANTLR3_BOOLEAN
-isNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
+isNilNode					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
-	return t->isNil(t);
+	return t->isNilNode(t);
 }

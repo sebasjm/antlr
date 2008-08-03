@@ -102,7 +102,7 @@ antlr3BitsetSetAPI(pANTLR3_BITSET bitset)
     bitset->isMember	=    antlr3BitsetMember;
     bitset->numBits		=    antlr3BitsetNumBits;
     bitset->remove		=    antlr3BitsetRemove;
-    bitset->isNil		=    antlr3BitsetIsNil;
+    bitset->isNilNode		=    antlr3BitsetIsNil;
     bitset->toIntList	=    antlr3BitsetToIntList;
 
     bitset->free		=    antlr3BitsetFree;

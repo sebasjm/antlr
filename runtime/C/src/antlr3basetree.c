@@ -124,7 +124,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 		return;
 	}
 
-	if	(child->isNil(child) == ANTLR3_TRUE)
+	if	(child->isNilNode(child) == ANTLR3_TRUE)
 	{
 		if  (child->children != NULL && child->children == tree->children)
 		{
@@ -263,7 +263,7 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 	*/
 	string	= tree->strFactory->newRaw(tree->strFactory);
 
-	if	(tree->isNil(tree) == ANTLR3_FALSE)
+	if	(tree->isNilNode(tree) == ANTLR3_FALSE)
 	{
 		string->append8	(string, "(");
 		string->appendS	(string, tree->toString(tree));
@@ -284,7 +284,7 @@ toStringTree	(pANTLR3_BASE_TREE tree)
 			string->appendS(string, t->toStringTree(t));
 		}
 	}
-	if	(tree->isNil(tree) == ANTLR3_FALSE)
+	if	(tree->isNilNode(tree) == ANTLR3_FALSE)
 	{
 		string->append8(string,")");
 	}
@@ -320,7 +320,7 @@ replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3
 	// Either use the existing list of children in the supplied nil node, or build a vector of the
 	// tree we were given if it is not a nil node, then we treat both situations exactly the same
 	//
-	if	(newTree->isNil(newTree))
+	if	(newTree->isNilNode(newTree))
 	{
 		newChildren = newTree->children;
 		freeNewChildren = ANTLR3_FALSE;		// We must NO free this memory
