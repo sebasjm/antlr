@@ -1025,6 +1025,198 @@ class T(testbase.ANTLRTest):
         self.assertEquals("(boo 34)", found)
 
 
+    def testRewriteOfRuleRef(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ID INT | INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+         
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : a -> a ;
+            a : ID INT -> ID INT ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.failUnlessEqual("abc 34", found)
+
+
+    def testRewriteOfRuleRefRoot(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT INT -> ^(INT ^(ID INT));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(a ^(ID INT)) -> a ;
+            a : INT ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 12 34")
+        # emits whole tree when you ref the root since I can't know whether
+        # you want the children or not.  You might be returning a whole new
+        # tree.  Hmm...still seems weird.  oh well.
+        self.failUnlessEqual("(12 (abc 34))", found)
+
+
+    def testRewriteOfRuleRefRootLabeled(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT INT -> ^(INT ^(ID INT));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(label=a ^(ID INT)) -> a ;
+            a : INT ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 12 34")
+        # emits whole tree when you ref the root since I can't know whether
+        # you want the children or not.  You might be returning a whole new
+        # tree.  Hmm...still seems weird.  oh well.
+        self.failUnlessEqual("(12 (abc 34))", found)
+
+
+    def testRewriteOfRuleRefRootListLabeled(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT INT -> ^(INT ^(ID INT));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(label+=a ^(ID INT)) -> a ;
+            a : INT ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 12 34")
+        # emits whole tree when you ref the root since I can't know whether
+        # you want the children or not.  You might be returning a whole new
+        # tree.  Hmm...still seems weird.  oh well.
+        self.failUnlessEqual("(12 (abc 34))", found)
+
+
+    def testRewriteOfRuleRefChild(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ^(ID ^(INT INT));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(ID a) -> a ;
+            a : ^(INT INT) ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.failUnlessEqual("(34 34)", found)
+
+
+    def testRewriteOfRuleRefLabel(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ^(ID ^(INT INT));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(ID label=a) -> a ;
+            a : ^(INT INT) ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.failUnlessEqual("(34 34)", found)
+
+
+    def testRewriteOfRuleRefListLabel(self):
+        grammar = textwrap.dedent(
+            r"""
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ^(ID ^(INT INT));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            """)
+
+        treeGrammar = textwrap.dedent(
+            r"""
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(ID label+=a) -> a ;
+            a : ^(INT INT) ;
+            """)
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.failUnlessEqual("(34 34)", found)
+
+
+
     def testRewriteModeWithPredicatedRewrites(self):
         grammar = textwrap.dedent(
             r'''
@@ -1060,10 +1252,10 @@ class T(testbase.ANTLRTest):
             treeGrammar, 's',
             "abc 34"
             )
-        
-        self.assertEquals("(root (ick 34))", found)
 
-        
+        self.failUnlessEqual("(root (ick 34))", found)
+
+
     def testWildcard(self):
         grammar = textwrap.dedent(
             r'''
@@ -1077,7 +1269,7 @@ class T(testbase.ANTLRTest):
             INT : '0'..'9'+;
             WS : (' '|'\n') {$channel=HIDDEN;} ;
             ''')
-        
+
         treeGrammar = textwrap.dedent(
             r'''
             tree grammar TP;
@@ -1090,14 +1282,14 @@ class T(testbase.ANTLRTest):
             s : ^(ID c=.) -> $c
             ;
             ''')
-        
+
         found = self.execTreeParser(
             grammar, 'a',
             treeGrammar, 's',
             "abc 34"
             )
-        
-        self.assertEquals("34", found)
+
+        self.failUnlessEqual("34", found)
 
 
 if __name__ == '__main__':
