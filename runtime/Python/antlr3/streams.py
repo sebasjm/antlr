@@ -488,7 +488,10 @@ class ANTLRStringStream(CharStream):
 
 
     def getCharPositionInLine(self):
-        """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
+        """
+        Using setter/getter methods is deprecated. Use o.charPositionInLine
+        instead.
+        """
         return self.charPositionInLine
 
 
@@ -498,7 +501,10 @@ class ANTLRStringStream(CharStream):
 
 
     def setCharPositionInLine(self, pos):
-        """Using setter/getter methods is deprecated. Use o.charPositionInLine instead."""
+        """
+        Using setter/getter methods is deprecated. Use o.charPositionInLine
+        instead.
+        """
         self.charPositionInLine = pos
 
 
@@ -913,7 +919,8 @@ class CommonTokenStream(TokenStream):
 class RewriteOperation(object):
     """@brief Internal helper class."""
     
-    def __init__(self, index, text):
+    def __init__(self, stream, index, text):
+        self.stream = stream
         self.index = index
         self.text = text
 
@@ -926,9 +933,10 @@ class RewriteOperation(object):
 
     def toString(self):
         opName = self.__class__.__name__
-        return opName+"@"+self.index+'"'+self.text+'"'
+        return '<%s@%d:"%s">' % (opName, self.index, self.text)
 
     __str__ = toString
+    __repr__ = toString
 
 
 class InsertBeforeOp(RewriteOperation):
@@ -936,7 +944,8 @@ class InsertBeforeOp(RewriteOperation):
 
     def execute(self, buf):
         buf.write(self.text)
-        return self.index
+        buf.write(self.stream.tokens[self.index].text)
+        return self.index + 1
 
 
 class ReplaceOp(RewriteOperation):
@@ -947,8 +956,8 @@ class ReplaceOp(RewriteOperation):
     instructions.
     """
 
-    def __init__(self, first, last, text):
-        RewriteOperation.__init__(self, first, text)
+    def __init__(self, stream, first, last, text):
+        RewriteOperation.__init__(self, stream, first, text)
         self.lastIndex = last
 
 
@@ -957,6 +966,30 @@ class ReplaceOp(RewriteOperation):
             buf.write(self.text)
 
         return self.lastIndex + 1
+
+
+    def toString(self):
+        return '<ReplaceOp@%d..%d:"%s">' % (
+            self.index, self.lastIndex, self.text)
+
+    __str__ = toString
+    __repr__ = toString
+
+
+class DeleteOp(ReplaceOp):
+    """
+    @brief Internal helper class.
+    """
+
+    def __init__(self, stream, first, last):
+        ReplaceOp.__init__(self, stream, first, last, None)
+
+
+    def toString(self):
+        return '<DeleteOp@%d..%d>' % (self.index, self.lastIndex)
+
+    __str__ = toString
+    __repr__ = toString
 
 
 class TokenRewriteStream(CommonTokenStream):
@@ -1048,92 +1081,14 @@ class TokenRewriteStream(CommonTokenStream):
         
         p = self.programs.get(programName, None)
         if p is not None:
-            self.programs[programName] = p[self.MIN_TOKEN_INDEX:instructionIndex]
+            self.programs[programName] = (
+                p[self.MIN_TOKEN_INDEX:instructionIndex])
 
 
     def deleteProgram(self, programName=DEFAULT_PROGRAM_NAME):
         """Reset the program so that no instructions exist"""
             
         self.rollback(programName, self.MIN_TOKEN_INDEX)
-
-
-    def addToSortedRewriteList(self, *args):
-        """
-        Add an instruction to the rewrite instruction list ordered by
-        the instruction number (do not use a binary search for bad efficiency).
-        The list is ordered so that toString() can be done efficiently.
-
-        When there are multiple instructions at the same index, the instructions
-        must be ordered to ensure proper behavior.  For example, a delete at
-        index i must kill any replace operation at i.  Insert-before operations
-        must come before any replace / delete instructions.  If there are
-        multiple insert instructions for a single index, they are done in
-        reverse insertion order so that "insert foo" then "insert bar" yields
-        "foobar" in front rather than "barfoo".  This is convenient because
-        I can insert new InsertOp instructions at the index returned by
-        the binary search.  A ReplaceOp kills any previous replace op.  Since
-        delete is the same as replace with null text, i can check for
-        ReplaceOp and cover DeleteOp at same time. :)
-        """
-
-        if len(args) == 2:
-            programName = args[0]
-            op = args[1]
-        elif len(args) == 1:
-            programName = self.DEFAULT_PROGRAM_NAME
-            op = args[0]
-        else:
-            raise TypeError("Invalid arguments")
-        
-        rewrites = self.getProgram(programName)
-        #System.out.println("### add "+op+"; rewrites="+rewrites)
-
-        # first insert position for operation
-        for pos, searchOp in enumerate(rewrites):
-            if searchOp.index == op.index:
-                # now pos is the index in rewrites of first op with op.index
-                #System.out.println("first op with op.index: pos="+pos)
-
-                # an instruction operating already on that index was found;
-                # make this one happen after all the others
-                #System.out.println("found instr for index="+op.index)
-                if isinstance(op, ReplaceOp):
-                    replaced = False
-                    i = pos
-                    # look for an existing replace
-                    while i < len(rewrites):
-                        prevOp = rewrites[pos]
-                        if prevOp.index != op.index:
-                            break
-
-                        if isinstance(prevOp, ReplaceOp):
-                            rewrites[pos] = op # replace old with new
-                            replaced = True
-                            break
-
-                        # keep going; must be an insert
-                        i += 1
-                        
-                    if not replaced:
-                        # add replace op to the end of all the inserts
-                        rewrites.insert(i, op)
-
-                else:
-                    # inserts are added in front of existing inserts
-                    rewrites.insert(pos, op)
-
-                break
-
-            elif searchOp.index > op.index:
-                #System.out.println("no instruction at pos=="+pos)
-                rewrites.insert(pos, op)
-                break
-            
-        else:
-            # new op is past any existing op, append to end
-            rewrites.append(op)
-            
-        #System.out.println("after, rewrites="+rewrites)
 
 
     def insertAfter(self, *args):
@@ -1176,10 +1131,9 @@ class TokenRewriteStream(CommonTokenStream):
             # index is a Token, grap the stream index from it
             index = index.index
 
-        self.addToSortedRewriteList(
-            programName,
-            InsertBeforeOp(index, text)
-            )
+        op = InsertBeforeOp(self, index, text)
+        rewrites = self.getProgram(programName)
+        rewrites.append(op)
 
 
     def replace(self, *args):
@@ -1212,13 +1166,14 @@ class TokenRewriteStream(CommonTokenStream):
             # last is a Token, grap the stream index from it
             last = last.index
 
-        if first > last or first < 0 or last < 0:
-            return
-        
-        self.addToSortedRewriteList(
-            programName,
-            ReplaceOp(first, last, text)
-            )
+        if first > last or first < 0 or last < 0 or last >= len(self.tokens):
+            raise ValueError(
+                "replace: range invalid: "+first+".."+last+
+                "(size="+len(self.tokens)+")")
+
+        op = ReplaceOp(self, first, last, text)
+        rewrites = self.getProgram(programName)
+        rewrites.append(op)
         
 
     def delete(self, *args):
@@ -1287,9 +1242,13 @@ class TokenRewriteStream(CommonTokenStream):
             end = len(self.tokens) - 1
         elif not isinstance(end, int):
             end = end.index
-        
+
+        # ensure start/end are in range
         if end >= len(self.tokens):
             end = len(self.tokens) - 1
+
+        if start < 0:
+            start = 0
 
         rewrites = self.programs.get(programName)
         if rewrites is None or len(rewrites) == 0:
@@ -1298,65 +1257,192 @@ class TokenRewriteStream(CommonTokenStream):
         
         buf = StringIO()
 
-        # Index of first rewrite we have not done
-        rewriteOpIndex = 0
+        # First, optimize instruction stream
+        indexToOp = self.reduceToSingleOperationPerIndex(rewrites)
 
-        tokenCursor = start
-        while ( tokenCursor >= self.MIN_TOKEN_INDEX
-                and tokenCursor <= end
-                and tokenCursor < len(self.tokens)
-                ):
-            #System.out.println("tokenCursor="+tokenCursor);
-            # execute instructions associated with this token index
-            if rewriteOpIndex < len(rewrites):
-                op = rewrites[rewriteOpIndex]
+        # Walk buffer, executing instructions and emitting tokens
+        i = start
+        while i <= end and i < len(self.tokens):
+            op = indexToOp.get(i)
+            # remove so any left have index size-1
+            try:
+                del indexToOp[i]
+            except KeyError:
+                pass
 
-                # skip all ops at lower index
-                while ( op.index < tokenCursor
-                        and rewriteOpIndex < len(rewrites)
-                        ):
-                    rewriteOpIndex += 1
-                    if rewriteOpIndex < len(rewrites):
-                        op = rewrites[rewriteOpIndex]
+            t = self.tokens[i]
+            if op is None:
+                # no operation at that index, just dump token
+                buf.write(t.text)
+                i += 1 # move to next token
 
-                # while we have ops for this token index, exec them
-                while ( tokenCursor == op.index
-                        and rewriteOpIndex < len(rewrites)
-                        ):
-                    #System.out.println("execute "+op+" at instruction "+rewriteOpIndex);
-                    tokenCursor = op.execute(buf)
-                    #System.out.println("after execute tokenCursor = "+tokenCursor);
-                    rewriteOpIndex += 1
-                    if rewriteOpIndex < len(rewrites):
-                        op = rewrites[rewriteOpIndex]
+            else:
+                i = op.execute(buf) # execute operation and skip
 
-            # dump the token at this index
-            if tokenCursor <= end:
-                buf.write(self.get(tokenCursor).text)
-                tokenCursor += 1
-        
-        # now see if there are operations (append) beyond last token index
-        for opi in range(rewriteOpIndex, len(rewrites)):
-            op = rewrites[opi]
-            
-            if op.index >= self.size():
-                op.execute(buf) # must be insertions if after last token
-
-            #System.out.println("execute "+op+" at "+opi);
-            #op.execute(buf); # must be insertions if after last token
-
+        # include stuff after end if it's last index in buffer
+        # So, if they did an insertAfter(lastValidIndex, "foo"), include
+        # foo if end==lastValidIndex.
+        if end == len(self.tokens) - 1:
+            # Scan any remaining operations after last token
+            # should be included (they will be inserts).
+            for i in sorted(indexToOp.keys()):
+                op = indexToOp[i]
+                if op.index >= len(self.tokens)-1:
+                    buf.write(op.text)
 
         return buf.getvalue()
 
     __str__ = toString
-    
+
+
+    def reduceToSingleOperationPerIndex(self, rewrites):
+        """
+        We need to combine operations and report invalid operations (like
+        overlapping replaces that are not completed nested).  Inserts to
+        same index need to be combined etc...   Here are the cases:
+
+        I.i.u I.j.v                           leave alone, nonoverlapping
+        I.i.u I.i.v                           combine: Iivu
+
+        R.i-j.u R.x-y.v | i-j in x-y          delete first R
+        R.i-j.u R.i-j.v                       delete first R
+        R.i-j.u R.x-y.v | x-y in i-j          ERROR
+        R.i-j.u R.x-y.v | boundaries overlap  ERROR
+
+        I.i.u R.x-y.v   | i in x-y            delete I
+        I.i.u R.x-y.v   | i not in x-y        leave alone, nonoverlapping
+        R.x-y.v I.i.u   | i in x-y            ERROR
+        R.x-y.v I.x.u                         R.x-y.uv (combine, delete I)
+        R.x-y.v I.i.u   | i not in x-y        leave alone, nonoverlapping
+
+        I.i.u = insert u before op @ index i
+        R.x-y.u = replace x-y indexed tokens with u
+
+        First we need to examine replaces.  For any replace op:
+
+          1. wipe out any insertions before op within that range.
+          2. Drop any replace op before that is contained completely within
+             that range.
+          3. Throw exception upon boundary overlap with any previous replace.
+
+        Then we can deal with inserts:
+
+          1. for any inserts to same index, combine even if not adjacent.
+          2. for any prior replace with same left boundary, combine this
+             insert with replace and delete this replace.
+          3. throw exception if index in same range as previous replace
+
+        Don't actually delete; make op null in list. Easier to walk list.
+        Later we can throw as we add to index -> op map.
+
+        Note that I.2 R.2-2 will wipe out I.2 even though, technically, the
+        inserted stuff would be before the replace range.  But, if you
+        add tokens in front of a method body '{' and then delete the method
+        body, I think the stuff before the '{' you added should disappear too.
+
+        Return a map from token index to operation.
+        """
+        
+        # WALK REPLACES
+        for i, rop in enumerate(rewrites):
+            if rop is None:
+                continue
+
+            if not isinstance(rop, ReplaceOp):
+                continue
+
+            # Wipe prior inserts within range
+            for j, iop in self.getKindOfOps(rewrites, InsertBeforeOp, i):
+                if iop.index >= rop.index and iop.index <= rop.lastIndex:
+                    rewrites[j] = None  # delete insert as it's a no-op.
+
+            # Drop any prior replaces contained within
+            for j, prevRop in self.getKindOfOps(rewrites, ReplaceOp, i):
+                if (prevRop.index >= rop.index
+                    and prevRop.lastIndex <= rop.lastIndex):
+                    rewrites[j] = None  # delete replace as it's a no-op.
+                    continue
+
+                # throw exception unless disjoint or identical
+                disjoint = (prevRop.lastIndex < rop.index
+                            or prevRop.index > rop.lastIndex)
+                same = (prevRop.index == rop.index
+                        and prevRop.lastIndex == rop.lastIndex)
+                if not disjoint and not same:
+                    raise ValueError(
+                        "replace op boundaries of %s overlap with previous %s"
+                        % (rop, prevRop))
+
+        # WALK INSERTS
+        for i, iop in enumerate(rewrites):
+            if iop is None:
+                continue
+
+            if not isinstance(iop, InsertBeforeOp):
+                continue
+
+            # combine current insert with prior if any at same index
+            for j, prevIop in self.getKindOfOps(rewrites, InsertBeforeOp, i):
+                if prevIop.index == iop.index: # combine objects
+                    # convert to strings...we're in process of toString'ing
+                    # whole token buffer so no lazy eval issue with any
+                    # templates
+                    iop.text = self.catOpText(iop.text, prevIop.text)
+                    rewrites[j] = None  # delete redundant prior insert
+
+            # look for replaces where iop.index is in range; error
+            for j, rop in self.getKindOfOps(rewrites, ReplaceOp, i):
+                if iop.index == rop.index:
+                    rop.text = self.catOpText(iop.text, rop.text)
+                    rewrites[i] = None  # delete current insert
+                    continue
+
+                if iop.index >= rop.index and iop.index <= rop.lastIndex:
+                    raise ValueError(
+                        "insert op %s within boundaries of previous %s"
+                        % (iop, rop))
+        
+        m = {}
+        for i, op in enumerate(rewrites):
+            if op is None:
+                continue # ignore deleted ops
+
+            assert op.index not in m, "should only be one op per index"
+            m[op.index] = op
+
+        return m
+
+
+    def catOpText(self, a, b):
+        x = ""
+        y = ""
+        if a is not None:
+            x = a
+        if b is not None:
+            y = b
+        return x + y
+
+
+    def getKindOfOps(self, rewrites, kind, before=None):
+        if before is None:
+            before = len(rewrites)
+        elif before > len(rewrites):
+            before = len(rewrites)
+
+        for i, op in enumerate(rewrites[:before]):
+            if op is None:
+                # ignore deleted
+                continue
+            if op.__class__ == kind:
+                yield i, op
+
 
     def toDebugString(self, start=None, end=None):
         if start is None:
             start = self.MIN_TOKEN_INDEX
         if end is None:
             end = self.size() - 1
-        
+
         buf = StringIO()
         i = start
         while i >= self.MIN_TOKEN_INDEX and i <= end and i < len(self.tokens):
