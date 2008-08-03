@@ -687,7 +687,156 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(boo 34)\n", found);
 	}
 
-	public void testRewriteModeWithPredicatedRewrites() throws Exception {
+    public void testRewriteOfRuleRef() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ID INT | INT ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : a -> a ;\n" +
+            "a : ID INT -> ID INT ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+        assertEquals("abc 34\n", found);
+    }
+
+    public void testRewriteOfRuleRefRoot() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT INT -> ^(INT ^(ID INT));\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(a ^(ID INT)) -> a ;\n" +
+            "a : INT ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 12 34");
+        // emits whole tree when you ref the root since I can't know whether
+        // you want the children or not.  You might be returning a whole new
+        // tree.  Hmm...still seems weird.  oh well.
+        assertEquals("(12 (abc 34))\n", found);
+    }
+
+    public void testRewriteOfRuleRefRootLabeled() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT INT -> ^(INT ^(ID INT));\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(label=a ^(ID INT)) -> a ;\n" +
+            "a : INT ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 12 34");
+        // emits whole tree when you ref the root since I can't know whether
+        // you want the children or not.  You might be returning a whole new
+        // tree.  Hmm...still seems weird.  oh well.
+        assertEquals("(12 (abc 34))\n", found);
+    }
+
+    public void testRewriteOfRuleRefRootListLabeled() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT INT -> ^(INT ^(ID INT));\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(label+=a ^(ID INT)) -> a ;\n" +
+            "a : INT ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 12 34");
+        // emits whole tree when you ref the root since I can't know whether
+        // you want the children or not.  You might be returning a whole new
+        // tree.  Hmm...still seems weird.  oh well.
+        assertEquals("(12 (abc 34))\n", found);
+    }
+
+    public void testRewriteOfRuleRefChild() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ^(ID ^(INT INT));\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(ID a) -> a ;\n" +
+            "a : ^(INT INT) ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+        assertEquals("(34 34)\n", found);
+    }
+
+    public void testRewriteOfRuleRefLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ^(ID ^(INT INT));\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(ID label=a) -> a ;\n" +
+            "a : ^(INT INT) ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+        assertEquals("(34 34)\n", found);
+    }
+
+    public void testRewriteOfRuleRefListLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ^(ID ^(INT INT));\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(ID label+=a) -> a ;\n" +
+            "a : ^(INT INT) ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+        assertEquals("(34 34)\n", found);
+    }
+
+    public void testRewriteModeWithPredicatedRewrites() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
