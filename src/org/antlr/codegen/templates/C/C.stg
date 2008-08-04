@@ -2887,8 +2887,8 @@ typedef struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStr
     pANTLR3_COMMON_TOKEN    start;
     pANTLR3_COMMON_TOKEN    stop;
 <else>
-    pANTLR3_BASE_TREE       start;
-    pANTLR3_BASE_TREE       stop;
+    <ASTLabelType>       start;
+    <ASTLabelType>       stop;
 <endif>
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">

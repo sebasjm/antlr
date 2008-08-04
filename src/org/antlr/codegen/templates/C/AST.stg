@@ -56,14 +56,14 @@ ADAPTOR->free(ADAPTOR);
 
 @returnScope.ruleReturnMembers() ::= <<
 
-pANTLR3_BASE_TREE	tree;
+<ASTLabelType>	tree;
 
 >>
 
 /** Add a variable to track rule's return AST */
 ruleDeclarations() ::= <<
 <super.ruleDeclarations()>
-pANTLR3_BASE_TREE root_0;<\n>
+<ASTLabelType> root_0;<\n>
 >>
 
 ruleInitializations() ::= <<
@@ -73,8 +73,8 @@ root_0 = NULL;<\n>
 
 ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
-<ruleDescriptor.tokenLabels:{pANTLR3_BASE_TREE <it.label.text>_tree;}; separator="\n">
-<ruleDescriptor.tokenListLabels:{pANTLR3_BASE_TREE <it.label.text>_tree;}; separator="\n">
+<ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree;}; separator="\n">
+<ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{pANTLR3_REWRITE_RULE_<rewriteElementType>_STREAM stream_<it>;}; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
@@ -408,7 +408,7 @@ rewriteEmptyAlt() ::= "root_0 = NULL; /* \<-- rewriteEmptyAlt()) */"
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
-    pANTLR3_BASE_TREE root_<treeLevel> = ADAPTOR->nilNode(ADAPTOR);
+    <ASTLabelType> root_<treeLevel> = ADAPTOR->nilNode(ADAPTOR);
     <root:rewriteElement()>
     <children:rewriteElement()>
     ADAPTOR->addChild(ADAPTOR, root_<enclosingTreeLevel>, root_<treeLevel>);
@@ -504,7 +504,7 @@ root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<label>->nextNode(stream_
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot((pANTLR3_BASE_TREE)(stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = ADAPTOR->becomeRoot((<ASTLabelType>)(stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<
