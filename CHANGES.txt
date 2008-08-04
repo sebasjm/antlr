@@ -15,6 +15,8 @@ August 4, 2008
 
 * Extra init code for tree parser nonrewrite mode removed.
 
+* Added empty child list check in becomeRoot
+
 August 3, 2008
 
 * Was using RuleReturnScope not Rulename_return for list labels in tree

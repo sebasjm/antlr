@@ -132,19 +132,21 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  efficiency.
 	 */
 	public Object becomeRoot(Object newRoot, Object oldRoot) {
-		Tree newRootTree = (Tree)newRoot;
+        //System.out.println("becomeroot new "+newRoot.toString()+" old "+oldRoot);
+        Tree newRootTree = (Tree)newRoot;
 		Tree oldRootTree = (Tree)oldRoot;
 		if ( oldRoot==null ) {
 			return newRoot;
 		}
 		// handle ^(nil real-node)
 		if ( newRootTree.isNil() ) {
-			if ( newRootTree.getChildCount()>1 ) {
+            int nc = newRootTree.getChildCount();
+            if ( nc==1 ) newRootTree = (Tree)newRootTree.getChild(0);
+            else if ( nc >1 ) {
 				// TODO: make tree run time exceptions hierarchy
 				throw new RuntimeException("more than one node as root (TODO: make exception hierarchy)");
 			}
-			newRootTree = (Tree)newRootTree.getChild(0);
-		}
+        }
 		// add oldRoot to newRoot; addChild takes care of case where oldRoot
 		// is a flat list (i.e., nil-rooted tree).  All children of oldRoot
 		// are added to newRoot.
