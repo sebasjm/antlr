@@ -2510,7 +2510,7 @@ orPredicates(operands) ::= "((<first(operands)>)<rest(operands):{o | ||(<o>)}>)"
 
 notPredicate(pred) ::= "!( <evalPredicate(...)> )"
 
-evalPredicate(pred,description) ::= "<pred>"
+evalPredicate(pred,description) ::= "(<pred>)"
 
 evalSynPredicate(pred,description) ::= "<pred>(ctx)"
 
