@@ -55,7 +55,7 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 static void
 expungeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-	if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
+	if (stream->elements != NULL)
 	{
 		stream->elements->free(stream->elements);
 	}
@@ -120,7 +120,6 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 
 	stream->cursor			= 0;
 	stream->dirty			= ANTLR3_FALSE;
-	stream->freeElements	= ANTLR3_FALSE;
 
 	// Install the description
 	//
