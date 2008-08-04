@@ -46,6 +46,10 @@ typedef struct ANTLR3_REWRITE_RULE_ELEMENT_STREAM_struct
     ///
     pANTLR3_VECTOR		  elements;
 
+    /// Indicates whether we should free the vector or it was supplied to us
+    ///
+    ANTLR3_BOOLEAN		  freeElements;
+
     /// The element or stream description; usually has name of the token or
     /// rule reference that this list tracks.  Can include rulename too, but
     /// the exception would track that info.

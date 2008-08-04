@@ -55,7 +55,7 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 static void
 expungeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
-	if (stream->elements != NULL)
+	if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
 	{
 		stream->elements->free(stream->elements);
 	}
@@ -120,6 +120,7 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 
 	stream->cursor			= 0;
 	stream->dirty			= ANTLR3_FALSE;
+	stream->freeElements	= ANTLR3_FALSE;
 
 	// Install the description
 	//
@@ -410,10 +411,11 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDE
 	// If we got here then we had only the one element so far
 	// and we must now create a vector to hold a collection of them
 	//
-	stream->elements = antlr3VectorNew(0);  // We will let the vector figure things out as it goes
+	stream->elements		= antlr3VectorNew(0);	// We will let the vector figure things out as it goes
+	stream->freeElements	= ANTLR3_TRUE;			// We 'ummed it, so we play it son.
 	stream->elements->add	(stream->elements, stream->singleElement, freePtr);
 	stream->elements->add	(stream->elements, el, freePtr);
-	stream->singleElement = NULL;
+	stream->singleElement	= NULL;
 
 	return;
 }
