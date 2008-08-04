@@ -177,12 +177,13 @@ input.replaceChildren(adaptor.getParent(retval.start),
                       retval.tree);
 <endif>
 <endif>
-<! if parser or rewrite!=true, we need to set result !>
+<! if parser or tree-parser && rewrite!=true, we need to set result !>
 <if(!TREE_PARSER)>
 <prevRuleRootRef()>.tree = root_0;
-<endif>
+<else>
 <if(!rewriteMode)>
 <prevRuleRootRef()>.tree = root_0;
+<endif>
 <endif>
 <if(backtracking)>
 }

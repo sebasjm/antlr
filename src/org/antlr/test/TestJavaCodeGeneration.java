@@ -39,13 +39,13 @@ public class TestJavaCodeGeneration extends BaseTest {
 		// LA3_1, s1 state for DFA 3, was defined twice in similar scope
 		// just wrapped in curlies and it's cool.
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"a : (| A | B) X Y\n" +
 			"  | (| A | B) X Z\n" +
 			"  ;\n" ;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"t.g", grammar, "tParser", null, false);
+				"T.g", grammar, "TParser", null, false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
@@ -53,12 +53,12 @@ public class TestJavaCodeGeneration extends BaseTest {
 	public void testLabeledNotSetsInLexer() {
 		// d must be an int
 		String grammar =
-			"lexer grammar t;\n" +
+			"lexer grammar T;\n" +
 			"A : d=~('x'|'y') e='0'..'9'\n" +
 			"  ; \n" ;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"t.g", grammar, null, "tLexer", false);
+				"T.g", grammar, null, "T", false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}

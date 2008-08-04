@@ -13,6 +13,8 @@ August 4, 2008
 
 * Added (...) are all predicate evaluations.
 
+* Extra init code for tree parser nonrewrite mode removed.
+
 August 3, 2008
 
 * Was using RuleReturnScope not Rulename_return for list labels in tree
