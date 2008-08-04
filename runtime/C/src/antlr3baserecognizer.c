@@ -1519,17 +1519,9 @@ recoverFromMismatchedToken  (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 t
 
 
 	// Neither deleting nor inserting tokens allows recovery
-	// must just report the exception we have or flag backtracking failed.
+	// must just report the exception.
 	//
-
-	if	(recognizer->state->backtracking > 0)
-	{
-		recognizer->state->failed	    = ANTLR3_TRUE;
-	}
-	else
-	{
-		recognizer->state->error	    = ANTLR3_TRUE;
-	}
+	recognizer->state->error	    = ANTLR3_TRUE;
 	return NULL;
 }
 

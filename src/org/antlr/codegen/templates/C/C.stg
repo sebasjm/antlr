@@ -1487,6 +1487,10 @@ if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
+if  (HASEXCEPTION())
+{
+    goto rule<ruleDescriptor.name>Ex;
+}
 <if(backtracking)>
 if (HASFAILED())
 {
@@ -2093,10 +2097,6 @@ ruleRef(rule,label,elementIndex,args,scope) ::= <<
 FOLLOWPUSH(FOLLOW_<rule.name>_in_<ruleName><elementIndex>);
 <if(label)><label>=<endif><if(scope)>ctx-><scope:delegateName()>-><endif><rule.name>(ctx<if(scope)>-><scope:delegateName()><endif><if(args)>, <args; separator=", "><endif>);<\n>
 FOLLOWPOP();
-if  (HASEXCEPTION())
-{
-    goto rule<ruleDescriptor.name>Ex;
-}
 <checkRuleBacktrackFailure()>
 >>
 
@@ -2340,10 +2340,6 @@ dfaEdgeSwitch(labels, targetState) ::= <<
  */
 dfaDecision(decisionNumber,description) ::= <<
 alt<decisionNumber> = cdfa<decisionNumber>.predict(ctx, RECOGNIZER, ISTREAM, &cdfa<decisionNumber>);
-if  (HASEXCEPTION())
-{
-    goto rule<ruleDescriptor.name>Ex;
-}
 <checkRuleBacktrackFailure()>
 >>
 
