@@ -9,7 +9,9 @@ CHANGES
 
 August 4, 2008
 
-* FOLLOW set computations altered constant FOLLOW bit sets
+* FOLLOW set computations altered constant FOLLOW bit sets.
+
+* Added (...) are all predicate evaluations.
 
 August 3, 2008
 
