@@ -44,6 +44,7 @@ parserMembers() ::= <<
 protected TreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
 public void setTreeAdaptor(TreeAdaptor adaptor) {
     this.adaptor = adaptor;
+    <grammar.directDelegates:{g|<g:delegateName()>.setTreeAdaptor(this.adaptor);}>
 }
 public TreeAdaptor getTreeAdaptor() {
     return adaptor;

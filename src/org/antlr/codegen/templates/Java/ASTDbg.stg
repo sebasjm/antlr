@@ -32,10 +32,14 @@
 group ASTDbg;
 
 parserMembers() ::= <<
-protected DebugTreeAdaptor adaptor =
-    new DebugTreeAdaptor(null,new CommonTreeAdaptor());
+protected DebugTreeAdaptor adaptor;
 public void setTreeAdaptor(TreeAdaptor adaptor) {
+<if(grammar.grammarIsRoot)>
     this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
+<else>
+    this.adaptor = (DebugTreeAdaptor)adaptor; // delegator sends dbg adaptor 
+<endif><\n>
+    <grammar.directDelegates:{g|<g:delegateName()>.setTreeAdaptor(this.adaptor);}>
 }
 public TreeAdaptor getTreeAdaptor() {
     return adaptor;
@@ -44,13 +48,11 @@ public TreeAdaptor getTreeAdaptor() {
 
 parserCtorBody() ::= <<
 <super.parserCtorBody()>
-adaptor.setDebugListener(dbg);
 >>
 
 createListenerAndHandshake() ::= <<
 DebugEventSocketProxy proxy =
     new DebugEventSocketProxy(this,port,<if(TREE_PARSER)>input.getTreeAdaptor()<else>adaptor<endif>);
-adaptor.setDebugListener(proxy);
 setDebugListener(proxy);
 set<inputStreamType>(new Debug<inputStreamType>(input,proxy));
 try {
@@ -61,16 +63,20 @@ catch (IOException ioe) {
 }
 >>
 
-ctorForPredefinedListener() ::= <<
-public <name>(<inputStreamType> input, DebugEventListener dbg) {
-    super(input, dbg);
-<if(profile)>
-    Profiler p = (Profiler)dbg;
-    p.setParser(this);<\n>
+@ctorForRootGrammar.finally() ::= <<
+setTreeAdaptor(new CommonTreeAdaptor());
+>>
+
+@ctorForProfilingRootGrammar.finally() ::=<<
+setTreeAdaptor(new CommonTreeAdaptor());
+>>
+
+@ctorForPredefinedListener.superClassRef() ::= "super(input, dbg);"
+
+@ctorForPredefinedListener.finally() ::=<<
+<if(grammar.grammarIsRoot)> <! don't create new adaptor for delegates !>
+setTreeAdaptor(new CommonTreeAdaptor());<\n>
 <endif>
-    <parserCtorBody()>
-    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-}<\n>
 >>
 
 @rewriteElement.pregen() ::= "dbg.location(<e.line>,<e.pos>);"
