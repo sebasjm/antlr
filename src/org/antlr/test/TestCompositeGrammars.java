@@ -252,7 +252,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
 		String expectedError = "error(161): /tmp/antlr3/M.g:2:8: combined grammar M cannot import combined grammar S";
-		assertEquals("unexpected errors: "+equeue, expectedError, equeue.errors.get(0).toString());
+		assertEquals("unexpected errors: "+equeue, expectedError, equeue.errors.get(0).toString().replaceFirst("\\-[0-9]+","3"));
 	}
 
 	public void testSameStringTwoNames() throws Exception {
@@ -638,7 +638,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 		String expectedError =
 			"error(161): /tmp/antlr3/M.g:2:8: tree grammar M cannot import lexer grammar S";
-		assertEquals(expectedError, equeue.errors.get(0).toString());
+		assertEquals(expectedError, equeue.errors.get(0).toString().replaceFirst("\\-[0-9]+","3"));
 	}
 
 	public void testSyntacticPredicateRulesAreNotInherited() throws Exception {
@@ -711,7 +711,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 		String expectedError =
 			"warning(105): /tmp/antlr3/M.g:3:5: no lexer rule corresponding to token: ABC";
-		assertEquals(expectedError, equeue.warnings.get(0).toString());
+		assertEquals(expectedError, equeue.warnings.get(0).toString().replaceFirst("\\-[0-9]+","3"));
 	}
 
 	/** Make sure that M can import S that imports T. */
