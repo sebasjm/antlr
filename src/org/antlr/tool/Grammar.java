@@ -1386,7 +1386,8 @@ outer:
 	*/
 
 	/** Given @scope::name {action} define it for this grammar.  Later,
-	 *  the code generator will ask for the actions table.
+	 *  the code generator will ask for the actions table.  For composite
+     *  grammars, make sure header action propogates down to all delegates.
 	 */
 	public void defineNamedAction(GrammarAST ampersandAST,
 								  String scope,
@@ -1412,7 +1413,14 @@ outer:
 		else {
 			scopeActions.put(actionName,actionAST);
 		}
-	}
+        // propogate header (regardless of scope (lexer, parser, ...) ?
+        if ( this==composite.getRootGrammar() && actionName.equals("header") ) {
+            List<Grammar> allgrammars = composite.getRootGrammar().getDelegates();
+            for (Grammar g : allgrammars) {
+                g.defineNamedAction(ampersandAST, scope, nameAST, actionAST);
+            }
+        }
+    }
 
 	public Map getActions() {
 		return actions;

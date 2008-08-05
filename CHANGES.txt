@@ -11,6 +11,9 @@ August 4, 2008
 
 * superClass works now for lexers
 
+* Made Grammar.defineNamedAction propogate header actions down to all
+  delegates if root grammar; regardless of lexer/parser scope.
+
 August 4, 2008
 
 * FOLLOW set computations altered constant FOLLOW bit sets.
