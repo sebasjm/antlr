@@ -9,6 +9,10 @@ CHANGES
 
 August 4, 2008
 
+* superClass works now for lexers
+
+August 4, 2008
+
 * FOLLOW set computations altered constant FOLLOW bit sets.
 
 * Added (...) are all predicate evaluations.

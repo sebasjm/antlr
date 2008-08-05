@@ -50,7 +50,7 @@ headerFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   scopes, superClass, literals);
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType,
-      filterMode);
+      filterMode, superClass);
 
 parser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
        bitsets, ASTLabelType, superClass,
