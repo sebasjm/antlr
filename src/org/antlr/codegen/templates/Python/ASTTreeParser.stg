@@ -62,8 +62,8 @@ noRewrite(rewriteBlockLevel, treeLevel) ::= <<
 <finishedBacktracking({
 <if(rewriteMode)>
 retval.tree = _first_0
-if self.adaptor.getParent(retval.tree) is not None and self.adaptor.isNil(self.adaptor.getParent(retval.tree)):
-    retval.tree = self.adaptor.getParent(retval.tree)
+if self._adaptor.getParent(retval.tree) is not None and self._adaptor.isNil(self._adaptor.getParent(retval.tree)):
+    retval.tree = self._adaptor.getParent(retval.tree)
 <endif>
 })>
 >>
@@ -77,7 +77,7 @@ _last = self.input.LT(1)
 _save_last_<treeLevel> = _last
 _first_<treeLevel> = None
 <if(!rewriteMode)>
-root_<treeLevel> = self.adaptor.nil()<\n>
+root_<treeLevel> = self._adaptor.nil()<\n>
 <endif>
 <root:element()>
 <if(rewriteMode)>
@@ -104,7 +104,7 @@ self.match(self.input, DOWN, None)
 self.match(self.input, UP, None)<\n>
 <endif>
 <if(!rewriteMode)>
-self.adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)<\n>
+self._adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)<\n>
 <endif>
 _last = _save_last_<treeLevel>
 
@@ -129,9 +129,9 @@ _last = self.input.LT(1)
 <if(hetero)>
 <label>_tree = <hetero>(<label>)
 <else>
-<label>_tree = self.adaptor.dupNode(<label>)
+<label>_tree = self._adaptor.dupNode(<label>)
 <endif><\n>
-self.adaptor.addChild(root_<treeLevel>, <label>_tree)
+self._adaptor.addChild(root_<treeLevel>, <label>_tree)
 })>
 <else> <! rewrite mode !>
 <finishedBacktracking({
@@ -156,9 +156,9 @@ _last = self.input.LT(1)
 <if(hetero)>
 <label>_tree = <hetero>(<label>)
 <else>
-<label>_tree = self.adaptor.dupNode(<label>)
+<label>_tree = self._adaptor.dupNode(<label>)
 <endif><\n>
-root_<treeLevel> = self.adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
+root_<treeLevel> = self._adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
 })>
 <endif>
 >>
@@ -178,9 +178,9 @@ _last = self.input.LT(1)
 <if(hetero)>
 <label>_tree = <hetero>(<label>)
 <else>
-<label>_tree = self.adaptor.dupNode(<label>)
+<label>_tree = self._adaptor.dupNode(<label>)
 <endif><\n>
-self.adaptor.addChild(root_<treeLevel>, <label>_tree)
+self._adaptor.addChild(root_<treeLevel>, <label>_tree)
 })>
 <endif>
 })>
@@ -203,9 +203,9 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <if(hetero)>
 <label>_tree = <hetero>(<label>)
 <else>
-<label>_tree = self.adaptor.dupNode(<label>)
+<label>_tree = self._adaptor.dupNode(<label>)
 <endif><\n>
-root_<treeLevel> = self.adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
+root_<treeLevel> = self._adaptor.becomeRoot(<label>_tree, root_<treeLevel>)
 })>
 <endif>
 })>
@@ -219,7 +219,7 @@ _last = self.input.LT(1)
 <super.ruleRef(...)>
 <finishedBacktracking({
 <if(!rewriteMode)>
-self.adaptor.addChild(root_<treeLevel>, <label>.tree)
+self._adaptor.addChild(root_<treeLevel>, <label>.tree)
 <else> <! rewrite mode !>
 if _first_<treeLevel> is None:
     _first_<treeLevel> = <label>.tree<\n>
@@ -239,7 +239,7 @@ _last = self.input.LT(1)
 <super.ruleRef(...)>
 <if(!rewriteMode)>
 <finishedBacktracking({
-root_<treeLevel> = self.adaptor.becomeRoot(<label>.tree, root_<treeLevel>)
+root_<treeLevel> = self._adaptor.becomeRoot(<label>.tree, root_<treeLevel>)
 })>
 <endif>
 >>
@@ -289,7 +289,7 @@ ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(!rewriteMode)>
 <finishedBacktracking({
-retval.tree = self.adaptor.rulePostProcessing(root_0)
+retval.tree = self._adaptor.rulePostProcessing(root_0)
 })>
 <endif>
 >>

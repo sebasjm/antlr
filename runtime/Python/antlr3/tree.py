@@ -1017,11 +1017,13 @@ class BaseTreeAdaptor(TreeAdaptor):
 
         # handle ^(nil real-node)
         if newRoot.isNil():
-            if newRoot.getChildCount() > 1:
+            nc = newRoot.getChildCount()
+            if nc == 1:
+                newRoot = newRoot.getChild(0)
+                
+            elif nc > 1:
                 # TODO: make tree run time exceptions hierarchy
                 raise RuntimeError("more than one node as root")
-
-            newRoot = newRoot.getChild(0)
 
         # add oldRoot to newRoot; addChild takes care of case where oldRoot
         # is a flat list (i.e., nil-rooted tree).  All children of oldRoot

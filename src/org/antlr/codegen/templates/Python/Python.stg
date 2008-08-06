@@ -94,11 +94,11 @@ if __name__ == '__main__':
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
-      filterMode) ::= <<
+      filterMode, superClass="Lexer") ::= <<
 <grammar.directDelegates:
  {g|from <g.recognizerName> import <g.recognizerName>}; separator="\n">
 
-class <grammar.recognizerName>(Lexer):
+class <grammar.recognizerName>(<@superClassName><superClass><@end>):
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 
     grammarFileName = "<fileName>"
@@ -108,7 +108,7 @@ class <grammar.recognizerName>(Lexer):
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input=None, state=None):
         if state is None:
             state = RecognizerSharedState()
-        Lexer.__init__(self, input, state)
+        <@superClassName><superClass><@end>.__init__(self, input, state)
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
         self._state.ruleMemo = {}
@@ -189,12 +189,12 @@ def nextToken(self):
 def memoize(self, input, ruleIndex, ruleStartIndex, success):
     if self._state.backtracking > 1:
         # is Lexer always superclass?
-        Lexer.memoize(self, input, ruleIndex, ruleStartIndex, success)
+        <@superClassName><superClass><@end>.memoize(self, input, ruleIndex, ruleStartIndex, success)
 
 
 def alreadyParsedRule(self, input, ruleIndex):
     if self._state.backtracking > 1:
-        return Lexer.alreadyParsedRule(self, input, ruleIndex)
+        return <@superClassName><superClass><@end>.alreadyParsedRule(self, input, ruleIndex)
     return False
 
 
@@ -1151,7 +1151,7 @@ orPredicates(operands) ::= "(<first(operands)><rest(operands):{o |  or <o>}>)"
 
 notPredicate(pred) ::= "not (<evalPredicate(...)>)"
 
-evalPredicate(pred,description) ::= "<pred>"
+evalPredicate(pred,description) ::= "(<pred>)"
 
 evalSynPredicate(pred,description) ::= "self.<pred>()"
 

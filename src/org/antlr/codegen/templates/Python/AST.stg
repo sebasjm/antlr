@@ -46,14 +46,22 @@ from antlr3.tree import *<\n>
 <endif>
 >>
 
+/** Add an adaptor property that knows how to build trees */
 @genericParser.init() ::= <<
 <@super.init()>
-<parserInit()>
+self._adaptor = CommonTreeAdaptor()
 >>
 
-/** Add an adaptor property that knows how to build trees */
-parserInit() ::= <<
-self.adaptor = CommonTreeAdaptor()<\n>
+@genericParser.members() ::= <<
+<@super.members()>
+def getTreeAdaptor(self):
+    return self._adaptor
+
+def setTreeAdaptor(self, adaptor):
+    self._adaptor = adaptor
+    <grammar.directDelegates:{g|<g:delegateName()>.adaptor = adaptor}; separator="\n">
+
+adaptor = property(getTreeAdaptor, setTreeAdaptor)
 >>
 
 @returnScope.ruleReturnInit() ::= <<
@@ -72,9 +80,9 @@ ruleLabelDefs() ::= <<
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree = None}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree = None}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it> = RewriteRule<rewriteElementType>Stream(self.adaptor, "token <it>")}; separator="\n">
+    :{stream_<it> = RewriteRule<rewriteElementType>Stream(self._adaptor, "token <it>")}; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{stream_<it> = RewriteRuleSubtreeStream(self.adaptor, "rule <it>")}; separator="\n">
+    :{stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "rule <it>")}; separator="\n">
 >>
 
 /** When doing auto AST construction, we must define some variables;
@@ -86,7 +94,7 @@ ruleLabelDefs() ::= <<
 <if(autoAST)>
 <if(outerAlt)>
 <if(!rewriteMode)>
-root_0 = self.adaptor.nil()<\n>
+root_0 = self._adaptor.nil()<\n>
 <endif>
 <endif>
 <endif>
@@ -169,7 +177,7 @@ rewriteCode(
 <finishedBacktracking({
 <prevRuleRootRef()>.tree = root_0
 <rewriteCodeLabels()>
-root_0 = self.adaptor.nil()
+root_0 = self._adaptor.nil()
 <first(alts):rewriteAltFirst(); anchor>
 
 <rest(alts):{a | el<rewriteAltRest(a)>}; anchor, separator="\n\n">
@@ -177,17 +185,17 @@ root_0 = self.adaptor.nil()
 <! if tree parser and rewrite=true !>
 <if(TREE_PARSER)>
 <if(rewriteMode)>
-<prevRuleRootRef()>.tree = self.adaptor.rulePostProcessing(root_0)
+<prevRuleRootRef()>.tree = self._adaptor.rulePostProcessing(root_0)
 self.input.replaceChildren(
-    self.adaptor.getParent(retval.start),
-    self.adaptor.getChildIndex(retval.start),
-    self.adaptor.getChildIndex(_last),
+    self._adaptor.getParent(retval.start),
+    self._adaptor.getChildIndex(retval.start),
+    self._adaptor.getChildIndex(_last),
     retval.tree
     )<\n>
 <endif>
 <endif>
 
-<! if parser or rewrite!=true, we need to set result !>
+<! if parser or tree-parser and rewrite!=true, we need to set result !>
 <if(!TREE_PARSER)>
 <prevRuleRootRef()>.tree = root_0<\n>
 <else>
@@ -200,24 +208,24 @@ self.input.replaceChildren(
 
 rewriteCodeLabels() ::= <<
 <referencedTokenLabels
-    :{stream_<it> = RewriteRule<rewriteElementType>Stream(self.adaptor, "token <it>", <it>)};
+    :{stream_<it> = RewriteRule<rewriteElementType>Stream(self._adaptor, "token <it>", <it>)};
     separator="\n"
 >
 <referencedTokenListLabels
-    :{stream_<it> = RewriteRule<rewriteElementType>Stream(self.adaptor, "token <it>", list_<it>)};
+    :{stream_<it> = RewriteRule<rewriteElementType>Stream(self._adaptor, "token <it>", list_<it>)};
     separator="\n"
 >
 <referencedRuleLabels
     :{
 if <it> is not None:
-    stream_<it> = RewriteRuleSubtreeStream(self.adaptor, "token <it>", <it>.tree)
+    stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "token <it>", <it>.tree)
 else:
-    stream_<it> = RewriteRuleSubtreeStream(self.adaptor, "token <it>", None)
+    stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "token <it>", None)
 };
     separator="\n"
 >
 <referencedRuleListLabels
-    :{stream_<it> = RewriteRuleSubtreeStream(self.adaptor, "token <it>", list_<it>)};
+    :{stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "token <it>", list_<it>)};
     separator="\n"
 >
 >>
@@ -295,10 +303,10 @@ rewriteEmptyAlt() ::= "root_0 = None"
 
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 # <fileName>:<description>
-root_<treeLevel> = self.adaptor.nil()
+root_<treeLevel> = self._adaptor.nil()
 <root:rewriteElement()>
 <children:rewriteElement()>
-self.adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)<\n>
+self._adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>)<\n>
 >>
 
 rewriteElementList(elements) ::= "<elements:rewriteElement()>"
@@ -310,22 +318,22 @@ rewriteElement(e) ::= <<
 
 /** Gen ID or ID[args] */
 rewriteTokenRef(token,elementIndex,hetero,args) ::= <<
-self.adaptor.addChild(root_<treeLevel>, <createRewriteNodeFromElement(...)>)<\n>
+self._adaptor.addChild(root_<treeLevel>, <createRewriteNodeFromElement(...)>)<\n>
 >>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextNode())<\n>
+self._adaptor.addChild(root_<treeLevel>, stream_<label>.nextNode())<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextNode())<\n>
+self._adaptor.addChild(root_<treeLevel>, stream_<label>.nextNode())<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
 >>
 
 /** Gen ^($label ...) where label+=... */
@@ -333,15 +341,15 @@ rewriteTokenListLabelRefRoot ::= rewriteTokenLabelRefRoot
 
 /** Gen ^(ID ...) or ^(ID[args] ...) */
 rewriteTokenRefRoot(token,elementIndex,hetero,args) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(<createRewriteNodeFromElement(...)>, root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(<createRewriteNodeFromElement(...)>, root_<treeLevel>)<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
-self.adaptor.addChild(root_<treeLevel>, <createImaginaryNode(tokenType=token, ...)>)<\n>
+self._adaptor.addChild(root_<treeLevel>, <createImaginaryNode(tokenType=token, ...)>)<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,hetero,elementIndex) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(<createImaginaryNode(tokenType=token, ...)>, root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(<createImaginaryNode(tokenType=token, ...)>, root_<treeLevel>)<\n>
 >>
 
 /** plain -> {foo} action */
@@ -358,39 +366,39 @@ root_0 = <action><\n>
 prevRuleRootRef() ::= "retval"
 
 rewriteRuleRef(rule) ::= <<
-self.adaptor.addChild(root_<treeLevel>, stream_<rule>.nextTree())<\n>
+self._adaptor.addChild(root_<treeLevel>, stream_<rule>.nextTree())<\n>
 >>
 
 rewriteRuleRefRoot(rule) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(stream_<rule>.nextNode(), root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(stream_<rule>.nextNode(), root_<treeLevel>)<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
-self.adaptor.addChild(root_<treeLevel>, <action>)<\n>
+self._adaptor.addChild(root_<treeLevel>, <action>)<\n>
 >>
 
 rewriteNodeActionRoot(action) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(<action>, root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(<action>, root_<treeLevel>)<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
 rewriteRuleLabelRef(label) ::= <<
-self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
+self._adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-self.adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
+self._adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = self.adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
+root_<treeLevel> = self._adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<
@@ -398,16 +406,16 @@ createImaginaryNode(tokenType,hetero,args) ::= <<
 <! new MethodNode(IDLabel, args) !>
 <hetero>(<tokenType><if(args)>, <args; separator=", "><endif>)
 <else>
-<if (!args)>self.adaptor.createFromType(<tokenType>, "<tokenType>")
-<else>self.adaptor.create(<tokenType>, <args; separator=", ">)
+<if (!args)>self._adaptor.createFromType(<tokenType>, "<tokenType>")
+<else>self._adaptor.create(<tokenType>, <args; separator=", ">)
 <endif>
 <endif>
 >>
 
 //<! need to call different adaptor.create*() methods depending of argument count !>
-//<if (!args)>self.adaptor.createFromType(<tokenType>, "<tokenType>")
-//<else><if (!rest(args))>self.adaptor.createFromType(<tokenType>, <first(args)>)
-//<else><if (!rest(rest(args)))>self.adaptor.createFromToken(<tokenType>, <first(args)>, <first(rest(args))>)
+//<if (!args)>self._adaptor.createFromType(<tokenType>, "<tokenType>")
+//<else><if (!rest(args))>self._adaptor.createFromType(<tokenType>, <first(args)>)
+//<else><if (!rest(rest(args)))>self._adaptor.createFromToken(<tokenType>, <first(args)>, <first(rest(args))>)
 //<endif>
 //<endif>
 //<endif>
@@ -419,9 +427,9 @@ createRewriteNodeFromElement(token,hetero,args) ::= <<
 <else>
 <if(args)> <! must create new node from old !>
 <! need to call different adaptor.create*() methods depending of argument count !>
-<if (!args)>self.adaptor.createFromType(<token>, "<token>")
-<else><if (!rest(args))>self.adaptor.createFromToken(<token>, <first(args)>)
-<else><if (!rest(rest(args)))>self.adaptor.createFromToken(<token>, <first(args)>, <first(rest(args))>)
+<if (!args)>self._adaptor.createFromType(<token>, "<token>")
+<else><if (!rest(args))>self._adaptor.createFromToken(<token>, <first(args)>)
+<else><if (!rest(rest(args)))>self._adaptor.createFromToken(<token>, <first(args)>, <first(rest(args))>)
 <endif>
 <endif>
 <endif>
