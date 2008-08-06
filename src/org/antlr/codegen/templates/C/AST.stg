@@ -56,7 +56,7 @@ ADAPTOR->free(ADAPTOR);
 
 @returnScope.ruleReturnMembers() ::= <<
 
-<ASTLabelType>	tree;
+<recognizer.ASTLabelType>	tree;
 
 >>
 
@@ -115,7 +115,9 @@ ruleLabelInitVal(label) ::= <<
 @alt.initializations() ::= <<
 <if(autoAST)>
 <if(outerAlt)>
-root_0 = ADAPTOR->nilNode(ADAPTOR);<\n>
+<if(!rewriteMode)>
+root_0 = (<ASTLabelType>)(ADAPTOR->nilNode(ADAPTOR));<\n>
+<endif>
 <endif>
 <endif>
 >>
@@ -252,14 +254,14 @@ if ( BACKTRACKING==0 ) <\n>
 {
 	<rewriteCodeLabelsDecl()>
 	<rewriteCodeLabelsInit()>
-	root_0			    = ADAPTOR->nilNode(ADAPTOR);
+	root_0			    = (<ASTLabelType>)(ADAPTOR->nilNode(ADAPTOR));
 	<prevRuleRootRef()>.tree    = root_0;
 	<alts:rewriteAlt(); separator="else ">
-	<if(rewriteMode)>
 	<if(TREE_PARSER)>
-	<prevRuleRootRef()>.tree = ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
+	<if(rewriteMode)>
+	<prevRuleRootRef()>.tree = (<ASTLabelType>)(ADAPTOR->rulePostProcessing(ADAPTOR, root_0));
 	INPUT->replaceChildren(INPUT, ADAPTOR->getParent(ADAPTOR, retval.start),
-                      ADAPTOR->.getChildIndex(ADAPTOR, retval.start),
+                      ADAPTOR->getChildIndex(ADAPTOR, retval.start),
                       ADAPTOR->getChildIndex(ADAPTOR, _last),
                       retval.tree);
 	<endif>
@@ -408,7 +410,7 @@ rewriteEmptyAlt() ::= "root_0 = NULL; /* \<-- rewriteEmptyAlt()) */"
 rewriteTree(root,children,description,enclosingTreeLevel,treeLevel) ::= <<
 // <fileName>:<description>
 {
-    <ASTLabelType> root_<treeLevel> = ADAPTOR->nilNode(ADAPTOR);
+    <ASTLabelType> root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->nilNode(ADAPTOR));
     <root:rewriteElement()>
     <children:rewriteElement()>
     ADAPTOR->addChild(ADAPTOR, root_<enclosingTreeLevel>, root_<treeLevel>);
@@ -440,7 +442,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextNode(stream_<la
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->nextToken(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->nextToken(stream_<label>), root_<treeLevel>));<\n>
 >>
 
 /** Gen ^($label ...) where label+=... */
@@ -448,7 +450,7 @@ rewriteTokenListLabelRefRoot ::= rewriteTokenLabelRefRoot
 
 /** Gen ^(ID ...) or ^(ID[args] ...) */
 rewriteTokenRefRoot(token,elementIndex,hetero,args) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createRewriteNodeFromElement(...)>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <createRewriteNodeFromElement(...)>, root_<treeLevel>));<\n>
 >>
 
 rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
@@ -456,7 +458,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <createImaginaryNode(tokenType=toke
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,hetero,elementIndex) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <createImaginaryNode(tokenType=token, ...)>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <createImaginaryNode(tokenType=token, ...)>, root_<treeLevel>));<\n>
 >>
 
 /** plain -> {foo} action */
@@ -476,7 +478,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<rule>->nextTree(stream_<rul
 >>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<rule>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<rule>), root_<treeLevel>));<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
@@ -484,7 +486,7 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <action>);<\n>
 >>
 
 rewriteNodeActionRoot(action) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, <action>, root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <action>, root_<treeLevel>));<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
@@ -499,12 +501,12 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextTree(stream_<la
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot(ADAPTOR, stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = ADAPTOR->becomeRoot((<ASTLabelType>)(stream_<label>->nextNode(stream_<label>), root_<treeLevel>);<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot((<ASTLabelType>)(stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<

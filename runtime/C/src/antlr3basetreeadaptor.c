@@ -56,41 +56,70 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 	//
 	if	(debugger == NULL)
 	{
-		adaptor->nilNode				= nilNode;
-		adaptor->addChild				= addChild;
-		adaptor->becomeRoot				= becomeRoot;
-		adaptor->addChildToken			= addChildToken;
-		adaptor->becomeRootToken		= becomeRootToken;
-		adaptor->createTypeToken		= createTypeToken;
-		adaptor->createTypeTokenText	= createTypeTokenText;
-		adaptor->createTypeText			= createTypeText;
-		adaptor->dupTree				= dupTree;
+		adaptor->nilNode				= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR)) 								
+																				nilNode;
+		adaptor->addChild				= (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))								
+																				addChild;
+		adaptor->becomeRoot				= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))				
+																				becomeRoot;
+		adaptor->addChildToken			= (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN))	
+																				addChildToken;
+		adaptor->becomeRootToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN, void *))	
+																				becomeRootToken;
+		adaptor->createTypeToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_COMMON_TOKEN))
+																				createTypeToken;
+		adaptor->createTypeTokenText	= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_COMMON_TOKEN, pANTLR3_UINT8))
+																				createTypeTokenText;
+		adaptor->createTypeText			= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_UINT8))
+																				createTypeText;
+		adaptor->dupTree				= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))		 				
+																				dupTree;
 	}
 	else
 	{
-		adaptor->nilNode					= dbgNil;
-		adaptor->addChild				= dbgAddChild;
-		adaptor->becomeRoot				= dbgBecomeRoot;
-		adaptor->addChildToken			= dbgAddChildToken;
-		adaptor->becomeRootToken		= dbgBecomeRootToken;
-		adaptor->createTypeToken		= dbgCreateTypeToken;
-		adaptor->createTypeTokenText	= dbgCreateTypeTokenText;
-		adaptor->createTypeText			= dbgCreateTypeText;
-		adaptor->dupTree				= dbgDupTree;
+		adaptor->nilNode				= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR))
+                                                                                dbgNil;
+		adaptor->addChild				= (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))
+                                                                                dbgAddChild;
+		adaptor->becomeRoot				= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))
+																				dbgBecomeRoot;
+		adaptor->addChildToken			= (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN))
+                                                                                dbgAddChildToken;
+		adaptor->becomeRootToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN, void *))
+                                                                                dbgBecomeRootToken;
+		adaptor->createTypeToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_COMMON_TOKEN))
+                                                                                dbgCreateTypeToken;
+		adaptor->createTypeTokenText	= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_COMMON_TOKEN, pANTLR3_UINT8))
+                                                                                dbgCreateTypeTokenText;
+		adaptor->createTypeText			= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_UINT8))
+                                                                                dbgCreateTypeText;
+		adaptor->dupTree				= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                dbgDupTree;
 		debugger->adaptor				= adaptor;
 	}
 
-	adaptor->dupTreeTT				=  dupTreeTT;
-	adaptor->rulePostProcessing		=  rulePostProcessing;
-	adaptor->getType				=  getType;
-	adaptor->setType				=  setType;
-	adaptor->getText				=  getText;
-	adaptor->setText8				=  setText8;
-	adaptor->setText				=  setText;
-	adaptor->getChild				=  getChild;
-	adaptor->getChildCount			=  getChildCount;
-	adaptor->getUniqueID			=  getUniqueID;
-	adaptor->isNilNode					=  isNilNode;
+	adaptor->dupTreeTT				=  (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))
+                                                                                dupTreeTT;
+	adaptor->rulePostProcessing		=  (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                rulePostProcessing;
+	adaptor->getType				=  (ANTLR3_UINT32 (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                getType;
+	adaptor->setType				=  (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, ANTLR3_UINT32))
+																				setType;
+	adaptor->getText				=  (pANTLR3_STRING (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                getText;
+	adaptor->setText8				=  (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_UINT8))
+																				setText8;
+	adaptor->setText				=  (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_STRING))
+                                                                                setText;
+	adaptor->getChild				=  (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, ANTLR3_UINT32))
+                                                                                getChild;
+	adaptor->getChildCount			=  (ANTLR3_UINT32 (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                getChildCount;
+	adaptor->getUniqueID			=  (ANTLR3_UINT32 (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                getUniqueID;
+	adaptor->isNilNode				=  (ANTLR3_BOOLEAN (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                                                isNilNode;
 
 	
 	/* Remaining functions filled in by the caller.

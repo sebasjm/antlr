@@ -70,23 +70,40 @@ ANTLR3_TREE_ADAPTORNew(pANTLR3_STRING_FACTORY strFactory)
 
 	// Install our interface overrides.
 	//
-	cta->baseAdaptor.dupNode				=  dupNode;
-	cta->baseAdaptor.create					=  create;
-	cta->baseAdaptor.createToken			=  createToken;
-	cta->baseAdaptor.createTokenFromToken   =  createTokenFromToken;
-	cta->baseAdaptor.setTokenBoundaries	    =  setTokenBoundaries;
-	cta->baseAdaptor.getTokenStartIndex	    =  getTokenStartIndex;
-	cta->baseAdaptor.getTokenStopIndex	    =  getTokenStopIndex;
-	cta->baseAdaptor.getText				=  getText;
-	cta->baseAdaptor.getType				=  getType;
-	cta->baseAdaptor.getChild				=  getChild;
-	cta->baseAdaptor.setChild				=  setChild;
-	cta->baseAdaptor.deleteChild			=  deleteChild;
-	cta->baseAdaptor.getChildCount			=  getChildCount;
-	cta->baseAdaptor.free					=  ctaFree;
-	cta->baseAdaptor.setDebugEventListener	=  setDebugEventListener;
-	cta->baseAdaptor.replaceChildren		=  replaceChildren;
-	cta->baseAdaptor.errorNode				=  errorNode;
+	cta->baseAdaptor.dupNode				=  (void * (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+													dupNode;
+	cta->baseAdaptor.create					=  (void * (*) (pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN))
+													create;
+	cta->baseAdaptor.createToken			=  
+													createToken;
+	cta->baseAdaptor.createTokenFromToken   =  
+													createTokenFromToken;
+	cta->baseAdaptor.setTokenBoundaries	    =  (void   (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN, pANTLR3_COMMON_TOKEN))
+													setTokenBoundaries;
+	cta->baseAdaptor.getTokenStartIndex	    =  (ANTLR3_MARKER  (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                    getTokenStartIndex;
+	cta->baseAdaptor.getTokenStopIndex	    =  (ANTLR3_MARKER  (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                    getTokenStopIndex;
+	cta->baseAdaptor.getText				=  (pANTLR3_STRING (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                    getText;
+	cta->baseAdaptor.getType				=  (ANTLR3_UINT32  (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                    getType;
+	cta->baseAdaptor.getChild				=  (void * (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, ANTLR3_UINT32))
+                                                    getChild;
+	cta->baseAdaptor.setChild				=  (void   (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, ANTLR3_UINT32, void *))
+                                                    setChild;
+	cta->baseAdaptor.deleteChild			=  (void   (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, ANTLR3_UINT32))
+                                                    deleteChild;
+	cta->baseAdaptor.getChildCount			=  (ANTLR3_UINT32  (*) (pANTLR3_BASE_TREE_ADAPTOR, void *))
+                                                    getChildCount;
+	cta->baseAdaptor.free					=  (void  (*) (pANTLR3_BASE_TREE_ADAPTOR))
+                                                    ctaFree;
+	cta->baseAdaptor.setDebugEventListener	=  
+													setDebugEventListener;
+	cta->baseAdaptor.replaceChildren		=  (void   (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, ANTLR3_INT32, ANTLR3_INT32, void *))
+                                                    replaceChildren;
+	cta->baseAdaptor.errorNode				=  (void * (*) (pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_TOKEN_STREAM, pANTLR3_COMMON_TOKEN, pANTLR3_COMMON_TOKEN, pANTLR3_EXCEPTION))
+                                                    errorNode;
 
 	// Install the super class pointer
 	//
@@ -130,8 +147,10 @@ ANTLR3_TREE_ADAPTORDebugNew(pANTLR3_STRING_FACTORY strFactory, pANTLR3_DEBUG_EVE
 		// Reinitialize as a debug version
 		//
 		antlr3BaseTreeAdaptorInit(ta, debugger);
-		ta->create				= dbgCreate;
-		ta->setTokenBoundaries	= dbgSetTokenBoundaries;
+		ta->create				= (void * (*) (pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN))
+									dbgCreate;
+		ta->setTokenBoundaries	= (void   (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN, pANTLR3_COMMON_TOKEN))
+									dbgSetTokenBoundaries;
 	}
 
 	return	ta;
@@ -146,8 +165,10 @@ setDebugEventListener	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT_LI
 	//
 	antlr3BaseTreeAdaptorInit(adaptor, debugger);
 
-	adaptor->create				= dbgCreate;
-	adaptor->setTokenBoundaries	= dbgSetTokenBoundaries;
+	adaptor->create				= (void * (*) (pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN))
+                                    dbgCreate;
+	adaptor->setTokenBoundaries	= (void   (*) (pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN, pANTLR3_COMMON_TOKEN))
+                                    dbgSetTokenBoundaries;
 
 }
 

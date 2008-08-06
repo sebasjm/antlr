@@ -891,11 +891,11 @@ ANTLR3_API p<name> <name>New
 ANTLR3_API p<name> <name>NewSSD         
 (pANTLR3_INPUT_STREAM instream, pANTLR3_RECOGNIZER_SHARED_STATE state<grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>)
 {
-    p<name> lexCtx; // Context structure we will build and return
+    p<name> ctx; // Context structure we will build and return
 
-    lexCtx = (p<name>) ANTLR3_MALLOC(sizeof(<name>));
+    ctx = (p<name>) ANTLR3_MALLOC(sizeof(<name>));
 
-    if  (lexCtx == NULL)
+    if  (ctx == NULL)
     {
         // Failed to allocate memory for lexer context
         return  NULL;
@@ -914,64 +914,64 @@ ANTLR3_API p<name> <name>NewSSD
     
     /* Create a base lexer, using the supplied input stream
      */
-    lexCtx->pLexer	= antlr3LexerNewStream(ANTLR3_SIZE_HINT, instream, state);
+    ctx->pLexer	= antlr3LexerNewStream(ANTLR3_SIZE_HINT, instream, state);
     
     /* Check that we allocated the memory correctly
      */
-    if	(lexCtx->pLexer == NULL)
+    if	(ctx->pLexer == NULL)
     {
-		ANTLR3_FREE(lexCtx);
+		ANTLR3_FREE(ctx);
 		return  NULL;
     }
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
     // Create a LIST for recording rule memos.
     //
-    lexCtx->pLexer->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */
+    ctx->pLexer->rec->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */
 <endif>
 <endif>
 
     /* Install the implementation of our <name> interface
      */
-    <rules:{r | <if(!r.ruleDescriptor.isSynPred)>lexCtx->m<r.ruleDescriptor.name>	= m<r.ruleDescriptor.name>;<endif>}; separator="\n";>
+    <rules:{r | <if(!r.ruleDescriptor.isSynPred)>ctx->m<r.ruleDescriptor.name>	= m<r.ruleDescriptor.name>;<endif>}; separator="\n";>
     
     /** When the nextToken() call is made to this lexer's pANTLR3_TOKEN_SOURCE
      *  it will call mTokens() in this generated code, and will pass it the ctx
      * pointer of this lexer, not the context of the base lexer, so store that now.
      */
-    lexCtx->pLexer->ctx	    = lexCtx;
+    ctx->pLexer->ctx	    = ctx;
     
     /**Install the token matching function
      */
-    lexCtx->pLexer->mTokens = (void (*) (void *))(mTokens);
+    ctx->pLexer->mTokens = (void (*) (void *))(mTokens);
     
-    lexCtx->getGrammarFileName	= getGrammarFileName;
-    lexCtx->free		= <name>Free;
+    ctx->getGrammarFileName	= getGrammarFileName;
+    ctx->free		= <name>Free;
 
 <if(grammar.directDelegates)>
 	// Initialize the lexers that we are going to delegate some
 	// functions to.
 	//
 	<grammar.directDelegates:
-         {g|lexCtx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, lexCtx->pLexer->rec->state, lexCtx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
+         {g|ctx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, ctx->pLexer->rec->state, ctx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
 <endif>    
 <if(grammar.delegators)>
 	// Install the pointers back to lexers that will delegate us to perform certain functions
 	// for them.
 	//
 	<grammar.delegators:
-         {g|lexCtx-><g:delegateName()>			= <g:delegateName()>;}; separator="\n">
+         {g|ctx-><g:delegateName()>			= <g:delegateName()>;}; separator="\n">
 <endif>    
 <if(filterMode)>
     /* We have filter mode turned on, so install the filtering nextToken function
      */
-    lexCtx->pLexer->rec->state->tokSource->nextToken = <name>NextToken;
+    ctx->pLexer->rec->state->tokSource->nextToken = <name>NextToken;
 <endif>
 	 <actions.lexer.apifuncs>
 
     /* Return the newly built lexer to the caller
      */
-    return  lexCtx;
+    return  ctx;
 }
 <if(cyclicDFAs)>
 
@@ -2887,8 +2887,8 @@ typedef struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStr
     pANTLR3_COMMON_TOKEN    start;
     pANTLR3_COMMON_TOKEN    stop;
 <else>
-    <recognizer.grammar.ASTLabelType>       start;
-    <recognizer.grammar.ASTLabelType>       stop;
+    <recognizer.ASTLabelType>       start;
+    <recognizer.ASTLabelType>       stop;
 <endif>
     <@ruleReturnMembers()>   
     <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
