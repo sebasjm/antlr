@@ -196,6 +196,12 @@ freeBR	    (pANTLR3_BASE_RECOGNIZER recognizer)
 			recognizer->state->rStreams->free(recognizer->state->rStreams);
 		}
 
+		// Free up any token factory we created (error recovery for instance)
+		//
+		if	(recognizer->state->tokFactory != NULL)
+		{
+			recognizer->state->tokFactory->close(recognizer->state->tokFactory);
+		}
 		// Free the shared state memory
 		//
 		ANTLR3_FREE(recognizer->state);

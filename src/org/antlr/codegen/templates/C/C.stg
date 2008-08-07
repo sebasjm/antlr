@@ -893,7 +893,7 @@ ANTLR3_API p<name> <name>NewSSD
 {
     p<name> ctx; // Context structure we will build and return
 
-    ctx = (p<name>) ANTLR3_MALLOC(sizeof(<name>));
+    ctx = (p<name>) ANTLR3_CALLOC(1, sizeof(<name>));
 
     if  (ctx == NULL)
     {
@@ -1190,7 +1190,7 @@ ANTLR3_API p<name>
 {
     p<name> ctx;	    /* Context structure we will build and return   */
     
-    ctx	= (p<name>) ANTLR3_MALLOC(sizeof(<name>));
+    ctx	= (p<name>) ANTLR3_CALLOC(1, sizeof(<name>));
     
     if	(ctx == NULL)
     {
@@ -2794,7 +2794,7 @@ static <scopeType(sname=scope.name)>
 
     /* Allocate the memory for a new structure
      */
-    newAttributes = (<scopeType(sname=scope.name)>) ANTLR3_MALLOC(sizeof(<scopeStruct(sname=scope.name)>));
+    newAttributes = (<scopeType(sname=scope.name)>) ANTLR3_CALLOC(1, sizeof(<scopeStruct(sname=scope.name)>));
 
     if  (newAttributes != NULL)
     {

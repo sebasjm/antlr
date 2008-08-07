@@ -518,10 +518,18 @@ reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 	ctns->p									= -1;
 	ctns->tnstream->istream->lastMarker		= 0;
 
-	if	(ctns->nodeStack != NULL)
-	{
-		ctns->nodeStack->free(ctns->nodeStack);
-		ctns->nodeStack = antlr3StackNew(INITIAL_CALL_STACK_SIZE);
+
+	// Free and reset the node stack only if this is not
+	// a rewriter, which is going to reuse the originating
+	// node streams node stack
+	//
+	if  (ctns->isRewriter != ANTLR3_TRUE)
+    {
+		if	(ctns->nodeStack != NULL)
+		{
+			ctns->nodeStack->free(ctns->nodeStack);
+			ctns->nodeStack = antlr3StackNew(INITIAL_CALL_STACK_SIZE);
+		}
 	}
 }
 

@@ -1517,7 +1517,7 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
 {
 	pANTLR3_INT_TRIE	trie;
 
-	trie    = (pANTLR3_INT_TRIE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));	/* Base memory required	*/
+	trie    = (pANTLR3_INT_TRIE) ANTLR3_CALLOC(1, sizeof(ANTLR3_INT_TRIE));	/* Base memory required	*/
 
 	if (trie == NULL)
 	{
@@ -1528,7 +1528,7 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
 	 * to use the tree as we don't have to do anything special 
 	 * for the root node.
 	 */
-	trie->root	= (pANTLR3_INT_TRIE_NODE) ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE));
+	trie->root	= (pANTLR3_INT_TRIE_NODE) ANTLR3_CALLOC(1, sizeof(ANTLR3_INT_TRIE));
 
 	if (trie->root == NULL)
 	{
@@ -1553,6 +1553,7 @@ antlr3IntTrieNew(ANTLR3_UINT32 depth)
 	 */
 	trie->root->leftN	= trie->root;
 	trie->root->rightN	= trie->root;
+	trie->count			= 0;
 
 	/* Finally, note that the key for this root node is 0 because
 	 * we use calloc() to initialise it.
@@ -1710,7 +1711,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key, ANTLR3_UINT32 type, ANTLR3
 		{
 			/* Yes, we are accepting duplicates
 			 */
-			newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_MALLOC(sizeof(ANTLR3_TRIE_ENTRY));
+			newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_CALLOC(1, sizeof(ANTLR3_TRIE_ENTRY));
 
 			if (newEnt == NULL)
 			{
@@ -1857,7 +1858,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key, ANTLR3_UINT32 type, ANTLR3
     /* We have located the correct insert point for this new key, so we need
      * to allocate our entry and insert it etc.
      */
-    nextNode	= (pANTLR3_INT_TRIE_NODE)ANTLR3_MALLOC(sizeof(ANTLR3_INT_TRIE_NODE));
+    nextNode	= (pANTLR3_INT_TRIE_NODE)ANTLR3_CALLOC(1, sizeof(ANTLR3_INT_TRIE_NODE));
     if (nextNode == NULL)
     {
 	/* All that work and no memory - bummer.
@@ -1867,7 +1868,7 @@ intTrieAdd	(pANTLR3_INT_TRIE trie, ANTLR3_INTKEY key, ANTLR3_UINT32 type, ANTLR3
 
     /* Build a new entry block for the new node
      */
-    newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_MALLOC(sizeof(ANTLR3_TRIE_ENTRY));
+    newEnt = (pANTLR3_TRIE_ENTRY)ANTLR3_CALLOC(1, sizeof(ANTLR3_TRIE_ENTRY));
 
     if (newEnt == NULL)
     {

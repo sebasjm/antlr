@@ -55,6 +55,7 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 static void
 expungeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
+
 	if (stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
 	{
 		stream->elements->free(stream->elements);
@@ -96,6 +97,8 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 		{
 			return	NULL;
 		}
+		stream->elements		= NULL;
+		stream->freeElements	= ANTLR3_FALSE;
 	}
 		// Populate the generic interface
 		//
@@ -113,14 +116,12 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 		stream->toTree			= toTree;
 		stream->free			= freeRS;
 		stream->singleElement	= NULL;
-		stream->elements		= NULL;
 
 	// Reset the stream to empty.
 	//
 
 	stream->cursor			= 0;
 	stream->dirty			= ANTLR3_FALSE;
-	stream->freeElements	= ANTLR3_FALSE;
 
 	// Install the description
 	//
@@ -393,12 +394,16 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDE
 	{
 		return;
 	}
-	if (stream->elements != NULL)
+	// As we may be reusing a stream, we may already have allocated
+	// a rewrite stream vector. If we have then is will be empty if
+	// we have either zero or just one element in the rewrite stream
+	//
+	if (stream->elements != NULL && stream->elements->count > 0)
 	{
-		// We have already started with a vector, which means we already have >1
-		// entries in the stream. So we can just add this new element to the existing
+		// We already have >1 entries in the stream. So we can just add this new element to the existing
 		// collection. 
 		//
+printf("adding to existing vector that has count %d\n", stream->elements->count);
 		stream->elements->add(stream->elements, el, freePtr);
 		return;
 	}
@@ -411,8 +416,11 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDE
 	// If we got here then we had only the one element so far
 	// and we must now create a vector to hold a collection of them
 	//
-	stream->elements		= antlr3VectorNew(0);	// We will let the vector figure things out as it goes
-	stream->freeElements	= ANTLR3_TRUE;			// We 'ummed it, so we play it son.
+	if	(stream->elements == NULL)
+	{
+		stream->elements		= antlr3VectorNew(0);	// We will let the vector figure things out as it goes
+		stream->freeElements	= ANTLR3_TRUE;			// We 'ummed it, so we play it son.
+	}
 	stream->elements->add	(stream->elements, stream->singleElement, freePtr);
 	stream->elements->add	(stream->elements, el, freePtr);
 	stream->singleElement	= NULL;
