@@ -19,6 +19,9 @@ August 7, 2008
   to the delegate constructors, forcing them to share a different
   state objects!  Changed state to this.state in Dbg.stg constructors.
 
+* Ack. messed up debug/AST.  Have to set proxy's tree adaptor; it's
+  a circular ref.  Just an ASTDbg.stg change.
+
 August 4, 2008
 
 * superClass works now for lexers

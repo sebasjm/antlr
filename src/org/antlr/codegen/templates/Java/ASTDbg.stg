@@ -64,18 +64,23 @@ catch (IOException ioe) {
 >>
 
 @ctorForRootGrammar.finally() ::= <<
-setTreeAdaptor(new CommonTreeAdaptor());
+TreeAdaptor adap = new CommonTreeAdaptor();
+setTreeAdaptor(adap);
+proxy.setTreeAdaptor(adap);
 >>
 
 @ctorForProfilingRootGrammar.finally() ::=<<
-setTreeAdaptor(new CommonTreeAdaptor());
+TreeAdaptor adap = new CommonTreeAdaptor();
+setTreeAdaptor(adap);
+proxy.setTreeAdaptor(adap);
 >>
 
 @ctorForPredefinedListener.superClassRef() ::= "super(input, dbg);"
 
 @ctorForPredefinedListener.finally() ::=<<
 <if(grammar.grammarIsRoot)> <! don't create new adaptor for delegates !>
-setTreeAdaptor(new CommonTreeAdaptor());<\n>
+TreeAdaptor adap = new CommonTreeAdaptor();
+setTreeAdaptor(adap);<\n>
 <endif>
 >>
 
