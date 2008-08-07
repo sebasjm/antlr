@@ -689,12 +689,13 @@ size	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	{
 		n = 1;
 	}
-
-	if (stream->elements != NULL)
+	else
 	{
-		return (ANTLR3_UINT32)(stream->elements->count);
+		if (stream->elements != NULL)
+		{
+			return (ANTLR3_UINT32)(stream->elements->count);
+		}
 	}
-
 	return n;
 }
 
