@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+August 7, 2008
+
+* an NFA target of EOF predicate transition in DFA cause an exception in
+  getPredicatesPerNonDeterministicAlt().
+
 August 4, 2008
 
 * superClass works now for lexers

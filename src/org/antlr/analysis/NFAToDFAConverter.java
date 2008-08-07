@@ -1597,8 +1597,10 @@ public class NFAToDFAConverter {
 					}
 					else System.out.println();
 					*/
-					if ( s.incidentEdgeLabel!=null ) {
-						if ( s.associatedASTNode==null && s.associatedASTNode.token==null ) {
+                    // We want to report getting to an NFA state with an
+                    // incoming label, unless it's EOF, w/o a predicate.
+                    if ( s.incidentEdgeLabel!=null && s.incidentEdgeLabel.label != Label.EOF ) {
+                        if ( s.associatedASTNode==null || s.associatedASTNode.token==null ) {
 							ErrorManager.internalError("no AST/token for nonepsilon target w/o predicate");
 						}
 						else {
