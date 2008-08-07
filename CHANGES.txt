@@ -12,6 +12,13 @@ August 7, 2008
 * an NFA target of EOF predicate transition in DFA cause an exception in
   getPredicatesPerNonDeterministicAlt().
 
+* Kay Roepke found a nasty bug when debugging AST-constructing
+  composite recognizers.  If the input state was null to the constructor,
+  super class constructor created a new parser state object.
+  Later, though we passed the argument state not this.state
+  to the delegate constructors, forcing them to share a different
+  state objects!  Changed state to this.state in Dbg.stg constructors.
+
 August 4, 2008
 
 * superClass works now for lexers
