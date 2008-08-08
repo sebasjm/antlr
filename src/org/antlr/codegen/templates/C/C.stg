@@ -792,7 +792,8 @@ lexer(  grammar,
         rules, 
         numRules, 
         labelType="pANTLR3_COMMON_TOKEN",
-        filterMode) ::= <<
+        filterMode,
+        superClass) ::= <<
 
 <if(filterMode)>
 /* Forward declare implementation function for ANTLR3_TOKEN_SOURCE interface when
