@@ -287,7 +287,7 @@ handshake				(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	//
 	sprintf		(message, "ANTLR %d\n", delboy->PROTOCOL_VERSION);
 	sockSend	(delboy->socket, message, (int)strlen(message));
-	sprintf		(message, "grammar \"%s\"\n", delboy->grammarFileName->chars);
+	sprintf		(message, "grammar \"%s\n", delboy->grammarFileName->chars);
 	sockSend	(delboy->socket, message, (int)strlen(message));
 	ack			(delboy);
 
