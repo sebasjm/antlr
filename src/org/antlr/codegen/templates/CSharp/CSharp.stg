@@ -67,7 +67,6 @@ namespace <actions.(actionScope).namespace>
 <@imports>
 using System;
 using Antlr.Runtime;
-using Antlr.Runtime.Debug;
 <if(TREE_PARSER)>
 using Antlr.Runtime.Tree;
 <endif>
@@ -91,9 +90,8 @@ using Hashtable 	= System.Collections.Hashtable;
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="IToken",
-      filterMode) ::= <<
-public class <grammar.recognizerName> : Lexer 
-{
+      filterMode, superClass="Lexer") ::= <<
+public class <grammar.recognizerName> : <@superClassName><superClass><@end> {
     <tokens:{public const int <it.name> = <it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
@@ -497,7 +495,7 @@ ruleLabelDefs() ::= <<
     :{IList list_<it.label.text> = null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|<ruleLabelType(referencedRule=ll.referencedRule)> <ll.label.text> = null;}; separator="\n">
 >>
 
 lexerRuleLabelDefs() ::= <<
@@ -1096,11 +1094,7 @@ static readonly short[][] DFA<dfa.decisionNumber>_transition = DFA.UnpackEncoded
 protected class DFA<dfa.decisionNumber> : DFA
 {
     <@debugMember()>
-    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer) : this(recognizer, null)
-    {
-    }
-
-    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer, IDebugEventListener dbg) 
+    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer)
     {
         this.recognizer = recognizer;
         this.decisionNumber = <dfa.decisionNumber>;
@@ -1108,11 +1102,12 @@ protected class DFA<dfa.decisionNumber> : DFA
         this.eof = DFA<dfa.decisionNumber>_eof;
         this.min = DFA<dfa.decisionNumber>_min;
         this.max = DFA<dfa.decisionNumber>_max;
-        this.accept     = DFA<dfa.decisionNumber>_accept;
-        this.special    = DFA<dfa.decisionNumber>_special;
+        this.accept = DFA<dfa.decisionNumber>_accept;
+        this.special = DFA<dfa.decisionNumber>_special;
         this.transition = DFA<dfa.decisionNumber>_transition;
-	<@debugConstructorCalls()>
+
     }
+    <@dbgCtor()>
 
     override public string Description
     {
@@ -1193,7 +1188,7 @@ orPredicates(operands) ::= "(<first(operands)><rest(operands):{o | || <o>}>)"
 
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
-evalPredicate(pred,description) ::= "<pred>"
+evalPredicate(pred,description) ::= "(<pred>)"
 
 evalSynPredicate(pred,description) ::= "<pred>()"
 

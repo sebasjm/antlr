@@ -121,6 +121,9 @@ namespace Antlr.Runtime
 		
 		protected internal class RewriteOperation
 		{
+	        /** What index into rewrites List are we? */
+	        protected internal int instructionIndex;
+	        /** Token buffer index. */
 			protected internal int index;
 			protected internal object text;
 			protected internal TokenRewriteStream parent;
@@ -333,6 +336,7 @@ namespace Antlr.Runtime
 			}
 			RewriteOperation op = new ReplaceOp(from, to, text, this);
 			IList rewrites = GetProgram(programName);
+			op.instructionIndex = rewrites.Count;
 			rewrites.Add(op);
 		}
 		
@@ -441,6 +445,11 @@ namespace Antlr.Runtime
 		public virtual string ToString(string programName, int start, int end)
 		{
 			IList rewrites = (IList) programs[programName];
+
+	        // ensure start/end are in range
+	        if ( end>tokens.Count-1 ) end = tokens.Count-1;
+	        if ( start<0 ) start = 0;
+
 			if ( (rewrites == null) || (rewrites.Count == 0) )
 			{
 				return ToOriginalString(start, end); // no instructions to execute
@@ -451,8 +460,8 @@ namespace Antlr.Runtime
 			IDictionary indexToOp = ReduceToSingleOperationPerIndex(rewrites);
 
 			// Walk buffer, executing instructions and emitting tokens
-			int i = 0;
-			while ( i < tokens.Count ) {
+			int i = start;
+			while ( i <= end && i < tokens.Count ) {
 				RewriteOperation op = (RewriteOperation)indexToOp[i];
 				indexToOp.Remove(i); // remove so any left have index size-1
 				IToken t = (IToken) tokens[i];
@@ -465,15 +474,20 @@ namespace Antlr.Runtime
 					i = op.Execute(buf); // execute operation and skip
 				}
 			}
-			
-			// any ops left must be at end of buffer: size-1 index
-			// in fact, must be inserts
-			IEnumerator iter = indexToOp.Values.GetEnumerator();
-			while (iter.MoveNext()) {
-				InsertBeforeOp iop = (InsertBeforeOp)iter.Current;
-				buf.Append(iop.text);
-			}
-			return buf.ToString();
+
+	        // include stuff after end if it's last index in buffer
+	        // So, if they did an insertAfter(lastValidIndex, "foo"), include
+	        // foo if end==lastValidIndex.
+	        if ( end==tokens.Count-1 ) {
+	            // Scan any remaining operations after last token
+	            // should be included (they will be inserts).
+				IEnumerator iter = indexToOp.Values.GetEnumerator();
+				while (iter.MoveNext()) {
+					InsertBeforeOp iop = (InsertBeforeOp)iter.Current;
+					if ( iop.index >= tokens.Count-1 ) buf.Append(iop.text);
+				}
+	        }
+	        return buf.ToString();
 		}
 			
 		/// <summary>
@@ -535,7 +549,8 @@ namespace Antlr.Runtime
 				for (int j = 0; j < inserts.Count; j++) {
 					InsertBeforeOp iop = (InsertBeforeOp) inserts[j];
 					if ( iop.index >= rop.index && iop.index <= rop.lastIndex ) {
-						rewrites[j] = null;  // delete insert as it's a no-op.
+						// delete insert as it's a no-op.
+						rewrites[iop.instructionIndex] = null;
 					}
 				}
 				// Drop any prior replaces contained within
@@ -543,7 +558,8 @@ namespace Antlr.Runtime
 				for (int j = 0; j < prevReplaces.Count; j++) {
 					ReplaceOp prevRop = (ReplaceOp) prevReplaces[j];
 					if ( prevRop.index>=rop.index && prevRop.lastIndex <= rop.lastIndex ) {
-						rewrites[j] = null;  // delete replace as it's a no-op.
+						// delete replace as it's a no-op.
+						rewrites[prevRop.instructionIndex] = null;
 						continue;
 					}
 					// throw exception unless disjoint or identical
@@ -572,7 +588,8 @@ namespace Antlr.Runtime
 						// convert to strings...we're in process of toString'ing
 						// whole token buffer so no lazy eval issue with any templates
 						iop.text = CatOpText(iop.text,prevIop.text);
-						rewrites[j] = null;  // delete redundant prior insert
+						// delete redundant prior insert
+						rewrites[prevIop.instructionIndex] = null;
 					}
 				}
 				// look for replaces where iop.index is in range; error
@@ -616,6 +633,9 @@ namespace Antlr.Runtime
 			return GetKindOfOps(rewrites, kind, rewrites.Count);
 		}
 
+		/// <summary>
+		/// Get all operations before an index of a particular kind
+		/// </summary>
 		protected IList GetKindOfOps(IList rewrites, Type kind, int before) {
 			IList ops = new ArrayList();
 			for (int i=0; i<before && i<rewrites.Count; i++) {

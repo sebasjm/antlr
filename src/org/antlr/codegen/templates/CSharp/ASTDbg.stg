@@ -34,22 +34,27 @@
 group ASTDbg;
 
 parserMembers() ::= <<
-protected DebugTreeAdaptor adaptor = new DebugTreeAdaptor(null, new CommonTreeAdaptor());
+protected DebugTreeAdaptor adaptor;
 public ITreeAdaptor TreeAdaptor
 {
-	get { return this.adaptor; }
+	get { 
+<if(grammar.grammarIsRoot)>
+		return this.adaptor;
+<else>
+		this.adaptor = (DebugTreeAdaptor)adaptor; // delegator sends dbg adaptor 
+<endif><\n>
+    		<grammar.directDelegates:{g|<g:delegateName()>.TreeAdaptor = this.adaptor;}>
+	}
 	set { this.adaptor = new DebugTreeAdaptor(dbg, value); }
 }<\n>
 >>
 
 parserCtorBody() ::= <<
 <super.parserCtorBody()>
-adaptor.DebugListener = dbg;
 >>
 
 createListenerAndHandshake() ::= <<
 DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, adaptor);
-adaptor.DebugListener = proxy;
 DebugListener = proxy;
 <!
 Original line follows, replaced by the next two ifs:
@@ -68,25 +73,25 @@ try {
 }
 >>
 
-/**
-Added additional constructor
-*/
-ctorForPredefinedListener() ::= <<
-public <name>(<inputStreamType> input, IDebugEventListener dbg)
-	: base(input, dbg)
-{
-<if(profile)>
-    Profiler p = (Profiler)dbg;
-    p.Parser = this;<\n>
-<endif>
-    <parserCtorBody()>
-    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-}
+@ctorForRootGrammar.finally() ::= <<
+ITreeAdaptor adap = new CommonTreeAdaptor();
+TreeAdaptor = adap;
+proxy.TreeAdaptor = adap;
+>>
 
-public <name>(<inputStreamType> input, int port)
-	: this(input, port, null)
-{
-}<\n>
+@ctorForProfilingRootGrammar.finally() ::=<<
+ITreeAdaptor adap = new CommonTreeAdaptor();
+TreeAdaptor = adap;
+proxy.TreeAdaptor = adap;
+>>
+
+@ctorForPredefinedListener.superClassRef() ::= "base(input, dbg)"
+
+@ctorForPredefinedListener.finally() ::=<<
+<if(grammar.grammarIsRoot)> <! don't create new adaptor for delegates !>
+ITreeAdaptor adap = new CommonTreeAdaptor();
+TreeAdaptor = adap;<\n>
+<endif>
 >>
 
 @rewriteElement.pregen() ::= "dbg.Location(<e.line>,<e.pos>);"

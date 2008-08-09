@@ -161,11 +161,11 @@ namespace Antlr.Runtime
 
 			// compute what can follow this grammar element reference
 			if (follow.Member(Token.EOR_TOKEN_TYPE)) {
+				BitSet viableTokensFollowingThisRule = ComputeContextSensitiveRuleFOLLOW();
+				follow = follow.Or(viableTokensFollowingThisRule);
 				if (state.followingStackPointer >= 0) { // remove EOR if we're not the start symbol
 					follow.Remove(Token.EOR_TOKEN_TYPE);
 				}
-				BitSet viableTokensFollowingThisRule = ComputeContextSensitiveRuleFOLLOW();
-				follow = follow.Or(viableTokensFollowingThisRule);
 			}
 
 			// if current token is consistent with what could come after set
@@ -291,7 +291,9 @@ namespace Antlr.Runtime
 				{
 					tokenName = tokenNames[mtne.expecting];
 				}
-				msg = "mismatched tree node: " + mtne.Node + " expecting " + tokenName;
+				// The ternary operator is only necessary because of a bug in the .NET framework
+				msg = "mismatched tree node: " + (mtne.Node!=null?mtne.Node:string.Empty) +
+					" expecting " + tokenName;
 			}
 			else if (e is NoViableAltException)
 			{

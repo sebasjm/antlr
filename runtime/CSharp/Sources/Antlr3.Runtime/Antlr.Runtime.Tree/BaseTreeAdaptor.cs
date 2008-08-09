@@ -170,11 +170,11 @@ namespace Antlr.Runtime.Tree
 			// handle ^(nil real-node)
 			if (newRootTree.IsNil)
 			{
-				if (newRootTree.ChildCount > 1)
-				{
+	            int nc = newRootTree.ChildCount;
+	            if ( nc==1 ) newRootTree = (ITree)newRootTree.GetChild(0);
+	            else if ( nc >1 ) {
 					throw new SystemException("more than one node as root (TODO: make exception hierarchy)");
 				}
-				newRootTree = (ITree) newRootTree.GetChild(0);
 			}
 			// add oldRoot to newRoot; AddChild takes care of case where oldRoot
 			// is a flat list (i.e., nil-rooted tree).  All children of oldRoot

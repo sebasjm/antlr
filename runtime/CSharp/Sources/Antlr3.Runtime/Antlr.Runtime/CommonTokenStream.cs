@@ -253,7 +253,7 @@ namespace Antlr.Runtime
 
 		public virtual void Reset()
 		{
-			p = -1;
+			p = 0;
 			lastMarker = 0;
 		}
 

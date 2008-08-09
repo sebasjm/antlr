@@ -72,7 +72,7 @@ namespace Antlr.Runtime.Tree
 		}
 
 		protected override object GetCurrentInputSymbol(IIntStream input) {
-			return ((ITreeNodeStream)input).LT(1);
+			return null;
 		}
 
 		protected override object GetMissingSymbol(IIntStream input,

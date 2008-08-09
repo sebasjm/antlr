@@ -352,6 +352,11 @@ namespace Antlr.Runtime.Debug
 
 		#region Support
 
+	    public ITreeAdaptor TreeAdaptor {
+			set { this.adaptor = value; }
+			get { return adaptor; }
+		}
+
 		protected internal virtual string SerializeToken(IToken t)
 		{
 			StringBuilder buf = new StringBuilder(50);

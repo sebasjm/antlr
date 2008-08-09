@@ -47,7 +47,10 @@ protected ITreeAdaptor adaptor = new CommonTreeAdaptor();<\n>
 public ITreeAdaptor TreeAdaptor
 {
     get { return this.adaptor; }
-    set { this.adaptor = value; }
+    set {
+	this.adaptor = value;
+	<grammar.directDelegates:{g|<g:delegateName()>.TreeAdaptor = this.adaptor;}>
+	}
 }
 >>
 
