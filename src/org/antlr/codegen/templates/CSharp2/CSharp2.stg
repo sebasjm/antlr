@@ -1391,7 +1391,7 @@ input.TokenStream.ToString(
   input.TreeAdaptor.GetTokenStartIndex(retval.Start),
   input.TreeAdaptor.GetTokenStopIndex(retval.Start) )
 <else>
-input.ToString(retval.Start,input.LT(-1))
+input.ToString((IToken)retval.Start,input.LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.ST"
