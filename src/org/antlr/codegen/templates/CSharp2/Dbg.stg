@@ -246,13 +246,6 @@ enterAlt(n) ::= "dbg.EnterAlt(<n>);<\n>"
 @matchSet.mismatchedSetException() ::=
     "dbg.RecognitionException(mse);"
 
-@DFAtemplate.dbgCtor() ::= <<
-    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer, IDebugEventListener dbg) : this(recognizer)
-    {
-     <@debugConstructorCalls()>
-    }
->> 
-
 @dfaState.noViableAltException() ::= "dbg.RecognitionException(nvae_d<decisionNumber>s<stateNumber>);"
 
 @dfaStateSwitch.noViableAltException() ::= "dbg.RecognitionException(nvae_d<decisionNumber>s<stateNumber>);"
@@ -270,12 +263,17 @@ catch (NoViableAltException nvae)
 }
 >>
 
+@cyclicDFA.dbgCtor() ::= <<
+    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer, IDebugEventListener dbg) : this(recognizer)
+    {
+		this.dbg = dbg;
+    }
+>> 
+
 @cyclicDFA.debugMember() ::= <<
 IDebugEventListener dbg;
 
 >>
-
-@cyclicDFA.debugConstructorCalls() ::= "this.dbg = dbg;"
 
 @cyclicDFA.errorMethod() ::= <<
 public override void Error(NoViableAltException nvae) 
