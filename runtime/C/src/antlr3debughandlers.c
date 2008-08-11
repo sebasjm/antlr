@@ -319,6 +319,7 @@ ack						(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	do
 	{
 		rCount = recv(delboy->socket, &buffer, 1, 0);
+printf("REceived character %02X\n", buffer);
 	}
 	while	(rCount == 1 && buffer != '\n');
 
@@ -329,6 +330,8 @@ ack						(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	//
 	if	(rCount != 1)
 	{
+		ANTLR3_PRINTF("Exiting debugger as remote cient closed the socket\n");
+		ANTLR3_PRINTF("Received char count was %d, but last char received was %02X\n", rCount, buffer);
 		exit(0);
 	}
 }
