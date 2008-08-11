@@ -403,7 +403,6 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDE
 		// We already have >1 entries in the stream. So we can just add this new element to the existing
 		// collection. 
 		//
-printf("adding to existing vector that has count %d\n", stream->elements->count);
 		stream->elements->add(stream->elements, el, freePtr);
 		return;
 	}
