@@ -61,10 +61,10 @@ Original line follows, replaced by the next two ifs:
 set<inputStreamType>(new Debug<inputStreamType>(input,proxy));
  !>
 <if(PARSER)>
-TokenStream = new DebugTokenStream(input,proxy);<n>
+TokenStream = new DebugTokenStream(input,proxy);<\n>
 <endif>
 <if(TREE_PARSER)>
-TokenStream = new DebugTreeNodeStream(input,proxy);<n>
+TokenStream = new DebugTreeNodeStream(input,proxy);<\n>
 <endif>
 try {
     proxy.Handshake();
