@@ -329,8 +329,8 @@ ack						(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	//
 	if	(rCount != 1)
 	{
-		ANTLR3_PRINTF("Exiting debugger as remote cient closed the socket\n");
-		ANTLR3_PRINTF("Received char count was %d, but last char received was %02X\n", rCount, buffer);
+		ANTLR3_PRINTF("Exiting debugger as remote client closed the socket\n");
+		ANTLR3_PRINTF("Received char count was %d, and last char received was %02X\n", rCount, buffer);
 		exit(0);
 	}
 }
