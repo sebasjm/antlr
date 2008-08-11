@@ -66,7 +66,7 @@ antlr3DebugListenerNew()
 {
 	pANTLR3_DEBUG_EVENT_LISTENER	delboy;
 
-	delboy = ANTLR3_MALLOC(sizeof(ANTLR3_DEBUG_EVENT_LISTENER));
+	delboy = ANTLR3_CALLOC(1, sizeof(ANTLR3_DEBUG_EVENT_LISTENER));
 
 	if	(delboy == NULL)
 	{
@@ -319,7 +319,6 @@ ack						(pANTLR3_DEBUG_EVENT_LISTENER delboy)
 	do
 	{
 		rCount = recv(delboy->socket, &buffer, 1, 0);
-printf("REceived character %02X\n", buffer);
 	}
 	while	(rCount == 1 && buffer != '\n');
 
