@@ -112,6 +112,7 @@ antlr-3.1/src/org/antlr/...
 antlr-3.1/lib/stringtemplate-3.2.jar
 antlr-3.1/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
 antlr-3.1/lib/antlr-3.1.jar (all jars combined, runtime and tools)
+antlr-3.1/lib/antlr-runtime-3.1.jar (only what is needed to use ANTLR parsers)
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
