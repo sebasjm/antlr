@@ -1,5 +1,5 @@
-ANTLR v3.1b2
-July 17, 2008
+ANTLR v3.1
+August 12, 2008
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -20,7 +20,7 @@ You should use v3 in conjunction with ANTLRWorks:
 
     http://www.antlr.org/works/index.html 
 
-and gUnit (grammar unit testing tool):
+and gUnit (grammar unit testing tool included in distribution):
 
     http://www.antlr.org/wiki/display/ANTLR3/gUnit+-+Grammar+Unit+Testing
 
@@ -68,13 +68,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 EXAMPLES
 
-ANTLR v3 sample grammars (currently for C, C#, Java targets):
+ANTLR v3 sample grammars:
 
     http://www.antlr.org/download/examples-v3.tar.gz
-
-contains the following examples: LL-star, cminus, dynamic-scope,
-fuzzy, hoistedPredicates, island-grammar, java, python, scopes,
-simplecTreeParser, treeparser, tweak, xmlLexer.
 
 Also check out Mantra Programming Language for a prototype (work in
 progress) using v3:
@@ -113,10 +109,9 @@ Just untar and you'll get:
 antlr-3.1/README.txt (this file)
 antlr-3.1/LICENSE.txt
 antlr-3.1/src/org/antlr/...
-antlr-3.1/lib/stringtemplate-3.1.jar (ST currently written in ANTLR v2)
+antlr-3.1/lib/stringtemplate-3.2.jar
 antlr-3.1/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
-antlr-3.1/lib/antlr-3.1.jar
-antlr-3.1/lib/gunit-1.0.2.jar
+antlr-3.1/lib/antlr-3.1.jar (all jars combined, runtime and tools)
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
