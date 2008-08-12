@@ -133,7 +133,7 @@ ruleRefBang(rule,label,elementIndex,args,scope) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = (<ASTLableType>)(ADAPTOR->becomeRoot(ADAPTOR, <label>.tree, root_0));
+<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <label>.tree, root_0));
 >>
 
 /** x+=rule when output=AST */
