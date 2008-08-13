@@ -62,8 +62,8 @@ import org.antlr.runtime.*;
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
-      filterMode) ::= <<
-public class <grammar.recognizerName> extends Lexer {
+      filterMode, superClass="Lexer") ::= <<
+public class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
     <tokens:{public static const <it.name>:int=<it.type>;}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     <actions.lexer.members>
@@ -1023,7 +1023,7 @@ orPredicates(operands) ::= "(<first(operands)><rest(operands):{o | ||<o>}>)"
 
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
-evalPredicate(pred,description) ::= "<pred>"
+evalPredicate(pred,description) ::= "(<pred>)"
 
 evalSynPredicate(pred,description) ::= "<pred>()"
 

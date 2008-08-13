@@ -305,7 +305,7 @@ package org.antlr.runtime.tree {
 		}
 	
 		public function reset():void {
-			p = -1;
+			p = 0;
 			lastMarker = 0;
 	        if (calls != null) {
 	            calls = new Array();

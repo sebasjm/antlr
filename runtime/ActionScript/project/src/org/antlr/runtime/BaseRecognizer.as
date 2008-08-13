@@ -97,11 +97,11 @@ package org.antlr.runtime {
     		}
      		// compute what can follow this grammar element reference
     		if ( follow.member(TokenConstants.EOR_TOKEN_TYPE) ) {
-    			if ( state._fsp>=0 ) { // remove EOR if we're not the start symbol
-					follow.remove(TokenConstants.EOR_TOKEN_TYPE);
-				}
 				var viableTokensFollowingThisRule:BitSet = computeContextSensitiveRuleFOLLOW();
 				follow = follow.or(viableTokensFollowingThisRule);
+				if ( state._fsp>=0 ) { // remove EOR if we're not the start symbol
+                    follow.remove(TokenConstants.EOR_TOKEN_TYPE);
+                }
     		}
     		// if current token is consistent with what could come after set
 			// then we know we're missing a token; error recovery is free to

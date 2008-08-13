@@ -310,7 +310,7 @@ package org.antlr.runtime {
 	    }
 	
 		public function reset():void {
-			p = -1;
+			p = 0;
 			lastMarker = 0;
 		}
 	

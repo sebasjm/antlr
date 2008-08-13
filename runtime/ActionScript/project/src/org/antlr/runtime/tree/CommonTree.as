@@ -37,7 +37,7 @@ package org.antlr.runtime.tree {
 	 */
 	public class CommonTree extends BaseTree {
 		/** A single token is the payload */
-		private var _token:Token;
+		protected var _token:Token;
 		
 		/** What token indexes bracket all tokens associated with this node
 		 *  and below?
@@ -45,10 +45,10 @@ package org.antlr.runtime.tree {
 		public var startIndex:int=-1, stopIndex:int=-1;
 	
 		/** Who is the parent node of this node; if null, implies node is root */
-		private var _parent:CommonTree;
+		protected var _parent:CommonTree;
 	
 		/** What index is this node in the child list? Range: 0..n-1 */
-		private var _childIndex:int = -1;
+		protected var _childIndex:int = -1;
 			
 		public function CommonTree(node:CommonTree = null) {
 			if (node != null) {

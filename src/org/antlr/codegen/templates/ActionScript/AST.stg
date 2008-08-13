@@ -44,6 +44,7 @@ parserMembers() ::= <<
 protected var adaptor:TreeAdaptor = new CommonTreeAdaptor();<\n>
 public function set treeAdaptor(adaptor:TreeAdaptor):void {
     this.adaptor = adaptor;
+    <grammar.directDelegates:{g|<g:delegateName()>.treeAdaptor = this.adaptor;}>
 }
 public function get treeAdaptor():TreeAdaptor {
     return adaptor;
@@ -177,12 +178,13 @@ input.replaceChildren(adaptor.getParent(retval.start),
                       retval.tree);
 <endif>
 <endif>
-<! if parser or rewrite!=true, we need to set result !>
+<! if parser or tree-parser && rewrite!=true, we need to set result !>
 <if(!TREE_PARSER)>
 <prevRuleRootRef()>.tree = root_0;
-<endif>
+<else>
 <if(!rewriteMode)>
 <prevRuleRootRef()>.tree = root_0;
+<endif>
 <endif>
 <if(backtracking)>
 }

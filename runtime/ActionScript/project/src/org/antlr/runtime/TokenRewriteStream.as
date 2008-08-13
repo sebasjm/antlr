@@ -130,6 +130,7 @@ package org.antlr.runtime {
 		public function insertBefore(index:int, text:Object, programName:String = DEFAULT_PROGRAM_NAME):void {
 			var op:RewriteOperation = new InsertBeforeOp(index,text);
 			var rewrites:Array = getProgram(programName);
+			op.instructionIndex = rewrites.length;
 			rewrites.push(op);
 		}
 			
@@ -143,6 +144,7 @@ package org.antlr.runtime {
 			}
 			var op:RewriteOperation = new ReplaceOp(fromIndex, toIndex, text);
 			var rewrites:Array = getProgram(programName);
+			op.instructionIndex = rewrites.length;
 			rewrites.push(op);
 		}
 	
@@ -218,6 +220,11 @@ package org.antlr.runtime {
 		
 		public function toStringWithRangeAndProgram(start:int, end:int, programName:String):String {
 			var rewrites:Array = programs[programName] as Array;
+			
+			// ensure start/end are in range
+	        if ( end > tokens.length-1 ) end = tokens.length-1;
+	        if ( start < 0 ) start = 0;
+        
 			if ( rewrites==null || rewrites.length==0 ) {
 				return toOriginalStringWithRange(start,end); // no instructions to execute
 			}
@@ -228,8 +235,8 @@ package org.antlr.runtime {
 	        var indexToOp:Array = reduceToSingleOperationPerIndex(rewrites);
 
 	        // Walk buffer, executing instructions and emitting tokens
-	        var i:int = 0;
-	        while ( i < tokens.length ) {
+	        var i:int = start;
+	        while ( i <= end && i < tokens.length ) {
 	            var op:RewriteOperation = RewriteOperation(indexToOp[i]);
 	            indexToOp[i] = undefined; // remove so any left have index size-1
 	            var t:Token = Token(tokens[i]);
@@ -243,11 +250,16 @@ package org.antlr.runtime {
 	            }
 	        }
 	        
-	        // any ops left must be at end of buffer: size-1 index
-	        // in fact, must be inserts
-	        for each (var iop:InsertBeforeOp in indexToOp) {
-	        	if (iop == null) continue;
-                state.buf += iop.text;
+	        // include stuff after end if it's last index in buffer
+	        // So, if they did an insertAfter(lastValidIndex, "foo"), include
+	        // foo if end==lastValidIndex.
+	        if ( end==tokens.length-1 ) {
+	            // Scan any remaining operations after last token
+	            // should be included (they will be inserts).
+	            for each (op in indexToOp) {
+	            	if (op == null) continue;
+	                if ( op.index >= tokens.length-1 ) state.buf += op.text;
+	            }
 	        }
 	        
 	        return state.buf;
@@ -312,7 +324,7 @@ package org.antlr.runtime {
 	            for (var j:int = 0; j < inserts.length; j++) {
 	                var iop:InsertBeforeOp = InsertBeforeOp(inserts[j]);
 	                if ( iop.index >= rop.index && iop.index <= rop.lastIndex ) {
-	                    rewrites[j] = null;  // delete insert as it's a no-op.
+	                    rewrites[iop.instructionIndex] = null;  // delete insert as it's a no-op.
 	                }
 	            }
 	            // Drop any prior replaces contained within
@@ -320,7 +332,7 @@ package org.antlr.runtime {
 	            for (j = 0; j < prevReplaces.length; j++) {
 	                var prevRop:ReplaceOp = ReplaceOp(prevReplaces[j]);
 	                if ( prevRop.index>=rop.index && prevRop.lastIndex <= rop.lastIndex ) {
-	                    rewrites[j] = null;  // delete replace as it's a no-op.
+	                    rewrites[prevRop.instructionIndex] = null;  // delete replace as it's a no-op.
 	                    continue;
 	                }
 	                // throw exception unless disjoint or identical
@@ -349,7 +361,7 @@ package org.antlr.runtime {
 	                    // convert to strings...we're in process of toString'ing
 	                    // whole token buffer so no lazy eval issue with any templates
 	                    iop.text = catOpText(iop.text,prevIop.text);
-	                    rewrites[j] = null;  // delete redundant prior insert
+	                    rewrites[prevIop.instructionIndex] = null;  // delete redundant prior insert
 	                }
 	            }
 	            // look for replaces where iop.index is in range; error
@@ -389,6 +401,7 @@ package org.antlr.runtime {
 	        return x+y;
 	    }
 	    
+	    /** Get all operations before an index of a particular kind */
 	    protected function getKindOfOps(rewrites:Array, kind:Class, before:int = -1):Array {
 	    	if (before == -1) {
 	    		before = rewrites.length;
@@ -429,6 +442,9 @@ class RewriteState {
 }
 
 class RewriteOperation {
+	/** What index into rewrites List are we? */
+    internal var instructionIndex:int;
+    /** Token buffer index. */
 	public var index:int;
 	internal var text:Object;
 	public function RewriteOperation(index:int, text:Object) {
