@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="C"
 	ProjectGUID="{0F0FE03A-78F3-4B34-9DCE-0CDFF1FB5C40}"
 	RootNamespace="C"
@@ -9,6 +9,7 @@
 	SccLocalPath="..\.."
 	SccProvider="MSSCCI:Perforce SCM"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -414,6 +415,8 @@
 				Version="3.0b4"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(TargetName)_dll.lib"
 			/>
 			<Tool
@@ -434,9 +437,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -511,6 +511,8 @@
 				Version="3.0.0.1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(TargetName)_dll.lib"
 				TargetMachine="17"
 			/>
@@ -532,9 +534,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -605,6 +604,8 @@
 				OutputFile="$(OutDir)\antlr3cd.dll"
 				Version="1.0b4"
 				GenerateDebugInformation="true"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(TargetName)_dll.lib"
 			/>
 			<Tool
@@ -624,9 +625,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -698,6 +696,8 @@
 				OutputFile="$(OutDir)\antlr3c64d.dll"
 				Version="3.0.0.1"
 				GenerateDebugInformation="true"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(TargetName)_dll.lib"
 				TargetMachine="17"
 			/>
@@ -718,9 +718,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
