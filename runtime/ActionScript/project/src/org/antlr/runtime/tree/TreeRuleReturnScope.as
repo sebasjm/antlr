@@ -38,7 +38,22 @@ package org.antlr.runtime.tree {
 		
 		/** First node or root node of tree matched for this rule. */
 		protected var _start:Object;
+		private var _tree:Object;  // if output=AST this contains the tree
+		private var _values:Object = new Object(); // contains the return values
 		
+		/** Has a value potentially if output=AST; */
+        public override function get tree():Object {
+             return _tree;
+        }
+        
+        public function set tree(tree:Object):void {
+            _tree = tree;
+        }
+        
+        public function get values():Object {
+            return _values;
+        }
+        
 		public override function get start():Object {
 			return _start;
 		}
@@ -46,6 +61,6 @@ package org.antlr.runtime.tree {
 		public function set start(value:Object):void {
 			_start = value;
 		}
-
+		
 	}
 }

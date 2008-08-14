@@ -150,7 +150,7 @@ package org.antlr.runtime {
 				}
 			}
 			else if ( this.node is Tree) {
-				this.line = this.node.line();
+				this.line = this.node.line;
 				this.charPositionInLine = this.node.charPositionInLine;
 				if ( this.node is CommonTree) {
 					this.token = this.node.token;

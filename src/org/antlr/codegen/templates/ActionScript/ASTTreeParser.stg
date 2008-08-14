@@ -83,14 +83,14 @@ if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = <root.el.
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
 if ( input.LA(1)==TokenConstants.DOWN ) {
-    match(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
+    matchStream(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
     <children:element()>
-    match(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
+    matchStream(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
 }
 <else>
-match(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
+matchStream(input, TokenConstants.DOWN, null); <checkRuleBacktrackFailure()>
 <children:element()>
-match(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
+matchStream(input, TokenConstants.UP, null); <checkRuleBacktrackFailure()>
 <endif>
 <if(!rewriteMode)>
 adaptor.addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
@@ -209,7 +209,7 @@ _last = <ASTLabelType>(input.LT(1));
 <super.ruleRef(...)>
 <if(backtracking)>if ( state.backtracking==0 ) <endif>
 <if(!rewriteMode)>
-adaptor.addChild(root_<treeLevel>, <label>.getTree());
+adaptor.addChild(root_<treeLevel>, <label>.tree);
 <else> <! rewrite mode !>
 if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>.tree;
 <endif>
