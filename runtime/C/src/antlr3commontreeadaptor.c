@@ -439,7 +439,7 @@ setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_
 static  ANTLR3_INT32
 getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
 {
-	t->getChildIndex(t);
+	return t->getChildIndex(t);
 }
 static	void
 setParent				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE child, pANTLR3_BASE_TREE parent)

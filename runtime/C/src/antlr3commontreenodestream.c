@@ -503,6 +503,10 @@ getNodeIndex(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 			return i;
 		}
 	}
+
+	// This should never be possible...
+	//
+	return	 0;
 }
 
 
