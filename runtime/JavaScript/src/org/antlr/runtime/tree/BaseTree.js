@@ -6,7 +6,9 @@
  */
 org.antlr.runtime.tree.BaseTree = function() {};
 
-org.antlr.runtime.tree.BaseTree.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.tree.BaseTree,
+                      org.antlr.runtime.tree.Tree,
+{
     getChild: function(i) {
         if ( !this.children || i>=this.children.length ) {
             return null;
@@ -277,4 +279,4 @@ org.antlr.runtime.tree.BaseTree.prototype = {
     getCharPositionInLine: function() {
         return 0;
     }
-};
+});

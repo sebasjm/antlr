@@ -8,6 +8,4 @@
  *
  *  This is a tree node without any payload; just navigation and factory stuff.
  */
-org.antlr.runtime.tree.Tree = {
-    INVALID_NODE: new org.antlr.runtime.tree.CommonTree(org.antlr.runtime.Token.INVALID_TOKEN)
-};
+org.antlr.runtime.tree.Tree = function(){};

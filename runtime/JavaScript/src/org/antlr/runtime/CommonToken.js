@@ -34,7 +34,9 @@ org.antlr.runtime.CommonToken = function() {
     }
 };
 
-org.antlr.runtime.CommonToken.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.CommonToken,
+                      org.antlr.runtime.Token,
+{
     getType: function() {
         return this.type;
     },
@@ -135,4 +137,11 @@ org.antlr.runtime.CommonToken.prototype = {
         }
         return "[@"+this.getTokenIndex()+","+this.start+":"+this.stop+"='"+txt+"',<"+this.type+">"+channelStr+","+this.line+":"+this.getCharPositionInLine()+"]";
     }
-};
+});
+
+/* Monkey patch Token static vars that depend on CommonToken. */
+org.antlr.lang.augmentObject(org.antlr.runtime.Token, {
+    EOF_TOKEN: new org.antlr.runtime.CommonToken(org.antlr.runtime.CharStream.EOF),
+    INVALID_TOKEN: new org.antlr.runtime.CommonToken(0),
+    SKIP_TOKEN: new org.antlr.runtime.CommonToken(0)
+}, true);

@@ -7,8 +7,8 @@
  *  subclasses.</p>
  *
  *  @class
- *  @param {org.antlr.runtime.RecognizerSharedState} [state] optional state object
- *      with which to initialize this recognizer.
+ *  @param {org.antlr.runtime.RecognizerSharedState} [state] state object with
+ *      which to initialize this recognizer.
  */
 org.antlr.runtime.BaseRecognizer = function(state) {
     /** State of a lexer, parser, or tree parser are collected into a state
@@ -16,18 +16,52 @@ org.antlr.runtime.BaseRecognizer = function(state) {
      *  have one grammar import others and share same error variables
      *  and other state variables.  It's a kind of explicit multiple
      *  inheritance via delegation of methods and shared state.
+     *  @type org.antlr.runtime.RecognizerSharedState
      */
     this.state = state || new org.antlr.runtime.RecognizerSharedState();
 };
 
-/* static vars, methods */
 org.antlr.lang.augmentObject(org.antlr.runtime.BaseRecognizer, {
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type Number
+     */
     MEMO_RULE_FAILED: -2,
+
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type Number
+     */
     MEMO_RULE_UNKNOWN: -1,
+
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type Number
+     */
     INITIAL_FOLLOW_STACK_SIZE: 100,
+
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type Number
+     */
     MEMO_RULE_FAILED_I: -2,
+
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type Number
+     */
     DEFAULT_TOKEN_CHANNEL: org.antlr.runtime.Token.DEFAULT_CHANNEL,
+
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type Number
+     */
     HIDDEN: org.antlr.runtime.Token.HIDDEN_CHANNEL,
+
+    /**
+     * @memberOf org.antlr.runtime.BaseRecognizer
+     * @type String 
+     */
     NEXT_TOKEN_RULE_NAME: "nextToken"
 });
 
@@ -125,11 +159,11 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         }
         // compute what can follow this grammar element reference
         if ( follow.member(org.antlr.runtime.Token.EOR_TOKEN_TYPE) ) {
+            var viableTokensFollowingThisRule = this.computeContextSensitiveRuleFOLLOW();
+            follow = follow.or(this.viableTokensFollowingThisRule);
             if ( this.state._fsp>=0 ) { // remove EOR if we're not the start symbol
                 follow.remove(org.antlr.runtime.Token.EOR_TOKEN_TYPE);
             }
-            var viableTokensFollowingThisRule = this.computeContextSensitiveRuleFOLLOW();
-            follow = follow.or(this.viableTokensFollowingThisRule);
         }
         // if current token is consistent with what could come after set
         // then we know we're missing a token; error recovery is free to
@@ -314,12 +348,13 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         return msg;
     },
 
-    /** Get number of recognition errors (lexer, parser, tree parser).  Each
+    /** <p>Get number of recognition errors (lexer, parser, tree parser).  Each
      *  recognizer tracks its own number.  So parser and lexer each have
      *  separate count.  Does not count the spurious errors found between
-     *  an error and next valid token match
+     *  an error and next valid token match.</p>
      *
-     *  See also reportError()
+     *  <p>See also {@link #reportError}()
+     *  @returns {Number} number of syntax errors encountered
      */
     getNumberOfSyntaxErrors: function() {
         return this.state.syntaxErrors;
@@ -329,9 +364,9 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  is to display just the text, but during development you might
      *  want to have a lot of information spit out.  Override in that case
      *  to use t.toString() (which, for CommonToken, dumps everything about
-     *  the token). This is better than forcing you to override a method in
-     *  your token objects because you don't have to go modify your lexer
-     *  so that it creates a new Java type.
+     *  the token).
+     * @param {org.antlr.runtime.Token} t token that will be displayed in an error message
+     * @return {String} the string representation of the token
      */
     getTokenErrorDisplay: function(t) {
         var s = t.getText();
@@ -354,6 +389,8 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  single token insertion and deletion, this will usually not
      *  handle mismatched symbol exceptions but there could be a mismatched
      *  token that the match() routine could not recover from.
+     *  @param {org.antlr.runtime.IntStream} input the intput stream
+     *  @param {org.antlr.runtime.RecogntionException} the error found on the input stream
      */
     recover: function(input, re) {
         if ( this.state.lastErrorIndex==input.index() ) {
@@ -371,34 +408,35 @@ org.antlr.runtime.BaseRecognizer.prototype = {
     },
 
     /** A hook to listen in on the token consumption during error recovery.
-     *  The DebugParser subclasses this to fire events to the listenter.
      */
     beginResync: function() {
     },
 
+    /** A hook to listen in on the token consumption during error recovery.
+     */
     endResync: function() {
     },
 
-    /*  Compute the error recovery set for the current rule.  During
-     *  rule invocation, the parser pushes the set of tokens that can
+    /** Compute the error recovery set for the current rule.
+     *  <p>During rule invocation, the parser pushes the set of tokens that can
      *  follow that rule reference on the stack; this amounts to
      *  computing FIRST of what follows the rule reference in the
      *  enclosing rule. This local follow set only includes tokens
      *  from within the rule; i.e., the FIRST computation done by
-     *  ANTLR stops at the end of a rule.
+     *  ANTLR stops at the end of a rule.</p>
      *
-     *  EXAMPLE
+     *  <p>EXAMPLE</p>
      *
-     *  When you find a "no viable alt exception", the input is not
+     *  <p>When you find a "no viable alt exception", the input is not
      *  consistent with any of the alternatives for rule r.  The best
      *  thing to do is to consume tokens until you see something that
      *  can legally follow a call to r *or* any rule that called r.
      *  You don't want the exact set of viable next tokens because the
      *  input might just be missing a token--you might consume the
-     *  rest of the input looking for one of the missing tokens.
+     *  rest of the input looking for one of the missing tokens.</p>
      *
-     *  Consider grammar:
-     *
+     *  <p>Consider grammar:</p>
+     *  <code><pre>
      *  a : '[' b ']'
      *    | '(' b ')'
      *    ;
@@ -406,31 +444,36 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  c : ID
      *    | INT
      *    ;
+     *  </pre></code>
      *
-     *  At each rule invocation, the set of tokens that could follow
+     *  <p>At each rule invocation, the set of tokens that could follow
      *  that rule is pushed on a stack.  Here are the various "local"
-     *  follow sets:
+     *  follow sets:</p>
      *
+     *  <code><pre>
      *  FOLLOW(b1_in_a) = FIRST(']') = ']'
      *  FOLLOW(b2_in_a) = FIRST(')') = ')'
      *  FOLLOW(c_in_b) = FIRST('^') = '^'
+     *  </pre></code>
      *
-     *  Upon erroneous input "[]", the call chain is
+     *  <p>Upon erroneous input "[]", the call chain is</p>
      *
-     *  a -> b -> c
+     *  <code>a -> b -> c</code>
      *
-     *  and, hence, the follow context stack is:
+     *  <p>and, hence, the follow context stack is:</p>
      *
+     *  <code><pre>
      *  depth  local follow set     after call to rule
      *    0         <EOF>                    a (from main())
      *    1          ']'                     b
      *    3          '^'                     c
+     *  </pre></code>
      *
-     *  Notice that ')' is not included, because b would have to have
+     *  <p>Notice that ')' is not included, because b would have to have
      *  been called from a different context in rule a for ')' to be
-     *  included.
+     *  included.</p>
      *
-     *  For error recovery, we cannot consider FOLLOW(c)
+     *  <p>For error recovery, we cannot consider FOLLOW(c)
      *  (context-sensitive or otherwise).  We need the combined set of
      *  all context-sensitive FOLLOW sets--the set of all tokens that
      *  could follow any reference in the call chain.  We need to
@@ -445,30 +488,31 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  set).  The rule exception handler tries to recover, but finds
      *  the same recovery set and doesn't consume anything.  Rule b
      *  exits normally returning to rule a.  Now it finds the ']' (and
-     *  with the successful match exits errorRecovery mode).
+     *  with the successful match exits errorRecovery mode).</p>
      *
-     *  So, you cna see that the parser walks up call chain looking
-     *  for the token that was a member of the recovery set.
+     *  <p>So, you cna see that the parser walks up call chain looking
+     *  for the token that was a member of the recovery set.</p>
      *
-     *  Errors are not generated in errorRecovery mode.
+     *  <p>Errors are not generated in errorRecovery mode.</p>
      *
-     *  ANTLR's error recovery mechanism is based upon original ideas:
+     *  <p>ANTLR's error recovery mechanism is based upon original ideas:</p>
      *
-     *  "Algorithms + Data Structures = Programs" by Niklaus Wirth
+     *  <p>"Algorithms + Data Structures = Programs" by Niklaus Wirth</p>
      *
-     *  and
+     *  <p>and</p>
      *
-     *  "A note on error recovery in recursive descent parsers":
-     *  http://portal.acm.org/citation.cfm?id=947902.947905
+     *  <p>"A note on error recovery in recursive descent parsers":
+     *  http://portal.acm.org/citation.cfm?id=947902.947905</p>
      *
-     *  Later, Josef Grosch had some good ideas:
+     *  <p>Later, Josef Grosch had some good ideas:</p>
      *
-     *  "Efficient and Comfortable Error Recovery in Recursive Descent
+     *  <p>"Efficient and Comfortable Error Recovery in Recursive Descent
      *  Parsers":
-     *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip
+     *  ftp://www.cocolab.com/products/cocktail/doca4.ps/ell.ps.zip</p>
      *
-     *  Like Grosch I implemented local FOLLOW sets that are combined
-     *  at run-time upon error to avoid overhead during parsing.
+     *  <p>Like Grosch I implemented local FOLLOW sets that are combined
+     *  at run-time upon error to avoid overhead during parsing.</p>
+     *  @returns {org.antlr.runtime.BitSet}
      */
     computeErrorRecoverySet: function() {
         return this.combineFollows(false);
@@ -476,24 +520,25 @@ org.antlr.runtime.BaseRecognizer.prototype = {
 
 
     /** Compute the context-sensitive FOLLOW set for current rule.
-     *  This is set of token types that can follow a specific rule
+     *  <p>This is set of token types that can follow a specific rule
      *  reference given a specific call chain.  You get the set of
      *  viable tokens that can possibly come next (lookahead depth 1)
      *  given the current call chain.  Contrast this with the
-     *  definition of plain FOLLOW for rule r:
+     *  definition of plain FOLLOW for rule r:</p>
      *
-     *   FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}
+     *   <code>FOLLOW(r)={x | S=>*alpha r beta in G and x in FIRST(beta)}</code>
      *
-     *  where x in T* and alpha, beta in V*; T is set of terminals and
+     *  <p>where x in T* and alpha, beta in V*; T is set of terminals and
      *  V is the set of terminals and nonterminals.  In other words,
      *  FOLLOW(r) is the set of all tokens that can possibly follow
      *  references to r in *any* sentential form (context).  At
      *  runtime, however, we know precisely which context applies as
      *  we have the call chain.  We may compute the exact (rather
-     *  than covering superset) set of following tokens.
+     *  than covering superset) set of following tokens.</p>
      *
-     *  For example, consider grammar:
+     *  <p>For example, consider grammar:</p>
      *
+     *  <code><pre>
      *  stat : ID '=' expr ';'      // FOLLOW(stat)=={EOF}
      *       | "return" expr '.'
      *       ;
@@ -501,36 +546,46 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  atom : INT                  // FOLLOW(atom)=={'+',')',';','.'}
      *       | '(' expr ')'
      *       ;
+     *  </pre></code>
      *
-     *  The FOLLOW sets are all inclusive whereas context-sensitive
+     *  <p>The FOLLOW sets are all inclusive whereas context-sensitive
      *  FOLLOW sets are precisely what could follow a rule reference.
-     *  For input input "i=(3);", here is the derivation:
+     *  For input input "i=(3);", here is the derivation:</p>
      *
+     *  <code><pre>
      *  stat => ID '=' expr ';'
      *       => ID '=' atom ('+' atom)* ';'
      *       => ID '=' '(' expr ')' ('+' atom)* ';'
      *       => ID '=' '(' atom ')' ('+' atom)* ';'
      *       => ID '=' '(' INT ')' ('+' atom)* ';'
      *       => ID '=' '(' INT ')' ';'
+     *  </pre></code>
      *
-     *  At the "3" token, you'd have a call chain of
+     *  <p>At the "3" token, you'd have a call chain of</p>
      *
-     *    stat -> expr -> atom -> expr -> atom
+     *  <code>  stat -> expr -> atom -> expr -> atom</code>
      *
-     *  What can follow that specific nested ref to atom?  Exactly ')'
+     *  <p>What can follow that specific nested ref to atom?  Exactly ')'
      *  as you can see by looking at the derivation of this specific
-     *  input.  Contrast this with the FOLLOW(atom)={'+',')',';','.'}.
+     *  input.  Contrast this with the FOLLOW(atom)={'+',')',';','.'}.</p>
      *
-     *  You want the exact viable token set when recovering from a
+     *  <p>You want the exact viable token set when recovering from a
      *  token mismatch.  Upon token mismatch, if LA(1) is member of
      *  the viable next token set, then you know there is most likely
      *  a missing token in the input stream.  "Insert" one by just not
-     *  throwing an exception.
+     *  throwing an exception.</p>
+     *  @returns {org.antlr.runtime.BitSet}
      */
     computeContextSensitiveRuleFOLLOW: function() {
         return this.combineFollows(true);
     },
 
+    /**
+     * Helper method for {@link #computeErrorRecoverySet} and
+     * {@link computeContextSensitiveRuleFOLLO}.
+     * @param {Boolean} exact
+     * @returns {org.antlr.runtime.BitSet}
+     */
     combineFollows: function(exact) {
         var top = this.state._fsp,
             i,
@@ -559,32 +614,37 @@ org.antlr.runtime.BaseRecognizer.prototype = {
 
     /** Attempt to recover from a single missing or extra token.
      *
-     *  EXTRA TOKEN
+     *  <p>EXTRA TOKEN</p>
      *
-     *  LA(1) is not what we are looking for.  If LA(2) has the right token,
+     *  <p>LA(1) is not what we are looking for.  If LA(2) has the right token,
      *  however, then assume LA(1) is some extra spurious token.  Delete it
      *  and LA(2) as if we were doing a normal match(), which advances the
-     *  input.
+     *  input.</p>
      *
-     *  MISSING TOKEN
+     *  <p>MISSING TOKEN</p>
      *
-     *  If current token is consistent with what could come after
+     *  <p>If current token is consistent with what could come after
      *  ttype then it is ok to "insert" the missing token, else throw
      *  exception For example, Input "i=(3;" is clearly missing the
      *  ')'.  When the parser returns from the nested call to expr, it
-     *  will have call chain:
+     *  will have call chain:</p>
      *
-     *    stat -> expr -> atom
+     *  <pre><code>  stat -> expr -> atom</code></pre>
      *
-     *  and it will be trying to match the ')' at this point in the
-     *  derivation:
+     *  <p>and it will be trying to match the ')' at this point in the
+     *  derivation:</p>
      *
-     *       => ID '=' '(' INT ')' ('+' atom)* ';'
+     *  <pre><code>     => ID '=' '(' INT ')' ('+' atom)* ';'</code></pre>
      *                          ^
-     *  match() will see that ';' doesn't match ')' and report a
+     *  <p>match() will see that ';' doesn't match ')' and report a
      *  mismatched token error.  To recover, it sees that LA(1)==';'
      *  is in the set of tokens that can follow the ')' token
-     *  reference in rule atom.  It can assume that you forgot the ')'.
+     *  reference in rule atom.  It can assume that you forgot the ')'.</p>
+     *
+     *  @param {org.antlr.runtime.IntStream} input
+     *  @param {Number} ttype
+     *  @param {org.antlr.runtime.BitSet} follow
+     *  @returns {Object}
      */
     recoverFromMismatchedToken: function(input,
                                          ttype,
@@ -615,6 +675,13 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         throw e;
     },
 
+    /**
+     * Recover from a mismatched set exception.
+     * @param {org.antlr.runtime.IntStream} input
+     * @param {org.antlr.runtime.RecognitionException} e
+     * @param {org.antlr.runtime.BitSet} follow
+     * @returns {Object}
+     */
     recoverFromMismatchedSet: function(input,
                                        e,
                                        follow)
@@ -635,13 +702,15 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  a simple method to ask the recognizer to tell me what the current
      *  input symbol is.
      * 
-     *  This is ignored for lexers.
+     *  <p>This is ignored for lexers.</p>
+     *  @param {org.antlr.runtime.IntStream} input
+     *  @returns {Object}
      */
     getCurrentInputSymbol: function(input) { return null; },
 
     /** Conjure up a missing token during error recovery.
      *
-     *  The recognizer attempts to recover from single missing
+     *  <p>The recognizer attempts to recover from single missing
      *  symbols. But, actions might refer to that missing symbol.
      *  For example, x=ID {f($x);}. The action clearly assumes
      *  that there has been an identifier matched previously and that
@@ -656,7 +725,13 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  action in the parser or tree parser works. It simply creates
      *  a CommonToken of the appropriate type. The text will be the token.
      *  If you change what tokens must be created by the lexer,
-     *  override this method to create the appropriate tokens.
+     *  override this method to create the appropriate tokens.</p>
+     *
+     *  @param {org.antlr.runtime.IntStream} input
+     *  @param {org.antlr.runtime.RecognitionException} e
+     *  @param {Number} expectedTokenType
+     *  @param {org.antlr.runtime.BitSet} follow
+     *  @returns {Object}
      */
     getMissingSymbol: function(input,
                                e,
@@ -667,7 +742,11 @@ org.antlr.runtime.BaseRecognizer.prototype = {
     },
 
 
-    /** Consume tokens until one matches the given token set */
+    /**
+     * Consume tokens until one matches the given token or token set
+     * @param {org.antlr.runtime.IntStream} input
+     * @param {Number|org.antlr.runtime.BitSet} set
+     */
     consumeUntil: function(input, set) {
         var ttype = input.LA(1);
         while (ttype != org.antlr.runtime.Token.EOF && !set.member(ttype) ) {
@@ -676,7 +755,10 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         }
     },
 
-    /** Push a rule's follow set using our own hardcoded stack */
+    /**
+     * Push a rule's follow set using our own hardcoded stack.
+     * @param {org.antlr.runtime.BitSet} fset
+     */
     pushFollow: function(fset) {
         if ( (this.state._fsp +1)>=this.state.following.length ) {
             var f = [];
@@ -690,37 +772,22 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         this.state.following[this.state._fsp] = fset;
     },
 
-    /** Return List<String> of the rules in your parser instance
-     *  leading up to a call to this method.  You could override if
-     *  you want more details such as the file/line info of where
-     *  in the parser java code a rule is invoked.
-     *
-     *  This is very useful for error messages and for context-sensitive
-     *  error recovery.
-     *
-     *  A more general version of getRuleInvocationStack where you can
-     *  pass in, for example, a RecognitionException to get it's rule
-     *  stack trace.  This routine is shared with all recognizers, hence,
-     *  static.
-     *
-     *  TODO: move to a utility class or something; weird having lexer call this
-     *
-     *  Most JS interpreters can't do real stack reflection.  See this
-     *  spidermonkey bug, for example:
-     *  https://bugzilla.mozilla.org/show_bug.cgi?id=332104
-     *
-     *  JS is supposed to get real stack traces in v4, at which time it would
-     *  be easy to implement this function.
-     *
-     *  Until then I'll leave this unimplemented.  If there is enough clamor
-     *  it would be possible to keep track of the invocation stack using an
-     *  auxillary array, but that will definitely be a performance hit.
+    /**
+     * Sadly JavaScript doesn't provide a robust mechanism for runtime stack reflection.
+     * This makes implementing this function impossible without maintaining an auxillary
+     * stack data structure, which would be crazy expensive, especially in Lexers.  As such,
+     * this method remains unimplemented.
+     * @deprecated
      */
     getRuleInvocationStack: function(e, recognizerClassName)
     {
         throw new Error("Not implemented.");
     },
 
+    /**
+     * Get this recognizer's backtracking level.
+     * @returns {Number} backtracking level
+     */
     getBacktrackingLevel: function() {
         return this.state.backtracking;
     },
@@ -728,6 +795,7 @@ org.antlr.runtime.BaseRecognizer.prototype = {
     /** Used to print out token names like ID during debugging and
      *  error reporting.  The generated parsers implement a method
      *  that overrides this to point to their String[] tokenNames.
+     *  @returns {Array} String array of token names.
      */
     getTokenNames: function() {
         return null;
@@ -735,13 +803,16 @@ org.antlr.runtime.BaseRecognizer.prototype = {
 
     /** For debugging and other purposes, might want the grammar name.
      *  Have ANTLR generate an implementation for this method.
+     *  @returns {String} the grammar name.
      */
     getGrammarFileName: function() {
         return null;
     },
 
     /** A convenience method for use most often with template rewrites.
-     *  Convert a List<Token> to List<String>
+     *  Convert an array of Tokens to an array of Strings.
+     *  @param {Array} array of org.antlr.runtime.Token objects.
+     *  @returns {Array} array of string representations of the argument.
      */
     toStrings: function(tokens) {
         if ( !tokens ) {
@@ -761,9 +832,12 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  start index before, then return where the rule stopped parsing.
      *  It returns the index of the last token matched by the rule.
      *
-     *  For now we use a hashtable and just the slow Object-based one.
+     *  <p>For now we use a hashtable and just the slow Object-based one.
      *  Later, we can make a special one for ints and also one that
-     *  tosses out data after we commit past input position i.
+     *  tosses out data after we commit past input position i.</p>
+     *  @param {Number} ruleIndex
+     *  @param {Number} ruleStartIndex
+     *  @returns {Number}
      */
     getRuleMemoization: function(ruleIndex, ruleStartIndex) {
         if ( !this.state.ruleMemo[ruleIndex] ) {
@@ -782,9 +856,12 @@ org.antlr.runtime.BaseRecognizer.prototype = {
      *  If we attempted but failed to parse properly before, return
      *  MEMO_RULE_FAILED.
      *
-     *  This method has a side-effect: if we have seen this input for
+     *  <p>This method has a side-effect: if we have seen this input for
      *  this rule and successfully parsed before, then seek ahead to
-     *  1 past the stop token matched for this rule last time.
+     *  1 past the stop token matched for this rule last time.</p>
+     *  @param {org.antlr.runtime.IntStream} input
+     *  @param {Number} ruleIndex
+     *  @returns {Boolean}
      */
     alreadyParsedRule: function(input, ruleIndex) {
         var stopIndex = this.getRuleMemoization(ruleIndex, input.index());
@@ -803,6 +880,9 @@ org.antlr.runtime.BaseRecognizer.prototype = {
 
     /** Record whether or not this rule parsed the input at this position
      *  successfully.  Use a standard java hashtable for now.
+     *  @param {org.antlr.runtime.IntStream} input
+     *  @param {Number} ruleIndex
+     *  @param {Number} ruleStartIndex
      */
     memoize: function(input,
                       ruleIndex,
@@ -823,6 +903,7 @@ org.antlr.runtime.BaseRecognizer.prototype = {
 
     /** return how many rule/input-index pairs there are in total.
      *  TODO: this includes synpreds.
+     *  @returns {Number}
      */
     getRuleMemoizationCacheSize: function() {
         var n = 0, i;
@@ -836,6 +917,13 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         return n;
     },
 
+    /**
+     * When a grammar is compiled with the tracing flag enabled, this method is invoked
+     * at the start of each rule.
+     * @param {String} ruleName the current ruleName
+     * @param {Number} ruleIndex
+     * @param {Object} inputSymbol
+     */
     traceIn: function(ruleName, ruleIndex, inputSymbol)  {
         this.emitErrorMessage("enter "+ruleName+" "+inputSymbol);
         if ( this.state.failed ) {
@@ -847,6 +935,13 @@ org.antlr.runtime.BaseRecognizer.prototype = {
         // System.out.println();
     },
 
+    /**
+     * When a grammar is compiled with the tracing flag enabled, this method is invoked
+     * at the end of each rule.
+     * @param {String} ruleName the current ruleName
+     * @param {Number} ruleIndex
+     * @param {Object} inputSymbol
+     */
     traceOut: function(ruleName, ruleIndex, inputSymbol) {
         this.emitErrorMessage("exit "+ruleName+" "+inputSymbol);
         if ( this.state.failed ) {

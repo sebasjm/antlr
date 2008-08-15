@@ -3,7 +3,9 @@ org.antlr.runtime.tree.BaseTreeAdaptor = function() {
     this.uniqueNodeID = 1;
 };
 
-org.antlr.runtime.tree.BaseTreeAdaptor.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.tree.BaseTreeAdaptor,
+                      org.antlr.runtime.tree.TreeAdaptor,
+{
     nil: function() {
         return this.create(null);
     },
@@ -90,7 +92,7 @@ org.antlr.runtime.tree.BaseTreeAdaptor.prototype = {
      *  efficiency.
      */
     becomeRoot: function(newRoot, oldRoot) {
-        if (newRoot instanceof org.antlr.runtime.CommonToken || !newRoot) {
+        if (newRoot instanceof org.antlr.runtime.Token || !newRoot) {
             newRoot = this.create(newRoot);
         }
 
@@ -101,11 +103,13 @@ org.antlr.runtime.tree.BaseTreeAdaptor.prototype = {
         }
         // handle ^(nil real-node)
         if ( newRootTree.isNil() ) {
-            if ( newRootTree.getChildCount()>1 ) {
+            var nc = newRootTree.getChildCount();
+            if (nc===1) {
+                newRootTree = newRootTree.getChild(0);
+            } else if ( nc>1 ) {
                 // TODO: make tree run time exceptions hierarchy
                 throw new Error("more than one node as root (TODO: make exception hierarchy)");
             }
-            newRootTree = newRootTree.getChild(0);
         }
         // add oldRoot to newRoot; addChild takes care of case where oldRoot
         // is a flat list (i.e., nil-rooted tree).  All children of oldRoot
@@ -203,4 +207,4 @@ org.antlr.runtime.tree.BaseTreeAdaptor.prototype = {
         // GC makes these nonunique:
         // return System.identityHashCode(node);
     }
-};
+});

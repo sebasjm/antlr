@@ -18,7 +18,9 @@ org.antlr.runtime.CommonTokenStream = function(tokenSource, channel) {
     }
 };
 
-org.antlr.runtime.CommonTokenStream.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.CommonTokenStream,
+                      org.antlr.runtime.TokenStream,       
+{
     /** Reset this token stream by setting its token source. */
     setTokenSource: function(tokenSource) {
         this.tokenSource = tokenSource;
@@ -264,7 +266,7 @@ org.antlr.runtime.CommonTokenStream.prototype = {
     },
 
     reset: function() {
-        this.p = -1;
+        this.p = 0;
         this.lastMarker = 0;
     },
 
@@ -316,4 +318,4 @@ org.antlr.runtime.CommonTokenStream.prototype = {
         }
         return buf;
     }
-};
+});

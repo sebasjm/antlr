@@ -32,7 +32,7 @@ org.antlr.runtime.RecognitionException = function(input) {
     org.antlr.runtime.RecognitionException.superclass.constructor.call(this);
     this.input = input;
     this.index = input.index();
-    if ( input instanceof org.antlr.runtime.CommonTokenStream ) {
+    if ( input instanceof org.antlr.runtime.TokenStream ) {
         this.token = input.LT(1);
         this.line = this.token.getLine();
         this.charPositionInLine = this.token.getCharPositionInLine();
@@ -40,7 +40,7 @@ org.antlr.runtime.RecognitionException = function(input) {
     if ( input instanceof org.antlr.runtime.tree.TreeNodeStream ) {
         this.extractInformationFromTreeNodeStream(input);
     }
-    else if ( input instanceof org.antlr.runtime.ANTLRStringStream ) {
+    else if ( input instanceof org.antlr.runtime.CharStream ) {
         // Note: removed CharStream from hierarchy in JS port so checking for
         // StringStream instead
         this.c = input.LA(1);
@@ -148,7 +148,7 @@ org.antlr.lang.extend(org.antlr.runtime.RecognitionException, Error,
 				this.charPositionInLine = payload.getCharPositionInLine();
 			}
 		}
-		else if ( this.node instanceof org.antlr.runtime.tree.CommonTree) {
+		else if ( this.node instanceof org.antlr.runtime.tree.Tree) {
 			this.line = this.node.getLine();
 			this.charPositionInLine = this.node.getCharPositionInLine();
 			if ( this.node instanceof org.antlr.runtime.tree.CommonTree) {
@@ -166,7 +166,7 @@ org.antlr.lang.extend(org.antlr.runtime.RecognitionException, Error,
      *  @return {Number} type of the unexpected input element.
      */
     getUnexpectedType: function() {
-		if ( this.input instanceof org.antlr.runtime.CommonTokenStream ) {
+		if ( this.input instanceof org.antlr.runtime.TokenStream ) {
 			return this.token.getType();
 		}
 		else if ( this.input instanceof org.antlr.runtime.tree.TreeNodeStream ) {

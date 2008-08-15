@@ -227,7 +227,7 @@ org.antlr.env.ua = function() {
     }
 
     try {
-        if (typeof window=="undefined" && loadClass) {
+        if (typeof window=="undefined" && typeof loadClass!="undefined") {
             o.rhino = true;
         }
     } catch(e) {}

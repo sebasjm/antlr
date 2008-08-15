@@ -281,7 +281,7 @@ org.antlr.lang.extend(org.antlr.runtime.tree.CommonTreeNodeStream,
     },
 
     reset: function() {
-        this.p = -1;
+        this.p = 0;
         this.lastMarker = 0;
         if (this.calls) {
             this.calls = [];

@@ -13,7 +13,7 @@ org.antlr.lang.extend(
     org.antlr.runtime.NoViableAltException,
     org.antlr.runtime.RecognitionException, {
     toString: function() {
-        if ( this.input instanceof org.antlr.runtime.ANTLRStringStream ) {
+        if ( this.input instanceof org.antlr.runtime.CharStream ) {
             return "NoViableAltException('"+this.getUnexpectedType()+"'@["+this.grammarDecisionDescription+"])";
         }
         else {

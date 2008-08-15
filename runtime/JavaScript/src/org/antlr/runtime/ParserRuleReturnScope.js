@@ -18,7 +18,9 @@
  */
 org.antlr.runtime.ParserRuleReturnScope = function() {};
 
-org.antlr.runtime.ParserRuleReturnScope.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.ParserRuleReturnScope,
+                      org.antlr.runtime.RuleReturnScope,
+{
     getStart: function() { return this.start; },
     getStop: function() { return this.stop; }
-};
+});

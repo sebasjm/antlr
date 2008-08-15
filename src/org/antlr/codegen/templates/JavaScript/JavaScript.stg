@@ -24,7 +24,7 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
-      filterMode) ::= <<
+      filterMode, superClass="org.antlr.runtime.Lexer") ::= <<
 var <grammar.recognizerName> = function(input, state<grammar.delegators:{g|, <g:delegateName()>}>) {
 // alternate constructor @todo
 // public <grammar.recognizerName>(CharStream input<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
@@ -61,7 +61,7 @@ org.antlr.lang.augmentObject(<grammar.recognizerName>, {
 (function(){
 var HIDDEN = org.antlr.runtime.Token.HIDDEN_CHANNEL,
     EOF = org.antlr.runtime.Token.EOF;
-org.antlr.lang.extend(<grammar.recognizerName>, org.antlr.runtime.Lexer, {
+org.antlr.lang.extend(<grammar.recognizerName>, <@superClassName><superClass><@end>, {
     <tokens:{<it.name> : <it.type>,}; separator="\n">
     <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
     getGrammarFileName: function() { return "<fileName>"; }
@@ -1064,7 +1064,7 @@ orPredicates(operands) ::= "(<first(operands)><rest(operands):{o | ||<o>}>)"
 
 notPredicate(pred) ::= "!(<evalPredicate(...)>)"
 
-evalPredicate(pred,description) ::= "<pred>"
+evalPredicate(pred,description) ::= "(<pred>)"
 
 evalSynPredicate(pred,description) ::= "this.<pred>()"
 

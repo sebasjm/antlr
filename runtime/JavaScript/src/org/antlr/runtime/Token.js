@@ -19,15 +19,15 @@ org.antlr.lang.augmentObject(org.antlr.runtime.Token, /** @lends Token */ {
     MIN_TOKEN_TYPE: 4, // UP+1,
 
     EOF: org.antlr.runtime.CharStream.EOF,
-    EOF_TOKEN: new org.antlr.runtime.CommonToken(org.antlr.runtime.CharStream.EOF),
+    EOF_TOKEN: null,
 
     INVALID_TOKEN_TYPE: 0,
-    INVALID_TOKEN: new org.antlr.runtime.CommonToken(0),
+    INVALID_TOKEN: null,
 
     /** In an action, a lexer rule can set token to this SKIP_TOKEN and ANTLR
      *  will avoid creating a token for this symbol and try to fetch another.
      */
-    SKIP_TOKEN: new org.antlr.runtime.CommonToken(0),
+    SKIP_TOKEN: null,
 
     /** All tokens go to the parser (unless skip() is called in that rule)
      *  on a particular "channel".  The parser tunes to a particular channel
@@ -40,5 +40,3 @@ org.antlr.lang.augmentObject(org.antlr.runtime.Token, /** @lends Token */ {
      */
     HIDDEN_CHANNEL: 99
 });
-
-org.antlr.lang.augmentObject(org.antlr.runtime.CommonToken, org.antlr.runtime.Token);

@@ -26,7 +26,7 @@ org.antlr.lang.extend(org.antlr.runtime.tree.CommonErrorNode, org.antlr.runtime.
 
     getText: function() {
         var badText = null;
-        if ( this.start instanceof org.antlr.runtime.CommonToken ) {
+        if ( this.start instanceof org.antlr.runtime.Token ) {
             var i = this.start.getTokenIndex();
             var j = this.stop.getTokenIndex();
             if ( this.stop.getType() === org.antlr.runtime.Token.EOF ) {
@@ -34,7 +34,7 @@ org.antlr.lang.extend(org.antlr.runtime.tree.CommonErrorNode, org.antlr.runtime.
             }
             badText = this.input.toString(i, j);
         }
-        else if ( this.start instanceof org.antlr.runtime.tree.CommonTree ) {
+        else if ( this.start instanceof org.antlr.runtime.tree.Tree ) {
             badText = this.input.toString(this.start, this.stop);
         }
         else {

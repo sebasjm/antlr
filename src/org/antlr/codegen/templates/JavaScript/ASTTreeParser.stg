@@ -208,6 +208,30 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 <listLabel(elem=label+".getTree()",...)>
 >>
 
+/** rule when output=AST and tracking for rewrite */
+ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
+_last = this.input.LT(1);
+<super.ruleRefTrack(...)>
+>>
+
+/** x+=rule when output=AST and tracking for rewrite */
+ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
+_last = this.input.LT(1);
+<super.ruleRefTrackAndListLabel(...)>
+>>
+
+/** ^(rule ...) rewrite */
+ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
+_last = this.input.LT(1);
+<super.ruleRefRootTrack(...)>
+>>
+
+/** ^(x+=rule ...) rewrite */
+ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
+_last = this.input.LT(1);
+<super.ruleRefRuleRootTrackAndListLabel(...)>
+>>
+
 /** Streams for token refs are tree nodes now; override to
  *  change nextToken to nextNode.
  */

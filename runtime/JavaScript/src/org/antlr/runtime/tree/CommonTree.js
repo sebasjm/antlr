@@ -129,3 +129,7 @@ org.antlr.lang.extend(org.antlr.runtime.tree.CommonTree, org.antlr.runtime.tree.
         return this.token.getText();
     }
 });
+
+/* Monkey patch Tree static property with CommonToken value. */
+org.antlr.runtime.tree.Tree.INVALID_NODE =
+  new org.antlr.runtime.tree.CommonTree(org.antlr.runtime.Token.INVALID_TOKEN);

@@ -2,6 +2,7 @@
  * A stream of characters created from a JavaScript string that in turn gets
  * fed to a lexer.
  * @class
+ * @extends org.antlr.runtime.CharStream
  * @param {String} data the string from which this stream will be created.
  */
 org.antlr.runtime.ANTLRStringStream = function(data) {
@@ -68,7 +69,10 @@ org.antlr.runtime.ANTLRStringStream = function(data) {
     this.n = data.length;
 };
 
-org.antlr.runtime.ANTLRStringStream.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.ANTLRStringStream,
+                      org.antlr.runtime.CharStream,
+/** @lends org.antlr.runtime.ANTLRStringStream.prototype */
+{
     /**
      * Reset the stream so that it's in the same state it was
      * when the object was created *except* the data array is not
@@ -305,11 +309,10 @@ org.antlr.runtime.ANTLRStringStream.prototype = {
     getSourceName: function() {
         return null;
     }
-};
+});
 
 /**
  * Alias for {@link #LA}.
  * @methodOf org.antlr.runtime.ANTLRStringStream.prototype
- * @name LT
  */
-org.antlr.runtime.ANTLRStringStream.LT = org.antlr.runtime.ANTLRStringStream.LA;
+org.antlr.runtime.ANTLRStringStream.prototype.LT = org.antlr.runtime.ANTLRStringStream.prototype.LA;

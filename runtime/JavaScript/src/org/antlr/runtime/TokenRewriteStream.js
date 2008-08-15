@@ -252,7 +252,7 @@ org.antlr.lang.extend(trs, org.antlr.runtime.CommonTokenStream, {
             text = arguments[2];
         }
 
-        if (index instanceof org.antlr.runtime.CommonToken) {
+        if (index instanceof org.antlr.runtime.Token) {
             // index is a Token, grab it's stream index
             index = index.index; // that's ugly
         }
@@ -273,7 +273,7 @@ org.antlr.lang.extend(trs, org.antlr.runtime.CommonTokenStream, {
             text = arguments[2];
         }
 
-        if (index instanceof org.antlr.runtime.CommonToken) {
+        if (index instanceof org.antlr.runtime.Token) {
             // index is a Token, grab it's stream index
             index = index.index; // that's ugly
         }
@@ -303,11 +303,11 @@ org.antlr.lang.extend(trs, org.antlr.runtime.CommonTokenStream, {
             text = arguments[3];
         } 
 
-        if (first instanceof org.antlr.runtime.CommonToken) {
+        if (first instanceof org.antlr.runtime.Token) {
             first = first.index;
         }
 
-        if (last instanceof org.antlr.runtime.CommonToken) {
+        if (last instanceof org.antlr.runtime.Token) {
             last = last.index; // that's ugly
         }
 

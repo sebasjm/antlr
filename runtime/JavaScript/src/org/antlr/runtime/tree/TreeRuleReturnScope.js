@@ -5,6 +5,8 @@
  */
 org.antlr.runtime.tree.TreeRuleReturnScope = function(){};
 
-org.antlr.runtime.tree.TreeRuleReturnScope.prototype = {
+org.antlr.lang.extend(org.antlr.runtime.tree.TreeRuleReturnScope,
+                      org.antlr.runtime.RuleReturnScope,
+{
     getStart: function() { return this.start; }
-};
+});
