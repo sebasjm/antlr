@@ -134,6 +134,19 @@
         <mkdir dir="${build.classes}" />
         <myjavac destdir="${build.classes}" classpathref="classpath">
             <src refid="src.path" />
+	    <exclude name="**/antlr/tool/ANTLRLexer.java" />
+	    <exclude name="**/antlr/tool/ANTLRParser.java" />
+	    <exclude name="**/antlr/tool/ANTLRTokenTypes.java" />
+	    <exclude name="**/antlr/tool/ANTLRTreePrinter.java" />
+	    <exclude name="**/antlr/tool/ANTLRTreePrinterTokenTypes.java" />
+	    <exclude name="**/antlr/tool/AssignTokenTypesWalker.java" />
+	    <exclude name="**/antlr/tool/AssignTokenTypesWalkerTokenTypes.java" />
+	    <exclude name="**/antlr/codegen/CodeGenTreeWalker.java" />
+	    <exclude name="**/antlr/codegen/CodeGenTreeWalkerTokenTypes.java" />
+	    <exclude name="**/antlr/tool/DefineGrammarItemsWalker.java" />
+	    <exclude name="**/antlr/tool/DefineGrammarItemsWalkerTokenTypes.java" />
+	    <exclude name="**/antlr/tool/TreeToNFAConverter.java" />
+	    <exclude name="**/antlr/tool/TreeToNFAConverterTokenTypes.java" />
         </myjavac>
     </target>
 
