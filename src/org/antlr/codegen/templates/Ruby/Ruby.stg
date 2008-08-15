@@ -32,9 +32,8 @@ group Ruby implements ANTLRCore;
  *  and cyclic DFAs plus support code.
  */
 outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
-		   docComment, recognizer,
-		   name, tokens, tokenNames, rules, cyclicDFAs,
-	   bitsets, buildTemplate, buildAST, rewrite, profile,
+           docComment, recognizer, name, tokens, tokenNames, rules,
+           cyclicDFAs, bitsets, buildTemplate, buildAST, rewriteMode, profile,
 	   backtracking, synpreds, memoize, numRules,
 	   fileName, ANTLRVersion, generatedTimestamp, trace,
 	   scopes, superClass, literals) ::=
@@ -51,7 +50,8 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
  *
  * labelType is not used for Ruby (no explicit type declarations)
  */
-lexer(grammar, name, tokens, scopes, rules, numRules, labelType, filterMode) ::=
+lexer(grammar, name, tokens, scopes, rules, numRules, labelType, filterMode,
+      superClass) ::=
 <<
 class <name>
     require 'stringio'
@@ -543,7 +543,7 @@ optionalBlock ::= block
 optionalBlockSingleAlt ::= block
 
 /** An alternative is just a list of elements; at outermost level */
-alt(elements,altNum,description,autoAST,outerAlt)::=
+alt(elements,altNum,description,autoAST,outerAlt,treeLevel,rew) ::=
 <<
 # <description>
 <elements: element(); separator="\n">
@@ -552,7 +552,7 @@ alt(elements,altNum,description,autoAST,outerAlt)::=
 // E L E M E N T S
 
 /** match a token optionally with a label in front */
-tokenRef(token,label,elementIndex)::=
+tokenRef(token,label,elementIndex,hetero) ::=
 <<
 <if(label)>
 _<label> = @input.look_ahead(1)<\n>
@@ -561,7 +561,7 @@ match(:<token>)
 >>
 
 /** ids+=ID */
-tokenRefAndListLabel(token,label,elementIndex)::=
+tokenRefAndListLabel(token,label,elementIndex,hetero) ::=
 <<
 <tokenRef(...)>
 <listLabel(elem=label, ...)>
@@ -654,7 +654,7 @@ wildcardCharListLabel(label, elementIndex)::=
 /** Match a rule reference by invoking it possibly with arguments
  *  and a return value or values.
  */
-ruleRef(rule,label,elementIndex,args)::=
+ruleRef(rule,label,elementIndex,args,scope) ::=
 <<
 <if(label)>
 _<label> = <rule>(<args; separator=", ">)<\n>
@@ -664,7 +664,7 @@ _<label> = <rule>(<args; separator=", ">)<\n>
 >>
 
 /** ids+=ID */
-ruleRefAndListLabel(rule,label,elementIndex,args)::=
+ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::=
 <<
 <ruleRef(...)>
 <listLabel(elem=label,...)>
@@ -679,7 +679,7 @@ B: .;
 TODO: Should we use a real token type instead of :invalid? How do we get it?
  
 */
-lexerRuleRef(rule,label,args,elementIndex)::=
+lexerRuleRef(rule,label,args,elementIndex,scope)::=
 <<
 <if(label)>
 _<label>_start_<elementIndex> = @input.index
@@ -696,7 +696,7 @@ match_<rule>(<args; separator=", ">)
 >>
 
 
-lexerRuleRefAndListLabel(rule,label,args,elementIndex) ::=
+lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::=
 <<
 <lexerRuleRef(...)>
 <listLabel(elem=label,...)>
@@ -712,7 +712,8 @@ match(:EOF)
 >>
 
 /** match ^(root children) in tree parser */
-tree(root, actionsAfterRoot, children, nullableChildList) ::=
+tree(root, actionsAfterRoot, children, nullableChildList, enclosingTreeLevel,
+     treeLevel) ::=
 <<
 	raise "tree not implemented"
 >>
@@ -1216,7 +1217,7 @@ codeFileExtension()::=".rb"
 true()::= "true"
 false()::= "false"
 
-
+noRewrite(rewriteBlockLevel, treeLevel) ::= ""
 
 ///////////// --------------------------- private templates --------------------------------
 
