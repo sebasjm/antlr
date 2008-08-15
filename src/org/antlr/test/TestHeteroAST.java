@@ -263,7 +263,32 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("(begin<V> 2)\n", found);
 	}
 
-	// TREE PARSERS -- REWRITE AST
+    public void testRewriteRuleResults() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "tokens {LIST;}\n" +
+            "@members {\n" +
+            "static class V extends CommonTree {\n" +
+            "  public V(Token t) { token=t;}\n" +
+            "  public String toString() { return token.getText()+\"<V>\";}\n" +
+            "}\n" +
+            "static class W extends CommonTree {\n" +
+            "  public W(int tokenType, String txt) { super(new CommonToken(tokenType,txt)); }\n" +
+            "  public W(Token t) { token=t;}\n" +
+            "  public String toString() { return token.getText()+\"<W>\";}\n" +
+            "}\n" +
+            "}\n"+
+            "a : id (',' id)* -> ^(LIST<W>[\"LIST\"] id+);\n" +
+            "id : ID -> ID<V>;\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+        String found = execParser("T.g", grammar, "TParser", "TLexer",
+                    "a", "a,b,c", debug);
+        assertEquals("(LIST<W> a<V> b<V> c<V>)\n", found);
+    }
+
+    // TREE PARSERS -- REWRITE AST
 
 	public void testTreeParserRewriteFlatList() throws Exception {
 		String grammar =
