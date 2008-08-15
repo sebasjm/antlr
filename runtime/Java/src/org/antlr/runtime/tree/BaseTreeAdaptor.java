@@ -54,6 +54,9 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	 *  override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
 	 *  if no token payload but you might have to set token type for diff
 	 *  node type.
+     *
+     *  You don't have to subclass CommonErrorNode; you will likely need to
+     *  subclass your own tree node class to avoid class cast exception.
 	 */
 	public Object errorNode(TokenStream input, Token start, Token stop,
 							RecognitionException e)
