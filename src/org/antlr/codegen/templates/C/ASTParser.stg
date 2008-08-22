@@ -49,7 +49,7 @@ retval.tree = (<ASTLabelType>)(ADAPTOR->errorNode(ADAPTOR, INPUT, retval.start, 
 tokenRef(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
 <if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
-<label>_tree = ADAPTOR->create(ADAPTOR, <label>);
+<label>_tree = (<ASTLabelType>)(ADAPTOR->create(ADAPTOR, <label>));
 ADAPTOR->addChild(ADAPTOR, root_0, <label>_tree);
 <if(backtracking)>}<endif>
 >>
