@@ -245,7 +245,6 @@ public partial class <grammar.recognizerName> : <@superClassName><superClass><@e
 
     public <grammar.recognizerName>(<inputStreamType> input, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>)
 		: base(input, state) {
-		InitializeCyclicDFAs();
         <parserCtorBody()>
         <grammar.directDelegates:
          {g|<g:delegateName()> = new <g.recognizerName>(input, state<trunc(g.delegators):{p|, <p:delegateName()>}>, this);}; separator="\n">         
@@ -292,6 +291,7 @@ public partial class <grammar.recognizerName> : <@superClassName><superClass><@e
 >>
 
 parserCtorBody() ::= <<
+InitializeCyclicDFAs();
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
 this.state.ruleMemo = new Hashtable[<length(grammar.allImportedRules)>+1];<\n> <! index from 1..n !>

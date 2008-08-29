@@ -292,8 +292,8 @@ namespace Antlr.Runtime
 					tokenName = tokenNames[mtne.expecting];
 				}
 				// The ternary operator is only necessary because of a bug in the .NET framework
-				msg = "mismatched tree node: " + (mtne.Node!=null?mtne.Node:string.Empty) +
-					" expecting " + tokenName;
+				msg = "mismatched tree node: " + ((mtne.Node!=null && mtne.Node.ToString()!=null) ?
+					mtne.Node : string.Empty) + " expecting " + tokenName;
 			}
 			else if (e is NoViableAltException)
 			{
