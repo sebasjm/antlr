@@ -272,7 +272,7 @@ UNREACHABLE_TOKENS(tokens) ::= <<
 The following token definitions can never be matched because prior tokens match the same input: <tokens; separator=",">
 >>
 
-TOKEN_NONDETERMINISM(input,conflictingTokens,paths,disabled) ::=
+TOKEN_NONDETERMINISM(input,conflictingTokens,paths,disabled,hasPredicateBlockedByAction) ::=
 <<
 <if(paths)>
 Decision can match input such as "<input>" using multiple alternatives:
@@ -280,9 +280,7 @@ Decision can match input such as "<input>" using multiple alternatives:
 <else>
 Multiple token rules can match input such as "<input>": <conflictingTokens; separator=", "><\n>
 <endif>
-<if(disabled)>
-As a result, tokens(s) <disabled; separator=","> were disabled for that input
-<endif>
+<if(disabled)><\n>As a result, token(s) <disabled; separator=","> were disabled for that input<endif><if(hasPredicateBlockedByAction)><\n>Semantic predicates were present but were hidden by actions.<endif>
 >>
 
 LEFT_RECURSION_CYCLES(listOfCycles) ::= <<

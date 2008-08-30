@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+August 30, 2008
+
+* Changed messages in en.stg so that TOKEN_NONDETERMINISM correctly
+  indicates when actions hid semantic predicates.
+
 August 15, 2008
 
 * Tweaked build properties and build.xml
