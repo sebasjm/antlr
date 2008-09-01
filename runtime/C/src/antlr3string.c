@@ -120,7 +120,7 @@ antlr3UCS2StringFactoryNew()
 
     if	(factory == NULL)
     {
-	return	NULL;
+		return	NULL;
     }
 
     /* Override the 8 bit API with the UCS2 (mostly just 16 bit) API
@@ -155,7 +155,7 @@ newRaw8	(pANTLR3_STRING_FACTORY factory)
 
     if	(string == NULL)
     {
-	return	NULL;
+		return	NULL;
     }
 
     /* Structure is allocated, now fill in the API etc.
@@ -184,7 +184,7 @@ newRaw16	(pANTLR3_STRING_FACTORY factory)
 
     if	(string == NULL)
     {
-	return	NULL;
+		return	NULL;
     }
 
     /* Structure is allocated, now fill in the API etc.
@@ -223,9 +223,9 @@ void	ANTLR3_CDECL stringFree  (pANTLR3_STRING string)
 static	void
 stringInit8  (pANTLR3_STRING string)
 {
-    string->len		= 0;
-    string->size	= 0;
-    string->chars	= NULL;
+    string->len			= 0;
+    string->size		= 0;
+    string->chars		= NULL;
     string->encoding	= ANTLR3_ENCODING_LATIN1;
 
     /* API for 8 bit strings*/
@@ -390,13 +390,15 @@ newSize8	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
 
     if	(string == NULL)
     {
-	return	string;
+		return	string;
     }
 
     /* Always add one more byte for a terminator ;-)
      */
-    string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT8) * (size+1)));
-    string->size    = size + 1;
+    string->chars		= (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT8) * (size+1)));
+	*(string->chars)	= '\0';
+    string->size		= size + 1;
+
 
     return string;
 }
@@ -416,13 +418,14 @@ newSize16	(pANTLR3_STRING_FACTORY factory, ANTLR3_UINT32 size)
 
     if	(string == NULL)
     {
-	return	string;
+		return	string;
     }
 
     /* Always add one more byte for a terminator ;-)
-     */
-    string->chars   = (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT16) * (size+1)));
-    string->size    = size+1;	/* Size is always in characters, as is len */
+     */	
+    string->chars		= (pANTLR3_UINT8) ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_UINT16) * (size+1)));
+	*(string->chars)	= '\0';
+    string->size		= size+1;	/* Size is always in characters, as is len */
 
     return string;
 }
@@ -584,7 +587,7 @@ newStr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
 
     while   (*in++ != '\0')
     {
-	count++;
+		count++;
     }
     return factory->newPtr(factory, ptr, count);
 }
@@ -616,24 +619,24 @@ printable8(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 
     for	(i = 0; i < instr->len; i++)
     {
-	if (*(instr->chars + i) == '\n')
-	{
-	    *scannedText++ = '\\';
-	    *scannedText++ = 'n';
-	}
-	else if (*(instr->chars + i) == '\r')
-	{
-	    *scannedText++ = '\\';
-	    *scannedText++ = 'r';
-	}
-	else if	(!isprint(*(instr->chars +i)))
-	{
-	    *scannedText++ = '?';
-	}
-	else
-	{
-	    *scannedText++ = *(instr->chars + i);
-	}
+		if (*(instr->chars + i) == '\n')
+		{
+			*scannedText++ = '\\';
+			*scannedText++ = 'n';
+		}
+		else if (*(instr->chars + i) == '\r')
+		{
+			*scannedText++ = '\\';
+			*scannedText++ = 'r';
+		}
+		else if	(!isprint(*(instr->chars +i)))
+		{
+			*scannedText++ = '?';
+		}
+		else
+		{
+			*scannedText++ = *(instr->chars + i);
+		}
     }
     *scannedText  = '\0';
 
@@ -667,28 +670,28 @@ printable16(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING instr)
 
     for	(i = 0; i < instr->len; i++)
     {
-	if (*(inText + i) == '\n')
-	{
-	    *scannedText++   = '\\';
-	    *scannedText++   = 'n';
-	    outLen	    += 2;
-	}
-	else if (*(inText + i) == '\r')
-	{
-	    *scannedText++   = '\\';
-	    *scannedText++   = 'r';
-	    outLen	    += 2;
-	}
-	else if	(!isprint(*(inText +i)))
-	{
-	    *scannedText++ = '?';
-	    outLen++;
-	}
-	else
-	{
-	    *scannedText++ = *(inText + i);
-	    outLen++;
-	}
+		if (*(inText + i) == '\n')
+		{
+			*scannedText++   = '\\';
+			*scannedText++   = 'n';
+			outLen	    += 2;
+		}
+		else if (*(inText + i) == '\r')
+		{
+			*scannedText++   = '\\';
+			*scannedText++   = 'r';
+			outLen	    += 2;
+		}
+		else if	(!isprint(*(inText +i)))
+		{
+			*scannedText++ = '?';
+			outLen++;
+		}
+		else
+		{
+			*scannedText++ = *(inText + i);
+			outLen++;
+		}
     }
     *scannedText  = '\0';
 
@@ -722,8 +725,8 @@ append8	(pANTLR3_STRING string, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + len + 1));
-	string->size	= string->len + len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + len + 1));
+		string->size	= string->len + len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing
@@ -745,8 +748,8 @@ append16_8	(pANTLR3_STRING string, const char * newbit)
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)((sizeof(ANTLR3_UINT16)*(string->len + len + 1))));
-	string->size	= string->len + len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)((sizeof(ANTLR3_UINT16)*(string->len + len + 1))));
+		string->size	= string->len + len + 1;
     }
 
     apPoint = ((pANTLR3_UINT16)string->chars) + string->len;
@@ -754,7 +757,7 @@ append16_8	(pANTLR3_STRING string, const char * newbit)
 
     for	(count = 0; count < len; count++)
     {
-	*apPoint++   = *(newbit + count);
+		*apPoint++   = *(newbit + count);
     }
     *apPoint = '\0';
 
@@ -774,13 +777,13 @@ append16_16	(pANTLR3_STRING string, const char * newbit)
 
     while   (*in++ != '\0')
     {
-	len++;
+		len++;
     }
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)( sizeof(ANTLR3_UINT16) *(string->len + len + 1) ));
-	string->size	= string->len + len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)( sizeof(ANTLR3_UINT16) *(string->len + len + 1) ));
+		string->size	= string->len + len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing delimiter
@@ -799,8 +802,8 @@ set8	(pANTLR3_STRING string, const char * chars)
     len = (ANTLR3_UINT32)strlen(chars);
     if	(string->size < len + 1)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(len + 1));
-	string->size	= len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(len + 1));
+		string->size	= len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing '\0'
@@ -821,16 +824,16 @@ set16_8	(pANTLR3_STRING string, const char * chars)
 
     len = (ANTLR3_UINT32)strlen(chars);
     if	(string->size < len + 1)
-    {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len + 1)));
-	string->size	= len + 1;
+	{
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len + 1)));
+		string->size	= len + 1;
     }
     apPoint = ((pANTLR3_UINT16)string->chars);
     string->len	= len;
 
     for	(count = 0; count < string->len; count++)
     {
-	*apPoint++   = *(chars + count);
+		*apPoint++   = *(chars + count);
     }
     *apPoint = '\0';
 
@@ -850,13 +853,13 @@ set16_16    (pANTLR3_STRING string, const char * chars)
 
     while   (*in++ != '\0')
     {
-	len++;
+		len++;
     }
 
     if	(string->size < len + 1)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len + 1)));
-	string->size	= len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(len + 1)));
+		string->size	= len + 1;
     }
 
     /* Note we copy one more byte than the strlen in order to get the trailing '\0'
@@ -873,8 +876,8 @@ addc8	(pANTLR3_STRING string, ANTLR3_UINT32 c)
 {
     if	(string->size < string->len + 2)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + 2));
-	string->size	= string->len + 2;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + 2));
+		string->size	= string->len + 2;
     }
     *(string->chars + string->len)	= (ANTLR3_UINT8)c;
     *(string->chars + string->len + 1)	= '\0';
@@ -890,8 +893,8 @@ addc16	(pANTLR3_STRING string, ANTLR3_UINT32 c)
 
     if	(string->size < string->len + 2)
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16) * (string->len + 2)));
-	string->size	= string->len + 2;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16) * (string->len + 2)));
+		string->size	= string->len + 2;
     }
     ptr	= (pANTLR3_UINT16)(string->chars);
 
@@ -945,20 +948,20 @@ insert8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     if	(point >= string->len)
     {
-	return	string->append(string, newbit);
+		return	string->append(string, newbit);
     }
  
     len	= (ANTLR3_UINT32)strlen(newbit);
 
     if	(len == 0)
     {
-	return	string->chars;
+		return	string->chars;
     }
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + len + 1));
-	string->size	= string->len + len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(string->len + len + 1));
+		string->size	= string->len + len + 1;
     }
 
     /* Move the characters we are inserting before, including the delimiter
@@ -983,14 +986,14 @@ insert16_8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     if	(point >= string->len)
     {
-	return	string->append8(string, newbit);
+		return	string->append8(string, newbit);
     }
  
     len	= (ANTLR3_UINT32)strlen(newbit);
 
     if	(len == 0)
     {
-	return	string->chars;
+		return	string->chars;
     }
 
     if	(string->size < (string->len + len + 1))
@@ -1008,7 +1011,7 @@ insert16_8	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
     inPoint = ((pANTLR3_UINT16)(string->chars))+point;
     for	(count = 0; count<len; count++)
     {
-	*(inPoint + count) = (ANTLR3_UINT16)(*(newbit+count));
+		*(inPoint + count) = (ANTLR3_UINT16)(*(newbit+count));
     }
 
     return  string->chars;
@@ -1022,7 +1025,7 @@ insert16_16	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     if	(point >= string->len)
     {
-	return	string->append(string, newbit);
+		return	string->append(string, newbit);
     }
  
     /** First, determine the length of the input string
@@ -1032,18 +1035,18 @@ insert16_16	(pANTLR3_STRING string, ANTLR3_UINT32 point, const char * newbit)
 
     while   (*in++ != '\0')
     {
-	len++;
+		len++;
     }
 
     if	(len == 0)
     {
-	return	string->chars;
+		return	string->chars;
     }
 
     if	(string->size < (string->len + len + 1))
     {
-	string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
-	string->size	= string->len + len + 1;
+		string->chars	= (pANTLR3_UINT8) ANTLR3_REALLOC((void *)string->chars, (ANTLR3_UINT32)(sizeof(ANTLR3_UINT16)*(string->len + len + 1)));
+		string->size	= string->len + len + 1;
     }
 
     /* Move the characters we are inserting before, including the delimiter
@@ -1071,11 +1074,11 @@ static    pANTLR3_UINT8	    appendS	(pANTLR3_STRING string, pANTLR3_STRING newbi
      */
     if	(newbit == NULL || newbit->len == 0 || newbit->size == 0 || newbit->chars == NULL)
     {
-	return	string->chars;
+		return	string->chars;
     }
     else
     {
-	return  string->append(string, (const char *)(newbit->chars));
+		return  string->append(string, (const char *)(newbit->chars));
     }
 }
 
@@ -1107,13 +1110,13 @@ compare16_8	(pANTLR3_STRING string, const char * compStr)
 
     while   (((ANTLR3_UCHAR)(*ourString) != '\0') && ((ANTLR3_UCHAR)(*compStr) != '\0'))
     {
-	charDiff = *ourString - *compStr;
-	if  (charDiff != 0)
-	{
-	    return charDiff;
-	}
-	ourString++;
-	compStr++;
+		charDiff = *ourString - *compStr;
+		if  (charDiff != 0)
+		{
+			return charDiff;
+		}
+		ourString++;
+		compStr++;
     }
 
     /* At this point, one of the strings was terminated
@@ -1138,13 +1141,13 @@ compare16_16	(pANTLR3_STRING string, const char * compStr8)
 
     while   (((ANTLR3_UCHAR)(*ourString) != '\0') && ((ANTLR3_UCHAR)(*((pANTLR3_UINT16)compStr)) != '\0'))
     {
-	charDiff = *ourString - *compStr;
-	if  (charDiff != 0)
-	{
-	    return charDiff;
-	}
-	ourString++;
-	compStr++;
+		charDiff = *ourString - *compStr;
+		if  (charDiff != 0)
+		{
+			return charDiff;
+		}
+		ourString++;
+		compStr++;
     }
 
     /* At this point, one of the strings was terminated
@@ -1187,11 +1190,11 @@ charAt16    (pANTLR3_STRING string, ANTLR3_UINT32 offset)
 {
     if	(offset > string->len)
     {
-	return (ANTLR3_UCHAR)'\0';
+		return (ANTLR3_UCHAR)'\0';
     }
     else
     {
-	return  (ANTLR3_UCHAR)(*((pANTLR3_UINT16)(string->chars) + offset));
+		return  (ANTLR3_UCHAR)(*((pANTLR3_UINT16)(string->chars) + offset));
     }
 }
 
@@ -1205,7 +1208,7 @@ subString8   (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 end
 
     if	(endIndex > string->len)
     {
-	endIndex = string->len + 1;
+		endIndex = string->len + 1;
     }
     newStr  = string->factory->newPtr(string->factory, string->chars + startIndex, endIndex - startIndex);
 
@@ -1222,7 +1225,7 @@ subString16  (pANTLR3_STRING string, ANTLR3_UINT32 startIndex, ANTLR3_UINT32 end
 
     if	(endIndex > string->len)
     {
-	endIndex = string->len + 1;
+		endIndex = string->len + 1;
     }
     newStr  = string->factory->newPtr(string->factory, (pANTLR3_UINT8)((pANTLR3_UINT16)(string->chars) + startIndex), endIndex - startIndex);
 
@@ -1252,19 +1255,19 @@ toInt32_16       (struct ANTLR3_STRING_struct * string)
 
     if	(*input == (ANTLR3_UCHAR)'-')
     {
-	negate = ANTLR3_TRUE;
-	input++;
+		negate = ANTLR3_TRUE;
+		input++;
     }
     else if (*input == (ANTLR3_UCHAR)'+')
     {
-	input++;
+		input++;
     }
 
     while   (*input != '\0' && isdigit(*input))
     {
-	value	 = value * 10;
-	value	+= ((ANTLR3_UINT32)(*input) - (ANTLR3_UINT32)'0');
-	input++;
+		value	 = value * 10;
+		value	+= ((ANTLR3_UINT32)(*input) - (ANTLR3_UINT32)'0');
+		input++;
     }
 
     return negate ? -value : value;
