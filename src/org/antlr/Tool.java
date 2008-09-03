@@ -37,7 +37,8 @@ import java.util.*;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
-	public static final String VERSION = "3.1.1-daily";
+    public static final String REV = "???";
+    public static final String VERSION = "3.1.1-"+REV;
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
 
