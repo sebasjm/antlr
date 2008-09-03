@@ -7,6 +7,16 @@ University of San Francisco
 
 CHANGES
 
+September 3, 2008
+
+* Made a REV static variable in Tool so that we can change the rev for
+  daily builds.
+
+* Made \uFFFF a valid character. Token types are 32-bit clean using -1
+  not 0x0000FFFF as -1 so it should be okay.  Label.java:
+    public static final int MIN_CHAR_VALUE = '\u0000';
+    public static final int MAX_CHAR_VALUE = '\uFFFF';
+
 August 30, 2008
 
 * Changed messages in en.stg so that TOKEN_NONDETERMINISM correctly
