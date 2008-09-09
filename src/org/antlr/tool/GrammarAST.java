@@ -479,11 +479,13 @@ public class GrammarAST extends BaseAST {
 			// return x from ^(ROOT x)
 			return (GrammarAST)dupListNoActions((GrammarAST)t.getFirstChild(), t);
 		}
-		if ( (ttype==ANTLRParser.ASSIGN||ttype==ANTLRParser.PLUS_ASSIGN) &&
+        /* DOH!  Must allow labels for sem preds
+        if ( (ttype==ANTLRParser.ASSIGN||ttype==ANTLRParser.PLUS_ASSIGN) &&
 			 (parent==null||parent.getType()!=ANTLRParser.OPTIONS) )
 		{
 			return dupTreeNoActions(t.getChild(1), t); // return x from ^(ASSIGN label x)
 		}
+		*/
 		GrammarAST result = dup(t);		// make copy of root
 		// copy all children of root.
 		GrammarAST kids = dupListNoActions((GrammarAST)t.getFirstChild(), t);

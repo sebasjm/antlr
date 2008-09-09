@@ -7,6 +7,16 @@ University of San Francisco
 
 CHANGES
 
+September 8, 2008
+
+* Labels on tokens, rules carry into synpreds now so semantic predicates work.
+  This didn't work since labels were stripped in the synpred and they weren't
+  defined in the generated method.
+
+  a : x=A z=a {$x.text.equals($z.text)}? A
+    | y=A a A A 
+    ;
+
 September 3, 2008
 
 * Made a REV static variable in Tool so that we can change the rev for
