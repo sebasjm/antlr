@@ -30,7 +30,7 @@ package org.antlr.test;
 public class TestSyntacticPredicateEvaluation extends BaseTest {
 	public void testTwoPredsWithNakedAlt() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : (a ';')+ ;\n" +
 			"a\n" +
 			"options {\n" +
@@ -48,7 +48,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"   : '(' c ')' | 'x' ;\n" +
 			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "(x) ;", false);
 		String expecting =
 			"enter b\n" +
@@ -57,7 +57,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 2\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 			    "a", "(x). ;", false);
 		expecting =
 			"enter b\n" +
@@ -65,7 +65,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 1\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 			    "a", "((x)) ;", false);
 		expecting =
 			"enter b\n" +
@@ -79,7 +79,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 
 	public void testTwoPredsWithNakedAltNotLast() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : (a ';')+ ;\n" +
 			"a\n" +
 			"options {\n" +
@@ -97,7 +97,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"   : '(' c ')' | 'x' ;\n" +
 			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "(x) ;", false);
 		String expecting =
 			"enter b\n" +
@@ -106,7 +106,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 2\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 			    "a", "(x). ;", false);
 		expecting =
 			"enter b\n" +
@@ -114,7 +114,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"alt 1\n";
 		assertEquals(expecting, found);
 
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 			    "a", "((x)) ;", false);
 		expecting =
 			"enter b\n" +
@@ -125,9 +125,9 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLexerPred() throws Exception {
+	public void tesTLexerPred() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : A ;\n" +
 			"A options {k=1;}\n" + // force backtracking
 			"  : (B '.')=>B '.' {System.out.println(\"alt1\");}\n" +
@@ -135,20 +135,20 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "s", "xxx", false);
 
 		assertEquals("alt2\n", found);
 
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 			    "s", "xxx.", false);
 
 		assertEquals("alt1\n", found);
 	}
 
-	public void testLexerWithPredLongerThanAlt() throws Exception {
+	public void tesTLexerWithPredLongerThanAlt() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : A ;\n" +
 			"A options {k=1;}\n" + // force backtracking
 			"  : (B '.')=>B {System.out.println(\"alt1\");}\n" +
@@ -157,20 +157,20 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"D : '.' {System.out.println(\"D\");} ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "s", "xxx", false);
 
 		assertEquals("alt2\n", found);
 
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 			    "s", "xxx.", false);
 
 		assertEquals("alt1\nD\n", found);
 	}
 
-	public void testLexerPredCyclicPrediction() throws Exception {
+	public void tesTLexerPredCyclicPrediction() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : A ;\n" +
 			"A : (B)=>(B|'y'+) {System.out.println(\"alt1\");}\n" +
 			"  | B {System.out.println(\"alt2\");}\n" +
@@ -178,15 +178,15 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "s", "xxx", false);
 
 		assertEquals("alt1\n", found);
 	}
 
-	public void testLexerPredCyclicPrediction2() throws Exception {
+	public void tesTLexerPredCyclicPrediction2() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : A ;\n" +
 			"A : (B '.')=>(B|'y'+) {System.out.println(\"alt1\");}\n" +
 			"  | B {System.out.println(\"alt2\");}\n" +
@@ -194,14 +194,14 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"fragment\n" +
 			"B : 'x'+ ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "s", "xxx", false);
 		assertEquals("alt2\n", found);
 	}
 
 	public void testSimpleNestedPred() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : (expr ';')+ ;\n" +
 			"expr\n" +
 			"options {\n" +
@@ -219,7 +219,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"INT: '0'..'9'+ ;\n" +
 			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "s", "(34)x;", false);
 		String expecting =
 			"enter expr (\n" +
@@ -236,7 +236,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 
 	public void testTripleNestedPredInLexer() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"s : (.)+ {System.out.println(\"done\");} ;\n" +
 			"EXPR\n" +
 			"options {\n" +
@@ -254,7 +254,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"fragment INT: '0'..'9'+ ;\n" +
 			"fragment WS : (' '|'\\n')+ \n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "s", "((34)x)x", false);
 		String expecting = // has no memoization
 			"enter expr (\n" +
@@ -338,7 +338,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 	public void testSynPredWithOutputTemplate() throws Exception {
 		// really just seeing if it will compile
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"options {output=template;}\n" +
 			"a\n" +
 			"options {\n" +
@@ -349,7 +349,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "xxxy", false);
 
 		assertEquals("1:xxxy;\n", found);
@@ -358,7 +358,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 	public void testSynPredWithOutputAST() throws Exception {
 		// really just seeing if it will compile
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 			"options {output=AST;}\n" +
 			"a\n" +
 			"options {\n" +
@@ -369,7 +369,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 			"  ;\n" +
 			"WS : (' '|'\\n')+ {$channel=HIDDEN;}\n" +
 			"   ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "xxxy", false);
 
 		assertEquals("x x x y\n", found);
@@ -377,14 +377,14 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 
 	public void testOptionalBlockWithSynPred() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 				"\n" +
 				"a : ( (b)=> b {System.out.println(\"b\");})? b ;\n" +
 				"b : 'x' ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "xx", false);
 		assertEquals("b\n", found);
-		found = execParser("t.g", grammar, "tParser", "tLexer",
+		found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "x", false);
 		assertEquals("", found);
 	}
@@ -393,11 +393,11 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		// all manually specified syn predicates are gated (i.e., forced
 		// to execute).
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 				"\n" +
 				"a : (b)=> b {System.out.println(\"alt1\");} | 'a' 'c' ;\n" +
 				"b : 'a' 'b' ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "ab", false);
 
 		assertEquals("alt1\n", found);
@@ -405,11 +405,11 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 
 	public void testSynPredKStar() throws Exception {
 		String grammar =
-			"grammar t;\n" +
+			"grammar T;\n" +
 				"\n" +
 				"a : (b)=> b {System.out.println(\"alt1\");} | 'a'+ 'c' ;\n" +
 				"b : 'a'+ 'b' ;\n" ;
-		String found = execParser("t.g", grammar, "tParser", "tLexer",
+		String found = execParser("T.g", grammar, "TParser", "TLexer",
 				    "a", "aaab", false);
 
 		assertEquals("alt1\n", found);
