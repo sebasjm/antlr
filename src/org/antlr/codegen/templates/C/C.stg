@@ -2465,7 +2465,7 @@ ANTLR3_CYCLIC_DFA cdfa<dfa.decisionNumber>
 cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::= <<
 {
     ANTLR3_UINT32 LA<decisionNumber>_<stateNumber>;<\n>
-    ANTLR3_UINT32 index<decisionNumber>_<stateNumber>;<\n>
+    ANTLR3_MARKER index<decisionNumber>_<stateNumber>;<\n>
 
 	LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     <if(semPredState)> <! get next lookahead symbol to test edges, then rewind !>

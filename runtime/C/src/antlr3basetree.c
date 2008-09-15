@@ -117,7 +117,6 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 {
 	ANTLR3_UINT32   n;
 	ANTLR3_UINT32   i;
-	pANTLR3_BASE_TREE newChild;
 
 	if	(child == NULL)
 	{
