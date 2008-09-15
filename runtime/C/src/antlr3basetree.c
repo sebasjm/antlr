@@ -156,7 +156,7 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 				//
 				if  (entry != NULL)
 				{
-					tree->children->add(tree->children, entry->dupTree(entry), (void (ANTLR3_CDECL *)(void *))child->free);
+					tree->children->add(tree->children, entry, (void (ANTLR3_CDECL *)(void *))child->free);
 				}
 			}
 		}
@@ -172,8 +172,8 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 			//
 			tree->createChildrenList(tree);
 		}
-		newChild = child->dupTree(child);
-		tree->children->add(tree->children, newChild, (void (ANTLR3_CDECL *)(void *))child->free);
+
+		tree->children->add(tree->children, child, (void (ANTLR3_CDECL *)(void *))child->free);
 		
 	}
 }
