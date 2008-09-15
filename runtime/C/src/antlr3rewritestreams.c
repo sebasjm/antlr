@@ -43,6 +43,11 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	if	(stream->elements != NULL)
 	{
 		stream->elements->clear(stream->elements);
+		stream->freeElements = ANTLR3_TRUE;
+	}
+	else
+	{
+		stream->freeElements = ANTLR3_FALSE; // Just in case
 	}
 
 	// Add the stream into the recognizer stream stack vector
@@ -175,8 +180,12 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 	// given. We assume that someone else is going to free the
 	// vector.
 	//
-	stream->elements	= vector;
-
+	if	(stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
+	{
+		stream->elements->free(stream->elements);
+	}
+	stream->elements		= vector;
+	stream->freeElements	= ANTLR3_FALSE;
 	return stream;
 }
 
