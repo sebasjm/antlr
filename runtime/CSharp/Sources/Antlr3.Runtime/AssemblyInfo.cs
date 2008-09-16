@@ -45,9 +45,12 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("ANTLR3 C# Runtime for .NET")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright (c) 2005-2007 Kunle Odutola")]
+[assembly: AssemblyCopyright("Copyright (c) 2005-2007 Kunle Odutola, 2007-2008 Johannes Luber")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+// Allow the use of the assembly in medium trust for websites
+[assembly: System.Security.AllowPartiallyTrustedCallers]
 
 
 // Version information for an assembly consists of the following four values:

@@ -334,8 +334,8 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start "<ruleName>"
-public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) //throws RecognitionException
-{   
+public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) {
+    <ruleLabelDefs()>
 <if(trace)>
     TraceIn("<ruleName>_fragment", <ruleDescriptor.index>);
     try

@@ -322,8 +322,8 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start "<ruleName>"
-public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) //throws RecognitionException
-{   
+public void <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>) {
+    <ruleLabelDefs()>
 <if(trace)>
     TraceIn("<ruleName>_fragment", <ruleDescriptor.index>);
     try
@@ -483,7 +483,7 @@ ruleLabelDefs() ::= <<
     :{IList list_<it.label.text> = null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{ll|<ruleLabelType(referencedRule=ll.referencedRule)> <ll.label.text> = null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
 >>
 
 lexerRuleLabelDefs() ::= <<

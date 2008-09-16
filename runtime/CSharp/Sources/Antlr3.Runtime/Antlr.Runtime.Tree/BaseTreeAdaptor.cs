@@ -61,10 +61,13 @@ namespace Antlr.Runtime.Tree
 		///  with an error.
 		/// </summary>
 		/// <remarks>
-		/// If you specify your own kind of tree nodes, you will likely have to
+		/// <para>If you specify your own kind of tree nodes, you will likely have to
 		/// override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
 		/// if no token payload but you might have to set token type for diff
-		/// node type.
+		/// node type.</para>
+		///
+		/// <para>You don't have to subclass CommonErrorNode; you will likely need to
+		/// subclass your own tree node class to avoid class cast exception.</para>
 		/// </remarks>
 		public virtual object ErrorNode(ITokenStream input, IToken start, IToken stop,
 								RecognitionException e)
