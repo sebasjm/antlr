@@ -145,20 +145,22 @@ public class LL1Analyzer {
 	 *  This routine will only be used on parser and tree parser grammars.
 	 */
 	public LookaheadSet FIRST(NFAState s) {
-		//System.out.println("> FIRST("+s+") in rule "+s.enclosingRule);
+		//System.out.println("> FIRST("+s.enclosingRule.name+") in rule "+s.enclosingRule);
 		lookBusy.clear();
 		LookaheadSet look = _FIRST(s, false);
-		//System.out.println("< FIRST("+s+") in rule "+s.enclosingRule+"="+look.toString(this));
+		//System.out.println("< FIRST("+s.enclosingRule.name+") in rule "+s.enclosingRule+"="+look.toString(this.grammar));
 		return look;
 	}
 
 	public LookaheadSet FOLLOW(Rule r) {
+        //System.out.println("> FOLLOW("+r.name+") in rule "+r.startState.enclosingRule);
 		LookaheadSet f = FOLLOWCache.get(r);
 		if ( f!=null ) {
 			return f;
 		}
 		f = _FIRST(r.stopState, true);
 		FOLLOWCache.put(r, f);
+        //System.out.println("< FOLLOW("+r+") in rule "+r.startState.enclosingRule+"="+f.toString(this.grammar));
 		return f;
 	}
 
@@ -189,8 +191,8 @@ public class LL1Analyzer {
 	}
 
 	protected LookaheadSet _FIRST(NFAState s, boolean chaseFollowTransitions) {
-		//System.out.println("_LOOK("+s+") in rule "+s.enclosingRule);
 		/*
+		System.out.println("_LOOK("+s+") in rule "+s.enclosingRule);
 		if ( s.transition[0] instanceof RuleClosureTransition ) {
 			System.out.println("go to rule "+((NFAState)s.transition[0].target).enclosingRule);
 		}
@@ -227,10 +229,10 @@ public class LL1Analyzer {
 		// compute FIRST of transition 0
 		LookaheadSet tset = null;
 		// if transition 0 is a rule call and we don't want FOLLOW, check cache
-		if ( !chaseFollowTransitions && transition0 instanceof RuleClosureTransition ) {
+        if ( !chaseFollowTransitions && transition0 instanceof RuleClosureTransition ) {
 			LookaheadSet prev = FIRSTCache.get((NFAState)transition0.target);
 			if ( prev!=null ) {
-				tset = prev;
+				tset = new LookaheadSet(prev);
 			}
 		}
 

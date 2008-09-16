@@ -563,7 +563,7 @@ public class CodeGenerator {
 						 " for "+referencedElementName+"#"+elementIndex +" in "+
 						 enclosingRuleName+
 						 " line="+referencedElementNode.getLine());
-		*/
+						 */
 		NFAState followingNFAState = referencedElementNode.followingNFAState;
 		LookaheadSet follow = null;
 		if ( followingNFAState!=null ) {
@@ -583,7 +583,6 @@ public class CodeGenerator {
 			follow.remove(Label.EOF);
 		}
 		//System.out.println(" "+follow);
-		//System.out.println("visited rules "+grammar.getRuleNamesVisitedDuringLOOK());
 
         List tokenTypeList = null;
         long[] words = null;

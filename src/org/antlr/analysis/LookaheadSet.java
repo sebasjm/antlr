@@ -52,7 +52,12 @@ public class LookaheadSet {
 		tokenTypeSet = IntervalSet.of(atom);
 	}
 
-	public void orInPlace(LookaheadSet other) {
+    public LookaheadSet(LookaheadSet other) {
+        this();
+        this.tokenTypeSet.addAll(other.tokenTypeSet);
+    }
+
+    public void orInPlace(LookaheadSet other) {
 		this.tokenTypeSet.addAll(other.tokenTypeSet);
 	}
 
