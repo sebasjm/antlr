@@ -42,8 +42,18 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	//
 	if	(stream->elements != NULL)
 	{
-		stream->elements->clear(stream->elements);
-		stream->freeElements = ANTLR3_TRUE;
+		// Protext factory generated nodes as we cannot clear them,
+		// the factory is responsible for that.
+		//
+		if	(stream->elements->factoryMade == ANTLR3_TRUE)
+		{
+			stream->elements = NULL;
+		} 
+		else
+		{
+			stream->elements->clear(stream->elements);
+			stream->freeElements = ANTLR3_TRUE;
+		}
 	}
 	else
 	{
