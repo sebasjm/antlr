@@ -709,7 +709,7 @@ public abstract class BaseRecognizer {
 	protected void pushFollow(BitSet fset) {
 		if ( (state._fsp +1)>=state.following.length ) {
 			BitSet[] f = new BitSet[state.following.length*2];
-			System.arraycopy(state.following, 0, f, 0, state.following.length-1);
+			System.arraycopy(state.following, 0, f, 0, state.following.length);
 			state.following = f;
 		}
 		state.following[++state._fsp] = fset;
