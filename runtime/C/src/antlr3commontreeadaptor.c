@@ -212,7 +212,7 @@ errorNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_TOKEN_STREAM ctnstream,
 static	pANTLR3_BASE_TREE
 dupNode		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE treeNode)
 {
-    return  treeNode->dupNode(treeNode);
+	return  treeNode == NULL ? NULL : treeNode->dupNode(treeNode);
 }
 
 static	pANTLR3_BASE_TREE

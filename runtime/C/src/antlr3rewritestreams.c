@@ -115,22 +115,23 @@ antlr3RewriteRuleElementStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 		stream->elements		= NULL;
 		stream->freeElements	= ANTLR3_FALSE;
 	}
-		// Populate the generic interface
-		//
-		stream->rec				= rec;
-		stream->reset			= reset;
-		stream->add				= add;
-		stream->next			= next;
-		stream->nextTree		= nextTree;
-		stream->nextNode		= nextNode;
-		stream->nextToken		= nextToken;
-		stream->_next			= _next;
-		stream->hasNext			= hasNext;
-		stream->size			= size;
-		stream->getDescription  = getDescription;
-		stream->toTree			= toTree;
-		stream->free			= freeRS;
-		stream->singleElement	= NULL;
+
+	// Populate the generic interface
+	//
+	stream->rec				= rec;
+	stream->reset			= reset;
+	stream->add				= add;
+	stream->next			= next;
+	stream->nextTree		= nextTree;
+	stream->nextNode		= nextNode;
+	stream->nextToken		= nextToken;
+	stream->_next			= _next;
+	stream->hasNext			= hasNext;
+	stream->size			= size;
+	stream->getDescription  = getDescription;
+	stream->toTree			= toTree;
+	stream->free			= freeRS;
+	stream->singleElement	= NULL;
 
 	// Reset the stream to empty.
 	//
@@ -190,7 +191,7 @@ antlr3RewriteRuleElementStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 	// given. We assume that someone else is going to free the
 	// vector.
 	//
-	if	(stream->freeElements == ANTLR3_TRUE && stream->elements != NULL)
+	if	(stream->elements != NULL && stream->elements->factoryMade == ANTLR3_FALSE && stream->freeElements == ANTLR3_TRUE )
 	{
 		stream->elements->free(stream->elements);
 	}
