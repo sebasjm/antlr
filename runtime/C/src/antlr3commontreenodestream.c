@@ -519,7 +519,10 @@ getNodeIndex(pANTLR3_COMMON_TREE_NODE_STREAM ctns, pANTLR3_BASE_TREE t)
 static	void		
 reset	    (pANTLR3_COMMON_TREE_NODE_STREAM ctns)
 {
-	ctns->p									= 0;
+	if	(ctns->p != -1)
+	{
+		ctns->p									= 0;
+	}
 	ctns->tnstream->istream->lastMarker		= 0;
 
 
