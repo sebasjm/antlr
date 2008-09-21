@@ -11,7 +11,7 @@
 
 /* Interface functions
  */
-static	pANTLR3_BASE_TREE	nilNode						(pANTLR3_BASE_TREE_ADAPTOR adaptor);
+static	pANTLR3_BASE_TREE	nilNode					(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 static	pANTLR3_BASE_TREE	dbgNil					(pANTLR3_BASE_TREE_ADAPTOR adaptor);
 static	pANTLR3_BASE_TREE	dupTree					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	pANTLR3_BASE_TREE	dbgDupTree				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
@@ -39,11 +39,12 @@ static	void				setText8				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_UINT8 t);
 static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 static	ANTLR3_UINT32		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static	ANTLR3_BOOLEAN		isNilNode					(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
+static	ANTLR3_BOOLEAN		isNilNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static  pANTLR3_BASE_TREE	setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT32 i);
 static  ANTLR3_INT32		getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 static  void				setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child);
 static	void				deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
+static	pANTLR3_STRING		makeDot					(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * theTree);
 
 /** Given a pointer to a base tree adaptor structure (which is usually embedded in the
  *  super class the implements the tree adaptor used in the parse), initialize its
@@ -121,11 +122,185 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 	adaptor->isNilNode				=  (ANTLR3_BOOLEAN (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
                                                                                 isNilNode;
 
+	adaptor->makeDot				=  (pANTLR3_STRING  (*)(pANTLR3_BASE_TREE_ADAPTOR, void *))
+																				makeDot;
 	
 	/* Remaining functions filled in by the caller.
 	 */
 	return;
 }
+
+static void
+defineDotNodes(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * t, pANTLR3_STRING dotSpec )
+{
+	// How many nodes are we talking about?
+	//
+	int	nCount;
+	int i;
+
+	if	(t == NULL)
+	{
+		// No tree, so create a blank spec
+		//
+		dotSpec->append8(dotSpec, "n0[label=\"EMPTY TREE\"]\n");
+		return;
+	}
+
+	// Count the nodes
+	//
+	nCount = adaptor->getChildCount(adaptor, t);
+
+	if	(nCount == 0)
+	{
+		// This will already have been included as a child of another node
+		// so there is nothing to add.
+		//
+		return;
+	}
+
+	// For each child of the current tree, define a node using the
+	// memory address of the node to name it
+	//
+	for	(i = 0; i<nCount; i++)
+	{
+		pANTLR3_BASE_TREE child;
+		char	buff[64];
+		pANTLR3_STRING	text;
+		int		j;
+
+		// Pick up a pointer for the child
+		//
+		child = adaptor->getChild(adaptor, t, i);
+
+		// Name the node
+		//
+		sprintf(buff, "\tn%p[label=\"", child);
+		dotSpec->append8(dotSpec, buff);
+		text = adaptor->getText(adaptor, child);
+		for (j = 0; j < (ANTLR3_INT32)(text->len); j++)
+		{
+			if	(text->charAt(text, j) == '"')
+			{
+				dotSpec->append8(dotSpec, "\\\"");
+			}
+			else
+			{
+				dotSpec->addc(dotSpec, text->charAt(text, j));
+			}
+		}
+		dotSpec->append8(dotSpec, "\"]\n");
+
+		// And now define the children of this child (if any)
+		//
+		defineDotNodes(adaptor, child, dotSpec);
+	}
+	
+	// Done
+	//
+	return;
+}
+
+static void
+defineDotEdges(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * t, pANTLR3_STRING dotSpec)
+{
+	// How many nodes are we talking about?
+	//
+	int	nCount;
+	int i;
+
+	if	(t == NULL)
+	{
+		// No tree, so do nothing
+		//
+		return;
+	}
+
+	// Count the nodes
+	//
+	nCount = adaptor->getChildCount(adaptor, t);
+
+	if	(nCount == 0)
+	{
+		// This will already have been included as a child of another node
+		// so there is nothing to add.
+		//
+		return;
+	}
+
+	// For each child, define an edge from this parent, then process
+	// and children of this child in the same way
+	//
+	for	(i=0; i<nCount; i++)
+	{
+		pANTLR3_BASE_TREE child;
+		char	buff[128];
+
+		// Next child
+		//
+		child	= adaptor->getChild(adaptor, t, i);
+
+		// Create the edge relation
+		//
+		sprintf(buff, "\t\tn%p -> n%p\t\t// ",  t, child);
+		dotSpec->append8(dotSpec, buff);
+
+		// Document the relationship
+		//
+		dotSpec->appendS(dotSpec, adaptor->getText(adaptor, t));
+		dotSpec->append8(dotSpec, " -> ");
+		dotSpec->appendS(dotSpec, adaptor->getText(adaptor, child));
+		dotSpec->append8(dotSpec, "\n");
+
+		// Define edges for this child
+		//
+		defineDotEdges(adaptor, child, dotSpec);
+	}
+
+	// Done
+	//
+	return;
+}
+
+/// Produce a DOT specification for graphviz
+//
+static pANTLR3_STRING
+makeDot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * theTree)
+{
+	// The string we are building up
+	//
+	pANTLR3_STRING		dotSpec;
+
+	dotSpec = adaptor->strFactory->newStr
+		
+		(
+			adaptor->strFactory,
+
+			// Default look and feel
+			//
+			(pANTLR3_UINT8)
+			"digraph {\n\n"
+			"\tordering=out;\n"
+			"\tranksep=.4;\n"
+			"\tbgcolor=\"lightgrey\";  node [shape=box, fixedsize=false, fontsize=12, fontname=\"Helvetica-bold\", fontcolor=\"blue\"\n"
+			"\twidth=.25, height=.25, color=\"black\", fillcolor=\"white\", style=\"filled, solid, bold\"];\n\n"
+			"\tedge [arrowsize=.5, color=\"black\", style=\"bold\"]\n\n"
+		);
+
+	// First produce the node defintions
+	//
+	defineDotNodes(adaptor, theTree, dotSpec);
+	dotSpec->append8(dotSpec, "\n");
+	defineDotEdges(adaptor, theTree, dotSpec);
+	
+	// Terminate the spec
+	//
+	dotSpec->append8(dotSpec, "\n}");
+
+	// Result
+	//
+	return dotSpec;
+}
+
 
 /** Create and return a nil tree node (no token payload)
  */
