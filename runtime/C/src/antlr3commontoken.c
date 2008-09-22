@@ -75,7 +75,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     /* Install factory API
      */
     factory->newToken	    =  newPoolToken;
-    factory->close	    =  factoryClose;
+    factory->close			=  factoryClose;
     factory->setInputStream = setInputStream;
     
     /* Allocate the initial pool
@@ -92,6 +92,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     /* Set some initial variables for future copying
      */
     factory->unTruc.factoryMade	= ANTLR3_TRUE;
+	
     setInputStream(factory, input);
     
     return  factory;
@@ -100,8 +101,16 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
 static void
 setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input)
 {
-    factory->input			=  input;
-    factory->unTruc.input   =  input;
+    factory->input				=  input;
+    factory->unTruc.input		=  input;
+	if	(input != NULL)
+	{
+		factory->unTruc.strFactory	= input->strFactory;
+	}
+	else
+	{
+		factory->unTruc.strFactory = NULL;
+	}
 }
 
 static void
@@ -243,8 +252,8 @@ newToken(void)
 	return	NULL;
     }
 
-    /* Install the API
-     */
+    // Install the API
+    //
     antlr3SetTokenAPI(token);
     token->factoryMade = ANTLR3_FALSE;
 
@@ -254,34 +263,34 @@ newToken(void)
 ANTLR3_API void
 antlr3SetTokenAPI(pANTLR3_COMMON_TOKEN token)
 {
-    token->getText		    = getText;
-    token->setText		    = setText;
-    token->setText8		    = setText8;
-    token->getType		    = getType;
-    token->setType		    = setType;
-    token->getLine		    = getLine;
-    token->setLine		    = setLine;
-    token->setLine		    = setLine;
+    token->getText					= getText;
+    token->setText					= setText;
+    token->setText8					= setText8;
+    token->getType					= getType;
+    token->setType					= setType;
+    token->getLine					= getLine;
+    token->setLine				    = setLine;
+    token->setLine					= setLine;
     token->getCharPositionInLine    = getCharPositionInLine;
     token->setCharPositionInLine    = setCharPositionInLine;
-    token->getChannel		    = getChannel;
-    token->setChannel		    = setChannel;
-    token->getTokenIndex	    = getTokenIndex;
-    token->setTokenIndex	    = setTokenIndex;
-    token->getStartIndex	    = getStartIndex;
-    token->setStartIndex	    = setStartIndex;
-    token->getStopIndex		    = getStopIndex;
-    token->setStopIndex		    = setStopIndex;
-    token->toString		    = toString;
+    token->getChannel				= getChannel;
+    token->setChannel				= setChannel;
+    token->getTokenIndex			= getTokenIndex;
+    token->setTokenIndex			= setTokenIndex;
+    token->getStartIndex			= getStartIndex;
+    token->setStartIndex			= setStartIndex;
+    token->getStopIndex				= getStopIndex;
+    token->setStopIndex				= setStopIndex;
+    token->toString					= toString;
 
-    /* Set defaults
-     */
+    // Set defaults
+    //
     token->setCharPositionInLine(token, -1);
 
     token->custom		    = NULL;
-    token->freeCustom		    = NULL;
+    token->freeCustom	    = NULL;
     token->type			    = ANTLR3_TOKEN_INVALID;
-    token->text			    = NULL;
+	token->textState		= ANTLR3_TEXT_NONE;
     token->start		    = 0;
     token->stop			    = 0;
     token->channel		    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
@@ -298,63 +307,96 @@ antlr3SetTokenAPI(pANTLR3_COMMON_TOKEN token)
 
 static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token)
 {
-    if	(token->text != NULL)
-    {
-	return	token->text;
-    }
-    if (token->type == ANTLR3_TOKEN_EOF)
-    {
-	token->setText8(token, (pANTLR3_UINT8)"<EOF>");
-	return	token->text;
-    }
-    if	(token->input != NULL)
-    {
-	return	token->input->substr(	token->input, 
-					token->getStartIndex(token), 
- 					token->getStopIndex(token));
-    }
+	switch (token->textState)
+	{
+		case ANTLR3_TEXT_STRING:
 
-    /* Nothing to return
-     */
-    return NULL;
+			// Someone already created a string for this token, so we just
+			// use it.
+			//
+			return	token->tokText.text;
+			break;
+    
+		case ANTLR3_TEXT_CHARP:
+
+			// We had a straight text pointer installed, now we
+			// must convert it to a string. Note we have to do this here
+			// or otherwise setText8() will just install the same char*
+			//
+			if	(token->strFactory != NULL)
+			{
+				token->tokText.text	= token->strFactory->newStr8(token->strFactory, (pANTLR3_UINT8)token->tokText.chars);
+				token->textState	= ANTLR3_TEXT_STRING;
+				return token->tokText.text;
+			}
+			else
+			{
+				// We cannot do anything here
+				//
+				return NULL;
+			}
+			break;
+
+		default:
+
+			// EOF is a special case
+			//
+			if (token->type == ANTLR3_TOKEN_EOF)
+			{
+				token->tokText.text	= token->strFactory->newStr8(token->strFactory, (pANTLR3_UINT8)"<EOF>");
+				token->textState	= ANTLR3_TEXT_STRING;
+				return token->tokText.text;
+			}
+
+
+			// We had nothing installed in the token, create a new string
+			// from the input stream
+			//
+
+			if	(token->input != NULL)
+			{
+			
+				return	token->input->substr(	token->input, 
+												token->getStartIndex(token), 
+ 												token->getStopIndex(token)
+											);
+			}
+
+			// Nothing to return, there is no input stream
+			//
+			return NULL;
+			break;
+	}
 }
 static  void		setText8		(pANTLR3_COMMON_TOKEN token, pANTLR3_UINT8 text)
 {
-    if	(token->text == NULL)
-    {
-	/* Do we have a string factory to build a new string with?
-	 */
-	if  (token->input == NULL || token->input->strFactory == NULL)
-	{
-	    /* There was no input stream for this token, or
-	     * it did not pay the rent on a string factory.
-	     */
+	// No text to set, so ignore
+	//
+	if	(text == NULL) return;
 
-	    /* There was no string factory, therefore, if this is not a factory made
-	     * token, we assume no resizing etc will go on and just set the text as it is given.
-	     */
-	    if	(token->factoryMade == ANTLR3_FALSE)
-	    {
-		token->text	    = (pANTLR3_STRING) ANTLR3_MALLOC(sizeof(ANTLR3_STRING));
-		token->text->len    = (ANTLR3_UINT32)strlen((const char *)text);
-		token->text->size   = token->text->len ;
-		token->text->chars  = text;
-	    }
-	    return;
+	switch	(token->textState)
+	{
+		case	ANTLR3_TEXT_NONE:
+		case	ANTLR3_TEXT_CHARP:	// Caller must free before setting again, if it needs to be freed
+
+			// Nothing in there yet, or just a char *, so just set the
+			// text as a pointer
+			//
+			token->textState		= ANTLR3_TEXT_CHARP;
+			token->tokText.chars	= (pANTLR3_UCHAR)text;
+			break;
+
+		default:
+
+			// It was already a pANTLR3_STRING, so just override it
+			//
+			token->tokText.text->set8(token->tokText.text, (const char *)text);
+			break;
 	}
 
-	/* We can make a new string from the supplied text then
-	 */
-	token->text = token->input->strFactory->newStr8(token->input->strFactory, text);
-    }
-    else
-    {
-	token->text->set8(token->text, (const char *)text);
-    }
-
-    /* We are done 
-     */
-    return;
+	// We are done 
+	//
+	return;
 }
 
 /** \brief Install the supplied text string as teh text for the token.
@@ -367,7 +409,8 @@ static  void		setText			(pANTLR3_COMMON_TOKEN token, pANTLR3_STRING text)
 	// Merely replaces and existing pre-defined text with the supplied
 	// string
 	//
-	token->text	= text;
+	token->textState	= ANTLR3_TEXT_STRING;
+	token->tokText.text	= text;
 
 	/* We are done 
 	*/

@@ -14,7 +14,6 @@ getFirstChildWithType
 (pANTLR3_BASE_TREE tree, ANTLR3_UINT32 type);
 static void					addChild			(pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child);
 static void					addChildren			(pANTLR3_BASE_TREE tree, pANTLR3_LIST kids);
-static void					createChildrenList	(pANTLR3_BASE_TREE tree);
 static void					replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t);
 
 static	void				freshenPACIndexesAll(pANTLR3_BASE_TREE tree);
@@ -312,7 +311,7 @@ replaceChildren		(pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3
 
 	if	(parent->children == NULL)
 	{
-		ANTLR3_FPRINTF(stderr, "replaceChildren call: Indexes are invalid; no children in list for %s", parent->getText(parent));
+		ANTLR3_FPRINTF(stderr, "replaceChildren call: Indexes are invalid; no children in list for %s", parent->getText(parent)->chars);
 		return;
 	}
 

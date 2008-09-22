@@ -742,7 +742,7 @@ recognitionException	(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_EXCEPTION e)
 {
 	char	buffer[256];
 
-	sprintf(buffer, "exception %s %d %d %d\n", e->name, e->index, e->line, e->charPositionInLine);
+	sprintf(buffer, "exception %s %d %d %d\n", e->name, (ANTLR3_INT32)(e->index), e->line, e->charPositionInLine);
 
 	// Transmit the message and wait for ack
 	//
@@ -982,7 +982,7 @@ createNodeTok			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE node, pA
 {
 	char	buffer[128];
 
-	sprintf(buffer, "createNode %d %d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, node), token->getTokenIndex(token));
+	sprintf(buffer, "createNode %d %d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, node), (ANTLR3_UINT32)token->getTokenIndex(token));
 
 	transmit(delboy, buffer);
 }

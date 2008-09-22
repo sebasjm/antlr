@@ -351,7 +351,7 @@ antlr3RecognitionExceptionNew(pANTLR3_BASE_RECOGNIZER recognizer)
 			{
 				if	(tnode->token->input == NULL)
 				{
-					ex->streamName		= tnode->token->text->factory->newStr8(tnode->token->text->factory, (pANTLR3_UINT8)"-Imaginary-");
+					ex->streamName		= NULL;
 				}
 				else
 				{
@@ -556,7 +556,7 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 		// EOR can follow, but if we are not the start symbol, we
 		// need to remove it.
 		//
-		if	(recognizer->state->following->size >= 0)
+		if	(recognizer->state->following->size >= (ANTLR3_UINT32)0)
 		{
 			followClone->remove(followClone, ANTLR3_EOR_TOKEN_TYPE);
 		}
@@ -1006,21 +1006,11 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 
 	// Next comes the line number
 	//
-#ifdef ANTLR3_WIN64
-	// shnazzle fraazzle Dick Dastardly
-	//
-	ANTLR3_FPRINTF(stderr, "%I64d) ", recognizer->state->exception->line);
-#else
-#ifdef ANTLR3_USE_64BIT
-	ANTLR3_FPRINTF(stderr, "%lld) ", recognizer->state->exception->line);
-#else
-	ANTLR3_FPRINTF(stderr, "%d) ", recognizer->state->exception->line);
-#endif
-#endif
 
+	ANTLR3_FPRINTF(stderr, "%d) ", recognizer->state->exception->line);
 	ANTLR3_FPRINTF(stderr, " : error %d : %s", 
-		recognizer->state->exception->type,
-		(pANTLR3_UINT8)	   (recognizer->state->exception->message));
+										recognizer->state->exception->type,
+					(pANTLR3_UINT8)	   (recognizer->state->exception->message));
 
 
 	// How we determine the next piece is dependent on which thing raised the
@@ -1231,7 +1221,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 					//
 					if  (tokenNames[bit])
 					{
-						ANTLR3_FPRINTF(stderr, "%%s", count > 0 ? ", " : "", tokenNames[bit]); 
+						ANTLR3_FPRINTF(stderr, "%s", count > 0 ? ", " : "", tokenNames[bit]); 
 						count++;
 					}
 				}
@@ -1814,11 +1804,6 @@ toStrings			    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_HASH_TABLE tokens)
     return NULL;
 }
 
-static	void ANTLR3_CDECL
-freeList    (void * list)
-{
-    ((pANTLR3_LIST)list)->free(list);
-}
 static	void ANTLR3_CDECL
 freeIntTrie    (void * trie)
 {

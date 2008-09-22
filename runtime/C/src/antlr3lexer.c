@@ -608,7 +608,16 @@ emit	    (pANTLR3_LEXER lexer)
     token->stop		    = lexer->getCharIndex(lexer) - 1;
     token->line		    = lexer->rec->state->tokenStartLine;
     token->charPosition	= lexer->rec->state->tokenStartCharPositionInLine;
-    token->text		    = lexer->rec->state->text;
+
+	if	(lexer->rec->state->text != NULL)
+	{
+		token->textState		= ANTLR3_TEXT_STRING;
+		token->tokText.text	    = lexer->rec->state->text;
+	}
+	else
+	{
+		token->textState	= ANTLR3_TEXT_NONE;
+	}
     token->lineStart	= lexer->input->currentLine;
 	token->user1		= lexer->rec->state->user1;
 	token->user2		= lexer->rec->state->user2;

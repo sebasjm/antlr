@@ -40,10 +40,6 @@ static	pANTLR3_BASE_TREE	getChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3
 static	ANTLR3_UINT32		getChildCount			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_UINT32		getUniqueID				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
 static	ANTLR3_BOOLEAN		isNilNode				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t);
-static  pANTLR3_BASE_TREE	setChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_INT32 i);
-static  ANTLR3_INT32		getChildIndex			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
-static  void				setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child);
-static	void				deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i);
 static	pANTLR3_STRING		makeDot					(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * theTree);
 
 /** Given a pointer to a base tree adaptor structure (which is usually embedded in the
@@ -715,16 +711,6 @@ static	pANTLR3_BASE_TREE
 {
 	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement getChild()\n");
 	return NULL;
-}
-static  void
-setChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i, pANTLR3_BASE_TREE child)
-{
-	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement setChild()\n");
-}
-static	void
-deleteChild				(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, ANTLR3_UINT32 i)
-{
-	ANTLR3_FPRINTF(stderr, "Internal error - implementor of superclass containing ANTLR3_TREE_ADAPTOR did not implement deleteChild()\n");
 }
 
 static	ANTLR3_UINT32	
