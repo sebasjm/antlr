@@ -41,7 +41,6 @@ pANTLR3_VECTOR_FACTORY		vectors;
 @genericParser.apifuncs() ::= <<
 <if(PARSER)>
 ADAPTOR	= ANTLR3_TREE_ADAPTORNew(instream->tstream->tokenSource->strFactory);<\n>
-ADAPTOR->tokenFactory->input 
 <endif>
 ctx->vectors	= antlr3VectorFactoryNew(64);
 >>
