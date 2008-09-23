@@ -215,10 +215,14 @@ antlr3CommonTreeNodeStreamNewStream(pANTLR3_COMMON_TREE_NODE_STREAM inStream)
 	antlr3SetCTAPI(&(stream->EOF_NODE));
 	antlr3SetCTAPI(&(stream->INVALID_NODE));
 
-	stream->UP.token			= inStream->UP.token;
-	stream->DOWN.token			= inStream->DOWN.token;
-	stream->EOF_NODE.token		= inStream->EOF_NODE.token;
-	stream->INVALID_NODE.token	= inStream->INVALID_NODE.token;
+	stream->UP.token						= inStream->UP.token;
+	inStream->UP.token->strFactory			= stream->stringFactory;
+	stream->DOWN.token						= inStream->DOWN.token;
+	inStream->DOWN.token->strFactory		= stream->stringFactory;
+	stream->EOF_NODE.token					= inStream->EOF_NODE.token;
+	inStream->EOF_NODE.token->strFactory	= stream->stringFactory;
+	stream->INVALID_NODE.token				= inStream->INVALID_NODE.token;
+	inStream->INVALID_NODE.token->strFactory			= stream->stringFactory;
 
 	// Reuse the root tree of the originating stream
 	//
@@ -355,21 +359,25 @@ antlr3CommonTreeNodeStreamNew(pANTLR3_STRING_FACTORY strFactory, ANTLR3_UINT32 h
 	antlr3SetCTAPI(&(stream->INVALID_NODE));
 
 	token						= antlr3CommonTokenNew(ANTLR3_TOKEN_UP);
+	token->strFactory			= strFactory;
 	token->textState			= ANTLR3_TEXT_CHARP;
 	token->tokText.chars		= (pANTLR3_UCHAR)"UP";
 	stream->UP.token			= token;
 
 	token						= antlr3CommonTokenNew(ANTLR3_TOKEN_DOWN);
+	token->strFactory			= strFactory;
 	token->textState			= ANTLR3_TEXT_CHARP;
 	token->tokText.chars		= (pANTLR3_UCHAR)"DOWN";
 	stream->DOWN.token			= token;
 
 	token						= antlr3CommonTokenNew(ANTLR3_TOKEN_EOF);
+	token->strFactory			= strFactory;
 	token->textState			= ANTLR3_TEXT_CHARP;
 	token->tokText.chars		= (pANTLR3_UCHAR)"EOF";
 	stream->EOF_NODE.token		= token;
 
 	token						= antlr3CommonTokenNew(ANTLR3_TOKEN_INVALID);
+	token->strFactory			= strFactory;
 	token->textState			= ANTLR3_TEXT_CHARP;
 	token->tokText.chars		= (pANTLR3_UCHAR)"INVALID";
 	stream->INVALID_NODE.token	= token;
