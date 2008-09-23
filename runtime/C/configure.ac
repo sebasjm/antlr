@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libantlr3c, 3.1.1b1, jimi@idle.ws)
+AC_INIT(libantlr3c, 3.1.1, jimi@idle.ws)
 AC_PREREQ(2.60)
 AC_COPYRIGHT([
  (The "BSD licence")
@@ -41,6 +41,10 @@ AC_ARG_ENABLE([debuginfo],
 AC_ARG_ENABLE([64bit],
 		[AS_HELP_STRING([--enable-64bit], [Turns on flags that produce 64 bit object code if any are required (default --disable-64bit)])],
 		[], [enable_64bit=no])
+
+AC_ARG_ENABLE([abiflags],
+		[AS_HELP_STRING([--disable-abiflags], [Does not add ABI flags -m32 or -m64 for older versions of gcc, such as itanium 3.x (default --enable-abiflags=yes)])],
+		[], [enable_abiflags=yes])
 
 AC_ARG_ENABLE([antlrdebug],
 		[AS_HELP_STRING([--disable-antlrdebug], [Turns off default flags that include the antlr debugger in the runtime. Specify to remove debugger and the socket dependancies (default --enable-antlrdebug)])],
@@ -88,9 +92,12 @@ aCC*)
 gcc*)
  CPPCMNTFLAGS=
  if test x"$enable_64bit" = xyes; then
-  CCFLAGS64="-m64"
+  GCCABIFLAGS="-m64"
  else
-  CCFLAGS64="-m32"
+  GCCABIFLAGS="-m32"
+ fi
+ if test x"$enable_abiflags" = xyes; then
+  CCFLAGS64=$GCCABIFLAGS
  fi
  OPTIMFLAGS="-O2"
  if test x"$enable_debuginfo" = xyes; then
@@ -104,7 +111,7 @@ case $host in
 sparc*-*solaris*)
  CPPCMNTFLAGS=
  if test x"$enable_64bit" = xyes; then
-  CCFLAGS64="-fast -xtarget=ultra4 -xarch=v9a"
+  CCFLAGS64="-fast -xtarget=ultra4 -m64 -xarch=sparcvis"
  fi
  OPTIMFLAGS="-O"
  if test x"$enable_debuginfo" = xyes; then
