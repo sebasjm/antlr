@@ -1221,7 +1221,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 					//
 					if  (tokenNames[bit])
 					{
-						ANTLR3_FPRINTF(stderr, "%c%s", count > 0 ? ", " : "", tokenNames[bit]); 
+						ANTLR3_FPRINTF(stderr, "%s%s", count > 0 ? ", " : "", tokenNames[bit]); 
 						count++;
 					}
 				}
