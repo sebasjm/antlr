@@ -968,7 +968,7 @@ namespace Antlr.Runtime
 			if ((state.followingStackPointer + 1) >= state.following.Length)
 			{
 				BitSet[] f = new BitSet[state.following.Length * 2];
-				Array.Copy(state.following, 0, f, 0, state.following.Length - 1);
+				Array.Copy(state.following, 0, f, 0, state.following.Length);
 				state.following = f;
 			}
 			state.following[++state.followingStackPointer] = fset;
