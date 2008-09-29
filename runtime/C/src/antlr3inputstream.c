@@ -21,7 +21,6 @@ static		pANTLR3_STRING	antlr3AsciiGetSourceName	(pANTLR3_INT_STREAM is);
 //
 static	    void			antlr3InputClose			(pANTLR3_INPUT_STREAM input);
 static	    void			antlr3InputReset			(pANTLR3_INPUT_STREAM input);
-static	    pANTLR3_UINT8   antlr3InputFileName			(pANTLR3_INPUT_STREAM input);
 static	    void *			antlr3AsciiLT				(pANTLR3_INPUT_STREAM input, ANTLR3_INT32 lt);
 static	    ANTLR3_UINT32   antlr3AsciiSize				(pANTLR3_INPUT_STREAM input);
 static	    pANTLR3_STRING  antlr3AsciiSubstr			(pANTLR3_INPUT_STREAM input, ANTLR3_MARKER start, ANTLR3_MARKER stop);

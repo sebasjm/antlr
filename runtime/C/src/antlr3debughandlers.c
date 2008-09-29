@@ -55,7 +55,6 @@ static	void	createNodeTok			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_T
 static	void	becomeRoot				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE newRoot, pANTLR3_BASE_TREE oldRoot);
 static	void	addChild				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE root, pANTLR3_BASE_TREE child);
 static	void	setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, ANTLR3_MARKER tokenStartIndex, ANTLR3_MARKER tokenStopIndex);
-static	void	freeDel					(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 static	void	ack						(pANTLR3_DEBUG_EVENT_LISTENER delboy);
 
 /// Create and initialize a new debug event listener that can be connected to
@@ -106,6 +105,7 @@ antlr3DebugListenerNew()
 	delboy->semanticPredicate		= semanticPredicate;
 	delboy->setTokenBoundaries		= setTokenBoundaries;
 	delboy->terminate				= terminate;
+	delboy->errorNode				= errorNode;
 
 	delboy->PROTOCOL_VERSION		= 2;	// ANTLR 3.1 is at protocol version 2
 
@@ -159,13 +159,6 @@ sockSend(SOCKET sock, const char * ptr, int len)
 		sent		+= thisSend;
 	}
 	return	ANTLR3_TRUE;
-}
-
-static void
-sockClose(SOCKET sock)
-{
-	shutdown	(sock, 0x01);	// Prevent further sending now
-	ANTLR3_CLOSESOCKET	(sock);			// Close the socket
 }
 
 static	ANTLR3_BOOLEAN	
@@ -742,7 +735,7 @@ recognitionException	(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_EXCEPTION e)
 {
 	char	buffer[256];
 
-	sprintf(buffer, "exception %s %d %d %d\n", e->name, (ANTLR3_INT32)(e->index), e->line, e->charPositionInLine);
+	sprintf(buffer, "exception %s %d %d %d\n", (char *)(e->name), (ANTLR3_INT32)(e->index), e->line, e->charPositionInLine);
 
 	// Transmit the message and wait for ack
 	//
@@ -1016,8 +1009,8 @@ setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, A
 	char	buffer[128];
 
 	sprintf(buffer, "becomeRoot %d %d %d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, t),
-												tokenStartIndex,
-												tokenStopIndex
+												(ANTLR3_UINT32)tokenStartIndex,
+												(ANTLR3_UINT32)tokenStopIndex
 											);
 	transmit(delboy, buffer);
 }

@@ -18,9 +18,6 @@ static void					emitNew						(pANTLR3_LEXER lexer,  pANTLR3_COMMON_TOKEN token);
 static pANTLR3_COMMON_TOKEN emit						(pANTLR3_LEXER lexer);
 static ANTLR3_BOOLEAN	    matchs						(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string);
 static ANTLR3_BOOLEAN	    matchc						(pANTLR3_LEXER lexer, ANTLR3_UCHAR c);
-static ANTLR3_BOOLEAN	    matchs_ucase				(pANTLR3_LEXER lexer, ANTLR3_UCHAR * string);
-static ANTLR3_BOOLEAN	    matchc_ucase				(pANTLR3_LEXER lexer, ANTLR3_UCHAR c);
-static void					setUpperCompare				(pANTLR3_LEXER lexer, ANTLR3_BOOLEAN flag);
 static ANTLR3_BOOLEAN	    matchRange					(pANTLR3_LEXER lexer, ANTLR3_UCHAR low, ANTLR3_UCHAR high);
 static void					matchAny					(pANTLR3_LEXER lexer);
 static void					recover						(pANTLR3_LEXER lexer);
@@ -390,18 +387,7 @@ displayRecognitionError	    (pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_UINT8 *
 		ANTLR3_FPRINTF(stderr, "%s(", ftext->chars);
     }
 
-#ifdef ANTLR3_WIN64
-    // shnazzle fraazzle Dick Dastardly
-    //
-    ANTLR3_FPRINTF(stderr, "%I64d) ", recognizer->state->exception->line);
-#else
-#ifdef ANTLR3_USE_64BIT
-    ANTLR3_FPRINTF(stderr, "%lld) ", recognizer->state->exception->line);
-#else
     ANTLR3_FPRINTF(stderr, "%d) ", recognizer->state->exception->line);
-#endif
-#endif
-
     ANTLR3_FPRINTF(stderr, ": lexer error %d :\n\t%s at offset %d, ", 
 						ex->type,
 						(pANTLR3_UINT8)	   (ex->message),
