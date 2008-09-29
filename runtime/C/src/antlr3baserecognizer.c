@@ -556,7 +556,7 @@ mismatchIsMissingToken(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM is
 		// EOR can follow, but if we are not the start symbol, we
 		// need to remove it.
 		//
-		if	(recognizer->state->following->size >= (ANTLR3_UINT32)0)
+		if	(recognizer->state->following->vector->count >= 0)
 		{
 			followClone->remove(followClone, ANTLR3_EOR_TOKEN_TYPE);
 		}
