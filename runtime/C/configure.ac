@@ -62,7 +62,7 @@ AC_CANONICAL_HOST
 OBJECT_MODE=
 # Checks for programs.
 AC_MSG_CHECKING([compiler flags required for compiling ANTLR with $CC C compiler on host $host])
-
+WARNFLAGS=
 case $CC in
 xlc*)
  CPPCMNTFLAGS="-qcpluscmt"
@@ -103,6 +103,7 @@ gcc*)
  if test x"$enable_debuginfo" = xyes; then
   DEBUGFLAGS="-g"
  fi
+ WARNFLAGS=-Wall
  ;;
 
 *)
@@ -132,7 +133,7 @@ esac
  ;;
 esac
 
-CFLAGS="$CCFLAGS64 $CPPCMNTFLAGS $OPTIMFLAGS $DEBUGFLAGS"
+CFLAGS="$CCFLAGS64 $CPPCMNTFLAGS $OPTIMFLAGS $DEBUGFLAGS $WARNFLAGS"
 AC_MSG_RESULT([$CFLAGS])
 AC_SUBST([OBJECT_MODE])
 
