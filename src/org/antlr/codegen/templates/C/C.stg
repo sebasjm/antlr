@@ -1434,7 +1434,9 @@ synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start <ruleName>
 static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:parameterScope(scope=it)>) 
-{   
+{
+	<ruleLabelDefs()>
+	<ruleLabelInitializations()>
 <if(trace)>
     ANTLR3_PRINTF("enter <ruleName> %d failed = %d, backtracking = %d\\n",LT(1),failed,BACKTRACKING);
     <block>
