@@ -7,6 +7,8 @@ University of San Francisco
 
 CHANGES
 
+October 1, 2008 -- ANTLR v3.1.1
+
 September 8, 2008
 
 * Labels on tokens, rules carry into synpreds now so semantic predicates work.
@@ -39,10 +41,6 @@ August 15, 2008
 August 13, 2008
 
 * Fixed ANTLR-314; 3.1 introduced a problem with list labels +=
-
-* Made explicit reference to java.util classes to avoid import.  Means
-  that if you have references to plain List, Map, etc. you will need to do
-  an import.
 
 August 12, 2008 -- ANTLR v3.1
 
