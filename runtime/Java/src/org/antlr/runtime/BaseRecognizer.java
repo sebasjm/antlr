@@ -42,8 +42,6 @@ public abstract class BaseRecognizer {
 	public static final int MEMO_RULE_UNKNOWN = -1;
 	public static final int INITIAL_FOLLOW_STACK_SIZE = 100;
 
-	public static final Integer MEMO_RULE_FAILED_I = new Integer(MEMO_RULE_FAILED);
-
 	// copies from Token object for convenience in actions
 	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
