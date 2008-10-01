@@ -37,7 +37,8 @@ import org.antlr.runtime.Token;
  *  use your subclass.
  *
  *  To get your parser to build nodes of a different type, override
- *  create(Token).
+ *  create(Token), errorNode(), and to be safe, YourTreeClass.dupNode().
+ *  dupNode is called to duplicate nodes during rewrite operations.
  */
 public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	/** Duplicate a node.  This is part of the factory;
