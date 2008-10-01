@@ -288,6 +288,28 @@ public class TestHeteroAST extends BaseTest {
         assertEquals("(LIST<W> a<V> b<V> c<V>)\n", found);
     }
 
+    public void testCopySemanticsWithHetero() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "@members {\n" +
+            "static class V extends CommonTree {\n" +
+            "  public V(Token t) { token=t;}\n" +  // for 'int'<V>
+            "  public V(V node) { super(node); }\n\n" + // for dupNode
+            "  public Tree dupNode() { return new V(this); }\n" + // for dup'ing type
+            "  public String toString() { return token.getText()+\"<V>\";}\n" +
+            "}\n" +
+            "}\n" +
+            "a : type ID (',' ID)* ';' -> ^(type ID)+;\n" +
+            "type : 'int'<V> ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+        String found = execParser("T.g", grammar, "TParser", "TLexer",
+                    "a", "int a, b, c;", debug);
+        assertEquals("(int<V> a) (int<V> b) (int<V> c)\n", found);
+    }
+
     // TREE PARSERS -- REWRITE AST
 
 	public void testTreeParserRewriteFlatList() throws Exception {

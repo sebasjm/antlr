@@ -177,23 +177,23 @@ public class TestLexer extends BaseTest {
 
 	public void testRepeatedLabelInLexer() {
 		String grammar =
-			"lexer grammar t;\n" +
+			"lexer grammar T;\n" +
 			"B : x='a' x='b' ;\n" ;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"t.g", grammar, null, "tLexer", false);
+				"T.g", grammar, null, "T", false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
 
 	public void testRepeatedRuleLabelInLexer() {
 		String grammar =
-			"lexer grammar t;\n" +
+			"lexer grammar T;\n" +
 			"B : x=A x=A ;\n" +
 			"fragment A : 'a' ;\n" ;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"t.g", grammar, null, "tLexer", false);
+				"T.g", grammar, null, "T", false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
@@ -205,7 +205,7 @@ public class TestLexer extends BaseTest {
 			"        : 'q' (~'q')* (('x' 'q') )* 'q' ; \n";
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"T.g", grammar, null, "TLexer", false);
+				"T.g", grammar, null, "T", false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}	
@@ -221,7 +221,7 @@ public class TestLexer extends BaseTest {
 			"B : '\\\\\\\"' ;\n" ; // '\\\"'
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"T.g", grammar, null, "TLexer", false);
+				"T.g", grammar, null, "T", false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
