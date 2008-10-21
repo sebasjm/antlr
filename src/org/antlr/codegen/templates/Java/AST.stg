@@ -64,7 +64,7 @@ ruleDeclarations() ::= <<
 
 ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
-<ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
+<[ruleDescriptor.tokenLabels,ruleDescriptor.wildcardTreeLabels]:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{RewriteRule<rewriteElementType>Stream stream_<it>=new RewriteRule<rewriteElementType>Stream(adaptor,"token <it>");}; separator="\n">
@@ -115,10 +115,6 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
-wildcardTrack(label,elementIndex) ::= <<
-<super.wildcard(...)>
->>
-
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
@@ -152,6 +148,7 @@ rewriteCode(
 	referencedTokenListLabels,
 	referencedRuleLabels,
 	referencedRuleListLabels,
+	referencedWildcardLabels,
 	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 
@@ -200,8 +197,12 @@ rewriteCodeLabels() ::= <<
     :{RewriteRule<rewriteElementType>Stream stream_<it>=new RewriteRule<rewriteElementType>Stream(adaptor,"token <it>", list_<it>);};
     separator="\n"
 >
+<referencedWildcardLabels
+    :{RewriteRuleSubtreeStream stream_<it>=new RewriteRuleSubtreeStream(adaptor,"wildcard <it>",<it>);};
+    separator="\n"
+>
 <referencedRuleLabels
-    :{RewriteRuleSubtreeStream stream_<it>=new RewriteRuleSubtreeStream(adaptor,"token <it>",<it>!=null?<it>.tree:null);};
+    :{RewriteRuleSubtreeStream stream_<it>=new RewriteRuleSubtreeStream(adaptor,"rule <it>",<it>!=null?<it>.tree:null);};
     separator="\n"
 >
 <referencedRuleListLabels
@@ -370,6 +371,11 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<label>.nextNode(),
 rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = (<ASTLabelType>)adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
 >>
+
+rewriteWildcardLabelRef(label) ::= <<
+adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree());<\n>
+>>
+
 
 createImaginaryNode(tokenType,hetero,args) ::= <<
 <if(hetero)>

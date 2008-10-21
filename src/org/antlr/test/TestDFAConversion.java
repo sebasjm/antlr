@@ -1089,7 +1089,7 @@ public class TestDFAConversion extends BaseTest {
 			"A : ~'x' | 'x' {;} ;\n");
 		String expecting =
 			".s0-'x'->:s2=>2\n" +
-			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFF'}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -1100,7 +1100,7 @@ public class TestDFAConversion extends BaseTest {
 			"B : 'y' ;");
 		String expecting =
 			".s0-'y'->:s2=>2\n" +
-			".s0-{'\\u0000'..'\\b', '\\n'..'\\u001F', '!'..'x', 'z'..'\\uFFFE'}->:s1=>1\n";
+			".s0-{'\\u0000'..'\\b', '\\n'..'\\u001F', '!'..'x', 'z'..'\\uFFFF'}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -1445,7 +1445,45 @@ As a result, alternative(s) 2 were disabled for that input
 		assertEquals("mismatched alt", expectedAlt, msg.alt);
 	}
 
-	protected void checkDecision(Grammar g,
+    public void testWildcardInTreeGrammar() throws Exception {
+        Grammar g = new Grammar(
+            "tree grammar t;\n" +
+            "a : A B | A . ;\n");
+        String expecting =
+            ".s0-A->.s1\n" +
+            ".s1-A->:s3=>2\n" +
+            ".s1-B->:s2=>1\n";
+        int[] unreachableAlts = null;
+        int[] nonDetAlts = new int[] {1,2};
+        String ambigInput = null;
+        int[] danglingAlts = null;
+        int numWarnings = 1;
+        checkDecision(g, 1, expecting, unreachableAlts,
+                      nonDetAlts, ambigInput, danglingAlts, numWarnings);
+    }
+
+    public void testWildcardInTreeGrammar2() throws Exception {
+        Grammar g = new Grammar(
+            "tree grammar t;\n" +
+            "a : ^(A X Y) | ^(A . .) ;\n");
+        String expecting =
+            ".s0-A->.s1\n" +
+            ".s1-DOWN->.s2\n" +
+            ".s2-X->.s3\n" +
+            ".s2-{A, Y}->:s6=>2\n" +
+            ".s3-A..X->:s6=>2\n" +
+            ".s3-Y->.s4\n" +
+            ".s4-UP->:s5=>1\n";
+        int[] unreachableAlts = null;
+        int[] nonDetAlts = new int[] {1,2};
+        String ambigInput = null;
+        int[] danglingAlts = null;
+        int numWarnings = 1;
+        checkDecision(g, 1, expecting, unreachableAlts,
+                      nonDetAlts, ambigInput, danglingAlts, numWarnings);
+    }
+
+    protected void checkDecision(Grammar g,
 								 int decision,
 								 String expecting,
 								 int[] expectingUnreachableAlts,

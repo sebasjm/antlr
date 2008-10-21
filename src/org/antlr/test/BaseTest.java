@@ -420,8 +420,32 @@ public abstract class BaseTest extends TestCase {
 				   foundMsg instanceof GrammarSemanticsMessage);
 		assertEquals(expectedMessage.arg, foundMsg.arg);
 	}
+    
+    protected void checkError(ErrorQueue equeue,
+                              Message expectedMessage)
+        throws Exception
+    {
+        //System.out.println("errors="+equeue);
+        Message foundMsg = null;
+        for (int i = 0; i < equeue.errors.size(); i++) {
+            Message m = (Message)equeue.errors.get(i);
+            if (m.msgID==expectedMessage.msgID ) {
+                foundMsg = m;
+            }
+        }
+        assertTrue("no error; "+expectedMessage.msgID+" expected", equeue.errors.size()>0);
+        assertTrue("too many errors; "+equeue.errors, equeue.errors.size()<=1);
+        assertNotNull("couldn't find expected error: "+expectedMessage.msgID, foundMsg);
+        /*
+        assertTrue("error is not a GrammarSemanticsMessage",
+                   foundMsg instanceof GrammarSemanticsMessage);
+         */
+        assertEquals(expectedMessage.arg, foundMsg.arg);
+        assertEquals(expectedMessage.arg2, foundMsg.arg2);
+        ErrorManager.resetErrorState(); // wack errors for next test
+    }
 
-	public static class StreamVacuum implements Runnable {
+    public static class StreamVacuum implements Runnable {
 		StringBuffer buf = new StringBuffer();
 		BufferedReader in;
 		Thread sucker;

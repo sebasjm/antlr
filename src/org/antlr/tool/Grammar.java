@@ -57,9 +57,11 @@ public class Grammar {
 	public static final int TOKEN_LABEL = 2;
 	public static final int RULE_LIST_LABEL = 3;
 	public static final int TOKEN_LIST_LABEL = 4;
-	public static final int CHAR_LABEL = 5; // used in lexer for x='a'
+    public static final int CHAR_LABEL = 5; // used in lexer for x='a'
+    public static final int WILDCARD_TREE_LABEL = 6; // Used in tree grammar x=.
 
-	public static String[] LabelTypeToString =
+
+    public static String[] LabelTypeToString =
 		{"<invalid>", "rule", "token", "rule-list", "token-list"};
 
 	public static final String ARTIFICIAL_TOKENS_RULENAME = "Tokens";
@@ -1658,13 +1660,23 @@ outer:
 			{
 				defineLabel(r, label, tokenRef, CHAR_LABEL);
 			}
-			else {
+            else {
 				defineLabel(r, label, tokenRef, TOKEN_LABEL);
 			}
 		}
 	}
 
-	public void defineRuleRefLabel(String ruleName,
+    public void defineWildcardTreeRefLabel(String ruleName,
+                                           antlr.Token label,
+                                           GrammarAST tokenRef)
+    {
+        Rule r = getLocallyDefinedRule(ruleName);
+        if ( r!=null ) {
+            defineLabel(r, label, tokenRef, WILDCARD_TREE_LABEL);
+        }
+    }
+
+    public void defineRuleRefLabel(String ruleName,
 								   antlr.Token label,
 								   GrammarAST ruleRef)
 	{
@@ -1711,7 +1723,21 @@ outer:
 				String labelName = el.getText();
 				Rule enclosingRule = getLocallyDefinedRule(el.enclosingRuleName);
 				LabelElementPair pair = enclosingRule.getLabel(labelName);
-				// if valid label and type is what we're looking for
+                /*
+                // if tree grammar and we have a wildcard, only notice it
+                // when looking for rule labels not token label. x=. should
+                // look like a rule ref since could be subtree.
+                if ( type==TREE_PARSER && pair!=null &&
+                     pair.elementRef.getType()==ANTLRParser.WILDCARD )
+                {
+                    if ( labelType==WILDCARD_TREE_LABEL ) {
+                        labels.add(labelName);
+                        continue;
+                    }
+                    else continue;
+                }
+                 */
+                // if valid label and type is what we're looking for
 				// and not ref to old value val $rule, add to list
 				if ( pair!=null && pair.type==labelType &&
 					 !labelName.equals(el.enclosingRuleName) )

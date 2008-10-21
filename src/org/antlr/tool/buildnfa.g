@@ -548,7 +548,15 @@ atom[String scopeName] returns [StateCluster g=null]
      	}
      	}
 
-    |   #( w:WILDCARD (as5:ast_suffix)? )    {g = factory.build_Wildcard();}
+    |   #( w:WILDCARD (as5:ast_suffix)? )
+        {
+        if ( nfa.grammar.type==Grammar.TREE_PARSER ) {
+            g = factory.build_WildcardTree(#w);
+        }
+        else {
+            g = factory.build_Wildcard(#w);
+        }
+        }
 
     |   #( DOT scope:ID g=atom[#scope.getText()] ) // scope override
 	;

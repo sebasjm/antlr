@@ -693,7 +693,7 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
-			".s2-{'\\u0000'..'2', '4'..'\\uFFFE'}->.s3\n" +
+			".s2-{'\\u0000'..'2', '4'..'\\uFFFF'}->.s3\n" +
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
@@ -712,7 +712,7 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
-			".s2-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFE'}->.s3\n" +
+			".s2-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFF'}->.s3\n" +
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
@@ -734,7 +734,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s2->.s3\n" +
 			".s2->.s9\n" +
 			".s3->.s4\n" +
-			".s4-{'\\u0000'..'2', '4'..'\\uFFFE'}->.s5\n" +
+			".s4-{'\\u0000'..'2', '4'..'\\uFFFF'}->.s5\n" +
 			".s5->.s3\n" +
 			".s5->.s6\n" +
 			".s6->:s7\n" +
@@ -759,7 +759,7 @@ public class TestNFAConstruction extends BaseTest {
 			".s2->.s3\n" +
 			".s2->.s9\n" +
 			".s3->.s4\n" +
-			".s4-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFE'}->.s5\n" +
+			".s4-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFF'}->.s5\n" +
 			".s5->.s3\n" +
 			".s5->.s6\n" +
 			".s6->:s7\n" +
@@ -814,7 +814,7 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
-			".s2-{'\\u0000'..'2', '4'..'\\uFFFE'}->.s3\n" +
+			".s2-{'\\u0000'..'2', '4'..'\\uFFFF'}->.s3\n" +
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);
@@ -833,7 +833,7 @@ public class TestNFAConstruction extends BaseTest {
 		String expecting =
 			".s0->.s1\n" +
 			".s1->.s2\n" +
-			".s2-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFE'}->.s3\n" +
+			".s2-{'\\u0000'..'2', '4'..'a', 'c'..'\\uFFFF'}->.s3\n" +
 			".s3->:s4\n" +
 			":s4-<EOT>->.s5\n";
 		checkRule(g, "A", expecting);

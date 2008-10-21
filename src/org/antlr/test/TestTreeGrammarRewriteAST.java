@@ -27,6 +27,13 @@
 */
 package org.antlr.test;
 
+import org.antlr.tool.ErrorManager;
+import org.antlr.tool.Grammar;
+import org.antlr.tool.GrammarSemanticsMessage;
+import org.antlr.tool.GrammarSyntaxMessage;
+import org.antlr.Tool;
+import org.antlr.codegen.CodeGenerator;
+
 /** Tree rewrites in tree parsers are basically identical to rewrites
  *  in a normal grammar except that the atomic element is a node not
  *  a Token.  Tests here ensure duplication of nodes occurs properly
@@ -199,7 +206,115 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("a 1\n", found);
 	}
 
-	public void testAutoDupMultiple() throws Exception {
+    public void testAutoWildcard() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "a : ID . \n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+        assertEquals("abc 34\n", found);
+    }
+
+    public void testNoWildcardAsRootError() throws Exception {
+        ErrorQueue equeue = new ErrorQueue();
+        ErrorManager.setErrorListener(equeue);
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST;}\n" +
+            "a : ^(. INT) \n" +
+            "  ;\n";
+
+        Grammar g = new Grammar(treeGrammar);
+        Tool antlr = newTool();
+        antlr.setOutputDirectory(null); // write to /dev/null
+        CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+        g.setCodeGenerator(generator);
+        generator.genRecognizer();
+
+        assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
+
+        int expectedMsgID = ErrorManager.MSG_WILDCARD_AS_ROOT;
+        Object expectedArg = null;
+        antlr.RecognitionException expectedExc = null;
+        GrammarSyntaxMessage expectedMessage =
+            new GrammarSyntaxMessage(expectedMsgID, g, null, expectedArg, expectedExc);
+
+        checkError(equeue, expectedMessage);        
+    }
+
+    public void testAutoWildcard2() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ^(ID INT);\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "a : ^(ID .) \n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+        assertEquals("(abc 34)\n", found);
+    }
+
+    public void testAutoWildcardWithLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "a : ID c=. \n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+        assertEquals("abc 34\n", found);
+    }
+
+    public void testAutoWildcardWithListLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "a : ID c+=. \n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "a", "abc 34");
+        assertEquals("abc 34\n", found);
+    }
+
+    public void testAutoDupMultiple() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -859,24 +974,104 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 					 "(root (ick 34))\n", found);
 	}
 
-	public void testWildcard() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : ID INT -> ^(ID[\"root\"] INT);\n"+
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+    public void testWildcardSingleNode() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ^(ID[\"root\"] INT);\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 
-		String treeGrammar =
-			"tree grammar TP;\n"+
-			"options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
-			"s : ^(ID c=.) -> $c\n" +
-			"  ;\n";
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "s : ^(ID c=.) -> $c\n" +
+            "  ;\n";
 
-		String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
-									  treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
-		assertEquals("34\n", found);
-	}
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+        assertEquals("34\n", found);
+    }
 
+    public void testWildcardUnlabeledSingleNode() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID INT -> ^(ID INT);\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "s : ^(ID .) -> ID\n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 34");
+        assertEquals("abc\n", found);
+    }
+
+    public void testWildcardGrabsSubtree() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID x=INT y=INT z=INT -> ^(ID[\"root\"] ^($x $y $z));\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "s : ^(ID c=.) -> $c\n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 1 2 3");
+        assertEquals("(1 2 3)\n", found);
+    }
+
+    public void testWildcardGrabsSubtree2() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID x=INT y=INT z=INT -> ID ^($x $y $z);\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "s : ID c=. -> $c\n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "abc 1 2 3");
+        assertEquals("(1 2 3)\n", found);
+    }
+
+    public void testWildcardListLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : INT INT INT ;\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T;}\n" +
+            "s : (c+=.)+ -> $c+\n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "1 2 3");
+        assertEquals("1 2 3\n", found);
+    }
+    
 }

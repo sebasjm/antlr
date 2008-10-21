@@ -182,10 +182,10 @@ public class TestCharDFAConversion extends BaseTest {
 		String expecting =
 			".s0-'r'->:s3=>2\n" +
 			".s0-'s'->:s2=>1\n" +
-			".s0-{'\\u0000'..'q', 't'..'\\uFFFE'}->.s1\n" +
+			".s0-{'\\u0000'..'q', 't'..'\\uFFFF'}->.s1\n" +
 			".s1-'r'->:s3=>2\n" +
 			".s1-<EOT>->:s2=>1\n" +
-			".s1-{'\\u0000'..'q', 't'..'\\uFFFE'}->.s1\n";
+			".s1-{'\\u0000'..'q', 't'..'\\uFFFF'}->.s1\n";
 		checkDecision(g, 3, expecting, null);
 	}
 
@@ -197,10 +197,10 @@ public class TestCharDFAConversion extends BaseTest {
 		String expecting =
 			".s0-'r'->:s3=>2\n" +
 			".s0-'t'->:s2=>1\n" +
-			".s0-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n" +
+			".s0-{'\\u0000'..'q', 's', 'u'..'\\uFFFF'}->.s1\n" +
 			".s1-'r'->:s3=>2\n" +
 			".s1-<EOT>->:s2=>1\n" +
-			".s1-{'\\u0000'..'q', 's', 'u'..'\\uFFFE'}->.s1\n";
+			".s1-{'\\u0000'..'q', 's', 'u'..'\\uFFFF'}->.s1\n";
 		checkDecision(g, 3, expecting, null);
 	}
 
@@ -210,7 +210,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"A : 'x'* ~'x'+ ;\n");
 		String expecting =
 			".s0-'x'->:s1=>1\n" +
-			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s2=>2\n";
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFF'}->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 
 		// The optimizer yanks out all exit branches from EBNF blocks
@@ -233,9 +233,9 @@ public class TestCharDFAConversion extends BaseTest {
 			"CMT : '/*' ( options {greedy=false;} : . )* '*/' ;");
 		String expecting =
 			".s0-'*'->.s1\n" +
-			".s0-{'\\u0000'..')', '+'..'\\uFFFE'}->:s3=>1\n" +
+			".s0-{'\\u0000'..')', '+'..'\\uFFFF'}->:s3=>1\n" +
 			".s1-'/'->:s2=>2\n" +
-			".s1-{'\\u0000'..'.', '0'..'\\uFFFE'}->:s3=>1\n";
+			".s1-{'\\u0000'..'.', '0'..'\\uFFFF'}->:s3=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -245,7 +245,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"SLCMT : '//' ( options {greedy=false;} : . )* '\n' ;");
 		String expecting =
 			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFF'}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -255,7 +255,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"SLCMT : '//' .* '\n' ;");
 		String expecting =
 			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFF'}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -267,7 +267,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"SLCMT : '//' ( options {greedy=false;} : . )+ '\n' ;");
 		String expecting =
 			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFF'}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -277,7 +277,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"SLCMT : '//' .+ '\n' ;");
 		String expecting =
 			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFF'}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -287,7 +287,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"SLCMT : '//' (.)+ '\n' ;");
 		String expecting =
 			".s0-'\\n'->:s1=>2\n" +
-			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFE'}->:s2=>1\n";
+			".s0-{'\\u0000'..'\\t', '\\u000B'..'\\uFFFF'}->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -326,9 +326,9 @@ public class TestCharDFAConversion extends BaseTest {
 		String expecting =
 			".s0-'\"'->:s1=>3\n" +
 				".s0-'\\\\'->.s2\n" +
-				".s0-{'\\u0000'..'!', '#'..'[', ']'..'\\uFFFE'}->:s4=>2\n" +
+				".s0-{'\\u0000'..'!', '#'..'[', ']'..'\\uFFFF'}->:s4=>2\n" +
 				".s2-'\"'->:s3=>1\n" +
-				".s2-{'\\u0000'..'!', '#'..'\\uFFFE'}->:s4=>2\n";
+				".s2-{'\\u0000'..'!', '#'..'\\uFFFF'}->:s4=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -372,7 +372,7 @@ public class TestCharDFAConversion extends BaseTest {
 			".s0-'\\\\'->:s2=>2\n" +
 			".s0-'{'->:s1=>1\n" +
 			".s0-'}'->:s4=>4\n" +
-			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s3=>3\n";
+			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFF'}->:s3=>3\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -396,12 +396,12 @@ public class TestCharDFAConversion extends BaseTest {
 			".s0-'\\\\'->.s3\n" +
 			".s0-'{'->:s2=>1\n" +
 			".s0-'}'->:s1=>4\n" +
-			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s5=>3\n" +
+			".s0-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFF'}->:s5=>3\n" +
 			".s3-'\\\\'->:s8=>2\n" +
 			".s3-'{'->:s7=>2\n" +
 			".s3-'}'->.s4\n" +
-			".s3-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFE'}->:s6=>2\n" +
-			".s4-'\\u0000'..'\\uFFFE'->:s6=>2\n" +
+			".s3-{'\\u0000'..'[', ']'..'z', '|', '~'..'\\uFFFF'}->:s6=>2\n" +
+			".s4-'\\u0000'..'\\uFFFF'->:s6=>2\n" +
 			".s4-<EOT>->:s5=>3\n";
 		checkDecision(g, 1, expecting, null);
 	}
@@ -414,7 +414,7 @@ public class TestCharDFAConversion extends BaseTest {
 		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'a'->:s1=>1\n" +
-			".s0-{'\\u0000'..'`', 'b'..'\\uFFFE'}->:s2=>2\n";
+			".s0-{'\\u0000'..'`', 'b'..'\\uFFFF'}->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -426,7 +426,7 @@ public class TestCharDFAConversion extends BaseTest {
 		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'a'..'b'->:s1=>1\n" +
-			".s0-{'\\u0000'..'`', 'c'..'\\uFFFE'}->:s2=>2\n";
+			".s0-{'\\u0000'..'`', 'c'..'\\uFFFF'}->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -438,7 +438,7 @@ public class TestCharDFAConversion extends BaseTest {
 		g.createLookaheadDFAs();
 		String expecting =
 			".s0-'a'->:s1=>1\n" +
-			".s0-{'\\u0000'..'`', 'b'..'\\uFFFE'}->:s2=>2\n";
+			".s0-{'\\u0000'..'`', 'b'..'\\uFFFF'}->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -450,7 +450,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"fragment C : 'f' ;\n"); // has to seen from B to C
 		String expecting =
 			".s0-'a'..'f'->:s1=>1\n" +
-			".s0-{'\\u0000'..'`', 'g'..'\\uFFFE'}->:s2=>2\n";
+			".s0-{'\\u0000'..'`', 'g'..'\\uFFFF'}->:s2=>2\n";
 		checkDecision(g, 1, expecting, null);
 	}
 
@@ -464,7 +464,7 @@ public class TestCharDFAConversion extends BaseTest {
 		String expecting =
 			".s0-'b'->:s3=>2\n" +
 			".s0-'x'->:s2=>1\n" +
-			".s0-{'\\u0000'..'a', 'c'..'w', 'y'..'\\uFFFE'}->.s1\n" +
+			".s0-{'\\u0000'..'a', 'c'..'w', 'y'..'\\uFFFF'}->.s1\n" +
 			".s1-<EOT>->:s2=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
@@ -476,7 +476,7 @@ public class TestCharDFAConversion extends BaseTest {
 			"S : 'x' (T | 'x') ;\n");
 		String expecting =
 			".s0-'x'->:s2=>2\n" +
-			".s0-{'\\u0000'..'w', 'y'..'\\uFFFE'}->:s1=>1\n";
+			".s0-{'\\u0000'..'w', 'y'..'\\uFFFF'}->:s1=>1\n";
 		checkDecision(g, 1, expecting, null);
 	}
 

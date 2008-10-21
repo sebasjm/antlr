@@ -402,7 +402,7 @@ ruleScopeCleanUp() ::= <<
 >>
 
 ruleLabelDefs() ::= <<
-<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
+<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels,ruleDescriptor.wildcardTreeLabels]
     :{<labelType> <it.label.text>=null;}; separator="\n"
 >
 <[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]

@@ -567,9 +567,6 @@ public class NFAFactory {
 		blockEndNFAState.decisionStateType = NFAState.RIGHT_EDGE_OF_BLOCK;
 
 		// don't reuse A.right as loopback if it's right edge of another block
-		if ( A==null ) {
-			System.out.println("what?");
-		}
 		if ( A.right.decisionStateType == NFAState.RIGHT_EDGE_OF_BLOCK ) {
 			// nested A* so make another tail node to be the loop back
 			// instead of the usual A.right which is the EOB for inner loop
@@ -663,14 +660,34 @@ public class NFAFactory {
 	 */
 
     /** Build an atom with all possible values in its label */
-    public StateCluster build_Wildcard() {
+    public StateCluster build_Wildcard(GrammarAST associatedAST) {
         NFAState left = newState();
         NFAState right = newState();
+        left.associatedASTNode = associatedAST;
+        right.associatedASTNode = associatedAST;
         Label label = new Label(nfa.grammar.getTokenTypes()); // char or tokens
         Transition e = new Transition(label,right);
         left.addTransition(e);
         StateCluster g = new StateCluster(left, right);
         return g;
+    }
+
+    /** Build a subrule matching ^(. .*) (any tree or node) */
+    public StateCluster build_WildcardTree(GrammarAST associatedAST) {
+        StateCluster wildRoot = build_Wildcard(associatedAST);
+
+        StateCluster down = build_Atom(Label.DOWN, associatedAST);
+        wildRoot = build_AB(wildRoot,down); // hook in; . DOWN
+
+        // make .*
+        StateCluster wildChildren = build_Wildcard(associatedAST);
+        wildChildren = build_Astar(wildChildren);
+        wildRoot = build_AB(wildRoot,wildChildren); // hook in; . DOWN .*
+
+        StateCluster up = build_Atom(Label.UP, associatedAST);
+        wildRoot = build_AB(wildRoot,up); // hook in; . DOWN .* UP
+
+        return wildRoot;
     }
 
     /** Given a collapsed block of alts (a set of atoms), pull out

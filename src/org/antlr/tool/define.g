@@ -368,6 +368,9 @@ element
     	if ( #el.getType()==RULE_REF) {
     		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),#el);
     	}
+    	else if ( #el.getType()==WILDCARD && grammar.type==Grammar.TREE_PARSER ) {
+    		grammar.defineWildcardTreeRefLabel(currentRuleName,#id.getToken(),#el);
+    	}
     	else {
     		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),#el);
     	}

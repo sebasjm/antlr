@@ -305,7 +305,7 @@ public class TestIntervalSet extends BaseTest {
 
 	public void testComplement3() throws Exception {
 		IntervalSet s = IntervalSet.of(1,96);
-		s.add(99,65534);
+		s.add(99,Label.MAX_CHAR_VALUE);
 		String expecting = "97..98";
 		String result = (s.complement(1,Label.MAX_CHAR_VALUE)).toString();
 		assertEquals(result, expecting);

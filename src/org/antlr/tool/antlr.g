@@ -103,6 +103,7 @@ tokens {
 	protected int gtype = 0;
 	protected String currentRuleName = null;
 	protected GrammarAST currentBlockAST = null;
+	protected boolean atTreeRoot; // are we matching a tree root in tree grammar?
 
 	protected GrammarAST setToBlockWithSet(GrammarAST b) {
 		GrammarAST alt = #(#[ALT,"ALT"],#b,#[EOA,"<end-of-alt>"]);
@@ -596,11 +597,16 @@ notSet
         {#notSet.setLine(line); #notSet.setColumn(col);}
 	;
 
-tree :
-	TREE_BEGIN^
-        element ( element )+
-    RPAREN!
-	;
+treeRoot
+    :   {atTreeRoot=true;}
+        (   id (ASSIGN^|PLUS_ASSIGN^) (atom|block)
+	    |   atom
+	    |   block
+	    )
+        {atTreeRoot=false;}
+    ;
+
+tree:   TREE_BEGIN^ treeRoot ( element )+ RPAREN! ;
 
 /** matches ENBF blocks (and sets via block rule) */
 ebnf!
@@ -662,6 +668,12 @@ GrammarAST ebnfRoot=null, subrule=null;
 	|   sl:STRING_LITERAL^ ( elementOptions[#sl]! )? (ROOT^|BANG^)?
 
 	|   wi:WILDCARD (ROOT^|BANG^)?
+	    {
+		if ( atTreeRoot ) {
+		    ErrorManager.syntaxError(
+			    ErrorManager.MSG_WILDCARD_AS_ROOT,grammar,wi,null,null);
+	    }
+	    }
 	;
 
 elementOptions[GrammarAST terminalAST]

@@ -160,18 +160,31 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(foo void ;)\n", found);
 	}
 
-	public void testWildcardRootWithListLabel() throws Exception {
-		String grammar =
-			"grammar T;\n" +
-			"options {output=AST;}\n" +
-			"a : v='void' x=.^ ';' ;\n" +
-			"ID : 'a'..'z'+ ;\n" +
-			"INT : '0'..'9'+;\n" +
-			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
-		String found = execParser("T.g", grammar, "TParser", "TLexer",
-								  "a", "void foo;", debug);
-		assertEquals("(foo void ;)\n", found);
-	}
+    public void testWildcardRootWithListLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : v='void' x=.^ ';' ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+        String found = execParser("T.g", grammar, "TParser", "TLexer",
+                                  "a", "void foo;", debug);
+        assertEquals("(foo void ;)\n", found);
+    }
+
+    public void testWildcardBangWithListLabel() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : v='void' x=.! ';' ;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+        String found = execParser("T.g", grammar, "TParser", "TLexer",
+                                  "a", "void foo;", debug);
+        assertEquals("void ;\n", found);
+    }
 
 	public void testRootRoot() throws Exception {
 		String grammar =
@@ -715,8 +728,8 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc", debug);
-		assertEquals("line 0:-1 missing INT at '<EOF>'\n", this.stderr);
-		assertEquals("abc <missing INT>\n", found);
+		assertEquals("line 0:-1 mismatched input '<EOF>' expecting INT\n", this.stderr);
+		assertEquals("<mismatched token: [@-1,0:0='<no text>',<-1>,0:-1], resync=abc>\n", found);
 	}
 
 	public void testExtraTokenGivesErrorNode() throws Exception {

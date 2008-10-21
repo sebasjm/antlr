@@ -227,6 +227,7 @@ IMPORT_NAME_CLASH(arg,arg2) ::=
   "combined grammar <arg.name> and imported <arg2.grammarTypeString> grammar <arg2.name> both generate <arg2.recognizerName>; import ignored"
 AST_OP_IN_ALT_WITH_REWRITE(arg,arg2) ::=
   "rule <arg> alt <arg2> uses rewrite syntax and also an AST operator"
+WILDCARD_AS_ROOT(arg) ::= "Wildcard invalid as root; wildcard can itself be a tree"
 
 // GRAMMAR WARNINGS
 

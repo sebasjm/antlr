@@ -410,13 +410,13 @@ LABEL_REF
 		{
 		StringTemplate st;
 		Grammar.LabelElementPair pair = getElementLabel($ID.text);
-		if ( pair.type==Grammar.TOKEN_LABEL ||
-              pair.type==Grammar.CHAR_LABEL )
+		if ( pair.type==Grammar.RULE_LIST_LABEL ||
+             pair.type==Grammar.TOKEN_LIST_LABEL )
         {
-			st = template("tokenLabelRef");
+			st = template("listLabelRef");
 		}
 		else {
-			st = template("listLabelRef");
+			st = template("tokenLabelRef");
 		}
 		st.setAttribute("label", $ID.text);
 		}

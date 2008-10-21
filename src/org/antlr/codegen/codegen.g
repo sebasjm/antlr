@@ -115,7 +115,7 @@ options {
     										  GrammarAST ast_suffix,
     										  String label)
 	{
-		String suffix = getSTSuffix(ast_suffix,label);
+		String suffix = getSTSuffix(elementAST,ast_suffix,label);
 		name += suffix;
 		// if we're building trees and there is no label, gen a label
 		// unless we're in a synpred rule.
@@ -141,7 +141,7 @@ options {
 											   GrammarAST ast_suffix,
 											   String label)
 	{
-		String suffix = getSTSuffix(ast_suffix,label);
+		String suffix = getSTSuffix(elementAST,ast_suffix,label);
 		name += suffix;
 		// if we're building trees and there is no label, gen a label
 		// unless we're in a synpred rule.
@@ -181,7 +181,7 @@ options {
 	/** Return a non-empty template name suffix if the token is to be
 	 *  tracked, added to a tree, or both.
 	 */
-	protected String getSTSuffix(GrammarAST ast_suffix, String label) {
+	protected String getSTSuffix(GrammarAST elementAST, GrammarAST ast_suffix, String label) {
 		if ( grammar.type==Grammar.LEXER ) {
 			return "";
 		}
@@ -199,7 +199,7 @@ options {
     			operatorPart = "Bang";
     		}
    		}
-		if ( currentAltHasASTRewrite ) {
+		if ( currentAltHasASTRewrite && elementAST.getType()!=WILDCARD ) {
 			rewritePart = "Track";
 		}
 		if ( isListLabel(label) ) {
@@ -1057,6 +1057,8 @@ if ( #rewrite.getType()==REWRITE ) {
             grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.RULE_LABEL);
         Set<String> ruleListLabels =
             grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.RULE_LIST_LABEL);
+        Set<String> wildcardLabels =
+            grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.WILDCARD_TREE_LABEL);
         // just in case they ref $r for "previous value", make a stream
         // from retval.tree
         StringTemplate retvalST = templates.getInstanceOf("prevRuleRootRef");
@@ -1065,6 +1067,7 @@ if ( #rewrite.getType()==REWRITE ) {
         code.setAttribute("referencedTokenListLabels", tokenListLabels);
         code.setAttribute("referencedRuleLabels", ruleLabels);
         code.setAttribute("referencedRuleListLabels", ruleListLabels);
+        code.setAttribute("referencedWildcardLabels", wildcardLabels);
 	}
 }
 else {
@@ -1327,6 +1330,9 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 			switch ( pair.type ) {
 				case Grammar.TOKEN_LABEL :
 					stName = "rewriteTokenLabelRef";
+					break;
+				case Grammar.WILDCARD_TREE_LABEL :
+					stName = "rewriteWildcardLabelRef";
 					break;
 				case Grammar.RULE_LABEL :
 					stName = "rewriteRuleLabelRef";

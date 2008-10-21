@@ -1,11 +1,21 @@
-ANTLR 3.1 Release
-August 12, 2008
+ANTLR 3.1.1 Release
+October 1, 2008
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
 University of San Francisco
 
 CHANGES
+
+October 21, 2008
+
+* Updated unit tests to be correct for \uFFFE->\uFFFF change
+
+* Made . in tree grammar look like ^(. .*) to analysis, though ^(. foo)
+  is illegal (can't have . at root). Wildcard is subtree or node.
+  Fixed bugs:
+    http://www.antlr.org:8888/browse/ANTLR-248
+    http://www.antlr.org:8888/browse/ANTLR-344
 
 October 1, 2008 -- ANTLR v3.1.1
 
