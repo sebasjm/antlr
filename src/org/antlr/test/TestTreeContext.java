@@ -31,6 +31,25 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
+    public void testNoParent() {
+        String tree = "(PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3])))";
+        TreeAdaptor adaptor = new CommonTreeAdaptor();
+        TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
+        CommonTree t = (CommonTree)wiz.create(tree);
+
+        Map labels = new HashMap();
+        boolean valid =
+            wiz.parse(t,
+                      "(%x:PRINT (MULT ID (VEC INT INT INT)))",
+                      labels);
+        assertTrue(valid);
+        CommonTree node = (CommonTree)labels.get("x");
+
+        boolean expecting = false;
+        boolean found = TreeParser.inContext(adaptor, tokenNames, node, "VEC");
+        assertEquals(expecting, found);
+    }
+
     public void testParentWithWildcard() {
         String tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();

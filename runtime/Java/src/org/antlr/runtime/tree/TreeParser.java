@@ -148,6 +148,7 @@ public class TreeParser extends BaseRecognizer {
             t = adaptor.getParent(t);
         }
 
+        if ( t==null && ni>=0 ) return false; // at root but more nodes to match
         return true;
     }
 
