@@ -29,6 +29,8 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.Token;
 
+import java.util.List;
+
 /** What does a tree look like?  ANTLR has a number of support classes
  *  such as CommonTreeNodeStream that work on these kinds of trees.  You
  *  don't have to make your trees implement this interface, but if you do,
@@ -52,7 +54,18 @@ public interface Tree {
 
 	public void setParent(Tree t);
 
-	/** This node is what child index? 0..n-1 */
+    /** Is there is a node above with token type ttype? */
+    public boolean hasAncestor(int ttype);
+
+    /** Walk upwards and get first ancestor with this token type. */
+    public Tree getAncestor(int ttype);
+
+    /** Return a list of all ancestors of this node.  The first node of
+     *  list is the root and the last is the parent of this node.
+     */
+    public List getAncestors();
+
+    /** This node is what child index? 0..n-1 */
 	public int getChildIndex();
 
 	public void setChildIndex(int index);

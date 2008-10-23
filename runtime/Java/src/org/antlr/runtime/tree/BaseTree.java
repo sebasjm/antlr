@@ -279,10 +279,40 @@ public abstract class BaseTree implements Tree {
 	public Tree getParent() {
 		return null;
 	}
-	public void setParent(Tree t) {
+
+    public void setParent(Tree t) {
 	}
 
-	/** Print out a whole tree not just a node */
+    /** Walk upwards looking for ancestor with this token type. */
+    public boolean hasAncestor(int ttype) { return getAncestor(ttype)!=null; }
+
+    /** Walk upwards and get first ancestor with this token type. */
+    public Tree getAncestor(int ttype) {
+        Tree t = this;
+        t = t.getParent();
+        while ( t!=null ) {
+            if ( t.getType()==ttype ) return t;
+            t = t.getParent();
+        }
+        return null;
+    }
+
+    /** Return a list of all ancestors of this node.  The first node of
+     *  list is the root and the last is the parent of this node.
+     */
+    public List getAncestors() {
+        if ( getParent()==null ) return null;
+        List ancestors = new ArrayList();
+        Tree t = this;
+        t = t.getParent();
+        while ( t!=null ) {
+            ancestors.add(0, t); // insert at start
+            t = t.getParent();
+        }
+        return ancestors;
+    }
+
+    /** Print out a whole tree not just a node */
     public String toStringTree() {
 		if ( children==null || children.size()==0 ) {
 			return this.toString();

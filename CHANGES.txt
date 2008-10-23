@@ -7,6 +7,37 @@ University of San Francisco
 
 CHANGES
 
+October 22, 2008
+
+* Added inContext() to TreeParser.  Very useful for predicating
+  tree grammar productions according to context (their parent list).
+  Added new TestTreeContext unit tests (15).
+
+    /** Check if current node in input has a context.  Context means sequence
+     *  of nodes towards root of tree.  For example, you might say context
+     *  is "MULT" which means my parent must be MULT.  "CLASS VARDEF" says
+     *  current node must be child of a VARDEF and whose parent is a CLASS node.
+     *  You can use "..." to mean zero-or-more nodes.  "METHOD ... VARDEF"
+     *  means my parent is VARDEF and somewhere above that is a METHOD node.
+     *  The first node in the context is not necessarily the root.  The context
+     *  matcher stops matching and returns true when it runs out of context.
+     *  There is no way to force the first node to be the root. 
+     */
+    public boolean inContext(String context) {...}
+
+* Added 3 methods to Tree interface [BREAKS BACKWARD COMPATIBILITY]
+
+    /** Is there is a node above with token type ttype? */
+    public boolean hasAncestor(int ttype);
+
+    /** Walk upwards and get first ancestor with this token type. */
+    public Tree getAncestor(int ttype);
+
+    /** Return a list of all ancestors of this node.  The first node of
+     *  list is the root and the last is the parent of this node.
+     */
+    public List getAncestors();
+
 October 21, 2008
 
 * Updated unit tests to be correct for \uFFFE->\uFFFF change
