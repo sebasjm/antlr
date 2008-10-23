@@ -293,7 +293,7 @@ stream_<token>->nextNode(stream_<token>)
 ruleCleanUp() ::= <<
 <super.ruleCleanUp(...)>
 <if(backtracking)>
-if ( BACKTRACKING==0 ) {<\n>
+if ( <actions.(actionScope).synpredgate> ) {<\n>
 <endif>
 <if(!ruleDescriptor.isSynPred)>
 	retval.stop = LT(-1);<\n>

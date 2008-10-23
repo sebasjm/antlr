@@ -333,22 +333,25 @@ public class CodeGenerator {
 		translateActionAttributeReferences(actions);
 		Map actionsForGrammarScope =
 			(Map)actions.get(grammar.getDefaultActionScope(grammar.type));
-		if ( filterMode &&
-			 (actionsForGrammarScope==null ||
+        // if no synpredgate action set by user then set
+        if ( (actionsForGrammarScope==null ||
 			 !actionsForGrammarScope.containsKey(Grammar.SYNPREDGATE_ACTION_NAME)) )
 		{
-			// if filtering, we need to set actions to execute at backtracking
-			// level 1 not 0.  Don't set this action if a user has though
-			StringTemplate gateST = templates.getInstanceOf("filteringActionGate");
-			if ( actionsForGrammarScope==null ) {
-				actionsForGrammarScope=new HashMap();
-				actions.put(grammar.getDefaultActionScope(grammar.type),
-							actionsForGrammarScope);
-			}
-			actionsForGrammarScope.put(Grammar.SYNPREDGATE_ACTION_NAME,
-									   gateST);
-		}
-		headerFileST.setAttribute("actions", actions);
+            StringTemplate gateST = templates.getInstanceOf("actionGate");
+            if ( filterMode ) {
+                // if filtering, we need to set actions to execute at backtracking
+                // level 1 not 0.
+                gateST = templates.getInstanceOf("filteringActionGate");
+            }
+            if ( actionsForGrammarScope==null ) {
+                actionsForGrammarScope=new HashMap();
+                actions.put(grammar.getDefaultActionScope(grammar.type),
+                            actionsForGrammarScope);
+            }
+            actionsForGrammarScope.put(Grammar.SYNPREDGATE_ACTION_NAME,
+                                       gateST);
+        }
+        headerFileST.setAttribute("actions", actions);
 		outputFileST.setAttribute("actions", actions);
 
 		headerFileST.setAttribute("buildTemplate", new Boolean(grammar.buildTemplate()));

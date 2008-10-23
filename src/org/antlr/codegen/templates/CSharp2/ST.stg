@@ -89,7 +89,7 @@ rewriteTemplate(alts) ::= <<
 
 // TEMPLATE REWRITE
 <if(backtracking)>
-if ( state.backtracking==0 )
+if ( <actions.(actionScope).synpredgate> )
 {
   <alts:rewriteTemplateAlt(); separator="else ">
   <if(rewriteMode)><replaceTextInLine()><endif>

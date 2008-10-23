@@ -128,7 +128,7 @@ root_0 = (<ASTLabelType>)(ADAPTOR->nilNode(ADAPTOR));<\n>
 /** ID but track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)> <! Track implies no auto AST construction!>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
@@ -142,7 +142,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
 >>
 
 wildcardTrack(label,elementIndex) ::= <<
@@ -152,7 +152,7 @@ wildcardTrack(label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -164,7 +164,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -249,7 +249,7 @@ rewriteCode(
  * rule list labels  : <referencedRuleListLabels; separator=", ">
  */
 <if(backtracking)>
-if ( BACKTRACKING==0 ) <\n>
+if ( <actions.(actionScope).synpredgate> ) <\n>
 <endif>
 {
 	<rewriteCodeLabelsDecl()>

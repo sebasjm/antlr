@@ -200,6 +200,8 @@ def alreadyParsedRule(self, input, ruleIndex):
 
 >>
 
+actionGate() ::= "self._state.backtracking == 0"
+
 filteringActionGate() ::= "self._state.backtracking == 1"
 
 /** How to generate a parser */
@@ -1389,7 +1391,7 @@ if <actions.(actionScope).synpredgate>:
     <action>
 
 <else>
-if self._state.backtracking == 0:
+if <actions.(actionScope).synpredgate>:
     <action>
 
 <endif>

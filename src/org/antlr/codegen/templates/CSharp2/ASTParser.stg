@@ -207,7 +207,7 @@ new <hetero>(<label>) <! new MethodNode(IDLabel) !>
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(backtracking)>
-if ( state.backtracking==0 )
+if ( <actions.(actionScope).synpredgate> )
 {
 <endif>
 	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);

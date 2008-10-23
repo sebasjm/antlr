@@ -22,7 +22,7 @@ var _last = null;<\n>
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(rewriteMode)>
 retval.tree = _first_0;
 if ( this.adaptor.getParent(retval.tree) && this.adaptor.isNil( this.adaptor.getParent(retval.tree) ) )
@@ -45,7 +45,7 @@ var root_<treeLevel> = this.adaptor.nil();
 <endif>
 <root:element()>
 <if(rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 )<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
 <if(root.el.rule)>
 if ( !_first_<enclosingTreeLevel> ) _first_<enclosingTreeLevel> = <root.el.label>.tree;
 <else>
@@ -86,7 +86,7 @@ tokenRef(token,label,elementIndex,hetero) ::= <<
 _last = this.input.LT(1);
 <super.tokenRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(hetero)>
 <label>_tree = new <hetero>(<label>);
 <else>
@@ -95,7 +95,7 @@ _last = this.input.LT(1);
 this.adaptor.addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <else> <! rewrite mode !>
-<if(backtracking)>if ( this.state.backtracking===0 )<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
 if ( !_first_<treeLevel> ) _first_<treeLevel> = <label>;
 <endif>
 >>
@@ -111,7 +111,7 @@ tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
 _last = this.input.LT(1);
 <super.tokenRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(hetero)>
 <label>_tree = new <hetero>(<label>);
 <else>
@@ -134,7 +134,7 @@ matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
 _last = this.input.LT(1);
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(hetero)>
 <label>_tree = new <hetero>(<label>);
 <else>
@@ -160,7 +160,7 @@ _last = this.input.LT(1);
 matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(hetero)>
 <label>_tree = new <hetero>(<label>);
 <else>
@@ -179,7 +179,7 @@ root_<treeLevel> = this.adaptor.becomeRoot(<label>_tree, root_<treeLevel>);
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 _last = this.input.LT(1);
 <super.ruleRef(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) <endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>
 <if(!rewriteMode)>
 this.adaptor.addChild(root_<treeLevel>, <label>.getTree());
 <else> <! rewrite mode !>
@@ -198,7 +198,7 @@ ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 _last = this.input.LT(1);
 <super.ruleRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 ) <endif>root_<treeLevel> = this.adaptor.becomeRoot(<label>.getTree(), root_<treeLevel>);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>root_<treeLevel> = this.adaptor.becomeRoot(<label>.getTree(), root_<treeLevel>);
 <endif>
 >>
 
@@ -246,7 +246,7 @@ stream_<token>.nextNode()
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(!rewriteMode)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<\n><endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<\n><endif>
 retval.tree = this.adaptor.rulePostProcessing(root_0);
 <if(backtracking)>}<endif>
 <endif>

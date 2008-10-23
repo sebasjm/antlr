@@ -162,6 +162,8 @@ return false;
 }
 >>
 
+actionGate() ::= "this.state.backtracking==0"
+
 filteringActionGate() ::= "this.state.backtracking==1"
 
 /** How to generate a parser */
@@ -1260,15 +1262,9 @@ ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st =<expr>;"
 /** How to execute an action (only when not backtracking) */
 execAction(action) ::= <<
 <if(backtracking)>
-<if(actions.(actionScope).synpredgate)>
 if ( <actions.(actionScope).synpredgate> ) {
   <action>
 }
-<else>
-if ( this.state.backtracking==0 ) {
-  <action>
-}
-<endif>
 <else>
 <action>
 <endif>

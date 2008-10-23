@@ -99,7 +99,7 @@ root_0 = (<ASTLabelType>)adaptor.GetNilNode();<\n>
 /** ID and track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)> <! Track implies no auto AST construction!>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<token>.Add(<label>);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>.Add(<label>);<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
@@ -113,7 +113,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<token>.Add(<label>);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>.Add(<label>);<\n>
 >>
 
 /** Match ^(label+=TOKEN ...) track for rewrite */
@@ -129,7 +129,7 @@ wildcardTrack(label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule.name>.Add(<label>.Tree);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>.Add(<label>.Tree);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -141,7 +141,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule>.Add(<label>.Tree);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule>.Add(<label>.Tree);
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -169,7 +169,7 @@ rewriteCode(
 // token list labels: <referencedTokenListLabels; separator=", ">
 // rule list labels:  <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
-if ( state.backtracking==0 ) {<\n>
+if ( <actions.(actionScope).synpredgate> ) {<\n>
 <endif>
 <prevRuleRootRef()>.Tree = root_0;
 <rewriteCodeLabels()>

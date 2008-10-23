@@ -32,7 +32,7 @@ group AST;
 
 finishedBacktracking(block) ::= <<
 <if(backtracking)>
-if self._state.backtracking == 0:
+if <actions.(actionScope).synpredgate>:
     <block>
 <else>
 <block>

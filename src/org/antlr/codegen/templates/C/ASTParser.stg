@@ -48,7 +48,7 @@ retval.tree = (<ASTLabelType>)(ADAPTOR->errorNode(ADAPTOR, INPUT, retval.start, 
 /** ID and output=AST */
 tokenRef(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = (<ASTLabelType>)(ADAPTOR->create(ADAPTOR, <label>));
 ADAPTOR->addChild(ADAPTOR, root_0, <label>_tree);
 <if(backtracking)>}<endif>
@@ -60,7 +60,7 @@ tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 /** ID^ and output=AST */
 tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
 root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <label>_tree, root_0));
 <if(backtracking)>}<endif>
@@ -100,7 +100,7 @@ tokenRefRuleRootAndListLabel(token,label,hetero,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>ADAPTOR->addChild(ADAPTOR, root_0, <createNodeFromToken(...)>);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>ADAPTOR->addChild(ADAPTOR, root_0, <createNodeFromToken(...)>);})>
 >>
 
 matchRuleBlockSet(s,label,hetero,elementIndex,postmatchCode,treeLevel="0") ::= <<
@@ -116,7 +116,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <createNodeFromToken(...)>, root_0));})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <createNodeFromToken(...)>, root_0));})>
 >>
 
 // RULE REF AST
@@ -124,7 +124,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>ADAPTOR->addChild(ADAPTOR, root_0, <label>.tree);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>ADAPTOR->addChild(ADAPTOR, root_0, <label>.tree);
 >>
 
 /** rule! is same as normal rule ref */
@@ -133,7 +133,7 @@ ruleRefBang(rule,label,elementIndex,args,scope) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) <endif>root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <label>.tree, root_0));
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <label>.tree, root_0));
 >>
 
 /** x+=rule when output=AST */
@@ -158,7 +158,7 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = (<ASTLabelType>)(ADAPTOR->create(ADAPTOR, <label>));
 ADAPTOR->addChild(ADAPTOR, root_0, <label>_tree);
 <if(backtracking)>}<endif>
@@ -168,7 +168,7 @@ wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
-<if(backtracking)>if ( BACKTRACKING==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = (<ASTLabelType>)(ADAPTOR->create(ADAPTOR, <label>));
 root_0 = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <label>_tree, root_0));
 <if(backtracking)>}<endif>
@@ -185,7 +185,7 @@ createNodeFromToken(label,hetero) ::= <<
 ruleCleanUp() ::= <<
 <super.ruleCleanUp(...)>
 <if(backtracking)>
-if ( BACKTRACKING==0 ) {<\n>
+if ( <actions.(actionScope).synpredgate> ) {<\n>
 <endif>
 
 <if(!ruleDescriptor.isSynPred)>

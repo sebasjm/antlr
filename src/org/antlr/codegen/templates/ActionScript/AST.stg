@@ -92,7 +92,7 @@ root_0 = <ASTLabelType>(adaptor.nil());<\n>
 /** ID and track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)> <! Track implies no auto AST construction!>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>.add(<label>);<\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
@@ -106,7 +106,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<token>.add(<label>);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>.add(<label>);<\n>
 >>
 
 /** Match ^(label+=TOKEN ...) track for rewrite */
@@ -122,7 +122,7 @@ wildcardTrack(label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( this.state.backtracking==0 ) <endif>stream_<rule.name>.add(<label>.tree);
+<if(backtracking)>if ( this.<actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>.add(<label>.tree);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -134,7 +134,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>stream_<rule>.add(<label>.tree);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule>.add(<label>.tree);
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -162,7 +162,7 @@ rewriteCode(
 // token list labels: <referencedTokenListLabels; separator=", ">
 // rule list labels: <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
-if ( this.state.backtracking==0 ) {<\n>
+if ( this.<actions.(actionScope).synpredgate> ) {<\n>
 <endif>
 <prevRuleRootRef()>.tree = root_0;
 <rewriteCodeLabels()>

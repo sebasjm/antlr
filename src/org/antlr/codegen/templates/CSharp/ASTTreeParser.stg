@@ -52,7 +52,7 @@ ruleDeclarations() ::= <<
  *  mode, does nothing.
  */
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
-<if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(rewriteMode)>
 retval.Tree = (<ASTLabelType>)_first_0;
 if ( adaptor.GetParent(retval.Tree)!=null && adaptor.IsNil( adaptor.GetParent(retval.Tree) ) )
@@ -75,7 +75,7 @@ _last = (<ASTLabelType>)input.LT(1);
 <endif>
 <root:element()>
 <if(rewriteMode)>
-<if(backtracking)>if ( state.backtracking==0 )<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
 <if(root.el.rule)>
 if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = <root.el.label>.Tree;
 <else>
@@ -131,7 +131,7 @@ if ( state.backtracking == 0 )
 }
 <endif>
 <else> <! rewrite mode !>
-<if(backtracking)>if ( state.backtracking==0 )<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
 if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>;
 <endif>
 >>
@@ -175,7 +175,7 @@ matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
 _last = (<ASTLabelType>)input.LT(1);
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(hetero)>
 <label>_tree = new <hetero>(<label>);
 <else>
@@ -201,7 +201,7 @@ _last = (<ASTLabelType>)input.LT(1);
 matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <super.matchSet(..., postmatchCode={
 <if(!rewriteMode)>
-<if(backtracking)>if ( state.backtracking==0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <if(hetero)>
 <label>_tree = new <hetero>(<label>);
 <else>
@@ -220,7 +220,7 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(<label>_tree, root_<treeLe
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 _last = (<ASTLabelType>)input.LT(1);
 <super.ruleRef(...)>
-<if(backtracking)>if ( state.backtracking==0 ) <endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>
 <if(!rewriteMode)>
 adaptor.AddChild(root_<treeLevel>, <label>.Tree);
 <else> <! rewrite mode !>
@@ -288,7 +288,7 @@ ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
 <if(!rewriteMode)>
 <if(backtracking)>
-if ( state.backtracking==0 )
+if ( <actions.(actionScope).synpredgate> )
 {
 <endif>
 	retval.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);

@@ -20,7 +20,7 @@ retval.tree = this.adaptor.errorNode(this.input, retval.start, this.input.LT(-1)
 /** ID and output=AST */
 tokenRef(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
 this.adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
@@ -32,7 +32,7 @@ tokenRefBang(token,label,elementIndex) ::= "<super.tokenRef(...)>"
 /** ID^ and output=AST */
 tokenRefRuleRoot(token,label,elementIndex,hetero) ::= <<
 <super.tokenRef(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = <createNodeFromToken(...)>;
 root_0 = this.adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
@@ -70,7 +70,7 @@ tokenRefRuleRootAndListLabel(token,label,hetero,elementIndex) ::= <<
 // I have more time.
 
 matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( this.state.backtracking===0 ) <endif>this.adaptor.addChild(root_0, <createNodeFromToken(...)>);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>this.adaptor.addChild(root_0, <createNodeFromToken(...)>);})>
 >>
 
 matchRuleBlockSet(s,label,hetero,elementIndex,postmatchCode,treeLevel="0") ::= <<
@@ -86,7 +86,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 <if(label)>
 <label>=input.LT(1);<\n>
 <endif>
-<super.matchSet(..., postmatchCode={<if(backtracking)>if ( this.state.backtracking===0 ) <endif>root_0 = this.adaptor.becomeRoot(<createNodeFromToken(...)>, root_0);})>
+<super.matchSet(..., postmatchCode={<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>root_0 = this.adaptor.becomeRoot(<createNodeFromToken(...)>, root_0);})>
 >>
 
 // RULE REF AST
@@ -94,7 +94,7 @@ matchSetRuleRoot(s,label,hetero,elementIndex,debug) ::= <<
 /** rule when output=AST */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) <endif>this.adaptor.addChild(root_0, <label>.getTree());
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>this.adaptor.addChild(root_0, <label>.getTree());
 >>
 
 /** rule! is same as normal rule ref */
@@ -103,7 +103,7 @@ ruleRefBang(rule,label,elementIndex,args,scope) ::= "<super.ruleRef(...)>"
 /** rule^ */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) <endif>root_0 = this.adaptor.becomeRoot(<label>.getTree(), root_0);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>root_0 = this.adaptor.becomeRoot(<label>.getTree(), root_0);
 >>
 
 /** x+=rule when output=AST */
@@ -128,7 +128,7 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 wildcard(label,elementIndex) ::= <<
 <super.wildcard(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = this.adaptor.create(<label>);
 this.adaptor.addChild(root_0, <label>_tree);
 <if(backtracking)>}<endif>
@@ -138,7 +138,7 @@ wildcardBang(label,elementIndex) ::= "<super.wildcard(...)>"
 
 wildcardRuleRoot(label,elementIndex) ::= <<
 <super.wildcard(...)>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
 <label>_tree = this.adaptor.create(<label>);
 root_0 = this.adaptor.becomeRoot(<label>_tree, root_0);
 <if(backtracking)>}<endif>
@@ -154,7 +154,7 @@ this.adaptor.create(<label>)
 
 ruleCleanUp() ::= <<
 <super.ruleCleanUp()>
-<if(backtracking)>if ( this.state.backtracking===0 ) {<\n><endif>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<\n><endif>
 retval.tree = this.adaptor.rulePostProcessing(root_0);
 this.adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
 <if(backtracking)>}<endif>

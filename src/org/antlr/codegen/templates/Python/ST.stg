@@ -79,7 +79,7 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 rewriteTemplate(alts) ::= <<
 # TEMPLATE REWRITE
 <if(backtracking)>
-if self._state.backtracking == 0:
+if <actions.(actionScope).synpredgate>:
     <first(alts):rewriteTemplateAltFirst()>
     <rest(alts):{el<rewriteTemplateAlt()>}>
     <if(rewriteMode)><replaceTextInLine()><endif>

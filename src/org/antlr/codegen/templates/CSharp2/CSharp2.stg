@@ -206,6 +206,8 @@ override public bool AlreadyParsedRule(IIntStream input, int ruleIndex)
 }
 >>
 
+actionGate() ::= "(state.backtracking==0)"
+
 filteringActionGate() ::= "(state.backtracking == 1)"
 
 /** How to generate a parser */
