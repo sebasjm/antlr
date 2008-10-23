@@ -33,6 +33,7 @@ import org.antlr.misc.IntervalSet;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 import antlr.Token;
 
@@ -672,22 +673,32 @@ public class NFAFactory {
         return g;
     }
 
-    /** Build a subrule matching ^(. .*) (any tree or node) */
+    /** Build a subrule matching ^(. .*) (any tree or node). Let's use
+     *  (^(. .+) | .) to be safe.
+     */
     public StateCluster build_WildcardTree(GrammarAST associatedAST) {
         StateCluster wildRoot = build_Wildcard(associatedAST);
 
         StateCluster down = build_Atom(Label.DOWN, associatedAST);
         wildRoot = build_AB(wildRoot,down); // hook in; . DOWN
 
-        // make .*
+        // make .+
         StateCluster wildChildren = build_Wildcard(associatedAST);
-        wildChildren = build_Astar(wildChildren);
-        wildRoot = build_AB(wildRoot,wildChildren); // hook in; . DOWN .*
+        wildChildren = build_Aplus(wildChildren);
+        wildRoot = build_AB(wildRoot,wildChildren); // hook in; . DOWN .+
 
         StateCluster up = build_Atom(Label.UP, associatedAST);
-        wildRoot = build_AB(wildRoot,up); // hook in; . DOWN .* UP
+        wildRoot = build_AB(wildRoot,up); // hook in; . DOWN .+ UP
 
-        return wildRoot;
+        // make optional . alt
+        StateCluster optionalNodeAlt = build_Wildcard(associatedAST);
+
+        List alts = new ArrayList();
+        alts.add(wildRoot);
+        alts.add(optionalNodeAlt);
+        StateCluster blk = build_AlternativeBlock(alts);
+
+        return blk;
     }
 
     /** Given a collapsed block of alts (a set of atoms), pull out

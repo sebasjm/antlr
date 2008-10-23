@@ -242,4 +242,97 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc, 2\n", found);
 	}
 
+    public void testWildcardLookahead() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID '+'^ INT;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "SEMI : ';' ;\n"+
+            "PERIOD : '.' ;\n"+
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP; options {tokenVocab=T; ASTLabelType=CommonTree;}\n" +
+            "a : ^('+' . INT) {System.out.print(\"alt 1\");}"+
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                    treeGrammar, "TP", "TLexer", "a", "a", "a + 2");
+        assertEquals("alt 1\n", found);
+    }
+
+    public void testWildcardLookahead2() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID '+'^ INT;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "SEMI : ';' ;\n"+
+            "PERIOD : '.' ;\n"+
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP; options {tokenVocab=T; ASTLabelType=CommonTree;}\n" +
+            "a : ^('+' . INT) {System.out.print(\"alt 1\");}"+
+            "  | ^('+' . .)   {System.out.print(\"alt 2\");}\n" +
+            "  ;\n";
+
+        // AMBIG upon '+' DOWN INT UP etc.. but so what.
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                    treeGrammar, "TP", "TLexer", "a", "a", "a + 2");
+        assertEquals("alt 1\n", found);
+    }
+
+    public void testWildcardLookahead3() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID '+'^ INT;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "SEMI : ';' ;\n"+
+            "PERIOD : '.' ;\n"+
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP; options {tokenVocab=T; ASTLabelType=CommonTree;}\n" +
+            "a : ^('+' ID INT) {System.out.print(\"alt 1\");}"+
+            "  | ^('+' . .)   {System.out.print(\"alt 2\");}\n" +
+            "  ;\n";
+
+        // AMBIG upon '+' DOWN INT UP etc.. but so what.
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                    treeGrammar, "TP", "TLexer", "a", "a", "a + 2");
+        assertEquals("alt 1\n", found);
+    }
+
+    public void testWildcardPlusLookahead() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST;}\n" +
+            "a : ID '+'^ INT;\n" +
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "SEMI : ';' ;\n"+
+            "PERIOD : '.' ;\n"+
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP; options {tokenVocab=T; ASTLabelType=CommonTree;}\n" +
+            "a : ^('+' INT INT ) {System.out.print(\"alt 1\");}"+
+            "  | ^('+' .+)   {System.out.print(\"alt 2\");}\n" +
+            "  ;\n";
+
+        // AMBIG upon '+' DOWN INT UP etc.. but so what.
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                    treeGrammar, "TP", "TLexer", "a", "a", "a + 2");
+        assertEquals("alt 2\n", found);
+    }
+
 }
