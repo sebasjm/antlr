@@ -29,7 +29,6 @@ package org.antlr.runtime.tree;
 
 import org.antlr.runtime.*;
 
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
