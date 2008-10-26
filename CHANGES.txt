@@ -7,6 +7,12 @@ University of San Francisco
 
 CHANGES
 
+October 25, 2008
+
+* Fixed debug event socket protocol to allow spaces in filenames.
+
+* Added TreeVisitor and TreeVisitorAction to org.antlr.runtime.tree.
+
 October 22, 2008
 
 * Added inContext() to TreeParser.  Very useful for predicating
