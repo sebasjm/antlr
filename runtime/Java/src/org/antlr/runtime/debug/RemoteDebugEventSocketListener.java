@@ -250,7 +250,8 @@ public class RemoteDebugEventSocketListener implements Runnable {
 	}
 
 	protected void dispatch(String line) {
-		String[] elements = getEventElements(line);
+        System.out.println("event: "+line);
+        String[] elements = getEventElements(line);
 		if ( elements==null || elements[0]==null ) {
 			System.err.println("unknown debug event: "+line);
 			return;
@@ -489,7 +490,7 @@ public class RemoteDebugEventSocketListener implements Runnable {
 				str = event.substring(firstQuoteIndex+1,event.length());
 				event = eventWithoutString;
 			}
-			StringTokenizer st = new StringTokenizer(event, " \t", false);
+			StringTokenizer st = new StringTokenizer(event, "\t", false);
 			int i = 0;
 			while ( st.hasMoreTokens() ) {
 				if ( i>=MAX_EVENT_ELEMENTS ) {
