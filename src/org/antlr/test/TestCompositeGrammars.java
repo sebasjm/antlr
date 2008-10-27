@@ -129,7 +129,6 @@ public class TestCompositeGrammars extends BaseTest {
 		String slave2 =
 			"parser grammar T;\n" +
 			"a : B {System.out.println(\"T.a\");} ;\n"; // hidden by S.a
-		mkdir(tmpdir);
 		writeFile(tmpdir, "T.g", slave2);
 		String master =
 			"grammar M;\n" +
