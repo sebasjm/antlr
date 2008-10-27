@@ -774,7 +774,8 @@ public class TestSymbolDefinitions extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		String tokens =
 			"';'=4\n";
-		writeFile(tmpdir, "T.tokens", tokens);
+        mkdir(tmpdir);
+        writeFile(tmpdir, "T.tokens", tokens);
 
 		String importer =
 			"lexer grammar B; \n" +
