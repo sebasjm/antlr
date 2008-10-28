@@ -176,6 +176,9 @@
 
     <target name="build" depends="compile,templates,jarnames"
             description="Creates the ANTLR3 fullversion jar">
+        <!-- include ANTLR 2.x and ST in the ANTLR jar -->
+        <unzip dest="${build.classes}" src="${legacy.antlr.jar}"/>
+        <unzip dest="${build.classes}" src="${stringtemplate.jar}"/>
         <jar jarfile="${antlr3.jar}" index="true" filesonly="true">
             <fileset file="LICENSE.txt" />
             <fileset dir="${build.classes}" excludes="org/antlr/test/**" />
@@ -192,7 +195,7 @@
     <target name="version" depends="version-bcel" unless="bcel.available">
         <echo>Install bcel in the classpath to have automatic version in jar name</echo>
         <property name="version" value="unknown 3.x build" />
-        <property name="jar.version" value="" />
+        <property name="jar.version" value="-${version}" />
     </target>
 
     <target name="version-bcel" if="bcel.available">
