@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.antlr</groupId>
+    <artifactId>antlr</artifactId>
+    <packaging>jar</packaging>
+    <version>3.2-SNAPSHOT</version>
+    <name>antlr</name>
+    <url>http://maven.apache.org</url>
+    
+  <distributionManagement>
+
+      <repository>
+          <id>antlr-repo</id>
+          <name>ANTLR Testing repository</name>
+          <url>scpexe://antlr.org/home/mavensync/antlr-repo</url>
+      </repository>
+      
+      <snapshotRepository>
+            <id>antlr-snapshot</id>
+            <name>ANTLR Testing Snapshot Repository</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-snapshot</url>
+      </snapshotRepository>
+
+  </distributionManagement>
+  
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>antlr</groupId>
+            <artifactId>antlr</artifactId>
+            <version>2.7.7</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>stringtemplate</artifactId>
+            <version>3.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <version>3.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        
+    </dependencies>
+    
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test</testSourceDirectory>
+        <testResources>
+            <testResource><directory>src</directory></testResource>
+        </testResources>
+         <defaultGoal>install</defaultGoal>
+        <plugins>
+            
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>antlr3-maven-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <sourceDirectory>src/org/antlr/grammar/v3</sourceDirectory>
+                    <outputDirectory>target/generated-sources/antlr/org/antlr/grammar/v3</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>antlr-maven-plugin</artifactId>
+                <configuration>
+                    <sourceDirectory>src/org/antlr/grammar/v2</sourceDirectory>
+                    <grammars>antlr.g codegen.g, antlr.print.g, assign.types.g, buildnfa.g, define.g</grammars>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <sourceDirectory>src</sourceDirectory>
+                    <excludes>
+                        <exclude>**/test/*.java</exclude>
+                        <exclude>**/test/*.st</exclude>
+                    </excludes>
+                    
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>src/**/*.st</include>
+                        <include>src/**/*.stg</include>
+                        <include>target/**/*.class</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${basedir}/src</additionalClasspathElement>
+                    </additionalClasspathElements>
+                    
+                    <includes>
+                        <include>**/test/*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/test/ErrorQueue.java</exclude>
+                    </excludes>
+                    
+                </configuration>
+            </plugin>
+            
+        </plugins>
+    </build>
+</project>
