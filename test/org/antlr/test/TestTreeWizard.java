@@ -34,12 +34,18 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+
 public class TestTreeWizard extends BaseTest {
 	protected static final String[] tokens =
 		new String[] {"", "", "", "", "", "A", "B", "C", "D", "E", "ID", "VAR"};
 	protected static final TreeAdaptor adaptor = new CommonTreeAdaptor();
 
-	public void testSingleNode() throws Exception {
+	@Test public void testSingleNode() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("ID");
 		String found = t.toStringTree();
@@ -47,7 +53,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSingleNodeWithArg() throws Exception {
+	@Test public void testSingleNodeWithArg() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("ID[foo]");
 		String found = t.toStringTree();
@@ -55,7 +61,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSingleNodeTree() throws Exception {
+	@Test public void testSingleNodeTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A)");
 		String found = t.toStringTree();
@@ -63,7 +69,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSingleLevelTree() throws Exception {
+	@Test public void testSingleLevelTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C D)");
 		String found = t.toStringTree();
@@ -71,7 +77,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testListTree() throws Exception {
+	@Test public void testListTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(nil A B C)");
 		String found = t.toStringTree();
@@ -79,13 +85,13 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testInvalidListTree() throws Exception {
+	@Test public void testInvalidListTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("A B C");
 		assertTrue(t==null);
 	}
 
-	public void testDoubleLevelTree() throws Exception {
+	@Test public void testDoubleLevelTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A (B C) (B D) E)");
 		String found = t.toStringTree();
@@ -93,7 +99,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSingleNodeIndex() throws Exception {
+	@Test public void testSingleNodeIndex() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("ID");
 		Map m = wiz.index(t);
@@ -102,7 +108,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNoRepeatsIndex() throws Exception {
+	@Test public void testNoRepeatsIndex() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C D)");
 		Map m = wiz.index(t);
@@ -111,7 +117,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRepeatsIndex() throws Exception {
+	@Test public void testRepeatsIndex() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		Map m = wiz.index(t);
@@ -120,7 +126,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNoRepeatsVisit() throws Exception {
+	@Test public void testNoRepeatsVisit() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C D)");
 		final List elements = new ArrayList();
@@ -134,7 +140,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNoRepeatsVisit2() throws Exception {
+	@Test public void testNoRepeatsVisit2() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
@@ -149,7 +155,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRepeatsVisit() throws Exception {
+	@Test public void testRepeatsVisit() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
@@ -164,7 +170,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRepeatsVisit2() throws Exception {
+	@Test public void testRepeatsVisit2() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
@@ -179,7 +185,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRepeatsVisitWithContext() throws Exception {
+	@Test public void testRepeatsVisitWithContext() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
@@ -196,7 +202,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRepeatsVisitWithNullParentAndContext() throws Exception {
+	@Test public void testRepeatsVisitWithNullParentAndContext() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		final List elements = new ArrayList();
@@ -213,7 +219,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testVisitPattern() throws Exception {
+	@Test public void testVisitPattern() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C (A B) D)");
 		final List elements = new ArrayList();
@@ -228,7 +234,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testVisitPatternMultiple() throws Exception {
+	@Test public void testVisitPatternMultiple() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C (A B) (D (A B)))");
 		final List elements = new ArrayList();
@@ -245,7 +251,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testVisitPatternMultipleWithLabels() throws Exception {
+	@Test public void testVisitPatternMultipleWithLabels() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
 		final List elements = new ArrayList();
@@ -262,35 +268,35 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testParse() throws Exception {
+	@Test public void testParse() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C)");
 		boolean valid = wiz.parse(t, "(A B C)");
 		assertTrue(valid);
 	}
 
-	public void testParseSingleNode() throws Exception {
+	@Test public void testParseSingleNode() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("A");
 		boolean valid = wiz.parse(t, "A");
 		assertTrue(valid);
 	}
 
-	public void testParseFlatTree() throws Exception {
+	@Test public void testParseFlatTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(nil A B C)");
 		boolean valid = wiz.parse(t, "(nil A B C)");
 		assertTrue(valid);
 	}
 
-	public void testWildcard() throws Exception {
+	@Test public void testWildcard() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C)");
 		boolean valid = wiz.parse(t, "(A . .)");
 		assertTrue(valid);
 	}
 
-	public void testParseWithText() throws Exception {
+	@Test public void testParseWithText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B[foo] C[bar])");
 		// C pattern has no text arg so despite [bar] in t, no need
@@ -299,14 +305,14 @@ public class TestTreeWizard extends BaseTest {
 		assertTrue(valid);
 	}
 
-	public void testParseWithTextFails() throws Exception {
+	@Test public void testParseWithTextFails() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C)");
 		boolean valid = wiz.parse(t, "(A[foo] B C)");
 		assertTrue(!valid); // fails
 	}
 
-	public void testParseLabels() throws Exception {
+	@Test public void testParseLabels() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C)");
 		Map labels = new HashMap();
@@ -317,7 +323,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals("C", labels.get("c").toString());
 	}
 
-	public void testParseWithWildcardLabels() throws Exception {
+	@Test public void testParseWithWildcardLabels() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C)");
 		Map labels = new HashMap();
@@ -327,7 +333,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals("C", labels.get("c").toString());
 	}
 
-	public void testParseLabelsAndTestText() throws Exception {
+	@Test public void testParseLabelsAndTestText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B[foo] C)");
 		Map labels = new HashMap();
@@ -338,7 +344,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals("C", labels.get("c").toString());
 	}
 
-	public void testParseLabelsInNestedTree() throws Exception {
+	@Test public void testParseLabelsInNestedTree() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A (B C) (D E))");
 		Map labels = new HashMap();
@@ -351,7 +357,7 @@ public class TestTreeWizard extends BaseTest {
 		assertEquals("E", labels.get("e").toString());
 	}
 
-	public void testEquals() throws Exception {
+	@Test public void testEquals() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t1 = (CommonTree)wiz.create("(A B C)");
 		CommonTree t2 = (CommonTree)wiz.create("(A B C)");
@@ -359,7 +365,7 @@ public class TestTreeWizard extends BaseTest {
 		assertTrue(same);
 	}
 
-	public void testEqualsWithText() throws Exception {
+	@Test public void testEqualsWithText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t1 = (CommonTree)wiz.create("(A B[foo] C)");
 		CommonTree t2 = (CommonTree)wiz.create("(A B[foo] C)");
@@ -367,7 +373,7 @@ public class TestTreeWizard extends BaseTest {
 		assertTrue(same);
 	}
 	
-	public void testEqualsWithMismatchedText() throws Exception {
+	@Test public void testEqualsWithMismatchedText() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t1 = (CommonTree)wiz.create("(A B[foo] C)");
 		CommonTree t2 = (CommonTree)wiz.create("(A B C)");
@@ -375,7 +381,7 @@ public class TestTreeWizard extends BaseTest {
 		assertTrue(!same);
 	}
 
-	public void testFindPattern() throws Exception {
+	@Test public void testFindPattern() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
 		final List subtrees = wiz.find(t, "(A B)");

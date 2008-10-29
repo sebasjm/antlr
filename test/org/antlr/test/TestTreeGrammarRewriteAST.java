@@ -34,6 +34,11 @@ import org.antlr.tool.GrammarSyntaxMessage;
 import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Tree rewrites in tree parsers are basically identical to rewrites
  *  in a normal grammar except that the atomic element is a node not
  *  a Token.  Tests here ensure duplication of nodes occurs properly
@@ -42,7 +47,7 @@ import org.antlr.codegen.CodeGenerator;
 public class TestTreeGrammarRewriteAST extends BaseTest {
 	protected boolean debug = false;
 
-	public void testFlatList() throws Exception {
+	@Test public void testFlatList() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -62,7 +67,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("34 abc\n", found);
 	}
 
-	public void testSimpleTree() throws Exception {
+	@Test public void testSimpleTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -82,7 +87,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(34 abc)\n", found);
 	}
 
-	public void testNonImaginaryWithCtor() throws Exception {
+	@Test public void testNonImaginaryWithCtor() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -101,7 +106,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("99\n", found);
 	}
 
-	public void testCombinedRewriteAndAuto() throws Exception {
+	@Test public void testCombinedRewriteAndAuto() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -125,7 +130,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("34\n", found);
 	}
 
-	public void testAvoidDup() throws Exception {
+	@Test public void testAvoidDup() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -145,7 +150,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(abc abc)\n", found);
 	}
 
-	public void testLoop() throws Exception {
+	@Test public void testLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -165,7 +170,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("3 4 5 a b c\n", found);
 	}
 
-	public void testAutoDup() throws Exception {
+	@Test public void testAutoDup() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -185,7 +190,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	public void testAutoDupRule() throws Exception {
+	@Test public void testAutoDupRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -206,7 +211,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("a 1\n", found);
 	}
 
-    public void testAutoWildcard() throws Exception {
+    @Test public void testAutoWildcard() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -226,7 +231,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("abc 34\n", found);
     }
 
-    public void testNoWildcardAsRootError() throws Exception {
+    @Test public void testNoWildcardAsRootError() throws Exception {
         ErrorQueue equeue = new ErrorQueue();
         ErrorManager.setErrorListener(equeue);
 
@@ -254,7 +259,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         checkError(equeue, expectedMessage);        
     }
 
-    public void testAutoWildcard2() throws Exception {
+    @Test public void testAutoWildcard2() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -274,7 +279,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(abc 34)\n", found);
     }
 
-    public void testAutoWildcardWithLabel() throws Exception {
+    @Test public void testAutoWildcardWithLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -294,7 +299,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("abc 34\n", found);
     }
 
-    public void testAutoWildcardWithListLabel() throws Exception {
+    @Test public void testAutoWildcardWithListLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -314,7 +319,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("abc 34\n", found);
     }
 
-    public void testAutoDupMultiple() throws Exception {
+    @Test public void testAutoDupMultiple() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -334,7 +339,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("a b 3\n", found);
 	}
 
-	public void testAutoDupTree() throws Exception {
+	@Test public void testAutoDupTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -354,7 +359,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3)\n", found);
 	}
 
-	public void testAutoDupTree2() throws Exception {
+	@Test public void testAutoDupTree2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -375,7 +380,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3 4)\n", found);
 	}
 
-	public void testAutoDupTreeWithLabels() throws Exception {
+	@Test public void testAutoDupTreeWithLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -395,7 +400,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3)\n", found);
 	}
 
-	public void testAutoDupTreeWithListLabels() throws Exception {
+	@Test public void testAutoDupTreeWithListLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -415,7 +420,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3)\n", found);
 	}
 
-	public void testAutoDupTreeWithRuleRoot() throws Exception {
+	@Test public void testAutoDupTreeWithRuleRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -435,7 +440,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3)\n", found);
 	}
 
-	public void testAutoDupTreeWithRuleRootAndLabels() throws Exception {
+	@Test public void testAutoDupTreeWithRuleRootAndLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -455,7 +460,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3)\n", found);
 	}
 
-	public void testAutoDupTreeWithRuleRootAndListLabels() throws Exception {
+	@Test public void testAutoDupTreeWithRuleRootAndListLabels() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -476,7 +481,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a 3)\n", found);
 	}
 
-	public void testAutoDupNestedTree() throws Exception {
+	@Test public void testAutoDupNestedTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -496,7 +501,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(a (b 3))\n", found);
 	}
 
-	public void testAutoDupTreeWithSubruleInside() throws Exception {
+	@Test public void testAutoDupTreeWithSubruleInside() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -518,7 +523,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(OP a)\n", found);
 	}
 
-	public void testDelete() throws Exception {
+	@Test public void testDelete() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -538,7 +543,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("", found);
 	}
 
-	public void testSetMatchNoRewrite() throws Exception {
+	@Test public void testSetMatchNoRewrite() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -559,7 +564,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testSetOptionalMatchNoRewrite() throws Exception {
+	@Test public void testSetOptionalMatchNoRewrite() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -579,7 +584,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 	}
 
 
-	public void testSetMatchNoRewriteLevel2() throws Exception {
+	@Test public void testSetMatchNoRewriteLevel2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -598,7 +603,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(abc 34)\n", found);
 	}
 
-	public void testSetMatchNoRewriteLevel2Root() throws Exception {
+	@Test public void testSetMatchNoRewriteLevel2Root() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -620,7 +625,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 
 	// REWRITE MODE
 
-	public void testRewriteModeCombinedRewriteAndAuto() throws Exception {
+	@Test public void testRewriteModeCombinedRewriteAndAuto() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -645,7 +650,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("34\n", found);
 	}
 
-	public void testRewriteModeFlatTree() throws Exception {
+	@Test public void testRewriteModeFlatTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -666,7 +671,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("abc 1\n", found);
 	}
 
-	public void testRewriteModeChainRuleFlatTree() throws Exception {
+	@Test public void testRewriteModeChainRuleFlatTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -688,7 +693,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("34 abc\n", found);
 	}
 
-	public void testRewriteModeChainRuleTree() throws Exception {
+	@Test public void testRewriteModeChainRuleTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -710,7 +715,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("34\n", found);
 	}
 
-	public void testRewriteModeChainRuleTree2() throws Exception {
+	@Test public void testRewriteModeChainRuleTree2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -733,7 +738,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("34\n", found);
 	}
 
-	public void testRewriteModeChainRuleTree3() throws Exception {
+	@Test public void testRewriteModeChainRuleTree3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -756,7 +761,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("boo 34\n", found);
 	}
 
-	public void testRewriteModeChainRuleTree4() throws Exception {
+	@Test public void testRewriteModeChainRuleTree4() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -779,7 +784,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(boo 34)\n", found);
 	}
 
-	public void testRewriteModeChainRuleTree5() throws Exception {
+	@Test public void testRewriteModeChainRuleTree5() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -802,7 +807,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 		assertEquals("(boo 34)\n", found);
 	}
 
-    public void testRewriteOfRuleRef() throws Exception {
+    @Test public void testRewriteOfRuleRef() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -822,7 +827,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("abc 34\n", found);
     }
 
-    public void testRewriteOfRuleRefRoot() throws Exception {
+    @Test public void testRewriteOfRuleRefRoot() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -845,7 +850,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(12 (abc 34))\n", found);
     }
 
-    public void testRewriteOfRuleRefRootLabeled() throws Exception {
+    @Test public void testRewriteOfRuleRefRootLabeled() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -868,7 +873,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(12 (abc 34))\n", found);
     }
 
-    public void testRewriteOfRuleRefRootListLabeled() throws Exception {
+    @Test public void testRewriteOfRuleRefRootListLabeled() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -891,7 +896,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(12 (abc 34))\n", found);
     }
 
-    public void testRewriteOfRuleRefChild() throws Exception {
+    @Test public void testRewriteOfRuleRefChild() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -911,7 +916,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(34 34)\n", found);
     }
 
-    public void testRewriteOfRuleRefLabel() throws Exception {
+    @Test public void testRewriteOfRuleRefLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -931,7 +936,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(34 34)\n", found);
     }
 
-    public void testRewriteOfRuleRefListLabel() throws Exception {
+    @Test public void testRewriteOfRuleRefListLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -951,7 +956,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(34 34)\n", found);
     }
 
-    public void testRewriteModeWithPredicatedRewrites() throws Exception {
+    @Test public void testRewriteModeWithPredicatedRewrites() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -974,7 +979,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
 					 "(root (ick 34))\n", found);
 	}
 
-    public void testWildcardSingleNode() throws Exception {
+    @Test public void testWildcardSingleNode() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -994,7 +999,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("34\n", found);
     }
 
-    public void testWildcardUnlabeledSingleNode() throws Exception {
+    @Test public void testWildcardUnlabeledSingleNode() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -1014,7 +1019,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("abc\n", found);
     }
 
-    public void testWildcardGrabsSubtree() throws Exception {
+    @Test public void testWildcardGrabsSubtree() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -1034,7 +1039,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(1 2 3)\n", found);
     }
 
-    public void testWildcardGrabsSubtree2() throws Exception {
+    @Test public void testWildcardGrabsSubtree2() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -1054,7 +1059,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(1 2 3)\n", found);
     }
 
-    public void testWildcardListLabel() throws Exception {
+    @Test public void testWildcardListLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +

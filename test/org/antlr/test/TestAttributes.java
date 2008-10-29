@@ -40,6 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.antlr.grammar.v2.ANTLRParser;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Check the $x, $x.y attributes.  For checking the actual
  *  translation, assume the Java target.  This is still a great test
  *  for the semantics of the $x.y stuff regardless of the target.
@@ -50,7 +55,7 @@ public class TestAttributes extends BaseTest {
 	public TestAttributes() {
 	}
 
-	public void testEscapedLessThanInAction() throws Exception {
+	@Test public void testEscapedLessThanInAction() throws Exception {
 		Grammar g = new Grammar();
 		Tool antlr = newTool();
 		CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
@@ -68,7 +73,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testEscaped$InAction() throws Exception {
+	@Test public void testEscaped$InAction() throws Exception {
 		String action = "int \\$n; \"\\$in string\\$\"";
 		String expecting = "int $n; \"$in string$\"";
 		Grammar g = new Grammar(
@@ -94,7 +99,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testArguments() throws Exception {
+	@Test public void testArguments() throws Exception {
 		String action = "$i; $i.x; $u; $u.x";
 		String expecting = "i; i.x; u; u.x";
 
@@ -122,7 +127,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testComplicatedArgParsing() throws Exception {
+	@Test public void testComplicatedArgParsing() throws Exception {
 		String action = "x, (*a).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		String expecting = "x, (*a).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
@@ -148,7 +153,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testBracketArgParsing() throws Exception {
+	@Test public void testBracketArgParsing() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
@@ -176,7 +181,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testStringArgParsing() throws Exception {
+	@Test public void testStringArgParsing() throws Exception {
 		String action = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
 		String expecting = "34, '{', \"it's<\", '\"', \"\\\"\", 19";
 
@@ -212,7 +217,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testComplicatedSingleArgParsing() throws Exception {
+	@Test public void testComplicatedSingleArgParsing() throws Exception {
 		String action = "(*a).foo(21,33,\",\")";
 		String expecting = "(*a).foo(21,33,\",\")";
 
@@ -237,7 +242,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testArgWithLT() throws Exception {
+	@Test public void testArgWithLT() throws Exception {
 		String action = "34<50";
 		String expecting = "34<50";
 
@@ -263,7 +268,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testGenericsAsArgumentDefinition() throws Exception {
+	@Test public void testGenericsAsArgumentDefinition() throws Exception {
 		String action = "$foo.get(\"ick\");";
 		String expecting = "foo.get(\"ick\");";
 
@@ -298,7 +303,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testGenericsAsArgumentDefinition2() throws Exception {
+	@Test public void testGenericsAsArgumentDefinition2() throws Exception {
 		String action = "$foo.get(\"ick\"); x=3;";
 		String expecting = "foo.get(\"ick\"); x=3;";
 
@@ -342,7 +347,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testGenericsAsReturnValue() throws Exception {
+	@Test public void testGenericsAsReturnValue() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String grammar =
@@ -358,7 +363,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testComplicatedArgParsingWithTranslation() throws Exception {
+	@Test public void testComplicatedArgParsingWithTranslation() throws Exception {
 		String action = "x, $A.text+\"3242\", (*$A).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		String expecting = "x, (A1!=null?A1.getText():null)+\"3242\", (*A1).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
@@ -395,7 +400,7 @@ public class TestAttributes extends BaseTest {
 	 convert actions to strings; keep as templates.
 	 June 9, 2006: made action translation leave templates not strings
 	 */
-	public void testRefToReturnValueBeforeRefToPredefinedAttr() throws Exception {
+	@Test public void testRefToReturnValueBeforeRefToPredefinedAttr() throws Exception {
 		String action = "$x.foo";
 		String expecting = "(x!=null?x.foo:0)";
 
@@ -422,7 +427,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleLabelBeforeRefToPredefinedAttr() throws Exception {
+	@Test public void testRuleLabelBeforeRefToPredefinedAttr() throws Exception {
 		// As of Mar 2007, I'm removing unused labels.  Unfortunately,
 		// the action is not seen until code gen.  Can't see $x.text
 		// before stripping unused labels.  We really need to translate
@@ -453,7 +458,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testInvalidArguments() throws Exception {
+	@Test public void testInvalidArguments() throws Exception {
 		String action = "$x";
 		String expecting = action;
 
@@ -484,7 +489,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testReturnValue() throws Exception {
+	@Test public void testReturnValue() throws Exception {
 		String action = "$x.i";
 		String expecting = "x";
 
@@ -515,7 +520,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testReturnValueWithNumber() throws Exception {
+	@Test public void testReturnValueWithNumber() throws Exception {
 		String action = "$x.i1";
 		String expecting = "x";
 
@@ -546,7 +551,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testReturnValues() throws Exception {
+	@Test public void testReturnValues() throws Exception {
 		String action = "$i; $i.x; $u; $u.x";
 		String expecting = "retval.i; retval.i.x; retval.u; retval.u.x";
 
@@ -575,7 +580,7 @@ public class TestAttributes extends BaseTest {
 	}
 
 	/* regression test for ANTLR-46 */
-	public void testReturnWithMultipleRuleRefs() throws Exception {
+	@Test public void testReturnWithMultipleRuleRefs() throws Exception {
 		String action1 = "$obj = $rule2.obj;";
 		String action2 = "$obj = $rule3.obj;";
 		String expecting1 = "obj = rule21;";
@@ -618,7 +623,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testInvalidReturnValues() throws Exception {
+	@Test public void testInvalidReturnValues() throws Exception {
 		String action = "$x";
 		String expecting = action;
 
@@ -648,7 +653,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testTokenLabels() throws Exception {
+	@Test public void testTokenLabels() throws Exception {
 		String action = "$id; $f; $id.text; $id.getText(); $id.dork " +
 						"$id.type; $id.line; $id.pos; " +
 						"$id.channel; $id.index;";
@@ -677,7 +682,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleLabels() throws Exception {
+	@Test public void testRuleLabels() throws Exception {
 		String action = "$r.x; $r.start;\r\n $r.stop;\r\n $r.tree; $a.x; $a.stop;";
 		String expecting = "(r!=null?r.x:0); (r!=null?((Token)r.start):null);\r\n" +
 						   "             (r!=null?((Token)r.stop):null);\r\n" +
@@ -705,7 +710,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testAmbiguRuleRef() throws Exception {
+	@Test public void testAmbiguRuleRef() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -721,7 +726,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
 	}
 
-	public void testRuleLabelsWithSpecialToken() throws Exception {
+	@Test public void testRuleLabelsWithSpecialToken() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.stop;";
 		String expecting = "(r!=null?r.x:0); (r!=null?((MYTOKEN)r.start):null); (r!=null?((MYTOKEN)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:0); (r!=null?((MYTOKEN)r.stop):null);";
 
@@ -749,7 +754,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testForwardRefRuleLabels() throws Exception {
+	@Test public void testForwardRefRuleLabels() throws Exception {
 		String action = "$r.x; $r.start; $r.stop; $r.tree; $a.x; $a.tree;";
 		String expecting = "(r!=null?r.x:0); (r!=null?((Token)r.start):null); (r!=null?((Token)r.stop):null); (r!=null?((Object)r.tree):null); (r!=null?r.x:0); (r!=null?((Object)r.tree):null);";
 
@@ -775,7 +780,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testInvalidRuleLabelAccessesParameter() throws Exception {
+	@Test public void testInvalidRuleLabelAccessesParameter() throws Exception {
 		String action = "$r.z";
 		String expecting = action;
 
@@ -808,7 +813,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testInvalidRuleLabelAccessesScopeAttribute() throws Exception {
+	@Test public void testInvalidRuleLabelAccessesScopeAttribute() throws Exception {
 		String action = "$r.n";
 		String expecting = action;
 
@@ -842,7 +847,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testInvalidRuleAttribute() throws Exception {
+	@Test public void testInvalidRuleAttribute() throws Exception {
 		String action = "$r.blort";
 		String expecting = action;
 
@@ -875,7 +880,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testMissingRuleAttribute() throws Exception {
+	@Test public void testMissingRuleAttribute() throws Exception {
 		String action = "$r";
 		String expecting = action;
 
@@ -903,7 +908,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testMissingUnlabeledRuleAttribute() throws Exception {
+	@Test public void testMissingUnlabeledRuleAttribute() throws Exception {
 		String action = "$a";
 		String expecting = action;
 
@@ -929,7 +934,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testNonDynamicAttributeOutsideRule() throws Exception {
+	@Test public void testNonDynamicAttributeOutsideRule() throws Exception {
 		String action = "public void foo() { $x; }";
 		String expecting = action;
 
@@ -959,7 +964,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testNonDynamicAttributeOutsideRule2() throws Exception {
+	@Test public void testNonDynamicAttributeOutsideRule2() throws Exception {
 		String action = "public void foo() { $x.y; }";
 		String expecting = action;
 
@@ -992,7 +997,7 @@ public class TestAttributes extends BaseTest {
 
 	// D Y N A M I C A L L Y  S C O P E D  A T T R I B U T E S
 
-	public void testBasicGlobalScope() throws Exception {
+	@Test public void testBasicGlobalScope() throws Exception {
 		String action = "$Symbols::names.add($id.text);";
 		String expecting = "((Symbols_scope)Symbols_stack.peek()).names.add((id!=null?id.getText():null));";
 
@@ -1024,7 +1029,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testUnknownGlobalScope() throws Exception {
+	@Test public void testUnknownGlobalScope() throws Exception {
 		String action = "$Symbols::names.add($id.text);";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -1050,7 +1055,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testIndexedGlobalScope() throws Exception {
+	@Test public void testIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[-1]::names.add($id.text);";
 		String expecting =
 			"((Symbols_scope)Symbols_stack.elementAt(Symbols_stack.size()-1-1)).names.add((id!=null?id.getText():null));";
@@ -1083,7 +1088,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void test0IndexedGlobalScope() throws Exception {
+	@Test public void test0IndexedGlobalScope() throws Exception {
 		String action = "$Symbols[0]::names.add($id.text);";
 		String expecting =
 			"((Symbols_scope)Symbols_stack.elementAt(0)).names.add((id!=null?id.getText():null));";
@@ -1114,7 +1119,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testAbsoluteIndexedGlobalScope() throws Exception {
+	@Test public void testAbsoluteIndexedGlobalScope() throws Exception {
 		String action = "$Symbols[3]::names.add($id.text);";
 		String expecting =
 			"((Symbols_scope)Symbols_stack.elementAt(3)).names.add((id!=null?id.getText():null));";
@@ -1145,7 +1150,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testScopeAndAttributeWithUnderscore() throws Exception {
+	@Test public void testScopeAndAttributeWithUnderscore() throws Exception {
 		String action = "$foo_bar::a_b;";
 		String expecting = "((foo_bar_scope)foo_bar_stack.peek()).a_b;";
 
@@ -1177,7 +1182,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testSharedGlobalScope() throws Exception {
+	@Test public void testSharedGlobalScope() throws Exception {
 		String action = "$Symbols::x;";
 		String expecting = "((Symbols_scope)Symbols_stack.peek()).x;";
 
@@ -1212,7 +1217,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testGlobalScopeOutsideRule() throws Exception {
+	@Test public void testGlobalScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$Symbols::names.add('foo');}";
 		String expecting = "public void foo() {((Symbols_scope)Symbols_stack.peek()).names.add('foo');}";
 
@@ -1244,7 +1249,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleScopeOutsideRule() throws Exception {
+	@Test public void testRuleScopeOutsideRule() throws Exception {
 		String action = "public void foo() {$a::name;}";
 		String expecting = "public void foo() {((a_scope)a_stack.peek()).name;}";
 
@@ -1275,7 +1280,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testBasicRuleScope() throws Exception {
+	@Test public void testBasicRuleScope() throws Exception {
 		String action = "$a::n;";
 		String expecting = "((a_scope)a_stack.peek()).n;";
 
@@ -1305,7 +1310,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testUnqualifiedRuleScopeAccessInsideRule() throws Exception {
+	@Test public void testUnqualifiedRuleScopeAccessInsideRule() throws Exception {
 		String action = "$n;";
 		String expecting = action;
 
@@ -1332,7 +1337,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testIsolatedDynamicRuleScopeRef() throws Exception {
+	@Test public void testIsolatedDynamicRuleScopeRef() throws Exception {
 		String action = "$a;"; // refers to stack not top of stack
 		String expecting = "a_stack;";
 
@@ -1363,7 +1368,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testDynamicRuleScopeRefInSubrule() throws Exception {
+	@Test public void testDynamicRuleScopeRefInSubrule() throws Exception {
 		String action = "$a::n;";
 		String expecting = "((a_scope)a_stack.peek()).n;";
 
@@ -1394,7 +1399,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testIsolatedGlobalScopeRef() throws Exception {
+	@Test public void testIsolatedGlobalScopeRef() throws Exception {
 		String action = "$Symbols;";
 		String expecting = "Symbols_stack;";
 
@@ -1429,7 +1434,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleScopeFromAnotherRule() throws Exception {
+	@Test public void testRuleScopeFromAnotherRule() throws Exception {
 		String action = "$a::n;"; // must be qualified
 		String expecting = "((a_scope)a_stack.peek()).n;";
 
@@ -1461,7 +1466,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testFullyQualifiedRefToCurrentRuleParameter() throws Exception {
+	@Test public void testFullyQualifiedRefToCurrentRuleParameter() throws Exception {
 		String action = "$a.i;";
 		String expecting = "i;";
 
@@ -1488,7 +1493,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
+	@Test public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
 		String action = "$a.i;";
 		String expecting = "retval.i;";
 
@@ -1515,7 +1520,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testSetFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
+	@Test public void testSetFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
 		String action = "$a.i = 1;";
 		String expecting = "retval.i = 1;";
 
@@ -1542,7 +1547,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testIsolatedRefToCurrentRule() throws Exception {
+	@Test public void testIsolatedRefToCurrentRule() throws Exception {
 		String action = "$a;";
 		String expecting = "";
 
@@ -1566,7 +1571,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testIsolatedRefToRule() throws Exception {
+	@Test public void testIsolatedRefToRule() throws Exception {
 		String action = "$x;";
 
 		ErrorQueue equeue = new ErrorQueue();
@@ -1589,7 +1594,7 @@ public class TestAttributes extends BaseTest {
 	}
 
 	/*  I think these have to be errors $a.x makes no sense.
-	public void testFullyQualifiedRefToLabelInCurrentRule() throws Exception {
+	@Test public void testFullyQualifiedRefToLabelInCurrentRule() throws Exception {
 			String action = "$a.x;";
 			String expecting = "x;";
 
@@ -1616,7 +1621,7 @@ public class TestAttributes extends BaseTest {
 			assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 		}
 
-	public void testFullyQualifiedRefToListLabelInCurrentRule() throws Exception {
+	@Test public void testFullyQualifiedRefToListLabelInCurrentRule() throws Exception {
 		String action = "$a.x;"; // must be qualified
 		String expecting = "list_x;";
 
@@ -1643,7 +1648,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 */
-	public void testFullyQualifiedRefToTemplateAttributeInCurrentRule() throws Exception {
+	@Test public void testFullyQualifiedRefToTemplateAttributeInCurrentRule() throws Exception {
 		String action = "$a.st;"; // can be qualified
 		String expecting = "retval.st;";
 
@@ -1671,7 +1676,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleRefWhenRuleHasScope() throws Exception {
+	@Test public void testRuleRefWhenRuleHasScope() throws Exception {
 		String action = "$b.start;";
 		String expecting = "(b1!=null?((Token)b1.start):null);";
 
@@ -1698,7 +1703,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
+	@Test public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
 		String action = "$b::n;";
 		String expecting = "((b_scope)b_stack.peek()).n;";
 
@@ -1729,7 +1734,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRefToTemplateAttributeForCurrentRule() throws Exception {
+	@Test public void testRefToTemplateAttributeForCurrentRule() throws Exception {
 		String action = "$st=null;";
 		String expecting = "retval.st =null;";
 
@@ -1757,7 +1762,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRefToTextAttributeForCurrentRule() throws Exception {
+	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
 		String action = "$text";
 		String expecting = "input.toString(retval.start,input.LT(-1))";
 
@@ -1785,7 +1790,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRefToStartAttributeForCurrentRule() throws Exception {
+	@Test public void testRefToStartAttributeForCurrentRule() throws Exception {
 		String action = "$start;";
 		String expecting = "((Token)retval.start);";
 
@@ -1809,7 +1814,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testTokenLabelFromMultipleAlts() throws Exception {
+	@Test public void testTokenLabelFromMultipleAlts() throws Exception {
 		String action = "$ID.text;"; // must be qualified
 		String action2 = "$INT.text;"; // must be qualified
 		String expecting = "(ID1!=null?ID1.getText():null);";
@@ -1854,7 +1859,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleLabelFromMultipleAlts() throws Exception {
+	@Test public void testRuleLabelFromMultipleAlts() throws Exception {
 		String action = "$b.text;"; // must be qualified
 		String action2 = "$c.text;"; // must be qualified
 		String expecting = "(b1!=null?input.toString(b1.start,b1.stop):null);";
@@ -1899,7 +1904,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testUnknownDynamicAttribute() throws Exception {
+	@Test public void testUnknownDynamicAttribute() throws Exception {
 		String action = "$a::x";
 		String expecting = action;
 
@@ -1936,7 +1941,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testUnknownGlobalDynamicAttribute() throws Exception {
+	@Test public void testUnknownGlobalDynamicAttribute() throws Exception {
 		String action = "$Symbols::x";
 		String expecting = action;
 
@@ -1973,7 +1978,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testUnqualifiedRuleScopeAttribute() throws Exception {
+	@Test public void testUnqualifiedRuleScopeAttribute() throws Exception {
 		String action = "$n;"; // must be qualified
 		String expecting = "$n;";
 
@@ -2010,7 +2015,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testRuleAndTokenLabelTypeMismatch() throws Exception {
+	@Test public void testRuleAndTokenLabelTypeMismatch() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2026,7 +2031,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testListAndTokenLabelTypeMismatch() throws Exception {
+	@Test public void testListAndTokenLabelTypeMismatch() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2042,7 +2047,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testListAndRuleLabelTypeMismatch() throws Exception {
+	@Test public void testListAndRuleLabelTypeMismatch() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2059,7 +2064,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testArgReturnValueMismatch() throws Exception {
+	@Test public void testArgReturnValueMismatch() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2076,7 +2081,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testSimplePlusEqualLabel() throws Exception {
+	@Test public void testSimplePlusEqualLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
 		String expecting = "list_ids.size();";
 
@@ -2104,7 +2109,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testPlusEqualStringLabel() throws Exception {
+	@Test public void testPlusEqualStringLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
 		String expecting = "list_ids.size();";
 
@@ -2133,7 +2138,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testPlusEqualSetLabel() throws Exception {
+	@Test public void testPlusEqualSetLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
 		String expecting = "list_ids.size();";
 
@@ -2162,7 +2167,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testPlusEqualWildcardLabel() throws Exception {
+	@Test public void testPlusEqualWildcardLabel() throws Exception {
 		String action = "$ids.size();"; // must be qualified
 		String expecting = "list_ids.size();";
 
@@ -2191,7 +2196,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testImplicitTokenLabel() throws Exception {
+	@Test public void testImplicitTokenLabel() throws Exception {
 		String action = "$ID; $ID.text; $ID.getText()";
 		String expecting = "ID1; (ID1!=null?ID1.getText():null); ID1.getText()";
 
@@ -2222,7 +2227,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testImplicitRuleLabel() throws Exception {
+	@Test public void testImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
 		String expecting = "(r1!=null?((Token)r1.start):null);";
 
@@ -2246,7 +2251,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
+	@Test public void testReuseExistingLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
 		String expecting = "(x!=null?((Token)x.start):null);";
 
@@ -2270,7 +2275,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
+	@Test public void testReuseExistingListLabelWithImplicitRuleLabel() throws Exception {
 		String action = "$r.start;";
 		String expecting = "(x!=null?((Token)x.start):null);";
 
@@ -2295,7 +2300,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
+	@Test public void testReuseExistingLabelWithImplicitTokenLabel() throws Exception {
 		String action = "$ID.text;";
 		String expecting = "(x!=null?x.getText():null);";
 
@@ -2324,7 +2329,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testReuseExistingListLabelWithImplicitTokenLabel() throws Exception {
+	@Test public void testReuseExistingListLabelWithImplicitTokenLabel() throws Exception {
 		String action = "$ID.text;";
 		String expecting = "(x!=null?x.getText():null);";
 
@@ -2353,7 +2358,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRuleLabelWithoutOutputOption() throws Exception {
+	@Test public void testRuleLabelWithoutOutputOption() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2376,7 +2381,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testRuleLabelOnTwoDifferentRulesAST() throws Exception {
+	@Test public void testRuleLabelOnTwoDifferentRulesAST() throws Exception {
 		String grammar =
 			"grammar T;\n"+
 			"options {output=AST;}\n"+
@@ -2390,7 +2395,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRuleLabelOnTwoDifferentRulesTemplate() throws Exception {
+	@Test public void testRuleLabelOnTwoDifferentRulesTemplate() throws Exception {
 		String grammar =
 			"grammar T;\n"+
 			"options {output=template;}\n"+
@@ -2404,7 +2409,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testMissingArgs() throws Exception {
+	@Test public void testMissingArgs() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2425,7 +2430,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testArgsWhenNoneDefined() throws Exception {
+	@Test public void testArgsWhenNoneDefined() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2446,7 +2451,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testReturnInitValue() throws Exception {
+	@Test public void testReturnInitValue() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2465,7 +2470,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testMultipleReturnInitValue() throws Exception {
+	@Test public void testMultipleReturnInitValue() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2484,7 +2489,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("String s=new String(\"foo\")", parameters.get(2).toString());
 	}
 
-	public void testCStyleReturnInitValue() throws Exception {
+	@Test public void testCStyleReturnInitValue() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2503,7 +2508,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testArgsWithInitValues() throws Exception {
+	@Test public void testArgsWithInitValues() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2524,7 +2529,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testArgsOnToken() throws Exception {
+	@Test public void testArgsOnToken() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2545,7 +2550,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testArgsOnTokenInLexer() throws Exception {
+	@Test public void testArgsOnTokenInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2566,7 +2571,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testLabelOnRuleRefInLexer() throws Exception {
+	@Test public void testLabelOnRuleRefInLexer() throws Exception {
 		String action = "$i.text";
 		String expecting = "(i!=null?i.getText():null)";
 		ErrorQueue equeue = new ErrorQueue();
@@ -2595,7 +2600,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRefToRuleRefInLexer() throws Exception {
+	@Test public void testRefToRuleRefInLexer() throws Exception {
 		String action = "$ID.text";
 		String expecting = "(ID1!=null?ID1.getText():null)";
 		ErrorQueue equeue = new ErrorQueue();
@@ -2624,7 +2629,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testRefToRuleRefInLexerNoAttribute() throws Exception {
+	@Test public void testRefToRuleRefInLexerNoAttribute() throws Exception {
 		String action = "$ID";
 		String expecting = "ID1";
 		ErrorQueue equeue = new ErrorQueue();
@@ -2653,7 +2658,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testCharLabelInLexer() throws Exception {
+	@Test public void testCharLabelInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2668,7 +2673,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testCharListLabelInLexer() throws Exception {
+	@Test public void testCharListLabelInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2682,7 +2687,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testWildcardCharLabelInLexer() throws Exception {
+	@Test public void testWildcardCharLabelInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2696,7 +2701,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testWildcardCharListLabelInLexer() throws Exception {
+	@Test public void testWildcardCharListLabelInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2710,7 +2715,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testMissingArgsInLexer() throws Exception {
+	@Test public void testMissingArgsInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2732,7 +2737,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testLexerRulePropertyRefs() throws Exception {
+	@Test public void testLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type $line $pos $channel $index $start $stop";
 		String expecting = "getText() _type state.tokenStartLine state.tokenStartCharPositionInLine _channel -1 state.tokenStartCharIndex (getCharIndex()-1)";
 		ErrorQueue equeue = new ErrorQueue();
@@ -2760,7 +2765,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testLexerLabelRefs() throws Exception {
+	@Test public void testLexerLabelRefs() throws Exception {
 		String action = "$a $b.text $c $d.text";
 		String expecting = "a (b!=null?b.getText():null) c (d!=null?d.getText():null)";
 		ErrorQueue equeue = new ErrorQueue();
@@ -2789,7 +2794,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testSettingLexerRulePropertyRefs() throws Exception {
+	@Test public void testSettingLexerRulePropertyRefs() throws Exception {
 		String action = "$text $type=1 $line=1 $pos=1 $channel=1 $index";
 		String expecting = "getText() _type=1 state.tokenStartLine=1 state.tokenStartCharPositionInLine=1 _channel=1 -1";
 		ErrorQueue equeue = new ErrorQueue();
@@ -2817,7 +2822,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testArgsOnTokenInLexerRuleOfCombined() throws Exception {
+	@Test public void testArgsOnTokenInLexerRuleOfCombined() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2850,7 +2855,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testMissingArgsOnTokenInLexerRuleOfCombined() throws Exception {
+	@Test public void testMissingArgsOnTokenInLexerRuleOfCombined() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -2885,7 +2890,7 @@ public class TestAttributes extends BaseTest {
 
 	// T R E E S
 
-	public void testTokenLabelTreeProperty() throws Exception {
+	@Test public void testTokenLabelTreeProperty() throws Exception {
 		String action = "$id.tree;";
 		String expecting = "id_tree;";
 
@@ -2916,7 +2921,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testTokenRefTreeProperty() throws Exception {
+	@Test public void testTokenRefTreeProperty() throws Exception {
 		String action = "$ID.tree;";
 		String expecting = "ID1_tree;";
 
@@ -2943,7 +2948,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testAmbiguousTokenRef() throws Exception {
+	@Test public void testAmbiguousTokenRef() throws Exception {
 		String action = "$ID;";
 		String expecting = "";
 
@@ -2966,7 +2971,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testAmbiguousTokenRefWithProp() throws Exception {
+	@Test public void testAmbiguousTokenRefWithProp() throws Exception {
 		String action = "$ID.text;";
 		String expecting = "";
 
@@ -2989,7 +2994,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testRuleRefWithDynamicScope() throws Exception {
+	@Test public void testRuleRefWithDynamicScope() throws Exception {
 		String action = "$field::x = $field.st;";
 		String expecting = "((field_scope)field_stack.peek()).x = retval.st;";
 
@@ -3019,7 +3024,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testAssignToOwnRulenameAttr() throws Exception {
+	@Test public void testAssignToOwnRulenameAttr() throws Exception {
 		String action = "$rule.tree = null;";
 		String expecting = "retval.tree = null;";
 		ErrorQueue equeue = new ErrorQueue();
@@ -3047,7 +3052,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testAssignToOwnParamAttr() throws Exception {
+	@Test public void testAssignToOwnParamAttr() throws Exception {
 		String action = "$rule.i = 42; $i = 23;";
 		String expecting = "i = 42; i = 23;";
 		ErrorQueue equeue = new ErrorQueue();
@@ -3075,7 +3080,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testIllegalAssignToOwnRulenameAttr() throws Exception {
+	@Test public void testIllegalAssignToOwnRulenameAttr() throws Exception {
 		String action = "$rule.stop = 0;";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3102,7 +3107,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testIllegalAssignToLocalAttr() throws Exception {
+	@Test public void testIllegalAssignToLocalAttr() throws Exception {
 		String action = "$tree = null; $st = null; $start = 0; $stop = 0; $text = 0;";
 		String expecting = "retval.tree = null; retval.st = null;   ";
 		ErrorQueue equeue = new ErrorQueue();
@@ -3142,7 +3147,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testIllegalAssignRuleRefAttr() throws Exception {
+	@Test public void testIllegalAssignRuleRefAttr() throws Exception {
 		String action = "$other.tree = null;";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3172,7 +3177,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testIllegalAssignTokenRefAttr() throws Exception {
+	@Test public void testIllegalAssignTokenRefAttr() throws Exception {
 		String action = "$ID.text = \"test\";";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -3201,7 +3206,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testAssignToTreeNodeAttribute() throws Exception {
+	@Test public void testAssignToTreeNodeAttribute() throws Exception {
 		String action = "$tree.scope = localScope;";
 		String expecting = "(()retval.tree).scope = localScope;";
 		ErrorQueue equeue = new ErrorQueue();
@@ -3235,7 +3240,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testDoNotTranslateAttributeCompare() throws Exception {
+	@Test public void testDoNotTranslateAttributeCompare() throws Exception {
 		String action = "$a.line == $b.line";
 		String expecting = "(a!=null?a.getLine():0) == (b!=null?b.getLine():0)";
 		ErrorQueue equeue = new ErrorQueue();
@@ -3264,7 +3269,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testDoNotTranslateScopeAttributeCompare() throws Exception {
+	@Test public void testDoNotTranslateScopeAttributeCompare() throws Exception {
 		String action = "if ($rule::foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
 		String expecting = "if (((rule_scope)rule_stack.peek()).foo == \"foo\" || 1) { System.out.println(\"ouch\"); }";
 		ErrorQueue equeue = new ErrorQueue();
@@ -3310,7 +3315,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTreeRuleStopAttributeIsInvalid() throws Exception {
+	@Test public void testTreeRuleStopAttributeIsInvalid() throws Exception {
 		String action = "$r.x; $r.start; $r.stop";
 		String expecting = "(r!=null?r.x:0); (r!=null?((CommonTree)r.start):null); $r.stop";
 
@@ -3343,7 +3348,7 @@ public class TestAttributes extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testRefToTextAttributeForCurrentTreeRule() throws Exception {
+	@Test public void testRefToTextAttributeForCurrentTreeRule() throws Exception {
 		String action = "$text";
 		String expecting = "input.getTokenStream().toString(\n" +
 						   "              input.getTreeAdaptor().getTokenStartIndex(retval.start),\n" +
@@ -3370,7 +3375,7 @@ public class TestAttributes extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testTypeOfGuardedAttributeRefIsCorrect() throws Exception {
+	@Test public void testTypeOfGuardedAttributeRefIsCorrect() throws Exception {
 		String action = "int x = $b::n;";
 		String expecting = "int x = ((b_scope)b_stack.peek()).n;";
 

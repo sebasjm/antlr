@@ -37,6 +37,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import antlr.Token;
 
 public class TestSemanticPredicates extends BaseTest {
@@ -45,7 +50,7 @@ public class TestSemanticPredicates extends BaseTest {
 	public TestSemanticPredicates() {
 	}
 
-	public void testPredsButSyntaxResolves() throws Exception {
+	@Test public void testPredsButSyntaxResolves() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A | {p2}? B ;");
@@ -55,7 +60,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testLL_1_Pred() throws Exception {
+	@Test public void testLL_1_Pred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A | {p2}? A ;");
@@ -66,7 +71,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testLL_1_Pred_forced_k_1() throws Exception {
+	@Test public void testLL_1_Pred_forced_k_1() throws Exception {
 		// should stop just like before w/o k set.
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -78,7 +83,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testLL_2_Pred() throws Exception {
+	@Test public void testLL_2_Pred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A B | {p2}? A B ;");
@@ -90,7 +95,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testPredicatedLoop() throws Exception {
+	@Test public void testPredicatedLoop() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : ( {p1}? A | {p2}? A )+;");
@@ -102,7 +107,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testPredicatedToStayInLoop() throws Exception {
+	@Test public void testPredicatedToStayInLoop() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : ( {p1}? A )+ (A)+;");
@@ -112,7 +117,7 @@ public class TestSemanticPredicates extends BaseTest {
 			".s1-{p1}?->:s3=>2\n";       // loop back
 	}
 
-	public void testAndPredicates() throws Exception {
+	@Test public void testAndPredicates() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? {p1a}? A | {p2}? A ;");
@@ -123,7 +128,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testOrPredicates() throws Exception {
+	@Test public void testOrPredicates() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | {p2}? A ;\n" +
@@ -135,7 +140,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testIgnoresHoistingDepthGreaterThanZero() throws Exception {
+	@Test public void testIgnoresHoistingDepthGreaterThanZero() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : A {p1}? | A {p2}?;");
@@ -145,7 +150,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  new int[] {1,2}, "A", null, null, 2, false);
 	}
 
-	public void testIgnoresPredsHiddenByActions() throws Exception {
+	@Test public void testIgnoresPredsHiddenByActions() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {a1} {p1}? A | {a2} {p2}? A ;");
@@ -155,7 +160,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  new int[] {1,2}, "A", null, null, 2, true);
 	}
 
-	public void testIgnoresPredsHiddenByActionsOneAlt() throws Exception {
+	@Test public void testIgnoresPredsHiddenByActionsOneAlt() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A | {a2} {p2}? A ;"); // ok since 1 pred visible
@@ -168,7 +173,7 @@ public class TestSemanticPredicates extends BaseTest {
 	}
 
 	/*
-	public void testIncompleteSemanticHoistedContextk2() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContextk2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -183,7 +188,7 @@ public class TestSemanticPredicates extends BaseTest {
 	}	
 	 */
 
-	public void testHoist2() throws Exception {
+	@Test public void testHoist2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | c ;\n" +
@@ -196,7 +201,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testHoistCorrectContext() throws Exception {
+	@Test public void testHoistCorrectContext() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | {p2}? ID ;\n" +
@@ -209,7 +214,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testDefaultPredNakedAltIsLast() throws Exception {
+	@Test public void testDefaultPredNakedAltIsLast() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | ID ;\n" +
@@ -222,7 +227,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testDefaultPredNakedAltNotLast() throws Exception {
+	@Test public void testDefaultPredNakedAltNotLast() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : ID | b ;\n" +
@@ -235,7 +240,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testLeftRecursivePred() throws Exception {
+	@Test public void testLeftRecursivePred() throws Exception {
 		// No analysis possible. but probably good to fail.  Not sure we really want
 		// left-recursion even if guarded with pred.
 		Grammar g = new Grammar(
@@ -271,7 +276,7 @@ public class TestSemanticPredicates extends BaseTest {
 				    msg instanceof LeftRecursionCyclesMessage);
 	}
 
-	public void testIgnorePredFromLL2AltLastAltIsDefaultTrue() throws Exception {
+	@Test public void testIgnorePredFromLL2AltLastAltIsDefaultTrue() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A B | A C | {p2}? A | {p3}? A | A ;\n");
@@ -292,7 +297,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testIgnorePredFromLL2AltPredUnionNeeded() throws Exception {
+	@Test public void testIgnorePredFromLL2AltPredUnionNeeded() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : {p1}? A B | A C | {p2}? A | A | {p3}? A ;\n");
@@ -313,7 +318,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testPredGets2SymbolSyntacticContext() throws Exception {
+	@Test public void testPredGets2SymbolSyntacticContext() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | A B | C ;\n" +
@@ -327,7 +332,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testMatchesLongestThenTestPred() throws Exception {
+	@Test public void testMatchesLongestThenTestPred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
 			"a : b | c ;\n" +
@@ -341,7 +346,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testPredsUsedAfterRecursionOverflow() throws Exception {
+	@Test public void testPredsUsedAfterRecursionOverflow() throws Exception {
 		// analysis must bail out due to non-LL(*) nature (ovf)
 		// retries with k=1 (but with LL(*) algorithm not optimized version
 		// as it has preds)
@@ -370,7 +375,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testPredsUsedAfterK2FailsNoRecursionOverflow() throws Exception {
+	@Test public void testPredsUsedAfterK2FailsNoRecursionOverflow() throws Exception {
 		// analysis must bail out due to non-LL(*) nature (ovf)
 		// retries with k=1 (but with LL(*) algorithm not optimized version
 		// as it has preds)
@@ -404,7 +409,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testLexerMatchesLongestThenTestPred() throws Exception {
+	@Test public void testLexerMatchesLongestThenTestPred() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
 			"B : {p}? 'a' ;\n" +
@@ -419,7 +424,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testLexerMatchesLongestMinusPred() throws Exception {
+	@Test public void testLexerMatchesLongestMinusPred() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
 			"B : 'a' ;\n" +
@@ -432,7 +437,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testGatedPred() throws Exception {
+	@Test public void testGatedPred() throws Exception {
 		// gated preds are present on all arcs in predictor
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -448,7 +453,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testGatedPredHoistsAndCanBeInStopState() throws Exception {
+	@Test public void testGatedPredHoistsAndCanBeInStopState() throws Exception {
 		// I found a bug where merging stop states made us throw away
 		// a stop state with a gated pred!
 		Grammar g = new Grammar(
@@ -462,7 +467,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testGatedPredInCyclicDFA() throws Exception {
+	@Test public void testGatedPredInCyclicDFA() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
 			"A : {p}?=> ('a')+ 'x' ;\n" +
@@ -479,7 +484,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 3, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testGatedPredNotActuallyUsedOnEdges() throws Exception {
+	@Test public void testGatedPredNotActuallyUsedOnEdges() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
 			"A : ('a' | {p}?=> 'a')\n" +
@@ -502,7 +507,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 2, expecting2, null, null, null, null, null, 0, false);
 	}
 
-	public void testGatedPredDoesNotForceAllToBeGated() throws Exception {
+	@Test public void testGatedPredDoesNotForceAllToBeGated() throws Exception {
 		Grammar g = new Grammar(
 			"grammar w;\n" +
 			"a : b | c ;\n" +
@@ -515,7 +520,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testGatedPredDoesNotForceAllToBeGated2() throws Exception {
+	@Test public void testGatedPredDoesNotForceAllToBeGated2() throws Exception {
 		Grammar g = new Grammar(
 			"grammar w;\n" +
 			"a : b | c ;\n" +
@@ -532,7 +537,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	public void testORGatedPred() throws Exception {
+	@Test public void testORGatedPred() throws Exception {
 		Grammar g = new Grammar(
 			"grammar w;\n" +
 			"a : b | c ;\n" +
@@ -552,7 +557,7 @@ public class TestSemanticPredicates extends BaseTest {
 	/** The following grammar should yield an error that rule 'a' has
 	 *  insufficient semantic info pulled from 'b'.
 	 */
-	public void testIncompleteSemanticHoistedContext() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContext() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -565,7 +570,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  new int[] {1,2}, "B", new int[] {1}, null, 3, false);
 	}
 
-	public void testIncompleteSemanticHoistedContextk2() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContextk2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -579,7 +584,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  new int[] {1,2}, "A B", new int[] {1}, null, 3, false);
 	}
 
-	public void testIncompleteSemanticHoistedContextInFOLLOW() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContextInFOLLOW() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -593,7 +598,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  new int[] {1,2}, "A", new int[] {2}, null, 3, false);
 	}
 
-	public void testIncompleteSemanticHoistedContextInFOLLOWk2() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContextInFOLLOWk2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -608,7 +613,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  new int[] {1,2}, "A B", new int[] {2}, null, 2, false);
 	}
 
-	public void testIncompleteSemanticHoistedContextInFOLLOWDueToHiddenPred() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContextInFOLLOWDueToHiddenPred() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -633,7 +638,7 @@ public class TestSemanticPredicates extends BaseTest {
 	 *  conversion to include an edge for D.  Alt 1 is the only possible
 	 *  prediction because we resolve the ambiguity by choosing alt 1.
 	 */
-	public void testIncompleteSemanticHoistedContext2() throws Exception {
+	@Test public void testIncompleteSemanticHoistedContext2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -647,7 +652,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  null, 3, false);
 	}
 
-	public void testTooFewSemanticPredicates() throws Exception {
+	@Test public void testTooFewSemanticPredicates() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : {p1}? A | A | A ;");
@@ -658,7 +663,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  null, null, 2, false);
 	}
 
-	public void testPredWithK1() throws Exception {
+	@Test public void testPredWithK1() throws Exception {
 		Grammar g = new Grammar(
 			"\tlexer grammar TLexer;\n" +
 			"A\n" +
@@ -683,7 +688,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  danglingAlts, numWarnings, false);
 	}
 
-	public void testPredWithArbitraryLookahead() throws Exception {
+	@Test public void testPredWithArbitraryLookahead() throws Exception {
 		Grammar g = new Grammar(
 			"\tlexer grammar TLexer;\n" +
 			"A : {p1}? ('x')+ '.'\n" +
@@ -712,7 +717,7 @@ public class TestSemanticPredicates extends BaseTest {
 	 *  test a||a||b||a||a etc...  ANTLR makes a unique set and THEN
 	 *  OR's them together.
 	 */
-	public void testUniquePredicateOR() throws Exception {
+	@Test public void testUniquePredicateOR() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar v;\n" +
 			"\n" +
@@ -740,7 +745,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  danglingAlts, numWarnings, false);
 	}
 
-	public void testSemanticContextPreventsEarlyTerminationOfClosure() throws Exception {
+	@Test public void testSemanticContextPreventsEarlyTerminationOfClosure() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n" +
 			"a : loop SEMI | ID SEMI\n" +

@@ -31,9 +31,15 @@ import org.antlr.tool.ANTLRErrorListener;
 import org.antlr.tool.Message;
 import org.antlr.tool.ToolMessage;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.util.List;
 import java.util.LinkedList;
 
+@Ignore
 public class ErrorQueue implements ANTLRErrorListener {
 	List infos = new LinkedList();
 	List errors = new LinkedList();

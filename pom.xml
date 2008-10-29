@@ -54,6 +54,7 @@
     
     <build>
         <sourceDirectory>src</sourceDirectory>
+        
         <testSourceDirectory>test</testSourceDirectory>
         <testResources>
             <testResource>
@@ -63,7 +64,9 @@
                 <directory>test</directory>
             </testResource>
         </testResources>
+        
          <defaultGoal>install</defaultGoal>
+         
         <plugins>
             
             <plugin>
@@ -121,19 +124,6 @@
             
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>${basedir}/src</additionalClasspathElement>
-                    </additionalClasspathElements>
-                    
-                    <includes>
-                        <include>**/test/*.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/test/ErrorQueue.java</exclude>
-                    </excludes>
-                    
-                </configuration>
             </plugin>
             
         </plugins>

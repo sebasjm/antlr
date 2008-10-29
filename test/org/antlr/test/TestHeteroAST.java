@@ -27,13 +27,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Test hetero trees in parsers and tree parsers */
 public class TestHeteroAST extends BaseTest {
 	protected boolean debug = false;
 
 	// PARSERS -- AUTO AST
 
-    public void testToken() throws Exception {
+    @Test public void testToken() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -50,7 +55,7 @@ public class TestHeteroAST extends BaseTest {
         assertEquals("a<V>\n", found);
     }
 
-    public void testTokenWithQualifiedType() throws Exception {
+    @Test public void testTokenWithQualifiedType() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -67,7 +72,7 @@ public class TestHeteroAST extends BaseTest {
         assertEquals("a<V>\n", found);
     }
 
-	public void testTokenWithLabel() throws Exception {
+	@Test public void testTokenWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -84,7 +89,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("a<V>\n", found);
 	}
 
-	public void testTokenWithListLabel() throws Exception {
+	@Test public void testTokenWithListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -101,7 +106,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("a<V>\n", found);
 	}
 
-	public void testTokenRoot() throws Exception {
+	@Test public void testTokenRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -118,7 +123,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("a<V>\n", found);
 	}
 
-	public void testTokenRootWithListLabel() throws Exception {
+	@Test public void testTokenRootWithListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -135,7 +140,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("a<V>\n", found);
 	}
 
-	public void testString() throws Exception {
+	@Test public void testString() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -152,7 +157,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("begin<V>\n", found);
 	}
 
-	public void testStringRoot() throws Exception {
+	@Test public void testStringRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -171,7 +176,7 @@ public class TestHeteroAST extends BaseTest {
 
 	// PARSERS -- REWRITE AST
 
-	public void testRewriteToken() throws Exception {
+	@Test public void testRewriteToken() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -188,7 +193,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("a<V>\n", found);
 	}
 
-	public void testRewriteTokenWithArgs() throws Exception {
+	@Test public void testRewriteTokenWithArgs() throws Exception {
 		// arg to ID<V>[42,19,30] means you're constructing node not associated with ID
 		// so must pass in token manually
 		String grammar =
@@ -210,7 +215,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("<V>;421930 a<V>;9900\n", found);
 	}
 
-	public void testRewriteTokenRoot() throws Exception {
+	@Test public void testRewriteTokenRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -228,7 +233,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("(a<V> 2)\n", found);
 	}
 
-	public void testRewriteString() throws Exception {
+	@Test public void testRewriteString() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -245,7 +250,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("begin<V>\n", found);
 	}
 
-	public void testRewriteStringRoot() throws Exception {
+	@Test public void testRewriteStringRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -263,7 +268,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("(begin<V> 2)\n", found);
 	}
 
-    public void testRewriteRuleResults() throws Exception {
+    @Test public void testRewriteRuleResults() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -288,7 +293,7 @@ public class TestHeteroAST extends BaseTest {
         assertEquals("(LIST<W> a<V> b<V> c<V>)\n", found);
     }
 
-    public void testCopySemanticsWithHetero() throws Exception {
+    @Test public void testCopySemanticsWithHetero() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -312,7 +317,7 @@ public class TestHeteroAST extends BaseTest {
 
     // TREE PARSERS -- REWRITE AST
 
-	public void testTreeParserRewriteFlatList() throws Exception {
+	@Test public void testTreeParserRewriteFlatList() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -342,7 +347,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("34<V> abc<W>\n", found);
 	}
 
-	public void testTreeParserRewriteTree() throws Exception {
+	@Test public void testTreeParserRewriteTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -372,7 +377,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("(34<V> abc<W>)\n", found);
 	}
 
-	public void testTreeParserRewriteImaginary() throws Exception {
+	@Test public void testTreeParserRewriteImaginary() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -399,7 +404,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("ROOT<V> abc\n", found);
 	}
 
-	public void testTreeParserRewriteImaginaryWithArgs() throws Exception {
+	@Test public void testTreeParserRewriteImaginaryWithArgs() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -427,7 +432,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("ROOT<V>;42 abc\n", found);
 	}
 
-	public void testTreeParserRewriteImaginaryRoot() throws Exception {
+	@Test public void testTreeParserRewriteImaginaryRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -454,7 +459,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("(ROOT<V> abc)\n", found);
 	}
 
-	public void testTreeParserRewriteImaginaryFromReal() throws Exception {
+	@Test public void testTreeParserRewriteImaginaryFromReal() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -482,7 +487,7 @@ public class TestHeteroAST extends BaseTest {
 		assertEquals("ROOT<V>@1\n", found); // at line 1; shows copy of ID's stuff
 	}
 
-	public void testTreeParserAutoHeteroAST() throws Exception {
+	@Test public void testTreeParserAutoHeteroAST() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +

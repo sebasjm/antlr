@@ -33,9 +33,14 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Tests specific to CommonTreeNodeStream */
 public class TestCommonTreeNodeStream extends TestTreeNodeStream {
-	public void testPushPop() throws Exception {
+	@Test public void testPushPop() throws Exception {
 		// ^(101 ^(102 103) ^(104 105) ^(106 107) 108 109)
 		// stream has 9 real + 8 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 UP 104 DN 105 UP 106 DN 107 UP 108 109 UP
@@ -79,7 +84,7 @@ public class TestCommonTreeNodeStream extends TestTreeNodeStream {
 		assertEquals(107, ((Tree)stream.LT(1)).getType());
 	}
 
-	public void testNestedPushPop() throws Exception {
+	@Test public void testNestedPushPop() throws Exception {
 		// ^(101 ^(102 103) ^(104 105) ^(106 107) 108 109)
 		// stream has 9 real + 8 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 UP 104 DN 105 UP 106 DN 107 UP 108 109 UP
@@ -135,7 +140,7 @@ public class TestCommonTreeNodeStream extends TestTreeNodeStream {
 		assertEquals(107, ((Tree)stream.LT(1)).getType());
 	}
 
-	public void testPushPopFromEOF() throws Exception {
+	@Test public void testPushPopFromEOF() throws Exception {
 		// ^(101 ^(102 103) ^(104 105) ^(106 107) 108 109)
 		// stream has 9 real + 8 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 UP 104 DN 105 UP 106 DN 107 UP 108 109 UP
@@ -188,7 +193,7 @@ public class TestCommonTreeNodeStream extends TestTreeNodeStream {
 		assertEquals(Token.EOF, ((Tree)stream.LT(1)).getType());
 	}
 
-	public void testStackStretch() throws Exception {
+	@Test public void testStackStretch() throws Exception {
 		// make more than INITIAL_CALL_STACK_SIZE pushes
 		Tree r0 = new CommonTree(new CommonToken(101));
 		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);

@@ -30,10 +30,15 @@ package org.antlr.test;
 import org.antlr.Tool;
 import org.antlr.tool.*;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestCompositeGrammars extends BaseTest {
 	protected boolean debug = false;
 
-	public void testWildcardStillWorks() throws Exception {
+	@Test public void testWildcardStillWorks() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String grammar =
@@ -43,7 +48,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testDelegatorInvokesDelegateRule() throws Exception {
+	@Test public void testDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
 			"a : B {System.out.println(\"S.a\");} ;\n";
@@ -60,7 +65,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
-	public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
+	@Test public void testDelegatorInvokesDelegateRuleWithArgs() throws Exception {
 		// must generate something like:
 		// public int a(int x) throws RecognitionException { return gS.a(x); }
 		// in M.
@@ -80,7 +85,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a1000\n", found);
 	}
 
-	public void testDelegatorInvokesDelegateRuleWithReturnStruct() throws Exception {
+	@Test public void testDelegatorInvokesDelegateRuleWithReturnStruct() throws Exception {
 		// must generate something like:
 		// public int a(int x) throws RecognitionException { return gS.a(x); }
 		// in M.
@@ -100,7 +105,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.ab\n", found);
 	}
 
-	public void testDelegatorAccessesDelegateMembers() throws Exception {
+	@Test public void testDelegatorAccessesDelegateMembers() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
 			"@members {\n" +
@@ -119,7 +124,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("foo\n", found);
 	}
 
-	public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
+	@Test public void testDelegatorInvokesFirstVersionOfDelegateRule() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
 			"a : b {System.out.println(\"S.a\");} ;\n" +
@@ -141,7 +146,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
-	public void testDelegatesSeeSameTokenType() throws Exception {
+	@Test public void testDelegatesSeeSameTokenType() throws Exception {
 		String slave =
 			"parser grammar S;\n" + // A, B, C token type order
 			"tokens { A; B; C; }\n" +
@@ -179,7 +184,7 @@ public class TestCompositeGrammars extends BaseTest {
 					 "T.y\n", found);
 	}
 
-	public void testDelegatesSeeSameTokenType2() throws Exception {
+	@Test public void testDelegatesSeeSameTokenType2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -224,7 +229,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testCombinedImportsCombined() throws Exception {
+	@Test public void testCombinedImportsCombined() throws Exception {
 		// for now, we don't allow combined to import combined
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
@@ -254,7 +259,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, expectedError, equeue.errors.get(0).toString().replaceFirst("\\-[0-9]+","3"));
 	}
 
-	public void testSameStringTwoNames() throws Exception {
+	@Test public void testSameStringTwoNames() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -307,7 +312,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(expectedError, equeue.errors.get(0).toString());
 	}
 
-	public void testSameNameTwoStrings() throws Exception {
+	@Test public void testSameNameTwoStrings() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -360,7 +365,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(expectedError, equeue.errors.get(0).toString());
 	}
 
-	public void testImportedTokenVocabIgnoredWithWarning() throws Exception {
+	@Test public void testImportedTokenVocabIgnoredWithWarning() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -398,7 +403,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(expectedError, equeue.warnings.get(0).toString());
 	}
 
-	public void testImportedTokenVocabWorksInRoot() throws Exception {
+	@Test public void testImportedTokenVocabWorksInRoot() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -439,7 +444,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testSyntaxErrorsInImportsNotThrownOut() throws Exception {
+	@Test public void testSyntaxErrorsInImportsNotThrownOut() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -465,7 +470,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 5, equeue.errors.size());
 	}
 
-	public void testSyntaxErrorsInImportsNotThrownOut2() throws Exception {
+	@Test public void testSyntaxErrorsInImportsNotThrownOut2() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -491,7 +496,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 3, equeue.errors.size());
 	}
 
-	public void testDelegatorRuleOverridesDelegate() throws Exception {
+	@Test public void testDelegatorRuleOverridesDelegate() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
 			"a : b {System.out.println(\"S.a\");} ;\n" +
@@ -508,7 +513,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a\n", found);
 	}
 
-	public void testDelegatorRuleOverridesLookaheadInDelegate() throws Exception {
+	@Test public void testDelegatorRuleOverridesLookaheadInDelegate() throws Exception {
 		String slave =
 			"parser grammar JavaDecl;\n" +
 			"type : 'int' ;\n" +
@@ -535,7 +540,7 @@ public class TestCompositeGrammars extends BaseTest {
 
 	// LEXER INHERITANCE
 
-	public void testLexerDelegatorInvokesDelegateRule() throws Exception {
+	@Test public void testLexerDelegatorInvokesDelegateRule() throws Exception {
 		String slave =
 			"lexer grammar S;\n" +
 			"A : 'a' {System.out.println(\"S.A\");} ;\n" +
@@ -551,7 +556,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.A\nabc\n", found);
 	}
 
-	public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
+	@Test public void testLexerDelegatorRuleOverridesDelegate() throws Exception {
 		String slave =
 			"lexer grammar S;\n" +
 			"A : 'a' {System.out.println(\"S.A\");} ;\n" +
@@ -569,7 +574,7 @@ public class TestCompositeGrammars extends BaseTest {
 					 "ab\n", found);
 	}
 
-	public void testLexerDelegatorRuleOverridesDelegateLeavingNoRules() throws Exception {
+	@Test public void testLexerDelegatorRuleOverridesDelegateLeavingNoRules() throws Exception {
 		// M.Tokens has nothing to predict tokens from S.  Should
 		// not include S.Tokens alt in this case?
 		String slave =
@@ -610,7 +615,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testInvalidImportMechanism() throws Exception {
+	@Test public void testInvalidImportMechanism() throws Exception {
 		// M.Tokens has nothing to predict tokens from S.  Should
 		// not include S.Tokens alt in this case?
 		String slave =
@@ -640,7 +645,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(expectedError, equeue.errors.get(0).toString().replaceFirst("\\-[0-9]+","3"));
 	}
 
-	public void testSyntacticPredicateRulesAreNotInherited() throws Exception {
+	@Test public void testSyntacticPredicateRulesAreNotInherited() throws Exception {
 		// if this compiles, it means that synpred1_S is defined in S.java
 		// but not MParser.java.  MParser has its own synpred1_M which must
 		// be separate to compile.
@@ -664,7 +669,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.a1\n", found);
 	}
 
-	public void testKeywordVSIDGivesNoWarning() throws Exception {
+	@Test public void testKeywordVSIDGivesNoWarning() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -687,7 +692,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("S.A\nM.a\n", found);
 	}
 
-	public void testWarningForUndefinedToken() throws Exception {
+	@Test public void testWarningForUndefinedToken() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -714,7 +719,7 @@ public class TestCompositeGrammars extends BaseTest {
 	}
 
 	/** Make sure that M can import S that imports T. */
-	public void test3LevelImport() throws Exception {
+	@Test public void test3LevelImport() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -760,7 +765,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(expecting, ok);
 	}
 
-	public void testBigTreeOfImports() throws Exception {
+	@Test public void testBigTreeOfImports() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =
@@ -823,7 +828,7 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals(expecting, ok);
 	}
 
-	public void testRulesVisibleThroughMultilevelImport() throws Exception {
+	@Test public void testRulesVisibleThroughMultilevelImport() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String slave =

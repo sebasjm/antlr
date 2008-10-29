@@ -27,8 +27,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestSemanticPredicateEvaluation extends BaseTest {
-	public void testSimpleCyclicDFAWithPredicate() throws Exception {
+	@Test public void testSimpleCyclicDFAWithPredicate() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"a : {false}? 'x'* 'y' {System.out.println(\"alt1\");}\n" +
@@ -39,7 +44,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("alt2\n", found);
 	}
 
-	public void testSimpleCyclicDFAWithInstanceVarPredicate() throws Exception {
+	@Test public void testSimpleCyclicDFAWithInstanceVarPredicate() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"@members {boolean v=true;}\n" +
@@ -51,7 +56,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("alt2\n", found);
 	}
 
-	public void testPredicateValidation() throws Exception {
+	@Test public void testPredicateValidation() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"@members {\n" +
@@ -67,7 +72,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("error: FailedPredicateException(a,{false}?)\n", found);
 	}
 
-	public void testLexerPreds() throws Exception {
+	@Test public void testLexerPreds() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=false;}\n" +
@@ -80,7 +85,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("token 2\n", found);
 	}
 
-	public void testLexerPreds2() throws Exception {
+	@Test public void testLexerPreds2() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
@@ -93,7 +98,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("token 1\n", found);
 	}
 
-	public void testLexerPredInExitBranch() throws Exception {
+	@Test public void testLexerPredInExitBranch() throws Exception {
 		// p says it's ok to exit; it has precendence over the !p loopback branch
 		String grammar =
 			"grammar foo;" +
@@ -107,7 +112,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("222\n", found);
 	}
 
-	public void testLexerPredInExitBranch2() throws Exception {
+	@Test public void testLexerPredInExitBranch2() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
@@ -119,7 +124,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("111\n", found);
 	}
 
-	public void testLexerPredInExitBranch3() throws Exception {
+	@Test public void testLexerPredInExitBranch3() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=true;}\n" +
@@ -131,7 +136,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("122\n", found);
 	}
 
-	public void testLexerPredInExitBranch4() throws Exception {
+	@Test public void testLexerPredInExitBranch4() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"a : (A|B)+ ;\n" +
@@ -142,7 +147,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("01xxx\n", found);
 	}
 
-	public void testLexerPredsInCyclicDFA() throws Exception {
+	@Test public void testLexerPredsInCyclicDFA() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=false;}\n" +
@@ -154,7 +159,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("token 2\n", found);
 	}
 
-	public void testLexerPredsInCyclicDFA2() throws Exception {
+	@Test public void testLexerPredsInCyclicDFA2() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"@lexer::members {boolean p=false;}\n" +
@@ -166,7 +171,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("token 2\n", found);
 	}
 
-	public void testGatedPred() throws Exception {
+	@Test public void testGatedPred() throws Exception {
 		String grammar =
 			"grammar foo;" +
 			"a : (A|B)+ ;\n" +
@@ -178,7 +183,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("token 1\ntoken 1\n", found);
 	}
 
-	public void testGatedPred2() throws Exception {
+	@Test public void testGatedPred2() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"@lexer::members {boolean sig=false;}\n"+
@@ -191,7 +196,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("AC\n", found);
 	}
 
-	public void testPredWithActionTranslation() throws Exception {
+	@Test public void testPredWithActionTranslation() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"a : b[2] ;\n" +
@@ -204,7 +209,7 @@ public class TestSemanticPredicateEvaluation extends BaseTest {
 		assertEquals("alt 2\n", found);
 	}
 
-	public void testPredicatesOnEOTTarget() throws Exception {
+	@Test public void testPredicatesOnEOTTarget() throws Exception {
 		String grammar =
 			"grammar foo; \n" +
 			"@lexer::members {boolean p=true, q=false;}" +

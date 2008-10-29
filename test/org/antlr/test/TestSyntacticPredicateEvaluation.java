@@ -27,8 +27,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestSyntacticPredicateEvaluation extends BaseTest {
-	public void testTwoPredsWithNakedAlt() throws Exception {
+	@Test public void testTwoPredsWithNakedAlt() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : (a ';')+ ;\n" +
@@ -77,7 +82,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTwoPredsWithNakedAltNotLast() throws Exception {
+	@Test public void testTwoPredsWithNakedAltNotLast() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : (a ';')+ ;\n" +
@@ -125,7 +130,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void tesTLexerPred() throws Exception {
+	@Test public void testLexerPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : A ;\n" +
@@ -146,7 +151,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt1\n", found);
 	}
 
-	public void tesTLexerWithPredLongerThanAlt() throws Exception {
+	@Test public void testLexerWithPredLongerThanAlt() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : A ;\n" +
@@ -168,7 +173,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt1\nD\n", found);
 	}
 
-	public void tesTLexerPredCyclicPrediction() throws Exception {
+	@Test public void testLexerPredCyclicPrediction() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : A ;\n" +
@@ -184,7 +189,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt1\n", found);
 	}
 
-	public void tesTLexerPredCyclicPrediction2() throws Exception {
+	@Test public void testLexerPredCyclicPrediction2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : A ;\n" +
@@ -199,7 +204,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt2\n", found);
 	}
 
-	public void testSimpleNestedPred() throws Exception {
+	@Test public void testSimpleNestedPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : (expr ';')+ ;\n" +
@@ -234,7 +239,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTripleNestedPredInLexer() throws Exception {
+	@Test public void testTripleNestedPredInLexer() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"s : (.)+ {System.out.println(\"done\");} ;\n" +
@@ -285,7 +290,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTreeParserWithSynPred() throws Exception {
+	@Test public void testTreeParserWithSynPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -308,7 +313,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt 2\n", found);
 	}
 
-	public void testTreeParserWithNestedSynPred() throws Exception {
+	@Test public void testTreeParserWithNestedSynPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -335,7 +340,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("b:alt 2 a:alt 1\n", found);
 	}
 
-	public void testSynPredWithOutputTemplate() throws Exception {
+	@Test public void testSynPredWithOutputTemplate() throws Exception {
 		// really just seeing if it will compile
 		String grammar =
 			"grammar T;\n" +
@@ -355,7 +360,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("1:xxxy;\n", found);
 	}
 
-	public void testSynPredWithOutputAST() throws Exception {
+	@Test public void testSynPredWithOutputAST() throws Exception {
 		// really just seeing if it will compile
 		String grammar =
 			"grammar T;\n" +
@@ -375,7 +380,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("x x x y\n", found);
 	}
 
-	public void testOptionalBlockWithSynPred() throws Exception {
+	@Test public void testOptionalBlockWithSynPred() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 				"\n" +
@@ -389,7 +394,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("", found);
 	}
 
-	public void testSynPredK2() throws Exception {
+	@Test public void testSynPredK2() throws Exception {
 		// all manually specified syn predicates are gated (i.e., forced
 		// to execute).
 		String grammar =
@@ -403,7 +408,7 @@ public class TestSyntacticPredicateEvaluation extends BaseTest {
 		assertEquals("alt1\n", found);
 	}
 
-	public void testSynPredKStar() throws Exception {
+	@Test public void testSynPredKStar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 				"\n" +

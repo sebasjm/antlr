@@ -34,11 +34,16 @@ import org.antlr.tool.*;
 import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.util.*;
 
 public class TestDFAConversion extends BaseTest {
 
-	public void testA() throws Exception {
+	@Test public void testA() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A C | B;");
@@ -48,7 +53,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAB_or_AC() throws Exception {
+	@Test public void testAB_or_AC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A B | A C;");
@@ -59,7 +64,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAB_or_AC_k2() throws Exception {
+	@Test public void testAB_or_AC_k2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"options {k=2;}\n"+
@@ -71,7 +76,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAB_or_AC_k1() throws Exception {
+	@Test public void testAB_or_AC_k1() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"options {k=1;}\n"+
@@ -87,7 +92,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testselfRecurseNonDet() throws Exception {
+	@Test public void testselfRecurseNonDet() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -96,7 +101,7 @@ public class TestDFAConversion extends BaseTest {
 		assertNonLLStar(g, altsWithRecursion);
 	}
 
-	public void testRecursionOverflow() throws Exception {
+	@Test public void testRecursionOverflow() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a Y | A A A A A X ;\n" + // force recursion past m=4
@@ -106,7 +111,7 @@ public class TestDFAConversion extends BaseTest {
 		assertRecursionOverflow(g, expectedTargetRules, expectedAlt);
 	}
 
-	public void testRecursionOverflow2() throws Exception {
+	@Test public void testRecursionOverflow2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a Y | A+ X ;\n" + // force recursion past m=4
@@ -116,7 +121,7 @@ public class TestDFAConversion extends BaseTest {
 		assertRecursionOverflow(g, expectedTargetRules, expectedAlt);
 	}
 
-	public void testRecursionOverflowWithPredOk() throws Exception {
+	@Test public void testRecursionOverflowWithPredOk() throws Exception {
 		// overflows with k=*, but resolves with pred
 		// no warnings/errors
 		Grammar g = new Grammar(
@@ -145,7 +150,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testRecursionOverflowWithPredOk2() throws Exception {
+	@Test public void testRecursionOverflowWithPredOk2() throws Exception {
 		// must predict Z w/o predicate
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -174,7 +179,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testCannotSeePastRecursion() throws Exception {
+	@Test public void testCannotSeePastRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x   : y X\n" +
@@ -187,7 +192,7 @@ public class TestDFAConversion extends BaseTest {
 		assertNonLLStar(g, altsWithRecursion);
 	}
 
-	public void testSynPredResolvesRecursion() throws Exception {
+	@Test public void testSynPredResolvesRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x   : (y X)=> y X\n" +
@@ -212,7 +217,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSemPredResolvesRecursion() throws Exception {
+	@Test public void testSemPredResolvesRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x   : {p}? y X\n" +
@@ -237,7 +242,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSemPredResolvesRecursion2() throws Exception {
+	@Test public void testSemPredResolvesRecursion2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x\n" +
@@ -264,7 +269,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSemPredResolvesRecursion3() throws Exception {
+	@Test public void testSemPredResolvesRecursion3() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x\n" +
@@ -295,7 +300,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSynPredResolvesRecursion2() throws Exception {
+	@Test public void testSynPredResolvesRecursion2() throws Exception {
 		// k=* fails and it retries/succeeds with k=1 silently
 		// because of predicate
 		Grammar g = new Grammar(
@@ -328,7 +333,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSynPredResolvesRecursion3() throws Exception {
+	@Test public void testSynPredResolvesRecursion3() throws Exception {
 		// No errors with k=1; don't try k=* first
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -361,7 +366,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSynPredResolvesRecursion4() throws Exception {
+	@Test public void testSynPredResolvesRecursion4() throws Exception {
 		// No errors with k=2; don't try k=* first
 		// Should be ok like k=1 'except bigger DFA
 		Grammar g = new Grammar(
@@ -396,7 +401,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testSynPredResolvesRecursionInLexer() throws Exception {
+	@Test public void testSynPredResolvesRecursionInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A :     (B ';')=> B ';'\n" +
@@ -422,7 +427,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testAutoBacktrackResolvesRecursionInLexer() throws Exception {
+	@Test public void testAutoBacktrackResolvesRecursionInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"options {backtrack=true;}\n"+
@@ -449,7 +454,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testAutoBacktrackResolvesRecursion() throws Exception {
+	@Test public void testAutoBacktrackResolvesRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"options {backtrack=true;}\n"+
@@ -475,7 +480,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testselfRecurseNonDet2() throws Exception {
+	@Test public void testselfRecurseNonDet2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -494,7 +499,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testIndirectRecursionLoop() throws Exception {
+	@Test public void testIndirectRecursionLoop() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -523,7 +528,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expecting, ruleNames2(result));
 	}
 
-	public void testIndirectRecursionLoop2() throws Exception {
+	@Test public void testIndirectRecursionLoop2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -553,7 +558,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expecting, ruleNames2(result));
 	}
 
-	public void testIndirectRecursionLoop3() throws Exception {
+	@Test public void testIndirectRecursionLoop3() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -583,7 +588,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expecting, ruleNames2(result));
 	}
 
-	public void testifThenElse() throws Exception {
+	@Test public void testifThenElse() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : IF s (E s)? | B;\n" +
@@ -604,7 +609,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0);
 	}
 
-	public void testifThenElseChecksStackSuffixConflict() throws Exception {
+	@Test public void testifThenElseChecksStackSuffixConflict() throws Exception {
 		// if you don't check stack soon enough, this finds E B not just E
 		// as ambig input
 		Grammar g = new Grammar(
@@ -628,7 +633,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testInvokeRule() throws Exception {
+	@Test public void testInvokeRule() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : b A\n" +
@@ -645,7 +650,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testDoubleInvokeRuleLeftEdge() throws Exception {
+	@Test public void testDoubleInvokeRuleLeftEdge() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : b X\n" +
@@ -670,7 +675,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0);
 	}
 
-	public void testimmediateTailRecursion() throws Exception {
+	@Test public void testimmediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -682,7 +687,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAStar_immediateTailRecursion() throws Exception {
+	@Test public void testAStar_immediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -699,7 +704,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testNoStartRule() throws Exception {
+	@Test public void testNoStartRule() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -717,7 +722,7 @@ public class TestDFAConversion extends BaseTest {
 				   msg instanceof GrammarSemanticsMessage);
 	}
 
-	public void testAStar_immediateTailRecursion2() throws Exception {
+	@Test public void testAStar_immediateTailRecursion2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -735,7 +740,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testimmediateLeftRecursion() throws Exception {
+	@Test public void testimmediateLeftRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -745,7 +750,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expectedRules, ruleNames(leftRecursive));
 	}
 
-	public void testIndirectLeftRecursion() throws Exception {
+	@Test public void testIndirectLeftRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -757,7 +762,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expectedRules, ruleNames(leftRecursive));
 	}
 
-	public void testLeftRecursionInMultipleCycles() throws Exception {
+	@Test public void testLeftRecursionInMultipleCycles() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 				"s : a x ;\n" +
@@ -772,7 +777,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expectedRules, ruleNames(leftRecursive));
 	}
 
-	public void testCycleInsideRuleDoesNotForceInfiniteRecursion() throws Exception {
+	@Test public void testCycleInsideRuleDoesNotForceInfiniteRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"s : a ;\n" +
@@ -786,7 +791,7 @@ public class TestDFAConversion extends BaseTest {
 
 	// L O O P S
 
-	public void testAStar() throws Exception {
+	@Test public void testAStar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ( A )* ;");
@@ -796,7 +801,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAorBorCStar() throws Exception {
+	@Test public void testAorBorCStar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ( A | B | C )* ;");
@@ -806,7 +811,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAPlus() throws Exception {
+	@Test public void testAPlus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ( A )+ ;");
@@ -816,7 +821,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback decision
 	}
 
-	public void testAPlusNonGreedyWhenDeterministic() throws Exception {
+	@Test public void testAPlusNonGreedyWhenDeterministic() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (options {greedy=false;}:A)+ ;\n");
@@ -827,7 +832,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAPlusNonGreedyWhenNonDeterministic() throws Exception {
+	@Test public void testAPlusNonGreedyWhenNonDeterministic() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (options {greedy=false;}:A)+ A+ ;\n");
@@ -843,7 +848,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testAPlusGreedyWhenNonDeterministic() throws Exception {
+	@Test public void testAPlusGreedyWhenNonDeterministic() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (options {greedy=true;}:A)+ A+ ;\n");
@@ -859,7 +864,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testAorBorCPlus() throws Exception {
+	@Test public void testAorBorCPlus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ( A | B | C )+ ;");
@@ -869,7 +874,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testAOptional() throws Exception {
+	@Test public void testAOptional() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ( A )? B ;");
@@ -879,7 +884,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0); // loopback decision
 	}
 
-	public void testAorBorCOptional() throws Exception {
+	@Test public void testAorBorCOptional() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ( A | B | C )? Z ;");
@@ -891,7 +896,7 @@ public class TestDFAConversion extends BaseTest {
 
 	// A R B I T R A R Y  L O O K A H E A D
 
-	public void testAStarBOrAStarC() throws Exception {
+	@Test public void testAStarBOrAStarC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A)* B | (A)* C;");
@@ -913,7 +918,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
-	public void testAStarBOrAPlusC() throws Exception {
+	@Test public void testAStarBOrAPlusC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A)* B | (A)+ C;");
@@ -935,7 +940,7 @@ public class TestDFAConversion extends BaseTest {
 	}
 
 
-	public void testAOrBPlusOrAPlus() throws Exception {
+	@Test public void testAOrBPlusOrAPlus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A|B)* X | (A)+ Y;");
@@ -956,7 +961,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule
 	}
 
-	public void testLoopbackAndExit() throws Exception {
+	@Test public void testLoopbackAndExit() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A|B)+ B;");
@@ -968,7 +973,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testOptionalAltAndBypass() throws Exception {
+	@Test public void testOptionalAltAndBypass() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A|B)? B;");
@@ -982,7 +987,7 @@ public class TestDFAConversion extends BaseTest {
 
 	// R E S O L V E  S Y N  C O N F L I C T S
 
-	public void testResolveLL1ByChoosingFirst() throws Exception {
+	@Test public void testResolveLL1ByChoosingFirst() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A C | A C;");
@@ -998,7 +1003,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testResolveLL2ByChoosingFirst() throws Exception {
+	@Test public void testResolveLL2ByChoosingFirst() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A B | A B;");
@@ -1014,7 +1019,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testResolveLL2MixAlt() throws Exception {
+	@Test public void testResolveLL2MixAlt() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A B | A C | A B | Z;");
@@ -1032,7 +1037,7 @@ public class TestDFAConversion extends BaseTest {
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testIndirectIFThenElseStyleAmbig() throws Exception {
+	@Test public void testIndirectIFThenElseStyleAmbig() throws Exception {
 		// the (c)+ loopback is ambig because it could match "CASE"
 		// by entering the loop or by falling out and ignoring (s)*
 		// back falling back into (cg)* loop which stats over and
@@ -1061,7 +1066,7 @@ public class TestDFAConversion extends BaseTest {
 
 	// S E T S
 
-	public void testComplement() throws Exception {
+	@Test public void testComplement() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ~(A | B | C) | C {;} ;\n" +
@@ -1072,7 +1077,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testComplementToken() throws Exception {
+	@Test public void testComplementToken() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : ~C | C {;} ;\n" +
@@ -1083,7 +1088,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testComplementChar() throws Exception {
+	@Test public void testComplementChar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : ~'x' | 'x' {;} ;\n");
@@ -1093,7 +1098,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testComplementCharSet() throws Exception {
+	@Test public void testComplementCharSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : ~(' '|'\t'|'x'|'y') | 'x';\n" + // collapse into single set
@@ -1104,7 +1109,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testNoSetCollapseWithActions() throws Exception {
+	@Test public void testNoSetCollapseWithActions() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : (A | B {foo}) | C;");
@@ -1114,7 +1119,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testRuleAltsSetCollapse() throws Exception {
+	@Test public void testRuleAltsSetCollapse() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A | B | C ;"
@@ -1124,7 +1129,7 @@ public class TestDFAConversion extends BaseTest {
 		assertEquals(expecting, g.getGrammarTree().toStringTree());
 	}
 
-	public void testTokensRuleAltsDoNotCollapse() throws Exception {
+	@Test public void testTokensRuleAltsDoNotCollapse() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';" +
@@ -1136,7 +1141,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	public void testMultipleSequenceCollision() throws Exception {
+	@Test public void testMultipleSequenceCollision() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"a : (A{;}|B)\n" +
@@ -1169,7 +1174,7 @@ As a result, alternative(s) 2 were disabled for that input
 */
 	}
 
-	public void testMultipleAltsSameSequenceCollision() throws Exception {
+	@Test public void testMultipleAltsSameSequenceCollision() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"a : type ID \n" +
@@ -1192,7 +1197,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testFollowReturnsToLoopReenteringSameRule() throws Exception {
+	@Test public void testFollowReturnsToLoopReenteringSameRule() throws Exception {
 		// D07 can be matched in the (...)? or fall out of esc back into (..)*
 		// loop in sl.  Note that D07 is matched by ~(R|SLASH).  No good
 		// way to write that grammar I guess
@@ -1214,7 +1219,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testTokenCallsAnotherOnLeftEdge() throws Exception {
+	@Test public void testTokenCallsAnotherOnLeftEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"F   :   I '.'\n" +
@@ -1230,7 +1235,7 @@ As a result, alternative(s) 2 were disabled for that input
 	}
 
 
-	public void testSelfRecursionAmbigAlts() throws Exception {
+	@Test public void testSelfRecursionAmbigAlts() throws Exception {
 		// ambiguous grammar for "L ID R" (alts 1,2 of a)
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -1257,7 +1262,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testIndirectRecursionAmbigAlts() throws Exception {
+	@Test public void testIndirectRecursionAmbigAlts() throws Exception {
 		// ambiguous grammar for "L ID R" (alts 1,2 of a)
 		// This was derived from the java grammar 12/4/2004 when it
 		// was not handling a unaryExpression properly.  I traced it
@@ -1291,7 +1296,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testTailRecursionInvokedFromArbitraryLookaheadDecision() throws Exception {
+	@Test public void testTailRecursionInvokedFromArbitraryLookaheadDecision() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : b X\n" +
@@ -1305,7 +1310,7 @@ As a result, alternative(s) 2 were disabled for that input
 		assertNonLLStar(g, altsWithRecursion);
 	}
 
-	public void testWildcardStarK1AndNonGreedyByDefaultInParser() throws Exception {
+	@Test public void testWildcardStarK1AndNonGreedyByDefaultInParser() throws Exception {
 		// no error because .* assumes it should finish when it sees R
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
@@ -1323,7 +1328,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testWildcardPlusK1AndNonGreedyByDefaultInParser() throws Exception {
+	@Test public void testWildcardPlusK1AndNonGreedyByDefaultInParser() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n" +
 			"s : A block EOF ;\n" +
@@ -1340,7 +1345,7 @@ As a result, alternative(s) 2 were disabled for that input
 					  nonDetAlts, ambigInput, danglingAlts, numWarnings);
 	}
 
-	public void testGatedSynPred() throws Exception {
+	@Test public void testGatedSynPred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x   : (X)=> X\n" +
@@ -1362,7 +1367,7 @@ As a result, alternative(s) 2 were disabled for that input
 		assertEquals("predicate names not recorded properly in grammar", expectedPreds, preds);
 	}
 
-	public void testHoistedGatedSynPred() throws Exception {
+	@Test public void testHoistedGatedSynPred() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"x   : (X)=> X\n" +
@@ -1387,7 +1392,7 @@ As a result, alternative(s) 2 were disabled for that input
 
 	// Check state table creation
 
-	public void testCyclicTableCreation() throws Exception {
+	@Test public void testCyclicTableCreation() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
 			"a : A+ X | A+ Y ;");
@@ -1445,7 +1450,7 @@ As a result, alternative(s) 2 were disabled for that input
 		assertEquals("mismatched alt", expectedAlt, msg.alt);
 	}
 
-    public void testWildcardInTreeGrammar() throws Exception {
+    @Test public void testWildcardInTreeGrammar() throws Exception {
         Grammar g = new Grammar(
             "tree grammar t;\n" +
             "a : A B | A . ;\n");
@@ -1462,7 +1467,7 @@ As a result, alternative(s) 2 were disabled for that input
                       nonDetAlts, ambigInput, danglingAlts, numWarnings);
     }
 
-    public void testWildcardInTreeGrammar2() throws Exception {
+    @Test public void testWildcardInTreeGrammar2() throws Exception {
         Grammar g = new Grammar(
             "tree grammar t;\n" +
             "a : ^(A X Y) | ^(A . .) ;\n");

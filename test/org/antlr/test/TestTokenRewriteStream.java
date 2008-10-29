@@ -33,13 +33,18 @@ import org.antlr.runtime.TokenRewriteStream;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestTokenRewriteStream extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestTokenRewriteStream() {
     }
 
-	public void testInsertBeforeIndex0() throws Exception {
+	@Test public void testInsertBeforeIndex0() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -55,7 +60,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testInsertAfterLastIndex() throws Exception {
+	@Test public void testInsertAfterLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -71,7 +76,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void test2InsertBeforeAfterMiddleIndex() throws Exception {
+	@Test public void test2InsertBeforeAfterMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -88,7 +93,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceIndex0() throws Exception {
+	@Test public void testReplaceIndex0() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -104,7 +109,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceLastIndex() throws Exception {
+	@Test public void testReplaceLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -120,7 +125,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceMiddleIndex() throws Exception {
+	@Test public void testReplaceMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -136,7 +141,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-    public void testToStringStartStop() throws Exception {
+    @Test public void testToStringStartStop() throws Exception {
         Grammar g = new Grammar(
             "lexer grammar t;\n"+
             "ID : 'a'..'z'+;\n" +
@@ -170,7 +175,7 @@ public class TestTokenRewriteStream extends BaseTest {
         assertEquals(expecting, result);
     }
 
-    public void testToStringStartStop2() throws Exception {
+    @Test public void testToStringStartStop2() throws Exception {
         Grammar g = new Grammar(
             "lexer grammar t;\n"+
             "ID : 'a'..'z'+;\n" +
@@ -223,7 +228,7 @@ public class TestTokenRewriteStream extends BaseTest {
     }
 
 
-    public void test2ReplaceMiddleIndex() throws Exception {
+    @Test public void test2ReplaceMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -240,7 +245,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-    public void test2ReplaceMiddleIndex1InsertBefore() throws Exception {
+    @Test public void test2ReplaceMiddleIndex1InsertBefore() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -258,7 +263,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceThenDeleteMiddleIndex() throws Exception {
+	@Test public void testReplaceThenDeleteMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -275,7 +280,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testInsertInPriorReplace() throws Exception {
+	@Test public void testInsertInPriorReplace() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -299,7 +304,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, exc.getMessage());
 	}
 
-	public void testInsertThenReplaceSameIndex() throws Exception {
+	@Test public void testInsertThenReplaceSameIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -316,7 +321,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void test2InsertMiddleIndex() throws Exception {
+	@Test public void test2InsertMiddleIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -333,7 +338,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void test2InsertThenReplaceIndex0() throws Exception {
+	@Test public void test2InsertThenReplaceIndex0() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -351,7 +356,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceThenInsertBeforeLastIndex() throws Exception {
+	@Test public void testReplaceThenInsertBeforeLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -368,7 +373,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testInsertThenReplaceLastIndex() throws Exception {
+	@Test public void testInsertThenReplaceLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -385,7 +390,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceThenInsertAfterLastIndex() throws Exception {
+	@Test public void testReplaceThenInsertAfterLastIndex() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -402,7 +407,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceRangeThenInsertAtLeftEdge() throws Exception {
+	@Test public void testReplaceRangeThenInsertAtLeftEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -419,7 +424,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceRangeThenInsertAtRightEdge() throws Exception {
+	@Test public void testReplaceRangeThenInsertAtRightEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -443,7 +448,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, exc.getMessage());
 	}
 
-	public void testReplaceRangeThenInsertAfterRightEdge() throws Exception {
+	@Test public void testReplaceRangeThenInsertAfterRightEdge() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -460,7 +465,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceAll() throws Exception {
+	@Test public void testReplaceAll() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -476,7 +481,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceSubsetThenFetch() throws Exception {
+	@Test public void testReplaceSubsetThenFetch() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -492,7 +497,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testReplaceThenReplaceSuperset() throws Exception {
+	@Test public void testReplaceThenReplaceSuperset() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -516,7 +521,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, exc.getMessage());
 	}
 
-	public void testReplaceThenReplaceLowerIndexedSuperset() throws Exception {
+	@Test public void testReplaceThenReplaceLowerIndexedSuperset() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -540,7 +545,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, exc.getMessage());
 	}
 
-	public void testReplaceSingleMiddleThenOverlappingSuperset() throws Exception {
+	@Test public void testReplaceSingleMiddleThenOverlappingSuperset() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -559,7 +564,7 @@ public class TestTokenRewriteStream extends BaseTest {
 
 	// June 2, 2008 I rewrote core of rewrite engine; just adding lots more tests here
 
-	public void testCombineInserts() throws Exception {
+	@Test public void testCombineInserts() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -576,7 +581,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testCombine3Inserts() throws Exception {
+	@Test public void testCombine3Inserts() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -594,7 +599,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testCombineInsertOnLeftWithReplace() throws Exception {
+	@Test public void testCombineInsertOnLeftWithReplace() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -611,7 +616,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testCombineInsertOnLeftWithDelete() throws Exception {
+	@Test public void testCombineInsertOnLeftWithDelete() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -628,7 +633,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testDisjointInserts() throws Exception {
+	@Test public void testDisjointInserts() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -646,7 +651,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testOverlappingReplace() throws Exception {
+	@Test public void testOverlappingReplace() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -663,7 +668,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testOverlappingReplace2() throws Exception {
+	@Test public void testOverlappingReplace2() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -687,7 +692,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, exc.getMessage());
 	}
 
-	public void testOverlappingReplace3() throws Exception {
+	@Test public void testOverlappingReplace3() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -704,7 +709,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testOverlappingReplace4() throws Exception {
+	@Test public void testOverlappingReplace4() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -721,7 +726,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testDropIdenticalReplace() throws Exception {
+	@Test public void testDropIdenticalReplace() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -738,7 +743,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testDropPrevCoveredInsert() throws Exception {
+	@Test public void testDropPrevCoveredInsert() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -755,7 +760,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testLeaveAloneDisjointInsert() throws Exception {
+	@Test public void testLeaveAloneDisjointInsert() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +
@@ -772,7 +777,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testLeaveAloneDisjointInsert2() throws Exception {
+	@Test public void testLeaveAloneDisjointInsert2() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a';\n" +

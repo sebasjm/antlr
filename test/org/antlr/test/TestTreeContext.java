@@ -5,6 +5,11 @@ import org.antlr.runtime.tree.*;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Test the TreeParser.inContext() method */
 public class TestTreeContext extends BaseTest {
     public static final String[] tokenNames = new String[] {
@@ -12,7 +17,7 @@ public class TestTreeContext extends BaseTest {
         "PLUS", "MULT", "DOT", "ID", "INT", "WS", "'['", "','", "']'"
     };
 
-    public void testSimpleParent() {
+    @Test public void testSimpleParent() {
         String tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -31,7 +36,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testNoParent() {
+    @Test public void testNoParent() {
         String tree = "(PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -50,7 +55,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testParentWithWildcard() {
+    @Test public void testParentWithWildcard() {
         String tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -69,7 +74,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testWildcardAtStartIgnored() {
+    @Test public void testWildcardAtStartIgnored() {
         String tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -88,7 +93,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testWildcardInBetween() {
+    @Test public void testWildcardInBetween() {
         String tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -107,7 +112,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testLotsOfWildcards() {
+    @Test public void testLotsOfWildcards() {
         String tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -126,7 +131,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testDeep() {
+    @Test public void testDeep() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -145,7 +150,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testDeepAndFindRoot() {
+    @Test public void testDeepAndFindRoot() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -164,7 +169,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testDeepAndFindRoot2() {
+    @Test public void testDeepAndFindRoot2() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -183,7 +188,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testChain() {
+    @Test public void testChain() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -204,7 +209,7 @@ public class TestTreeContext extends BaseTest {
 
     // TEST INVALID CONTEXTS
 
-    public void testNotParent() {
+    @Test public void testNotParent() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -223,7 +228,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testMismatch() {
+    @Test public void testMismatch() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -243,7 +248,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testMismatch2() {
+    @Test public void testMismatch2() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -262,7 +267,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testMismatch3() {
+    @Test public void testMismatch3() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -281,7 +286,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testDoubleEtc() {
+    @Test public void testDoubleEtc() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
@@ -306,7 +311,7 @@ public class TestTreeContext extends BaseTest {
         assertEquals(expecting, found);
     }
 
-    public void testDotDot() {
+    @Test public void testDotDot() {
         String tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))";
         TreeAdaptor adaptor = new CommonTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, tokenNames);

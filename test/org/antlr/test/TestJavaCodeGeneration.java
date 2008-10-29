@@ -27,14 +27,17 @@
 */
 package org.antlr.test;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /** General code generation testing; compilation and/or execution.
  *  These tests are more about avoiding duplicate var definitions
  *  etc... than testing a particular ANTLR feature.
  */
 public class TestJavaCodeGeneration extends BaseTest {
-	public void testDupVarDefForPinchedState() {
+	@Test public void testDupVarDefForPinchedState() {
 		// so->s2 and s0->s3->s1 pinches back to s1
 		// LA3_1, s1 state for DFA 3, was defined twice in similar scope
 		// just wrapped in curlies and it's cool.
@@ -50,7 +53,7 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabeledNotSetsInLexer() {
+	@Test public void testLabeledNotSetsInLexer() {
 		// d must be an int
 		String grammar =
 			"lexer grammar T;\n" +
@@ -63,7 +66,7 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabeledSetsInLexer() {
+	@Test public void testLabeledSetsInLexer() {
 		// d must be an int
 		String grammar =
 			"grammar T;\n" +
@@ -75,7 +78,7 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testLabeledRangeInLexer() {
+	@Test public void testLabeledRangeInLexer() {
 		// d must be an int
 		String grammar =
 			"grammar T;\n" +
@@ -87,7 +90,7 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testLabeledWildcardInLexer() {
+	@Test public void testLabeledWildcardInLexer() {
 		// d must be an int
 		String grammar =
 			"grammar T;\n" +
@@ -99,7 +102,7 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testSynpredWithPlusLoop() {
+	@Test public void testSynpredWithPlusLoop() {
 		String grammar =
 			"grammar T; \n" +
 			"a : (('x'+)=> 'x'+)?;\n";
@@ -110,7 +113,7 @@ public class TestJavaCodeGeneration extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testDoubleQuoteEscape() {
+	@Test public void testDoubleQuoteEscape() {
 		String grammar =
 			"lexer grammar T; \n" +
 			"A : '\\\\\"';\n"; // this is A : '\\"';

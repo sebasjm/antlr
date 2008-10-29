@@ -27,10 +27,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestAutoAST extends BaseTest {
 	protected boolean debug = false;
 
-	public void testTokenList() throws Exception {
+	@Test public void testTokenList() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -43,7 +48,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testTokenListInSingleAltBlock() throws Exception {
+	@Test public void testTokenListInSingleAltBlock() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -56,7 +61,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testSimpleRootAtOuterLevel() throws Exception {
+	@Test public void testSimpleRootAtOuterLevel() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -69,7 +74,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(abc 34)\n", found);
 	}
 
-	public void testSimpleRootAtOuterLevelReverse() throws Exception {
+	@Test public void testSimpleRootAtOuterLevelReverse() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -82,7 +87,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(abc 34)\n", found);
 	}
 
-	public void testBang() throws Exception {
+	@Test public void testBang() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -95,7 +100,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 4532\n", found);
 	}
 
-	public void testOptionalThenRoot() throws Exception {
+	@Test public void testOptionalThenRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -108,7 +113,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(b a 1)\n", found);
 	}
 
-	public void testLabeledStringRoot() throws Exception {
+	@Test public void testLabeledStringRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -121,7 +126,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(void foo ;)\n", found);
 	}
 
-	public void testWildcard() throws Exception {
+	@Test public void testWildcard() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -134,7 +139,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(void foo ;)\n", found);
 	}
 
-	public void testWildcardRoot() throws Exception {
+	@Test public void testWildcardRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -147,7 +152,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(foo void ;)\n", found);
 	}
 
-	public void testWildcardRootWithLabel() throws Exception {
+	@Test public void testWildcardRootWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -160,7 +165,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(foo void ;)\n", found);
 	}
 
-    public void testWildcardRootWithListLabel() throws Exception {
+    @Test public void testWildcardRootWithListLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -173,7 +178,7 @@ public class TestAutoAST extends BaseTest {
         assertEquals("(foo void ;)\n", found);
     }
 
-    public void testWildcardBangWithListLabel() throws Exception {
+    @Test public void testWildcardBangWithListLabel() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -186,7 +191,7 @@ public class TestAutoAST extends BaseTest {
         assertEquals("void ;\n", found);
     }
 
-	public void testRootRoot() throws Exception {
+	@Test public void testRootRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -199,7 +204,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(34 a c)\n", found);
 	}
 
-	public void testRootRoot2() throws Exception {
+	@Test public void testRootRoot2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -212,7 +217,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(c (34 a))\n", found);
 	}
 
-	public void testRootThenRootInLoop() throws Exception {
+	@Test public void testRootThenRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -225,7 +230,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(* (* (a 34) b 9) c)\n", found);
 	}
 
-	public void testNestedSubrule() throws Exception {
+	@Test public void testNestedSubrule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -238,7 +243,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("void a b ;\n", found);
 	}
 
-	public void testInvokeRule() throws Exception {
+	@Test public void testInvokeRule() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -252,7 +257,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("int a\n", found);
 	}
 
-	public void testInvokeRuleAsRoot() throws Exception {
+	@Test public void testInvokeRuleAsRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -266,7 +271,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(int a)\n", found);
 	}
 
-	public void testInvokeRuleAsRootWithLabel() throws Exception {
+	@Test public void testInvokeRuleAsRootWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -280,7 +285,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(int a)\n", found);
 	}
 
-	public void testInvokeRuleAsRootWithListLabel() throws Exception {
+	@Test public void testInvokeRuleAsRootWithListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -294,7 +299,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(int a)\n", found);
 	}
 
-	public void testRuleRootInLoop() throws Exception {
+	@Test public void testRuleRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -307,7 +312,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(+ (+ (+ a b) c) d)\n", found);
 	}
 
-	public void testRuleInvocationRuleRootInLoop() throws Exception {
+	@Test public void testRuleInvocationRuleRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -321,7 +326,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(- (+ (+ a b) c) d)\n", found);
 	}
 
-	public void testTailRecursion() throws Exception {
+	@Test public void testTailRecursion() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -336,7 +341,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(exp 3 (exp 4 5))\n", found);
 	}
 
-	public void testSet() throws Exception {
+	@Test public void testSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -349,7 +354,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	public void testSetRoot() throws Exception {
+	@Test public void testSetRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -362,7 +367,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(+ abc)\n", found);
 	}
 
-	public void testSetRootWithLabel() throws Exception {
+	@Test public void testSetRootWithLabel() throws Exception {
 		// FAILS until I rebuild the antlr.g in v3
 		String grammar =
 			"grammar T;\n" +
@@ -376,7 +381,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(+ abc)\n", found);
 	}
 
-	public void testSetAsRuleRootInLoop() throws Exception {
+	@Test public void testSetAsRuleRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -389,7 +394,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(- (+ a b) c)\n", found);
 	}
 
-	public void testNotSet() throws Exception {
+	@Test public void testNotSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -402,7 +407,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("34 + 2\n", found);
 	}
 
-	public void testNotSetWithLabel() throws Exception {
+	@Test public void testNotSetWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -415,7 +420,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("34 + 2\n", found);
 	}
 
-	public void testNotSetWithListLabel() throws Exception {
+	@Test public void testNotSetWithListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -428,7 +433,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("34 + 2\n", found);
 	}
 
-	public void testNotSetRoot() throws Exception {
+	@Test public void testNotSetRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -441,7 +446,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(34 55)\n", found);
 	}
 
-	public void testNotSetRootWithLabel() throws Exception {
+	@Test public void testNotSetRootWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -454,7 +459,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(34 55)\n", found);
 	}
 
-	public void testNotSetRootWithListLabel() throws Exception {
+	@Test public void testNotSetRootWithListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -467,7 +472,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(34 55)\n", found);
 	}
 
-	public void testNotSetRuleRootInLoop() throws Exception {
+	@Test public void testNotSetRuleRootInLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -481,7 +486,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(+ (+ 3 4) 5)\n", found);
 	}
 
-	public void testTokenLabelReuse() throws Exception {
+	@Test public void testTokenLabelReuse() throws Exception {
 		// check for compilation problem due to multiple defines
 		String grammar =
 			"grammar T;\n" +
@@ -495,7 +500,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("2nd id=b;a b\n", found);
 	}
 
-	public void testTokenLabelReuse2() throws Exception {
+	@Test public void testTokenLabelReuse2() throws Exception {
 		// check for compilation problem due to multiple defines
 		String grammar =
 			"grammar T;\n" +
@@ -509,7 +514,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("2nd id=b;(b a)\n", found);
 	}
 
-	public void testTokenListLabelReuse() throws Exception {
+	@Test public void testTokenListLabelReuse() throws Exception {
 		// check for compilation problem due to multiple defines
 		// make sure ids has both ID tokens
 		String grammar =
@@ -525,7 +530,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTokenListLabelReuse2() throws Exception {
+	@Test public void testTokenListLabelReuse2() throws Exception {
 		// check for compilation problem due to multiple defines
 		// make sure ids has both ID tokens
 		String grammar =
@@ -541,7 +546,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTokenListLabelRuleRoot() throws Exception {
+	@Test public void testTokenListLabelRuleRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -554,7 +559,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("a\n", found);
 	}
 
-	public void testTokenListLabelBang() throws Exception {
+	@Test public void testTokenListLabelBang() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -567,7 +572,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("", found);
 	}
 
-	public void testRuleListLabel() throws Exception {
+	@Test public void testRuleListLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -583,7 +588,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("2nd x=b;a b\n", found);
 	}
 
-	public void testRuleListLabelRuleRoot() throws Exception {
+	@Test public void testRuleListLabelRuleRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -598,7 +603,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("x=(b a);(b a)\n", found);
 	}
 
-	public void testRuleListLabelBang() throws Exception {
+	@Test public void testRuleListLabelBang() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -613,7 +618,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("1st x=a;b\n", found);
 	}
 
-	public void testComplicatedMelange() throws Exception {
+	@Test public void testComplicatedMelange() throws Exception {
 		// check for compilation problem
 		String grammar =
 			"grammar T;\n" +
@@ -629,7 +634,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("a b b c c d\n", found);
 	}
 
-	public void testReturnValueWithAST() throws Exception {
+	@Test public void testReturnValueWithAST() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -643,7 +648,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("34\nabc 34\n", found);
 	}
 
-	public void testSetLoop() throws Exception {
+	@Test public void testSetLoop() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options { output=AST; }\n" +
@@ -656,7 +661,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 34 d\n", found);
 	}
 
-	public void testExtraTokenInSimpleDecl() throws Exception {
+	@Test public void testExtraTokenInSimpleDecl() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -671,7 +676,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(int x 1)\n", found); // tree gets correct x and 1 tokens
 	}
 
-	public void testMissingIDInSimpleDecl() throws Exception {
+	@Test public void testMissingIDInSimpleDecl() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -687,7 +692,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(int <missing ID> 1)\n", found); // tree gets invented ID token
 	}
 
-	public void testMissingSetInSimpleDecl() throws Exception {
+	@Test public void testMissingSetInSimpleDecl() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -703,7 +708,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("(<error: x> x 1)\n", found); // tree gets invented ID token
 	}
 
-	public void testMissingTokenGivesErrorNode() throws Exception {
+	@Test public void testMissingTokenGivesErrorNode() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -717,7 +722,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc <missing INT>\n", found);
 	}
 
-	public void testMissingTokenGivesErrorNodeInInvokedRule() throws Exception {
+	@Test public void testMissingTokenGivesErrorNodeInInvokedRule() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -732,7 +737,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("<mismatched token: [@-1,0:0='<no text>',<-1>,0:-1], resync=abc>\n", found);
 	}
 
-	public void testExtraTokenGivesErrorNode() throws Exception {
+	@Test public void testExtraTokenGivesErrorNode() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -748,7 +753,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testMissingFirstTokenGivesErrorNode() throws Exception {
+	@Test public void testMissingFirstTokenGivesErrorNode() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -762,7 +767,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("<missing ID> 34\n", found);
 	}
 
-	public void testMissingFirstTokenGivesErrorNode2() throws Exception {
+	@Test public void testMissingFirstTokenGivesErrorNode2() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +
@@ -781,7 +786,7 @@ public class TestAutoAST extends BaseTest {
 		assertEquals("<missing ID> 34\n", found);
 	}
 
-	public void testNoViableAltGivesErrorNode() throws Exception {
+	@Test public void testNoViableAltGivesErrorNode() throws Exception {
 		String grammar =
 			"grammar foo;\n" +
 			"options {output=AST;}\n" +

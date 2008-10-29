@@ -32,13 +32,18 @@ import org.antlr.tool.Interpreter;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.ParseTree;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestInterpretedParsing extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestInterpretedParsing() {
     }
 
-	public void testSimpleParse() throws Exception {
+	@Test public void testSimpleParse() throws Exception {
 		Grammar pg = new Grammar(
 			"parser grammar p;\n"+
 			"prog : WHILE ID LCURLY (assign)* RCURLY EOF;\n" +
@@ -73,7 +78,7 @@ public class TestInterpretedParsing extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testMismatchedTokenError() throws Exception {
+	@Test public void testMismatchedTokenError() throws Exception {
 		Grammar pg = new Grammar(
 			"parser grammar p;\n"+
 			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +
@@ -108,7 +113,7 @@ public class TestInterpretedParsing extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testMismatchedSetError() throws Exception {
+	@Test public void testMismatchedSetError() throws Exception {
 		Grammar pg = new Grammar(
 			"parser grammar p;\n"+
 			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +
@@ -143,7 +148,7 @@ public class TestInterpretedParsing extends BaseTest {
 		assertEquals(expecting, result);
 	}
 
-	public void testNoViableAltError() throws Exception {
+	@Test public void testNoViableAltError() throws Exception {
 		Grammar pg = new Grammar(
 			"parser grammar p;\n"+
 			"prog : WHILE ID LCURLY (assign)* RCURLY;\n" +

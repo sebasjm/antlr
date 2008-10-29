@@ -27,7 +27,7 @@
 */
 package org.antlr.test;
 
-import junit.framework.TestCase;
+
 import org.antlr.Tool;
 import org.antlr.analysis.Label;
 import org.antlr.stringtemplate.StringTemplate;
@@ -36,20 +36,39 @@ import org.antlr.tool.Message;
 import org.antlr.tool.GrammarSemanticsMessage;
 import org.antlr.tool.ANTLRErrorListener;
 
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.io.*;
 import java.util.*;
 
-public abstract class BaseTest extends TestCase {
+public abstract class BaseTest {
 
 	public static final String jikes = null;//"/usr/bin/jikes";
 	public static final String pathSep = System.getProperty("path.separator");
-	public static final String CLASSPATH = System.getProperty("java.class.path");
+    
+   /**
+    * When runnning from Maven, the junit tests are run via the surefire plugin. It sets the
+    * classpath for the test environment into the following property. We need to pick this up
+    * for the junit tests that are going to generate and try to run code.
+    */
+    public static final String SUREFIRE_CLASSPATH = System.getProperty("surefire.test.class.path");
+
+    /**
+     * Build up the full classpath we need, including the surefire path (if present)
+     */
+    public static final String CLASSPATH = System.getProperty("java.class.path") + (SUREFIRE_CLASSPATH.equals("") ? "" : pathSep + SUREFIRE_CLASSPATH); 
+    
 	public final String tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr-"+System.currentTimeMillis()).getAbsolutePath();
 
 	/** If error during execution, store stderr here */
 	protected String stderr;
 
-	protected void setUp() throws Exception {
+    @Before
+	public void setUp() throws Exception {
 		ErrorManager.resetErrorState();
 	}
 

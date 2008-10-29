@@ -27,6 +27,11 @@
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestLexer extends BaseTest {
 	protected boolean debug = false;
 
@@ -34,7 +39,7 @@ public class TestLexer extends BaseTest {
 	public TestLexer() {
 	}
 
-	public void testSetText() throws Exception {
+	@Test public void testSetText() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -47,7 +52,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("\t\n", found);
 	}
 
-	public void testRefToRuleDoesNotSetTokenNorEmitAnother() throws Exception {
+	@Test public void testRefToRuleDoesNotSetTokenNorEmitAnother() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -61,7 +66,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("-34\n", found);
 	}
 
-	public void testRefToRuleDoesNotSetChannel() throws Exception {
+	@Test public void testRefToRuleDoesNotSetChannel() throws Exception {
 		// this must set channel of A to HIDDEN.  $channel is local to rule
 		// like $type.
 		String grammar =
@@ -75,7 +80,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("- 34, channel=0\n", found);
 	}
 
-	public void testWeCanSetType() throws Exception {
+	@Test public void testWeCanSetType() throws Exception {
 		String grammar =
 			"grammar P;\n"+
 			"tokens {X;}\n" +
@@ -88,7 +93,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("-34\n", found);
 	}
 
-	public void testRefToFragment() throws Exception {
+	@Test public void testRefToFragment() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -102,7 +107,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("-34\n", found);
 	}
 
-	public void testMultipleRefToFragment() throws Exception {
+	@Test public void testMultipleRefToFragment() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -116,7 +121,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("3.14159\n", found);
 	}
 
-	public void testLabelInSubrule() throws Exception {
+	@Test public void testLabelInSubrule() throws Exception {
 		// can we see v outside?
 		String grammar =
 			"grammar P;\n"+
@@ -129,7 +134,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("342\n", found);
 	}
 
-	public void testRefToTokenInLexer() throws Exception {
+	@Test public void testRefToTokenInLexer() throws Exception {
 		String grammar =
 			"grammar P;\n"+
 			"a : A EOF ;\n"+
@@ -141,7 +146,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("342\n", found);
 	}
 
-	public void testListLabelInLexer() throws Exception {
+	@Test public void testListLabelInLexer() throws Exception {
 		String grammar =
 			"grammar P;\n"+
 			"a : A ;\n"+
@@ -153,7 +158,7 @@ public class TestLexer extends BaseTest {
 		assertEquals(" 33 297\n", found);
 	}
 
-	public void testDupListRefInLexer() throws Exception {
+	@Test public void testDupListRefInLexer() throws Exception {
 		String grammar =
 			"grammar P;\n"+
 			"a : A ;\n"+
@@ -165,7 +170,7 @@ public class TestLexer extends BaseTest {
 		assertEquals(" 33 297\n", found);
 	}
 
-	public void testCharLabelInLexer() {
+	@Test public void testCharLabelInLexer() {
 		String grammar =
 			"grammar T;\n" +
 			"a : B ;\n" +
@@ -175,7 +180,7 @@ public class TestLexer extends BaseTest {
 		assertEquals("a\n", found);
 	}
 
-	public void testRepeatedLabelInLexer() {
+	@Test public void testRepeatedLabelInLexer() {
 		String grammar =
 			"lexer grammar T;\n" +
 			"B : x='a' x='b' ;\n" ;
@@ -186,7 +191,7 @@ public class TestLexer extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRepeatedRuleLabelInLexer() {
+	@Test public void testRepeatedRuleLabelInLexer() {
 		String grammar =
 			"lexer grammar T;\n" +
 			"B : x=A x=A ;\n" +
@@ -198,7 +203,7 @@ public class TestLexer extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testIsolatedEOTEdge() {
+	@Test public void testIsolatedEOTEdge() {
 		String grammar =
 			"lexer grammar T;\n" +
 			"QUOTED_CONTENT \n" +
@@ -210,7 +215,7 @@ public class TestLexer extends BaseTest {
 		assertEquals(expecting, found);
 	}	
 
-	public void testEscapedLiterals() {
+	@Test public void testEscapedLiterals() {
 		/* Grammar:
 			A : '\"' ;  should match a single double-quote: "
 			B : '\\\"' ; should match input \"

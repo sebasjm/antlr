@@ -36,11 +36,16 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.grammar.v2.ANTLRParser;
 import org.antlr.grammar.v3.ActionTranslator;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Test templates in actions; %... shorthands */
 public class TestTemplates extends BaseTest {
 	private static final String LINE_SEP = System.getProperty("line.separator");
 
-	public void testTemplateConstructor() throws Exception {
+	@Test public void testTemplateConstructor() throws Exception {
 		String action = "x = %foo(name={$ID.text});";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
 			LINE_SEP + "  new STAttrMap().put(\"name\", (ID1!=null?ID1.getText():null)));";
@@ -77,7 +82,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testTemplateConstructorNoArgs() throws Exception {
+	@Test public void testTemplateConstructorNoArgs() throws Exception {
 		String action = "x = %foo();";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\");";
 
@@ -113,7 +118,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testIndirectTemplateConstructor() throws Exception {
+	@Test public void testIndirectTemplateConstructor() throws Exception {
 		String action = "x = %({\"foo\"})(name={$ID.text});";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
 			LINE_SEP + "  new STAttrMap().put(\"name\", (ID1!=null?ID1.getText():null)));";
@@ -150,7 +155,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testStringConstructor() throws Exception {
+	@Test public void testStringConstructor() throws Exception {
 		String action = "x = %{$ID.text};";
 		String expecting = "x = new StringTemplate(templateLib,(ID1!=null?ID1.getText():null));";
 
@@ -185,7 +190,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSetAttr() throws Exception {
+	@Test public void testSetAttr() throws Exception {
 		String action = "%x.y = z;";
 		String expecting = "(x).setAttribute(\"y\", z);";
 
@@ -221,7 +226,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSetAttrOfExpr() throws Exception {
+	@Test public void testSetAttrOfExpr() throws Exception {
 		String action = "%{foo($ID.text).getST()}.y = z;";
 		String expecting = "(foo((ID1!=null?ID1.getText():null)).getST()).setAttribute(\"y\", z);";
 
@@ -256,7 +261,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSetAttrOfExprInMembers() throws Exception {
+	@Test public void testSetAttrOfExprInMembers() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -279,7 +284,7 @@ public class TestTemplates extends BaseTest {
 		assertNoErrors(equeue);
 	}
 
-	public void testCannotHaveSpaceBeforeDot() throws Exception {
+	@Test public void testCannotHaveSpaceBeforeDot() throws Exception {
 		String action = "%x .y = z;";
 		String expecting = null;
 
@@ -307,7 +312,7 @@ public class TestTemplates extends BaseTest {
 		checkError(equeue, expectedMessage);
 	}
 
-	public void testCannotHaveSpaceAfterDot() throws Exception {
+	@Test public void testCannotHaveSpaceAfterDot() throws Exception {
 		String action = "%x. y = z;";
 		String expecting = null;
 

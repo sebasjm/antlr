@@ -31,13 +31,18 @@ import org.antlr.runtime.tree.*;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestUnBufferedTreeNodeStream extends TestTreeNodeStream {
 
 	public TreeNodeStream newStream(Object t) {
 		return new UnBufferedTreeNodeStream(t);
 	}
 
-	public void testBufferOverflow() throws Exception {
+	@Test public void testBufferOverflow() throws Exception {
 		StringBuffer buf = new StringBuffer();
 		StringBuffer buf2 = new StringBuffer();
 		// make ^(101 102 ... n)
@@ -75,7 +80,7 @@ public class TestUnBufferedTreeNodeStream extends TestTreeNodeStream {
 	 *  to load at least INITIAL_LOOKAHEAD_BUFFER_SIZE-N nodes so the
 	 *  buffer has to wrap.
 	 */
-	public void testBufferWrap() throws Exception {
+	@Test public void testBufferWrap() throws Exception {
 		int N = 10;
 		// make tree with types: 1 2 ... INITIAL_LOOKAHEAD_BUFFER_SIZE+N
 		Tree t = new CommonTree((Token)null);

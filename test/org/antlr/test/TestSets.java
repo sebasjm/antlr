@@ -27,6 +27,11 @@
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Test the set stuff in lexer and parser */
 public class TestSets extends BaseTest {
 	protected boolean debug = false;
@@ -35,7 +40,7 @@ public class TestSets extends BaseTest {
 	public TestSets() {
 	}
 
-	public void testSeqDoesNotBecomeSet() throws Exception {
+	@Test public void testSeqDoesNotBecomeSet() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -49,7 +54,7 @@ public class TestSets extends BaseTest {
 		assertEquals("34\n", found);
 	}
 
-	public void testParserSet() throws Exception {
+	@Test public void testParserSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : t=('x'|'y') {System.out.println($t.text);} ;\n";
@@ -58,7 +63,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testParserNotSet() throws Exception {
+	@Test public void testParserNotSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : t=~('x'|'y') 'z' {System.out.println($t.text);} ;\n";
@@ -67,7 +72,7 @@ public class TestSets extends BaseTest {
 		assertEquals("z\n", found);
 	}
 
-	public void testParserNotToken() throws Exception {
+	@Test public void testParserNotToken() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : ~'x' 'z' {System.out.println(input);} ;\n";
@@ -76,7 +81,7 @@ public class TestSets extends BaseTest {
 		assertEquals("zz\n", found);
 	}
 
-	public void testParserNotTokenWithLabel() throws Exception {
+	@Test public void testParserNotTokenWithLabel() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : t=~'x' 'z' {System.out.println($t.text);} ;\n";
@@ -85,7 +90,7 @@ public class TestSets extends BaseTest {
 		assertEquals("z\n", found);
 	}
 
-	public void testRuleAsSet() throws Exception {
+	@Test public void testRuleAsSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a @after {System.out.println(input);} : 'a' | 'b' |'c' ;\n";
@@ -94,7 +99,7 @@ public class TestSets extends BaseTest {
 		assertEquals("b\n", found);
 	}
 
-	public void testRuleAsSetAST() throws Exception {
+	@Test public void testRuleAsSetAST() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -104,7 +109,7 @@ public class TestSets extends BaseTest {
 		assertEquals("b\n", found);
 	}
 
-	public void testNotChar() throws Exception {
+	@Test public void testNotChar() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
@@ -114,7 +119,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testOptionalSingleElement() throws Exception {
+	@Test public void testOptionalSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A? 'c' {System.out.println(input);} ;\n" +
@@ -124,7 +129,7 @@ public class TestSets extends BaseTest {
 		assertEquals("bc\n", found);
 	}
 
-	public void testOptionalLexerSingleElement() throws Exception {
+	@Test public void testOptionalLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println(input);} ;\n" +
@@ -134,7 +139,7 @@ public class TestSets extends BaseTest {
 		assertEquals("bc\n", found);
 	}
 
-	public void testStarLexerSingleElement() throws Exception {
+	@Test public void testStarLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println(input);} ;\n" +
@@ -147,7 +152,7 @@ public class TestSets extends BaseTest {
 		assertEquals("c\n", found);
 	}
 
-	public void testPlusLexerSingleElement() throws Exception {
+	@Test public void testPlusLexerSingleElement() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println(input);} ;\n" +
@@ -157,7 +162,7 @@ public class TestSets extends BaseTest {
 		assertEquals("bbbbc\n", found);
 	}
 
-	public void testOptionalSet() throws Exception {
+	@Test public void testOptionalSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : ('a'|'b')? 'c' {System.out.println(input);} ;\n";
@@ -166,7 +171,7 @@ public class TestSets extends BaseTest {
 		assertEquals("ac\n", found);
 	}
 
-	public void testStarSet() throws Exception {
+	@Test public void testStarSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : ('a'|'b')* 'c' {System.out.println(input);} ;\n";
@@ -175,7 +180,7 @@ public class TestSets extends BaseTest {
 		assertEquals("abaac\n", found);
 	}
 
-	public void testPlusSet() throws Exception {
+	@Test public void testPlusSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : ('a'|'b')+ 'c' {System.out.println(input);} ;\n";
@@ -184,7 +189,7 @@ public class TestSets extends BaseTest {
 		assertEquals("abaac\n", found);
 	}
 
-	public void testLexerOptionalSet() throws Exception {
+	@Test public void testLexerOptionalSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println(input);} ;\n" +
@@ -194,7 +199,7 @@ public class TestSets extends BaseTest {
 		assertEquals("ac\n", found);
 	}
 
-	public void testLexerStarSet() throws Exception {
+	@Test public void testLexerStarSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println(input);} ;\n" +
@@ -204,7 +209,7 @@ public class TestSets extends BaseTest {
 		assertEquals("abaac\n", found);
 	}
 
-	public void testLexerPlusSet() throws Exception {
+	@Test public void testLexerPlusSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println(input);} ;\n" +
@@ -214,7 +219,7 @@ public class TestSets extends BaseTest {
 		assertEquals("abaac\n", found);
 	}
 
-	public void testNotCharSet() throws Exception {
+	@Test public void testNotCharSet() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
@@ -224,7 +229,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testNotCharSetWithLabel() throws Exception {
+	@Test public void testNotCharSetWithLabel() throws Exception {
 		// This doesn't work in lexer yet.
 		// Generates: h=input.LA(1); but h is defined as a Token
 		String grammar =
@@ -236,7 +241,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testNotCharSetWithRuleRef() throws Exception {
+	@Test public void testNotCharSetWithRuleRef() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
@@ -247,7 +252,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testNotCharSetWithRuleRef2() throws Exception {
+	@Test public void testNotCharSetWithRuleRef2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
@@ -258,7 +263,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testNotCharSetWithRuleRef3() throws Exception {
+	@Test public void testNotCharSetWithRuleRef3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +
@@ -270,7 +275,7 @@ public class TestSets extends BaseTest {
 		assertEquals("x\n", found);
 	}
 
-	public void testNotCharSetWithRuleRef4() throws Exception {
+	@Test public void testNotCharSetWithRuleRef4() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"a : A {System.out.println($A.text);} ;\n" +

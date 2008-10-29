@@ -28,6 +28,10 @@
 package org.antlr.test;
 
 import org.antlr.tool.Grammar;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class TestASTConstruction extends BaseTest {
 
@@ -35,7 +39,7 @@ public class TestASTConstruction extends BaseTest {
     public TestASTConstruction() {
     }
 
-	public void testA() throws Exception {
+	@Test public void testA() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : A;");
@@ -45,7 +49,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNakeRulePlusInLexer() throws Exception {
+	@Test public void testNakeRulePlusInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"A : B+;\n" +
@@ -56,7 +60,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRulePlus() throws Exception {
+	@Test public void testRulePlus() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : (b)+;\n" +
@@ -67,7 +71,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNakedRulePlus() throws Exception {
+	@Test public void testNakedRulePlus() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : b+;\n" +
@@ -78,7 +82,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRuleOptional() throws Exception {
+	@Test public void testRuleOptional() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : (b)?;\n" +
@@ -89,7 +93,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNakedRuleOptional() throws Exception {
+	@Test public void testNakedRuleOptional() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : b?;\n" +
@@ -100,7 +104,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRuleStar() throws Exception {
+	@Test public void testRuleStar() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : (b)*;\n" +
@@ -111,7 +115,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNakedRuleStar() throws Exception {
+	@Test public void testNakedRuleStar() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar P;\n"+
 				"a : b*;\n" +
@@ -122,7 +126,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharStar() throws Exception {
+	@Test public void testCharStar() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : 'a'*;");
@@ -132,7 +136,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharStarInLexer() throws Exception {
+	@Test public void testCharStarInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"B : 'b'*;");
@@ -142,7 +146,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testStringStar() throws Exception {
+	@Test public void testStringStar() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : 'while'*;");
@@ -152,7 +156,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testStringStarInLexer() throws Exception {
+	@Test public void testStringStarInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"B : 'while'*;");
@@ -162,7 +166,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharPlus() throws Exception {
+	@Test public void testCharPlus() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : 'a'+;");
@@ -172,7 +176,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharPlusInLexer() throws Exception {
+	@Test public void testCharPlusInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"B : 'b'+;");
@@ -182,7 +186,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharOptional() throws Exception {
+	@Test public void testCharOptional() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : 'a'?;");
@@ -192,7 +196,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharOptionalInLexer() throws Exception {
+	@Test public void testCharOptionalInLexer() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"B : 'b'?;");
@@ -202,7 +206,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testCharRangePlus() throws Exception {
+	@Test public void testCharRangePlus() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar P;\n"+
 				"ID : 'a'..'z'+;");
@@ -212,7 +216,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabel() throws Exception {
+	@Test public void testLabel() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=ID;");
@@ -222,7 +226,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabelOfOptional() throws Exception {
+	@Test public void testLabelOfOptional() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=ID?;");
@@ -232,7 +236,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLabelOfClosure() throws Exception {
+	@Test public void testLabelOfClosure() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=ID*;");
@@ -242,7 +246,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRuleLabel() throws Exception {
+	@Test public void testRuleLabel() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=b;\n" +
@@ -253,7 +257,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testSetLabel() throws Exception {
+	@Test public void testSetLabel() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=(A|B);\n");
@@ -263,7 +267,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNotSetLabel() throws Exception {
+	@Test public void testNotSetLabel() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=~(A|B);\n");
@@ -273,7 +277,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNotSetListLabel() throws Exception {
+	@Test public void testNotSetListLabel() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x+=~(A|B);\n");
@@ -283,7 +287,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testNotSetListLabelInLoop() throws Exception {
+	@Test public void testNotSetListLabelInLoop() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x+=~(A|B)+;\n");
@@ -293,7 +297,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRuleLabelOfPositiveClosure() throws Exception {
+	@Test public void testRuleLabelOfPositiveClosure() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x=b+;\n" +
@@ -304,7 +308,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testListLabelOfClosure() throws Exception {
+	@Test public void testListLabelOfClosure() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x+=ID*;");
@@ -314,7 +318,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testListLabelOfClosure2() throws Exception {
+	@Test public void testListLabelOfClosure2() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n"+
 				"a : x+='int'*;");
@@ -324,7 +328,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRuleListLabelOfPositiveClosure() throws Exception {
+	@Test public void testRuleListLabelOfPositiveClosure() throws Exception {
 		Grammar g = new Grammar(
 				"grammar P;\n" +
 				"options {output=AST;}\n"+
@@ -336,7 +340,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testRootTokenInStarLoop() throws Exception {
+	@Test public void testRootTokenInStarLoop() throws Exception {
 		Grammar g = new Grammar(
 				"grammar Expr;\n" +
 				"options { backtrack=true; }\n" +
@@ -347,7 +351,7 @@ public class TestASTConstruction extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testActionInStarLoop() throws Exception {
+	@Test public void testActionInStarLoop() throws Exception {
 		Grammar g = new Grammar(
 				"grammar Expr;\n" +
 				"options { backtrack=true; }\n" +

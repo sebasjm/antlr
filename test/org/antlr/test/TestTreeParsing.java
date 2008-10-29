@@ -27,8 +27,13 @@
 */
 package org.antlr.test;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestTreeParsing extends BaseTest {
-	public void testFlatList() throws Exception {
+	@Test public void testFlatList() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -48,7 +53,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc, 34\n", found);
 	}
 
-	public void testSimpleTree() throws Exception {
+	@Test public void testSimpleTree() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -68,7 +73,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc, 34\n", found);
 	}
 
-	public void testFlatVsTreeDecision() throws Exception {
+	@Test public void testFlatVsTreeDecision() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -91,7 +96,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("^(a 1)b 2\n", found);
 	}
 
-	public void testFlatVsTreeDecision2() throws Exception {
+	@Test public void testFlatVsTreeDecision2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -115,7 +120,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("^(a 3)b 5\n", found);
 	}
 
-	public void testCyclicDFALookahead() throws Exception {
+	@Test public void testCyclicDFALookahead() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -137,7 +142,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("alt 1\n", found);
 	}
 
-	public void testTemplateOutput() throws Exception {
+	@Test public void testTemplateOutput() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -158,7 +163,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("34\n", found);
 	}
 
-	public void testNullableChildList() throws Exception {
+	@Test public void testNullableChildList() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -178,7 +183,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	public void testNullableChildList2() throws Exception {
+	@Test public void testNullableChildList2() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -199,7 +204,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	public void testNullableChildList3() throws Exception {
+	@Test public void testNullableChildList3() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -221,7 +226,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc, def\n", found);
 	}
 
-	public void testActionsAfterRoot() throws Exception {
+	@Test public void testActionsAfterRoot() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -242,7 +247,7 @@ public class TestTreeParsing extends BaseTest {
 		assertEquals("abc, 2\n", found);
 	}
 
-    public void testWildcardLookahead() throws Exception {
+    @Test public void testWildcardLookahead() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -263,7 +268,7 @@ public class TestTreeParsing extends BaseTest {
         assertEquals("alt 1\n", found);
     }
 
-    public void testWildcardLookahead2() throws Exception {
+    @Test public void testWildcardLookahead2() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -287,7 +292,7 @@ public class TestTreeParsing extends BaseTest {
         assertEquals("alt 1\n", found);
     }
 
-    public void testWildcardLookahead3() throws Exception {
+    @Test public void testWildcardLookahead3() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
@@ -311,7 +316,7 @@ public class TestTreeParsing extends BaseTest {
         assertEquals("alt 1\n", found);
     }
 
-    public void testWildcardPlusLookahead() throws Exception {
+    @Test public void testWildcardPlusLookahead() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +

@@ -33,6 +33,10 @@ import org.antlr.grammar.v2.ANTLRParser;
 import org.antlr.grammar.v3.ActionTranslator;
 import org.antlr.tool.*;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class TestMessages extends BaseTest {
 
@@ -41,7 +45,7 @@ public class TestMessages extends BaseTest {
 	}
 
 
-	public void testMessageStringificationIsConsistent() throws Exception {
+	@Test public void testMessageStringificationIsConsistent() throws Exception {
 		String action = "$other.tree = null;";
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);

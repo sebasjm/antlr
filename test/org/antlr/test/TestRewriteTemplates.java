@@ -32,10 +32,15 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestRewriteTemplates extends BaseTest {
 	protected boolean debug = false;
 
-	public void testDelete() throws Exception {
+	@Test public void testDelete() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -48,7 +53,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("", found);
 	}
 
-	public void testAction() throws Exception {
+	@Test public void testAction() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -61,7 +66,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	public void testEmbeddedLiteralConstructor() throws Exception {
+	@Test public void testEmbeddedLiteralConstructor() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -74,7 +79,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("abc\n", found);
 	}
 
-	public void testInlineTemplate() throws Exception {
+	@Test public void testInlineTemplate() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -87,7 +92,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("x:abc, y:34;\n", found);
 	}
 
-	public void testNamedTemplate() throws Exception {
+	@Test public void testNamedTemplate() throws Exception {
 		// the support code adds template group in it's output Test.java
 		// that defines template foo.
 		String grammar =
@@ -102,7 +107,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testIndirectTemplate() throws Exception {
+	@Test public void testIndirectTemplate() throws Exception {
 		// the support code adds template group in it's output Test.java
 		// that defines template foo.
 		String grammar =
@@ -117,7 +122,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testInlineTemplateInvokingLib() throws Exception {
+	@Test public void testInlineTemplateInvokingLib() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -130,7 +135,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testPredicatedAlts() throws Exception {
+	@Test public void testPredicatedAlts() throws Exception {
 		// the support code adds template group in it's output Test.java
 		// that defines template foo.
 		String grammar =
@@ -147,7 +152,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("hi abc\n", found);
 	}
 
-	public void testTemplateReturn() throws Exception {
+	@Test public void testTemplateReturn() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -161,7 +166,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("abc 34\n", found);
 	}
 
-	public void testReturnValueWithTemplate() throws Exception {
+	@Test public void testReturnValueWithTemplate() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -175,7 +180,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("8\n", found);
 	}
 
-	public void testTemplateRefToDynamicAttributes() throws Exception {
+	@Test public void testTemplateRefToDynamicAttributes() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=template;}\n" +
@@ -193,7 +198,7 @@ public class TestRewriteTemplates extends BaseTest {
 
 	// tests for rewriting templates in tree parsers
 
-	public void testSingleNode() throws Exception {
+	@Test public void testSingleNode() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -213,7 +218,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("|abc|\n", found);
 	}
 
-	public void testSingleNodeRewriteMode() throws Exception {
+	@Test public void testSingleNodeRewriteMode() throws Exception {
 		String grammar =
 			"grammar T;\n" +
 			"options {output=AST;}\n" +
@@ -233,7 +238,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("|abc|\n", found);
 	}
 
-	public void testRewriteRuleAndRewriteModeOnSimpleElements() throws Exception {
+	@Test public void testRewriteRuleAndRewriteModeOnSimpleElements() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -254,7 +259,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.warnings.size());
 	}
 
-	public void testRewriteRuleAndRewriteModeIgnoreActionsPredicates() throws Exception {
+	@Test public void testRewriteRuleAndRewriteModeIgnoreActionsPredicates() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -276,7 +281,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.warnings.size());
 	}
 
-	public void testRewriteRuleAndRewriteModeNotSimple() throws Exception {
+	@Test public void testRewriteRuleAndRewriteModeNotSimple() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -295,7 +300,7 @@ public class TestRewriteTemplates extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 2, equeue.warnings.size());
 	}
 
-	public void testRewriteRuleAndRewriteModeRefRule() throws Exception {
+	@Test public void testRewriteRuleAndRewriteModeRefRule() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(

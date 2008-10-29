@@ -31,6 +31,11 @@ import org.antlr.runtime.tree.*;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestTrees extends BaseTest {
 	TreeAdaptor adaptor = new CommonTreeAdaptor();
 	protected boolean debug = false;
@@ -43,13 +48,13 @@ public class TestTrees extends BaseTest {
 		public String toString() { return (token!=null?token.getText():"")+"<V>";}
 	}
 
-	public void testSingleNode() throws Exception {
+	@Test public void testSingleNode() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(101));
 		assertNull(t.parent);
 		assertEquals(-1, t.childIndex);
 	}
 
-	public void testTwoChildrenOfNilRoot() throws Exception {
+	@Test public void testTwoChildrenOfNilRoot() throws Exception {
 		CommonTree root_0 = (CommonTree)adaptor.nil();
 		CommonTree t = new V(101, 2);
 		CommonTree u = new V(new CommonToken(102,"102"));
@@ -61,7 +66,7 @@ public class TestTrees extends BaseTest {
 		assertEquals(1, u.childIndex);
 	}
 
-	public void test4Nodes() throws Exception {
+	@Test public void test4Nodes() throws Exception {
 		// ^(101 ^(102 103) 104)
 		CommonTree r0 = new CommonTree(new CommonToken(101));
 		r0.addChild(new CommonTree(new CommonToken(102)));
@@ -72,7 +77,7 @@ public class TestTrees extends BaseTest {
 		assertEquals(-1, r0.childIndex);
 	}
 
-	public void testList() throws Exception {
+	@Test public void testList() throws Exception {
 		// ^(nil 101 102 103)
 		CommonTree r0 = new CommonTree((Token)null);
 		CommonTree c0, c1, c2;
@@ -90,7 +95,7 @@ public class TestTrees extends BaseTest {
 		assertEquals(2, c2.childIndex);
 	}
 
-	public void testList2() throws Exception {
+	@Test public void testList2() throws Exception {
 		// Add child ^(nil 101 102 103) to root 5
 		// should pull 101 102 103 directly to become 5's child list
 		CommonTree root = new CommonTree(new CommonToken(5));
@@ -115,7 +120,7 @@ public class TestTrees extends BaseTest {
 		assertEquals(2, c2.childIndex);
 	}
 
-	public void testAddListToExistChildren() throws Exception {
+	@Test public void testAddListToExistChildren() throws Exception {
 		// Add child ^(nil 101 102 103) to root ^(5 6)
 		// should add 101 102 103 to end of 5's child list
 		CommonTree root = new CommonTree(new CommonToken(5));
@@ -141,7 +146,7 @@ public class TestTrees extends BaseTest {
 		assertEquals(3, c2.childIndex);
 	}
 
-	public void testDupTree() throws Exception {
+	@Test public void testDupTree() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		CommonTree r0 = new CommonTree(new CommonToken(101));
 		CommonTree r1 = new CommonTree(new CommonToken(102));
@@ -160,7 +165,7 @@ public class TestTrees extends BaseTest {
 		dup.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testBecomeRoot() throws Exception {
+	@Test public void testBecomeRoot() throws Exception {
 		// 5 becomes new root of ^(nil 101 102 103)
 		CommonTree newRoot = new CommonTree(new CommonToken(5));
 
@@ -174,7 +179,7 @@ public class TestTrees extends BaseTest {
 		newRoot.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testBecomeRoot2() throws Exception {
+	@Test public void testBecomeRoot2() throws Exception {
 		// 5 becomes new root of ^(101 102 103)
 		CommonTree newRoot = new CommonTree(new CommonToken(5));
 
@@ -187,7 +192,7 @@ public class TestTrees extends BaseTest {
 		newRoot.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testBecomeRoot3() throws Exception {
+	@Test public void testBecomeRoot3() throws Exception {
 		// ^(nil 5) becomes new root of ^(nil 101 102 103)
 		CommonTree newRoot = new CommonTree((Token)null);
 		newRoot.addChild(new CommonTree(new CommonToken(5)));
@@ -202,7 +207,7 @@ public class TestTrees extends BaseTest {
 		newRoot.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testBecomeRoot5() throws Exception {
+	@Test public void testBecomeRoot5() throws Exception {
 		// ^(nil 5) becomes new root of ^(101 102 103)
 		CommonTree newRoot = new CommonTree((Token)null);
 		newRoot.addChild(new CommonTree(new CommonToken(5)));
@@ -216,7 +221,7 @@ public class TestTrees extends BaseTest {
 		newRoot.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testBecomeRoot6() throws Exception {
+	@Test public void testBecomeRoot6() throws Exception {
 		// emulates construction of ^(5 6)
 		CommonTree root_0 = (CommonTree)adaptor.nil();
 		CommonTree root_1 = (CommonTree)adaptor.nil();
@@ -231,7 +236,7 @@ public class TestTrees extends BaseTest {
 
 	// Test replaceChildren
 
-	public void testReplaceWithNoChildren() throws Exception {
+	@Test public void testReplaceWithNoChildren() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(101));
 		CommonTree newChild = new CommonTree(new CommonToken(5));
 		boolean error = false;
@@ -244,7 +249,7 @@ public class TestTrees extends BaseTest {
 		assertTrue(error);
 	}
 
-	public void testReplaceWithOneChildren() throws Exception {
+	@Test public void testReplaceWithOneChildren() throws Exception {
 		// assume token type 99 and use text
 		CommonTree t = new CommonTree(new CommonToken(99,"a"));
 		CommonTree c0 = new CommonTree(new CommonToken(99, "b"));
@@ -257,7 +262,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceInMiddle() throws Exception {
+	@Test public void testReplaceInMiddle() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c"))); // index 1
@@ -270,7 +275,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceAtLeft() throws Exception {
+	@Test public void testReplaceAtLeft() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b"))); // index 0
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -283,7 +288,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceAtRight() throws Exception {
+	@Test public void testReplaceAtRight() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -296,7 +301,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceOneWithTwoAtLeft() throws Exception {
+	@Test public void testReplaceOneWithTwoAtLeft() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -312,7 +317,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceOneWithTwoAtRight() throws Exception {
+	@Test public void testReplaceOneWithTwoAtRight() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -328,7 +333,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceOneWithTwoInMiddle() throws Exception {
+	@Test public void testReplaceOneWithTwoInMiddle() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -344,7 +349,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceTwoWithOneAtLeft() throws Exception {
+	@Test public void testReplaceTwoWithOneAtLeft() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -358,7 +363,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceTwoWithOneAtRight() throws Exception {
+	@Test public void testReplaceTwoWithOneAtRight() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -372,7 +377,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceAllWithOne() throws Exception {
+	@Test public void testReplaceAllWithOne() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));
@@ -386,7 +391,7 @@ public class TestTrees extends BaseTest {
 		t.sanityCheckParentAndChildIndexes();
 	}
 
-	public void testReplaceAllWithTwo() throws Exception {
+	@Test public void testReplaceAllWithTwo() throws Exception {
 		CommonTree t = new CommonTree(new CommonToken(99, "a"));
 		t.addChild(new CommonTree(new CommonToken(99, "b")));
 		t.addChild(new CommonTree(new CommonToken(99, "c")));

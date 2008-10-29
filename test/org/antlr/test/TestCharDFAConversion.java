@@ -32,6 +32,11 @@ import org.antlr.analysis.DFAOptimizer;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.tool.*;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 public class TestCharDFAConversion extends BaseTest {
@@ -42,7 +47,7 @@ public class TestCharDFAConversion extends BaseTest {
 
 	// R A N G E S  &  S E T S
 
-	public void testSimpleRangeVersusChar() throws Exception {
+	@Test public void testSimpleRangeVersusChar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a'..'z' '@' | 'k' '$' ;");
@@ -55,7 +60,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testRangeWithDisjointSet() throws Exception {
+	@Test public void testRangeWithDisjointSet() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a'..'z' '@'\n" +
@@ -72,7 +77,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testDisjointSetCollidingWithTwoRanges() throws Exception {
+	@Test public void testDisjointSetCollidingWithTwoRanges() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : ('a'..'z'|'0'..'9') '@'\n" +
@@ -89,7 +94,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testDisjointSetCollidingWithTwoRangesCharsFirst() throws Exception {
+	@Test public void testDisjointSetCollidingWithTwoRangesCharsFirst() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : ('k'|'9'|'p') '$'\n" +
@@ -105,7 +110,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testDisjointSetCollidingWithTwoRangesAsSeparateAlts() throws Exception {
+	@Test public void testDisjointSetCollidingWithTwoRangesAsSeparateAlts() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a'..'z' '@'\n" +
@@ -131,7 +136,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testKeywordVersusID() throws Exception {
+	@Test public void testKeywordVersusID() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"IF : 'if' ;\n" + // choose this over ID
@@ -150,7 +155,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null);
 	}
 
-	public void testIdenticalRules() throws Exception {
+	@Test public void testIdenticalRules() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'a' ;\n" +
@@ -174,7 +179,7 @@ public class TestCharDFAConversion extends BaseTest {
 
 	}
 
-	public void testAdjacentNotCharLoops() throws Exception {
+	@Test public void testAdjacentNotCharLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : (~'r')+ ;\n" +
@@ -189,7 +194,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 3, expecting, null);
 	}
 
-	public void testNonAdjacentNotCharLoops() throws Exception {
+	@Test public void testNonAdjacentNotCharLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : (~'r')+ ;\n" +
@@ -204,7 +209,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 3, expecting, null);
 	}
 
-	public void testLoopsWithOptimizedOutExitBranches() throws Exception {
+	@Test public void testLoopsWithOptimizedOutExitBranches() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"A : 'x'* ~'x'+ ;\n");
@@ -227,7 +232,7 @@ public class TestCharDFAConversion extends BaseTest {
 
 	// N O N G R E E D Y
 
-	public void testNonGreedy() throws Exception {
+	@Test public void testNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"CMT : '/*' ( options {greedy=false;} : . )* '*/' ;");
@@ -239,7 +244,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonGreedyWildcardStar() throws Exception {
+	@Test public void testNonGreedyWildcardStar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"SLCMT : '//' ( options {greedy=false;} : . )* '\n' ;");
@@ -249,7 +254,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonGreedyByDefaultWildcardStar() throws Exception {
+	@Test public void testNonGreedyByDefaultWildcardStar() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"SLCMT : '//' .* '\n' ;");
@@ -259,7 +264,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonGreedyWildcardPlus() throws Exception {
+	@Test public void testNonGreedyWildcardPlus() throws Exception {
 		// same DFA as nongreedy .* but code gen checks number of
 		// iterations at runtime
 		Grammar g = new Grammar(
@@ -271,7 +276,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonGreedyByDefaultWildcardPlus() throws Exception {
+	@Test public void testNonGreedyByDefaultWildcardPlus() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"SLCMT : '//' .+ '\n' ;");
@@ -281,7 +286,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonGreedyByDefaultWildcardPlusWithParens() throws Exception {
+	@Test public void testNonGreedyByDefaultWildcardPlusWithParens() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"SLCMT : '//' (.)+ '\n' ;");
@@ -291,7 +296,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonWildcardNonGreedy() throws Exception {
+	@Test public void testNonWildcardNonGreedy() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"DUH : (options {greedy=false;}:'x'|'y')* 'xy' ;");
@@ -303,7 +308,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonWildcardEOTMakesItWorkWithoutNonGreedyOption() throws Exception {
+	@Test public void testNonWildcardEOTMakesItWorkWithoutNonGreedyOption() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"DUH : ('x'|'y')* 'xy' ;");
@@ -317,7 +322,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testAltConflictsWithLoopThenExit() throws Exception {
+	@Test public void testAltConflictsWithLoopThenExit() throws Exception {
 		// \" predicts alt 1, but wildcard then " can predict exit also
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
@@ -332,7 +337,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNonGreedyLoopThatNeverLoops() throws Exception {
+	@Test public void testNonGreedyLoopThatNeverLoops() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar t;\n"+
 			"DUH : (options {greedy=false;}:'x')+ ;"); // loop never matched
@@ -353,7 +358,7 @@ public class TestCharDFAConversion extends BaseTest {
 		assertEquals("[1]", u.alts.toString());
 	}
 
-	public void testRecursive() throws Exception {
+	@Test public void testRecursive() throws Exception {
 		// this is cool because the 3rd alt includes !(all other possibilities)
 		Grammar g = new Grammar(
 			"lexer grammar duh;\n" +
@@ -376,7 +381,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testRecursive2() throws Exception {
+	@Test public void testRecursive2() throws Exception {
 		// this is also cool because it resolves \\ to be ESC alt; it's just
 		// less efficient of a DFA
 		Grammar g = new Grammar(
@@ -406,7 +411,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNotFragmentInLexer() throws Exception {
+	@Test public void testNotFragmentInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+
 			"A : 'a' | ~B {;} ;\n" +
@@ -418,7 +423,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNotSetFragmentInLexer() throws Exception {
+	@Test public void testNotSetFragmentInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+
 			"A : B | ~B {;} ;\n" +
@@ -430,7 +435,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNotTokenInLexer() throws Exception {
+	@Test public void testNotTokenInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+
 			"A : 'x' ('a' | ~B {;}) ;\n" +
@@ -442,7 +447,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNotComplicatedSetRuleInLexer() throws Exception {
+	@Test public void testNotComplicatedSetRuleInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+
 			"A : B | ~B {;} ;\n" +
@@ -454,7 +459,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testNotSetWithRuleInLexer() throws Exception {
+	@Test public void testNotSetWithRuleInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+
 			"T : ~('a' | B) | 'a';\n" +
@@ -469,7 +474,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testSetCallsRuleWithNot() throws Exception {
+	@Test public void testSetCallsRuleWithNot() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar A;\n" +
 			"T : ~'x' ;\n" +
@@ -480,7 +485,7 @@ public class TestCharDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null);
 	}
 
-	public void testSynPredInLexer() throws Exception {
+	@Test public void testSynPredInLexer() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar T;\n"+
 			"LT:  '<' ' '*\n" +

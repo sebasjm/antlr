@@ -33,6 +33,11 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.tool.*;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.util.*;
 
 public class TestSymbolDefinitions extends BaseTest {
@@ -41,7 +46,7 @@ public class TestSymbolDefinitions extends BaseTest {
 	public TestSymbolDefinitions() {
 	}
 
-	public void testParserSimpleTokens() throws Exception {
+	@Test public void testParserSimpleTokens() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
 				"a : A | B;\n" +
@@ -51,7 +56,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testParserTokensSection() throws Exception {
+	@Test public void testParserTokensSection() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar t;\n" +
 				"tokens {\n" +
@@ -65,7 +70,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testLexerTokensSection() throws Exception {
+	@Test public void testLexerTokensSection() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n" +
 				"tokens {\n" +
@@ -79,7 +84,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testTokensSectionWithAssignmentSection() throws Exception {
+	@Test public void testTokensSectionWithAssignmentSection() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n" +
 				"tokens {\n" +
@@ -93,7 +98,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testCombinedGrammarLiterals() throws Exception {
+	@Test public void testCombinedGrammarLiterals() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : 'begin' b 'end';\n" +
@@ -106,7 +111,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testLiteralInParserAndLexer() throws Exception {
+	@Test public void testLiteralInParserAndLexer() throws Exception {
 		// 'x' is token and char in lexer rule
 		Grammar g = new Grammar(
 				"grammar t;\n" +
@@ -126,7 +131,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		assertEquals(implicitLexer, g.getLexerGrammar());
 	}
 
-	public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
+	@Test public void testCombinedGrammarWithRefToLiteralButNoTokenIDRef() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : 'a' ;\n" +
@@ -136,7 +141,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testSetDoesNotMissTokenAliases() throws Exception {
+	@Test public void testSetDoesNotMissTokenAliases() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : 'a'|'b' ;\n" +
@@ -147,7 +152,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkSymbols(g, rules, tokenNames);
 	}
 
-	public void testSimplePlusEqualLabel() throws Exception {
+	@Test public void testSimplePlusEqualLabel() throws Exception {
 		Grammar g = new Grammar(
 				"parser grammar t;\n"+
 				"a : ids+=ID ( COMMA ids+=ID )* ;\n");
@@ -157,7 +162,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkPlusEqualsLabels(g, rule, tokenLabels, ruleLabels);
 	}
 
-	public void testMixedPlusEqualLabel() throws Exception {
+	@Test public void testMixedPlusEqualLabel() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"options {output=AST;}\n" +
@@ -172,7 +177,7 @@ public class TestSymbolDefinitions extends BaseTest {
 
 	// T E S T  L I T E R A L  E S C A P E S
 
-	public void testParserCharLiteralWithEscape() throws Exception {
+	@Test public void testParserCharLiteralWithEscape() throws Exception {
 		Grammar g = new Grammar(
 				"grammar t;\n"+
 				"a : '\\n';\n");
@@ -181,7 +186,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		assertEquals("'\\n'", literals.toArray()[0]);
 	}
 
-	public void testTokenInTokensSectionAndTokenRuleDef() throws Exception {
+	@Test public void testTokenInTokensSectionAndTokenRuleDef() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -196,7 +201,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		assertEquals("a}\n", found);
 	}
 
-	public void testTokenInTokensSectionAndTokenRuleDef2() throws Exception {
+	@Test public void testTokenInTokensSectionAndTokenRuleDef2() throws Exception {
 		// this must return A not I to the parser; calling a nonfragment rule
 		// from a nonfragment rule does not set the overall token.
 		String grammar =
@@ -212,7 +217,7 @@ public class TestSymbolDefinitions extends BaseTest {
 	}
 
 
-	public void testRefToRuleWithNoReturnValue() throws Exception {
+	@Test public void testRefToRuleWithNoReturnValue() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 
@@ -235,7 +240,7 @@ public class TestSymbolDefinitions extends BaseTest {
 
 	// T E S T  E R R O R S
 
-	public void testParserStringLiterals() throws Exception {
+	@Test public void testParserStringLiterals() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -249,7 +254,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testParserCharLiterals() throws Exception {
+	@Test public void testParserCharLiterals() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -263,7 +268,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testEmptyNotChar() throws Exception {
+	@Test public void testEmptyNotChar() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -277,7 +282,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testEmptyNotToken() throws Exception {
+	@Test public void testEmptyNotToken() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -291,7 +296,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testEmptyNotSet() throws Exception {
+	@Test public void testEmptyNotSet() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		Grammar g = new Grammar(
@@ -305,7 +310,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testStringLiteralInParserTokensSection() throws Exception {
+	@Test public void testStringLiteralInParserTokensSection() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -322,7 +327,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testCharLiteralInParserTokensSection() throws Exception {
+	@Test public void testCharLiteralInParserTokensSection() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -339,7 +344,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testCharLiteralInLexerTokensSection() throws Exception {
+	@Test public void testCharLiteralInLexerTokensSection() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -355,7 +360,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testRuleRedefinition() throws Exception {
+	@Test public void testRuleRedefinition() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -370,7 +375,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLexerRuleRedefinition() throws Exception {
+	@Test public void testLexerRuleRedefinition() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -385,7 +390,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testCombinedRuleRedefinition() throws Exception {
+	@Test public void testCombinedRuleRedefinition() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -401,7 +406,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testUndefinedToken() throws Exception {
+	@Test public void testUndefinedToken() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -415,7 +420,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsWarning(equeue, expectedMessage);
 	}
 
-	public void testUndefinedTokenOkInParser() throws Exception {
+	@Test public void testUndefinedTokenOkInParser() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -424,7 +429,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		assertEquals("should not be an error", 0, equeue.errors.size());
 	}
 
-	public void testUndefinedRule() throws Exception {
+	@Test public void testUndefinedRule() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -438,7 +443,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLexerRuleInParser() throws Exception {
+	@Test public void testLexerRuleInParser() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -452,7 +457,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testParserRuleInLexer() throws Exception {
+	@Test public void testParserRuleInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -466,7 +471,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testRuleScopeConflict() throws Exception {
+	@Test public void testRuleScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -484,7 +489,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testTokenRuleScopeConflict() throws Exception {
+	@Test public void testTokenRuleScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -502,7 +507,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testTokenScopeConflict() throws Exception {
+	@Test public void testTokenScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -521,7 +526,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testTokenRuleScopeConflictInLexerGrammar() throws Exception {
+	@Test public void testTokenRuleScopeConflictInLexerGrammar() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -539,7 +544,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testTokenLabelScopeConflict() throws Exception {
+	@Test public void testTokenLabelScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -557,7 +562,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testRuleLabelScopeConflict() throws Exception {
+	@Test public void testRuleLabelScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -576,7 +581,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLabelAndRuleNameConflict() throws Exception {
+	@Test public void testLabelAndRuleNameConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -593,7 +598,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLabelAndTokenNameConflict() throws Exception {
+	@Test public void testLabelAndTokenNameConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -610,7 +615,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLabelAndArgConflict() throws Exception {
+	@Test public void testLabelAndArgConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -625,7 +630,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLabelAndParameterConflict() throws Exception {
+	@Test public void testLabelAndParameterConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -640,7 +645,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testLabelRuleScopeConflict() throws Exception {
+	@Test public void testLabelRuleScopeConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -660,7 +665,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testRuleScopeArgConflict() throws Exception {
+	@Test public void testRuleScopeArgConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -680,7 +685,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testRuleScopeReturnValueConflict() throws Exception {
+	@Test public void testRuleScopeReturnValueConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -700,7 +705,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testRuleScopeRuleNameConflict() throws Exception {
+	@Test public void testRuleScopeRuleNameConflict() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -720,7 +725,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testBadGrammarOption() throws Exception {
+	@Test public void testBadGrammarOption() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Tool antlr = newTool();
@@ -736,7 +741,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testBadRuleOption() throws Exception {
+	@Test public void testBadRuleOption() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -752,7 +757,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testBadSubRuleOption() throws Exception {
+	@Test public void testBadSubRuleOption() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue); // unique listener per thread
 		Grammar g = new Grammar(
@@ -769,7 +774,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		checkGrammarSemanticsError(equeue, expectedMessage);
 	}
 
-	public void testTokenVocabStringUsedInLexer() throws Exception {
+	@Test public void testTokenVocabStringUsedInLexer() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String tokens =
@@ -801,7 +806,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
-	public void testTokenVocabStringUsedInCombined() throws Exception {
+	@Test public void testTokenVocabStringUsedInCombined() throws Exception {
 		ErrorQueue equeue = new ErrorQueue();
 		ErrorManager.setErrorListener(equeue);
 		String tokens =

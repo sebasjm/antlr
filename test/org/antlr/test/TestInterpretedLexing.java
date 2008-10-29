@@ -31,6 +31,11 @@ import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 import org.antlr.runtime.*;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestInterpretedLexing extends BaseTest {
 
 	/*
@@ -72,7 +77,7 @@ public class TestInterpretedLexing extends BaseTest {
     public TestInterpretedLexing() {
     }
 
-	public void testSimpleAltCharTest() throws Exception {
+	@Test public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : 'a' | 'b' | 'c';");
@@ -86,7 +91,7 @@ public class TestInterpretedLexing extends BaseTest {
 		assertEquals(result.getType(), Atype);
     }
 
-    public void testSingleRuleRef() throws Exception {
+    @Test public void testSingleRuleRef() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : 'a' B 'c' ;\n" +
@@ -97,7 +102,7 @@ public class TestInterpretedLexing extends BaseTest {
 		assertEquals(result.getType(), Atype);
     }
 
-    public void testSimpleLoop() throws Exception {
+    @Test public void testSimpleLoop() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "INT : (DIGIT)+ ;\n"+
@@ -111,7 +116,7 @@ public class TestInterpretedLexing extends BaseTest {
 		assertEquals(result.getType(), INTtype);
     }
 
-    public void testMultAltLoop() throws Exception {
+    @Test public void testMultAltLoop() throws Exception {
 		Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : ('0'..'9'|'a'|'b')+ ;\n");
@@ -138,7 +143,7 @@ public class TestInterpretedLexing extends BaseTest {
 		assertEquals(result.getType(), Atype);
     }
 
-	public void testSimpleLoops() throws Exception {
+	@Test public void testSimpleLoops() throws Exception {
 		Grammar g = new Grammar(
 				"lexer grammar t;\n"+
 				"A : ('0'..'9')+ '.' ('0'..'9')* | ('0'..'9')+ ;\n");
@@ -149,7 +154,7 @@ public class TestInterpretedLexing extends BaseTest {
 		assertEquals(result.getType(), Atype);
 	}
 
-	public void testTokensRules() throws Exception {
+	@Test public void testTokensRules() throws Exception {
 		Grammar pg = new Grammar(
 			"grammar p;\n"+
 			"a : (INT|FLOAT|WS)+;\n");

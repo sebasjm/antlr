@@ -31,6 +31,11 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.*;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /** Test the tree node stream. */
 public class TestTreeNodeStream extends BaseTest {
 
@@ -39,7 +44,7 @@ public class TestTreeNodeStream extends BaseTest {
 		return new CommonTreeNodeStream(t);
 	}
 
-	public void testSingleNode() throws Exception {
+	@Test public void testSingleNode() throws Exception {
 		Tree t = new CommonTree(new CommonToken(101));
 
 		TreeNodeStream stream = newStream(t);
@@ -52,7 +57,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void test4Nodes() throws Exception {
+	@Test public void test4Nodes() throws Exception {
 		// ^(101 ^(102 103) 104)
 		Tree t = new CommonTree(new CommonToken(101));
 		t.addChild(new CommonTree(new CommonToken(102)));
@@ -69,7 +74,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testList() throws Exception {
+	@Test public void testList() throws Exception {
 		Tree root = new CommonTree((Token)null);
 
 		Tree t = new CommonTree(new CommonToken(101));
@@ -92,7 +97,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testFlatList() throws Exception {
+	@Test public void testFlatList() throws Exception {
 		Tree root = new CommonTree((Token)null);
 
 		root.addChild(new CommonTree(new CommonToken(101)));
@@ -109,7 +114,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testListWithOneNode() throws Exception {
+	@Test public void testListWithOneNode() throws Exception {
 		Tree root = new CommonTree((Token)null);
 
 		root.addChild(new CommonTree(new CommonToken(101)));
@@ -124,7 +129,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testAoverB() throws Exception {
+	@Test public void testAoverB() throws Exception {
 		Tree t = new CommonTree(new CommonToken(101));
 		t.addChild(new CommonTree(new CommonToken(102)));
 
@@ -138,7 +143,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	public void testLT() throws Exception {
+	@Test public void testLT() throws Exception {
 		// ^(101 ^(102 103) 104)
 		Tree t = new CommonTree(new CommonToken(101));
 		t.addChild(new CommonTree(new CommonToken(102)));
@@ -159,7 +164,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(Token.EOF, ((Tree)stream.LT(100)).getType());
 	}
 
-	public void testMarkRewindEntire() throws Exception {
+	@Test public void testMarkRewindEntire() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		// stream has 7 real + 6 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
@@ -192,7 +197,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(Token.UP, ((Tree)stream.LT(-1)).getType());
 	}
 
-	public void testMarkRewindInMiddle() throws Exception {
+	@Test public void testMarkRewindInMiddle() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		// stream has 7 real + 6 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
@@ -236,7 +241,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(Token.UP, ((Tree)stream.LT(-1)).getType());
 	}
 
-	public void testMarkRewindNested() throws Exception {
+	@Test public void testMarkRewindNested() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		// stream has 7 real + 6 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
@@ -275,7 +280,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(Token.DOWN, ((Tree)stream.LT(1)).getType());
 	}
 
-	public void testSeek() throws Exception {
+	@Test public void testSeek() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		// stream has 7 real + 6 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
@@ -301,7 +306,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(104, ((Tree)stream.LT(1)).getType());
 	}
 
-	public void testSeekFromStart() throws Exception {
+	@Test public void testSeekFromStart() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		// stream has 7 real + 6 nav nodes
 		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF

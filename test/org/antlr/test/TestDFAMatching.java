@@ -32,13 +32,18 @@ import org.antlr.analysis.NFA;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.tool.Grammar;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class TestDFAMatching extends BaseTest {
 
     /** Public default constructor used by TestRig */
     public TestDFAMatching() {
     }
 
-    public void testSimpleAltCharTest() throws Exception {
+    @Test public void testSimpleAltCharTest() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : {;}'a' | 'b' | 'c';");
@@ -51,7 +56,7 @@ public class TestDFAMatching extends BaseTest {
         checkPrediction(dfa,"d", NFA.INVALID_ALT_NUMBER);
     }
 
-    public void testSets() throws Exception {
+    @Test public void testSets() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : {;}'a'..'z' | ';' | '0'..'9' ;");
@@ -65,7 +70,7 @@ public class TestDFAMatching extends BaseTest {
         checkPrediction(dfa,"9",3);
     }
 
-    public void testFiniteCommonLeftPrefixes() throws Exception {
+    @Test public void testFiniteCommonLeftPrefixes() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : 'a' 'b' | 'a' 'c' | 'd' 'e' ;");
@@ -78,7 +83,7 @@ public class TestDFAMatching extends BaseTest {
         checkPrediction(dfa,"q", NFA.INVALID_ALT_NUMBER);
     }
 
-    public void testSimpleLoops() throws Exception {
+    @Test public void testSimpleLoops() throws Exception {
         Grammar g = new Grammar(
                 "lexer grammar t;\n"+
                 "A : (DIGIT)+ '.' DIGIT | (DIGIT)+ ;\n" +
