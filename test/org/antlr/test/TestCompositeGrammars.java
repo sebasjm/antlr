@@ -342,12 +342,12 @@ public class TestCompositeGrammars extends BaseTest {
 		g.composite.assignTokenTypes();
 
 		String expectedTokenIDToTypeMap = "[A=4, T__6=6, WS=5]";
-		String expectedStringLiteralToTypeMap = "{'x'=6, 'a'=4}";
+		String expectedStringLiteralToTypeMap = "{'a'=4, 'x'=6}";
 		String expectedTypeToTokenList = "[A, WS, T__6]";
 
 		assertEquals(expectedTokenIDToTypeMap,
 					 realElements(g.composite.tokenIDToTypeMap).toString());
-		assertEquals(expectedStringLiteralToTypeMap, g.composite.stringLiteralToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, sortMapToString(g.composite.stringLiteralToTypeMap));
 		assertEquals(expectedTypeToTokenList,
 					 realElements(g.composite.typeToTokenList).toString());
 

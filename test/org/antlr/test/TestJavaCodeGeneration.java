@@ -116,10 +116,10 @@ public class TestJavaCodeGeneration extends BaseTest {
 	@Test public void testDoubleQuoteEscape() {
 		String grammar =
 			"lexer grammar T; \n" +
-			"A : '\\\\\"';\n"; // this is A : '\\"';
+			"A : '\\\\\\\"';\n"; // this is A : '\\"', which shoudl give "\\\"" at JAva level;
 		boolean found =
 			rawGenerateAndBuildRecognizer(
-				"T.g", grammar, null, "TLexer", false);
+				"T.g", grammar, null, "T", false);
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}

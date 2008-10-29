@@ -53,7 +53,7 @@ public abstract class BaseTest {
     * classpath for the test environment into the following property. We need to pick this up
     * for the junit tests that are going to generate and try to run code.
     */
-    public static final String SUREFIRE_CLASSPATH = System.getProperty("surefire.test.class.path");
+    public static final String SUREFIRE_CLASSPATH = System.getProperty("surefire.test.class.path", "");
 
     /**
      * Build up the full classpath we need, including the surefire path (if present)
@@ -67,7 +67,6 @@ public abstract class BaseTest {
 
     @Before
 	public void setUp() throws Exception {
-        ErrorManager fred = new ErrorManager();
 		ErrorManager.resetErrorState();
 	}
 
@@ -109,7 +108,7 @@ public abstract class BaseTest {
 			stderr.start();
 			process.waitFor();
 			if ( stdout.toString().length()>0 ) {
-				System.err.println("compile stderr from: "+cmdLine);
+				System.err.println("compile stdout from: "+cmdLine);
 				System.err.println(stdout);
 			}
 			if ( stderr.toString().length()>0 ) {
