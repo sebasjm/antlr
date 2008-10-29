@@ -43,6 +43,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.*;
 
+
 public abstract class BaseTest {
 
 	public static final String jikes = null;//"/usr/bin/jikes";
