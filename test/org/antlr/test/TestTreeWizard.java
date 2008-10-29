@@ -112,8 +112,8 @@ public class TestTreeWizard extends BaseTest {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C D)");
 		Map m = wiz.index(t);
-		String found = m.toString();
-		String expecting = "{8=[D], 6=[B], 7=[C], 5=[A]}";
+		String found = sortMapToString(m);
+        String expecting = "{5=[A], 6=[B], 7=[C], 8=[D]}";
 		assertEquals(expecting, found);
 	}
 
@@ -121,8 +121,8 @@ public class TestTreeWizard extends BaseTest {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B (A C B) B D D)");
 		Map m = wiz.index(t);
-		String found = m.toString();
-		String expecting = "{8=[D, D], 6=[B, B, B], 7=[C], 5=[A, A]}";
+		String found =  sortMapToString(m);
+        String expecting = "{5=[A, A], 6=[B, B, B], 7=[C], 8=[D, D]}";
 		assertEquals(expecting, found);
 	}
 

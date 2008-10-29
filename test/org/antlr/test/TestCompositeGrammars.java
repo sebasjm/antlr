@@ -325,7 +325,7 @@ public class TestCompositeGrammars extends BaseTest {
 			"parser grammar T;\n" +
 			"tokens { A='x'; }\n" +
 			"y : A {System.out.println(\"T.y\");} ;\n";
-		mkdir(tmpdir);
+		
 		writeFile(tmpdir, "T.g", slave2);
 
 		String master =

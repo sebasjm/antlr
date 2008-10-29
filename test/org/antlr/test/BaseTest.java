@@ -38,8 +38,6 @@ import org.antlr.tool.ANTLRErrorListener;
 
 
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -69,6 +67,7 @@ public abstract class BaseTest {
 
     @Before
 	public void setUp() throws Exception {
+        ErrorManager fred = new ErrorManager();
 		ErrorManager.resetErrorState();
 	}
 
@@ -782,4 +781,31 @@ public abstract class BaseTest {
 		return n;
 	}
 
+    /**
+     * When looking at a result set that consists of a Map/HashTable
+     * we cannot rely on the output order, as the hashing algorithm or other aspects
+     * of the implementation may be different on differnt JDKs or platforms. Hence
+     * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
+     * bit of a hack, but guarantees that we get the same order on all systems. We assume that
+     * the keys are strings.
+     * 
+     * @param m The Map that contains keys we wish to return in sorted order
+     * @return A string that represents all the keys in sorted order.
+     */
+    public String sortMapToString(Map m) {
+        
+        System.out.println("Map toString looks like: " + m.toString());
+        // Pass in crap, and get nothing back
+        //
+        if  (m == null) {
+            return null;
+        }
+        
+        // Sort the keys in the Map
+        //
+        TreeMap nset = new TreeMap(m);
+        
+        System.out.println("Tree map looks like: " + nset.toString());
+        return nset.toString();
+    }
 }

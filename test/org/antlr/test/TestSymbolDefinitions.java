@@ -811,6 +811,7 @@ public class TestSymbolDefinitions extends BaseTest {
 		ErrorManager.setErrorListener(equeue);
 		String tokens =
 			"';'=4\n";
+        mkdir(tmpdir);
 		writeFile(tmpdir, "T.tokens", tokens);
 
 		String importer =
