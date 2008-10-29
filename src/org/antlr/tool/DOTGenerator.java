@@ -35,6 +35,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 
 import java.util.*;
+import org.antlr.grammar.v2.ANTLRParser;
 
 /** The DOT (part of graphviz) generation aspect. */
 public class DOTGenerator {

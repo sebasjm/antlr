@@ -29,7 +29,7 @@ package org.antlr.analysis;
 
 import org.antlr.misc.IntervalSet;
 import org.antlr.misc.MultiMap;
-import org.antlr.tool.ANTLRParser;
+import org.antlr.grammar.v2.ANTLRParser;
 
 import java.util.Iterator;
 import java.util.List;

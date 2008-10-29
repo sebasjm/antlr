@@ -28,7 +28,7 @@
 package org.antlr.test;
 
 import org.antlr.Tool;
-import org.antlr.codegen.ActionTranslator;
+import org.antlr.grammar.v3.ActionTranslator;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -38,6 +38,7 @@ import org.antlr.tool.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.antlr.grammar.v2.ANTLRParser;
 
 /** Check the $x, $x.y attributes.  For checking the actual
  *  translation, assume the Java target.  This is still a great test

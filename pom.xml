@@ -56,7 +56,12 @@
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>test</testSourceDirectory>
         <testResources>
-            <testResource><directory>src</directory></testResource>
+            <testResource>
+                <directory>src</directory>
+            </testResource>
+            <testResource>
+                <directory>test</directory>
+            </testResource>
         </testResources>
          <defaultGoal>install</defaultGoal>
         <plugins>
@@ -99,12 +104,7 @@
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
-                    <sourceDirectory>src</sourceDirectory>
-                    <excludes>
-                        <exclude>**/test/*.java</exclude>
-                        <exclude>**/test/*.st</exclude>
-                    </excludes>
-                    
+                    <sourceDirectory>src</sourceDirectory>                  
                 </configuration>
             </plugin>
             

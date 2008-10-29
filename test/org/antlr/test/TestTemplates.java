@@ -33,7 +33,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.codegen.ActionTranslator;
+import org.antlr.grammar.v2.ANTLRParser;
+import org.antlr.grammar.v3.ActionTranslator;
 
 /** Test templates in actions; %... shorthands */
 public class TestTemplates extends BaseTest {

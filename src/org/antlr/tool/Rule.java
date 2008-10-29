@@ -33,6 +33,7 @@ import org.antlr.analysis.LookaheadSet;
 import org.antlr.codegen.CodeGenerator;
 
 import java.util.*;
+import org.antlr.grammar.v2.ANTLRParser;
 
 /** Combine the info associated with a rule. */
 public class Rule {

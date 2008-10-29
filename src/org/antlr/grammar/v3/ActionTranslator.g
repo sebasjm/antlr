@@ -37,6 +37,13 @@ package org.antlr.grammar.v3;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.runtime.*;
 import org.antlr.tool.*;
+import org.antlr.codegen.*;
+
+import org.antlr.runtime.*;
+import java.util.List;
+import java.util.ArrayList;
+import org.antlr.grammar.v2.ANTLRParser;
+
 }
 
 @members {

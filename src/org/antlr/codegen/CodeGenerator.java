@@ -27,6 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.codegen;
 
+
+import antlr.ANTLRLexer;
 import antlr.RecognitionException;
 import antlr.TokenStreamRewriteEngine;
 import antlr.collections.AST;
@@ -36,16 +38,18 @@ import org.antlr.misc.*;
 import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.*;
-import org.antlr.grammar.v2.*;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.antlr.grammar.v2.*;
 import org.antlr.grammar.v3.ActionTranslator;
-import org.antlr.misc.BitSet;
-import org.antlr.tool.ANTLRLexer;
-import org.antlr.tool.ANTLRParser;
 
 /** ANTLR's code generator.
  *
@@ -525,7 +529,7 @@ public class CodeGenerator {
 	}
 
 	/** Use for translating rule @init{...} actions that have no scope */
-	protected void translateActionAttributeReferencesForSingleScope(
+	public void translateActionAttributeReferencesForSingleScope(
 		Rule r,
 		Map scopeActions)
 	{

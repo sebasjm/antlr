@@ -797,8 +797,8 @@ public class Grammar {
 		tokbuf.discard(ANTLRParser.COMMENT);
 		tokbuf.discard(ANTLRParser.SL_COMMENT);
 		ANTLRParser parser = new ANTLRParser(tokbuf);
-		parser.grammar = this;
-		parser.gtype = ANTLRParser.LEXER_GRAMMAR;
+		parser.setGrammar(this);
+		parser.setGtype(ANTLRParser.LEXER_GRAMMAR);
 		parser.setASTNodeClass("org.antlr.tool.GrammarAST");
 		try {
 			parser.rule();
@@ -1770,16 +1770,16 @@ outer:
 			List<GrammarAST> actions = r.getInlineActions();
 			for (int i = 0; i < actions.size(); i++) {
 				GrammarAST actionAST = (GrammarAST) actions.get(i);
-				ActionAnalysisLexer sniffer =
-					new ActionAnalysisLexer(this, r.name, actionAST);
+				ActionAnalysis sniffer =
+					new ActionAnalysis(this, r.name, actionAST);
 				sniffer.analyze();
 			}
 			// walk any named actions like @init, @after
 			Collection<GrammarAST> namedActions = r.getActions().values();
 			for (Iterator it2 = namedActions.iterator(); it2.hasNext();) {
 				GrammarAST actionAST = (GrammarAST) it2.next();
-				ActionAnalysisLexer sniffer =
-					new ActionAnalysisLexer(this, r.name, actionAST);
+				ActionAnalysis sniffer =
+					new ActionAnalysis(this, r.name, actionAST);
 				sniffer.analyze();
 			}
 		}

@@ -30,7 +30,7 @@ package org.antlr.analysis;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.GrammarAST;
-import org.antlr.tool.ANTLRParser;
+import org.antlr.grammar.v2.ANTLRParser;
 import org.antlr.misc.Utils;
 import org.antlr.misc.MultiMap;
 

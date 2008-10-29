@@ -30,7 +30,7 @@ package org.antlr.analysis;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.tool.ANTLRParser;
+import org.antlr.grammar.v2.ANTLRParser;
 import org.antlr.tool.GrammarAST;
 import org.antlr.tool.Grammar;
 import java.util.Set;

@@ -29,7 +29,8 @@ package org.antlr.test;
 
 import org.antlr.Tool;
 import org.antlr.codegen.CodeGenerator;
-import org.antlr.codegen.ActionTranslator;
+import org.antlr.grammar.v2.ANTLRParser;
+import org.antlr.grammar.v3.ActionTranslator;
 import org.antlr.tool.*;
 
 

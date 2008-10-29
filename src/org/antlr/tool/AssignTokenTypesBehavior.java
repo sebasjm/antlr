@@ -32,7 +32,7 @@ import org.antlr.misc.Utils;
 
 import java.util.*;
 
-import antlr.collections.impl.ASTArray;
+import org.antlr.grammar.v2.AssignTokenTypesWalker;
 
 /** Move all of the functionality from assign.types.g grammar file. */
 public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
@@ -49,6 +49,7 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 	 */
 	protected Set<String> tokenRuleDefs = new HashSet();
 
+    @Override
 	protected void init(Grammar g) {
 		this.grammar = g;
 		currentRuleName = null;
@@ -59,6 +60,7 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 	}
 
 	/** Track string literals (could be in tokens{} section) */
+    @Override
 	protected void trackString(GrammarAST t) {
 		// if lexer, don't allow aliasing in tokens section
 		if ( currentRuleName==null && grammar.type==Grammar.LEXER ) {
@@ -94,6 +96,7 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 		}
 	}
 
+    @Override
 	protected void trackToken(GrammarAST t) {
 		// imported token names might exist, only add if new
 		// Might have ';'=4 in vocab import and SEMI=';'. Avoid
@@ -105,6 +108,7 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 		}
 	}
 
+    @Override
 	protected void trackTokenRule(GrammarAST t,
 								  GrammarAST modifier,
 								  GrammarAST block)
@@ -150,6 +154,7 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 		// else error
 	}
 
+    @Override
 	protected void alias(GrammarAST t, GrammarAST s) {
 		String tokenID = t.getText();
 		String literal = s.getText();
@@ -193,7 +198,8 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 		aliasesReverseIndex.put(literal, tokenID);
 	}
 
-	protected void defineTokens(Grammar root) {
+    @Override
+	public void defineTokens(Grammar root) {
 /*
 	System.out.println("stringLiterals="+stringLiterals);
 	System.out.println("tokens="+tokens);
@@ -234,6 +240,7 @@ protected void defineStringLiteralsFromDelegates() {
 }
 */
 
+    @Override
 	protected void assignStringTypes(Grammar root) {
 		// walk string literals assigning types to unassigned ones
 		Set s = stringLiterals.keySet();
@@ -251,6 +258,7 @@ protected void defineStringLiteralsFromDelegates() {
 		}
 	}
 
+    @Override
 	protected void aliasTokenIDsAndLiterals(Grammar root) {
 		if ( root.type==Grammar.LEXER ) {
 			return; // strings/chars are never token types in LEXER
@@ -272,6 +280,7 @@ protected void defineStringLiteralsFromDelegates() {
 		}
 	}
 
+    @Override
 	protected void assignTokenIDTypes(Grammar root) {
 		// walk token names, assigning values if unassigned
 		Set s = tokens.keySet();
@@ -283,6 +292,7 @@ protected void defineStringLiteralsFromDelegates() {
 		}
 	}
 
+    @Override
 	protected void defineTokenNamesAndLiteralsInGrammar(Grammar root) {
 		Set s = tokens.keySet();
 		for (Iterator it = s.iterator(); it.hasNext();) {

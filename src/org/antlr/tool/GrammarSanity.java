@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Set;
+import org.antlr.grammar.v2.ANTLRParser;
 
 /** Factor out routines that check sanity of rules, alts, grammars, etc.. */
 public class GrammarSanity {
