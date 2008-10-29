@@ -50,6 +50,14 @@ public class NFAFactory {
      */
 	NFA nfa = null;
 
+    public Rule getCurrentRule() {
+        return currentRule;
+    }
+
+    public void setCurrentRule(Rule currentRule) {
+        this.currentRule = currentRule;
+    }
+
 	Rule currentRule = null;
 
 	public NFAFactory(NFA nfa) {

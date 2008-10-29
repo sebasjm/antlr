@@ -35,6 +35,7 @@ import org.antlr.analysis.DFA;
 import org.antlr.analysis.NFAState;
 import org.antlr.misc.IntSet;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.grammar.v2.ANTLRParser;
 
 import java.util.*;
 
@@ -125,7 +126,23 @@ public class GrammarAST extends BaseAST {
 	 *  a label if someone does $tokenref or $ruleref in an action.
 	 */
 	public StringTemplate code;
+    
+    /**
+     * 
+     * @return
+     */
+    public Map<String, Object> getBlockOptions() {
+        return blockOptions;
+    }
 
+    /**
+     * 
+     * @param blockOptions
+     */
+    public void setBlockOptions(Map<String, Object> blockOptions) {
+        this.blockOptions = blockOptions;
+    }
+        
 	public GrammarAST() {;}
 
 	public GrammarAST(int t, String txt) {

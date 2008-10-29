@@ -27,9 +27,17 @@
 */
 package org.antlr.tool;
 
+import antlr.RecognitionException;
+import antlr.Token;
+import antlr.TokenStreamException;
+import antlr.TokenStreamRewriteEngine;
+import antlr.TokenWithIndex;
+import org.antlr.grammar.v2.*;
+import org.antlr.grammar.v3.*;
+
 import org.antlr.misc.*;
 import org.antlr.misc.Utils;
-import antlr.*;
+
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;

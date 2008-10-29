@@ -26,10 +26,11 @@ header {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.tool;
+package org.antlr.grammar.v2;
 import java.util.*;
 import org.antlr.analysis.*;
 import org.antlr.misc.*;
+import org.antlr.tool.*;
 }
 
 /** Build an NFA from a tree representing an ANTLR grammar. */
@@ -169,7 +170,7 @@ rule
     :   #( RULE id:ID {r=#id.getText();}
 		{
         currentRuleName = r;
-        factory.currentRule = grammar.getLocallyDefinedRule(r);
+        factory.setCurrentRule(grammar.getLocallyDefinedRule(r));
         }
 		(modifier)?
         (ARG (ARG_ACTION)?)
@@ -182,7 +183,7 @@ rule
            (exceptionGroup)?
            EOR
            {
-                if ( blk.setValue!=null ) {
+                if ( blk.getSetValue() !=null ) {
                     // if block comes back as a set not BLOCK, make it
                     // a single ALT block
                     b = factory.build_AlternativeBlockFromSet(b);
@@ -341,7 +342,7 @@ ebnf returns [StateCluster g=null]
         }
     |   #( OPTIONAL b=block )
         {
-        if ( blk.setValue!=null ) {
+        if ( blk.getSetValue() !=null ) {
             // if block comes back SET not BLOCK, make it
             // a single ALT block
             b = factory.build_AlternativeBlockFromSet(b);
@@ -356,7 +357,7 @@ ebnf returns [StateCluster g=null]
     	}
     |   #( CLOSURE b=block )
         {
-        if ( blk.setValue!=null ) {
+        if (  blk.getSetValue() !=null ) {
             b = factory.build_AlternativeBlockFromSet(b);
         }
         g = factory.build_Astar(b);
@@ -375,7 +376,7 @@ ebnf returns [StateCluster g=null]
     	}
     |   #( POSITIVE_CLOSURE b=block )
         {
-        if ( blk.setValue!=null ) {
+        if ( blk.getSetValue() !=null ) {
             b = factory.build_AlternativeBlockFromSet(b);
         }
         g = factory.build_Aplus(b);
@@ -578,7 +579,7 @@ IntSet elements=new IntervalSet();
         {
         g = factory.build_Set(elements,#b);
         #b.followingNFAState = g.right;
-        #b.setValue = elements; // track set value of this block
+        #b.setSetValue(elements); // track set value of this block
         }
 		//{System.out.println("set elements="+elements.toString(grammar));}
 	;

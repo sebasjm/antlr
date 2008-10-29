@@ -33,7 +33,7 @@ options {
 }
 
 @header {
-package org.antlr.codegen;
+package org.antlr.grammar.v3;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.runtime.*;
 import org.antlr.tool.*;

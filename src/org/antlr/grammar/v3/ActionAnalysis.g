@@ -39,7 +39,7 @@ options {
 }
 
 @header {
-package org.antlr.tool;
+package org.antlr.grammar.v3;
 import org.antlr.runtime.*;
 import org.antlr.tool.*;
 }
@@ -50,7 +50,7 @@ Grammar grammar;
 antlr.Token actionToken;
 int outerAltNum = 0;
 
-	public ActionAnalysisLexer(Grammar grammar, String ruleName, GrammarAST actionAST)
+	public ActionAnalysis(Grammar grammar, String ruleName, GrammarAST actionAST)
 	{
 		this(new ANTLRStringStream(actionAST.token.getText()));
 		this.grammar = grammar;

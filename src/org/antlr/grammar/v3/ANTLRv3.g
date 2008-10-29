@@ -79,6 +79,16 @@ tokens {
 	int gtype;
 }
 
+@parser::header
+{
+    package org.antlr.grammar.v3;
+}
+@lexer::header
+{
+    package org.antlr.grammar.v3;
+}
+
+
 grammarDef
     :   DOC_COMMENT?
     	(	'lexer'  {gtype=LEXER_GRAMMAR;}    // pure lexer

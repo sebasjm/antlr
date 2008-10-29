@@ -26,9 +26,10 @@ header {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-	package org.antlr.tool;
+	package org.antlr.grammar.v2;
 	import java.util.*;
 	import org.antlr.misc.*;
+    import org.antlr.tool.*;
 }
 
 class DefineGrammarItemsWalker extends TreeParser;
@@ -206,7 +207,7 @@ String name=null;
 Map opts=null;
 Rule r = null;
 }
-    :   #( RULE id:ID {opts = #RULE.blockOptions;}
+    :   #( RULE id:ID {opts = #RULE.getBlockOptions();}
            (mod=modifier)?
            #( ARG (args:ARG_ACTION)? )
            #( RET (ret:ARG_ACTION)? )
@@ -243,7 +244,7 @@ Rule r = null;
            {
            // copy rule options into the block AST, which is where
            // the analysis will look for k option etc...
-           #b.blockOptions = opts;
+           #b.setBlockOptions(opts);
            }
          )
     ;

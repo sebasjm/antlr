@@ -26,12 +26,26 @@ header {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.tool;
+package org.antlr.grammar.v2;
 import java.util.*;
 import java.io.*;
 import org.antlr.analysis.*;
 import org.antlr.misc.*;
-import antlr.*;
+import org.antlr.tool.*;
+
+import antlr.TokenBuffer;
+import antlr.TokenStreamException;
+import antlr.Token;
+import antlr.TokenStream;
+import antlr.RecognitionException;
+import antlr.NoViableAltException;
+import antlr.ParserSharedInputState;
+import antlr.collections.impl.BitSet;
+import antlr.collections.AST;
+import antlr.ASTFactory;
+import antlr.ASTPair;
+import antlr.TokenWithIndex;
+import antlr.collections.impl.ASTArray;
 }
 
 /** Read in an ANTLR grammar and build an AST.  Try not to do
@@ -99,9 +113,26 @@ tokens {
 }
 
 {
-	Grammar grammar = null;
+	protected Grammar grammar = null;
 	protected int gtype = 0;
-	protected String currentRuleName = null;
+
+    public Grammar getGrammar() {
+        return grammar;
+    }
+
+    public void setGrammar(Grammar grammar) {
+        this.grammar = grammar;
+    }
+
+    public int getGtype() {
+        return gtype;
+    }
+
+    public void setGtype(int gtype) {
+        this.gtype = gtype;
+        }
+	
+    protected String currentRuleName = null;
 	protected GrammarAST currentBlockAST = null;
 	protected boolean atTreeRoot; // are we matching a tree root in tree grammar?
 
@@ -387,7 +418,7 @@ Map opts = null;
 	colon:COLON
 	{
 	blkRoot = #[BLOCK,"BLOCK"];
-	blkRoot.blockOptions = opts;
+	blkRoot.setBlockOptions(opts);
 	blkRoot.setLine(colon.getLine());
 	blkRoot.setColumn(colon.getColumn());
 	eob = #[EOB,"<end-of-block>"];
@@ -406,7 +437,7 @@ Map opts = null;
 	root.ruleStartTokenIndex = start;
 	root.ruleStopTokenIndex = stop;
 	root.setLine(startLine);
-	root.blockOptions = opts;
+	root.setBlockOptions(opts);
     #rule = #(root,
               #ruleName,modifier,#(#[ARG,"ARG"],#aa),#(#[RET,"RET"],#rt),
               opt,#scopes,#a,blk,ex,eor);
@@ -485,7 +516,7 @@ Map opts=null;
 altList[Map opts]
 {
 	GrammarAST blkRoot = #[BLOCK,"BLOCK"];
-	blkRoot.blockOptions = opts;
+	blkRoot.setBlockOptions(opts);
 	blkRoot.setLine(LT(0).getLine()); // set to : or (
 	blkRoot.setColumn(LT(0).getColumn());
 	GrammarAST save = currentBlockAST;

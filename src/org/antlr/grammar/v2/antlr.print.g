@@ -26,8 +26,9 @@ header {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-	package org.antlr.tool;
+	package org.antlr.grammar.v2;
 	import java.util.*;
+    import org.antlr.tool.*;
 }
 
 /** Print out a grammar (no pretty printing).

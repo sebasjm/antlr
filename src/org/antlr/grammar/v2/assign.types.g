@@ -26,11 +26,12 @@ header {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-	package org.antlr.tool;
+	package org.antlr.grammar.v2;
 	import java.util.*;
 	import org.antlr.analysis.*;
 	import org.antlr.misc.*;
 	import java.io.*;
+    import org.antlr.tool.*;
 }
 
 /** [Warning: TJP says that this is probably out of date as of 11/19/2005,
@@ -132,7 +133,7 @@ protected void trackString(GrammarAST t) {;}
 protected void trackToken(GrammarAST t) {;}
 protected void trackTokenRule(GrammarAST t, GrammarAST modifier, GrammarAST block) {;}
 protected void alias(GrammarAST t, GrammarAST s) {;}
-protected void defineTokens(Grammar root) {;}
+public    void defineTokens(Grammar root) {;}
 protected void defineStringLiteralsFromDelegates() {;}
 protected void assignStringTypes(Grammar root) {;}
 protected void aliasTokenIDsAndLiterals(Grammar root) {;}

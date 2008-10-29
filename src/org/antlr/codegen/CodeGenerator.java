@@ -32,16 +32,20 @@ import antlr.TokenStreamRewriteEngine;
 import antlr.collections.AST;
 import org.antlr.Tool;
 import org.antlr.analysis.*;
-import org.antlr.misc.BitSet;
 import org.antlr.misc.*;
 import org.antlr.stringtemplate.*;
 import org.antlr.stringtemplate.language.AngleBracketTemplateLexer;
 import org.antlr.tool.*;
+import org.antlr.grammar.v2.*;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.*;
+import org.antlr.grammar.v3.ActionTranslator;
+import org.antlr.misc.BitSet;
+import org.antlr.tool.ANTLRLexer;
+import org.antlr.tool.ANTLRParser;
 
 /** ANTLR's code generator.
  *
@@ -1074,8 +1078,8 @@ public class CodeGenerator {
 		// then translate via codegen.g
 		CodeGenTreeWalker gen = new CodeGenTreeWalker();
 		gen.init(grammar);
-		gen.currentRuleName = ruleName;
-		gen.outerAltNum = outerAltNum;
+		gen.setCurrentRuleName(ruleName);
+		gen.setOuterAltNum(outerAltNum);
 		StringTemplate st = null;
 		try {
 			st = gen.rewrite_template((AST)rewriteTree);

@@ -26,7 +26,7 @@ header {
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-	package org.antlr.codegen;
+	package org.antlr.grammar.v2;
     import org.antlr.tool.*;
     import org.antlr.analysis.*;
     import org.antlr.misc.*;
@@ -34,6 +34,7 @@ header {
 	import org.antlr.stringtemplate.*;
     import antlr.TokenWithIndex;
     import antlr.CommonToken;
+    import org.antlr.codegen.*;
 }
 
 /** Walk a grammar and generate code by gradually building up
@@ -57,6 +58,22 @@ options {
 {
 	protected static final int RULE_BLOCK_NESTING_LEVEL = 0;
 	protected static final int OUTER_REWRITE_NESTING_LEVEL = 0;
+
+    public String getCurrentRuleName() {
+        return currentRuleName;
+    }
+
+    public void setCurrentRuleName(String currentRuleName) {
+        this.currentRuleName = currentRuleName;
+    }
+
+    public int getOuterAltNum() {
+        return outerAltNum;
+    }
+
+    public void setOuterAltNum(int outerAltNum) {
+        this.outerAltNum = outerAltNum;
+    }
 
     protected String currentRuleName = null;
     protected int blockNestingLevel = 0;
