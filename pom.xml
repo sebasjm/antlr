@@ -54,6 +54,16 @@
     
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src</directory>
+                <includes>
+                    <include>**/*.st</include>
+                    <include>**/*.stg</include>
+                    <include>**/*.sti</include>
+               </includes>
+           </resource>
+        </resources>
         
         <testSourceDirectory>test</testSourceDirectory>
         <testResources>
@@ -111,16 +121,6 @@
                 </configuration>
             </plugin>
             
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>src/**/*.st</include>
-                        <include>src/**/*.stg</include>
-                        <include>target/**/*.class</include>
-                    </includes>
-                </configuration>
-            </plugin>
             
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
