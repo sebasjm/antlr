@@ -116,7 +116,11 @@ public class TestJavaCodeGeneration extends BaseTest {
 	@Test public void testDoubleQuoteEscape() {
 		String grammar =
 			"lexer grammar T; \n" +
-			"A : '\\\\\\\"';\n"; // this is A : '\\"', which shoudl give "\\\"" at JAva level;
+			"A : '\\\\\"';\n" +          // this is A : '\\"', which should give "\\\"" at Java level;
+            "B : '\\\"';\n" +            // this is B: '\"', which shodl give "\"" at Java level;
+            "C : '\\'\\'';\n" +          // this is C: '\'\'', which shoudl give "''" at Java level
+            "D : '\\k';\n";              // this is D: '\k', which shoudl give just "k" at Java level;
+        
 		boolean found =
 			rawGenerateAndBuildRecognizer(
 				"T.g", grammar, null, "T", false);

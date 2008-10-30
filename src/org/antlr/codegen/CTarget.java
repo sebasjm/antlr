@@ -145,12 +145,11 @@ public class CTarget extends Target {
         
 	/** Convert from an ANTLR string literal found in a grammar file to
 	 *  an equivalent string literal in the C target.
-         *  Because we msut support Unicode character sets and have chosen
-         *  to have the lexer match UTF32 characters, then we must encode
-         *  string matches to use 32 bit character arrays. Here then we
-         *  must produce the C array and cater for the case where the 
-         *  lexer has been eoncded with a string such as "xyz\n", which looks
-         *  slightly incogrous to me but is not incorrect.
+     *  Because we must support Unicode character sets and have chosen
+     *  to have the lexer match UTF32 characters, then we must encode
+     *  string matches to use 32 bit character arrays. Here then we
+     *  must produce the C array and cater for the case where the 
+     *  lexer has been encoded with a string such as 'xyz\n',
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,

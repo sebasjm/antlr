@@ -198,17 +198,83 @@ public class Target {
 	 *  is the translation 'a\n"' -> "a\n\"".  Expect single quotes
 	 *  around the incoming literal.  Just flip the quotes and replace
 	 *  double quotes with \"
+     * 
+     *  Note that we have decided to allow poeple to use '\"' without
+     *  penalty, so we must build the target string in a loop as Utils.replae
+     *  cannot handle both \" and " without a lot of messing around.
+     * 
 	 */
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
 		String literal)
 	{
-		literal = Utils.replace(literal,"\\\"","\""); // \" to " to normalize
-		literal = Utils.replace(literal,"\"","\\\""); // " to \" to escape all
-		StringBuffer buf = new StringBuffer(literal);
-		buf.setCharAt(0,'"');
-		buf.setCharAt(literal.length()-1,'"');
-		return buf.toString();
+        
+        StringBuilder sb = new StringBuilder();
+        StringBuffer is = new StringBuffer(literal);
+        
+        // Opening quote
+        //
+        sb.append('"');
+        
+        for (int i = 1; i < is.length() -1; i++) {
+        
+            if  (is.charAt(i) == '\\') {
+
+                // Anything escaped is what it is! We assume that 
+                // people know how to escape characters correctly. However
+                // we catch anything that does not need an escape in Java (which
+                // is what the default implementation is dealing with and remove 
+                // the escape. The C target does this for instance.
+                //
+                switch (is.charAt(i+1)) {
+                    
+                    // Pass through any escapes that Java also needs
+                    //
+                    case    '"':
+                    case    'r':
+                    case    't':
+                    case    'b':
+                    case    'f':
+                    case    '\\':
+                    case    'u':    // Assume unnnn
+                   
+                        sb.append('\\');    // Pass the escape through
+                        break;
+                
+                    default:
+                        
+                        // Remove the escape by virtue of not adding it here
+                        // Thus \' becaimes ' and so on
+                        //
+                        break;
+                }
+                
+                // Go past the \ character
+                //
+                i++;
+                
+            } else {
+                
+                // Chracters that don't need \ in ANTLR 'strings' but do in Java
+                //
+                if (is.charAt(i) == '"') {
+                    
+                    // We need to escape " in Java
+                    //
+                    sb.append('\\');
+                }
+            }
+            
+            // Add in the next character, which may have been escaped
+            //
+            sb.append(is.charAt(i));   
+        }
+        
+        // Append closing " and return
+        //
+        sb.append('"');
+        
+		return sb.toString();
 	}
 
 	/** Given a random string of Java unicode chars, return a new string with
@@ -234,6 +300,7 @@ public class Target {
 		if ( s==null ) {
 			return null;
 		}
+
 		StringBuffer buf = new StringBuffer();
 		if ( quoted ) {
 			buf.append('"');
