@@ -163,6 +163,8 @@ public abstract class BaseRecognizer {
 	 *  to get single token insertion and deletion.  Use this to turn of
 	 *  single token insertion and deletion. Override mismatchRecover
 	 *  to call this instead.
+     *
+     * TODO: fix this comment, mismatchRecover doesn't exist, for example
 	 */
 	protected void mismatch(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
