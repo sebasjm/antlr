@@ -80,7 +80,7 @@
         <plugins>
             
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.antlr</groupId>
                 <artifactId>antlr3-maven-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
@@ -120,7 +120,26 @@
                     <sourceDirectory>src</sourceDirectory>                  
                 </configuration>
             </plugin>
-            
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                   <archive>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <mainClass>org.antlr.Tool</mainClass>
+                    </manifest>
+                   </archive>
+                </configuration>
+            </plugin>
             
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
