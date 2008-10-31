@@ -5,7 +5,9 @@ package org.antlr.runtime.tree;
  */
 public interface TreeVisitorAction {
     /** Execute an action before visiting children of t.  Return t or
-     *  a rewritten t.  Children of returned value will be visited.
+     *  a rewritten t.  It is up to the visitor to decide what to do
+     *  with the return value.  Children of returned value will be
+     *  visited if using TreeVisitor.visit().
      */
     public Object pre(Object t);
 
