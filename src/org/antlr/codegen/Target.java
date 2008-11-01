@@ -229,7 +229,6 @@ public class Target {
                     case    '"':
                     case    'n':
                     case    'r':
-                    case    'n':
                     case    't':
                     case    'b':
                     case    'f':
