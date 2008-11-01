@@ -231,6 +231,7 @@ public class Target {
                     // Pass through any escapes that Java also needs
                     //
                     case    '"':
+                    case    'n':
                     case    'r':
                     case    't':
                     case    'b':
@@ -244,7 +245,7 @@ public class Target {
                     default:
                         
                         // Remove the escape by virtue of not adding it here
-                        // Thus \' becaimes ' and so on
+                        // Thus \' becomes ' and so on
                         //
                         break;
                 }
