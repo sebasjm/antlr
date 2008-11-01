@@ -208,7 +208,6 @@ public class Target {
 		CodeGenerator generator,
 		String literal)
 	{
-        
         StringBuilder sb = new StringBuilder();
         StringBuffer is = new StringBuffer(literal);
         
@@ -217,33 +216,28 @@ public class Target {
         sb.append('"');
         
         for (int i = 1; i < is.length() -1; i++) {
-        
             if  (is.charAt(i) == '\\') {
-
-                // Anything escaped is what it is! We assume that 
+                // Anything escaped is what it is! We assume that
                 // people know how to escape characters correctly. However
                 // we catch anything that does not need an escape in Java (which
                 // is what the default implementation is dealing with and remove 
                 // the escape. The C target does this for instance.
                 //
                 switch (is.charAt(i+1)) {
-                    
                     // Pass through any escapes that Java also needs
                     //
                     case    '"':
                     case    'n':
                     case    'r':
+                    case    'n':
                     case    't':
                     case    'b':
                     case    'f':
                     case    '\\':
                     case    'u':    // Assume unnnn
-                   
                         sb.append('\\');    // Pass the escape through
                         break;
-                
                     default:
-                        
                         // Remove the escape by virtue of not adding it here
                         // Thus \' becomes ' and so on
                         //
@@ -253,19 +247,15 @@ public class Target {
                 // Go past the \ character
                 //
                 i++;
-                
             } else {
-                
                 // Chracters that don't need \ in ANTLR 'strings' but do in Java
                 //
                 if (is.charAt(i) == '"') {
-                    
                     // We need to escape " in Java
                     //
                     sb.append('\\');
                 }
             }
-            
             // Add in the next character, which may have been escaped
             //
             sb.append(is.charAt(i));   

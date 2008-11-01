@@ -27,10 +27,12 @@
 */
 package org.antlr.test;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import org.antlr.Tool;
+import org.antlr.tool.Grammar;
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.codegen.CodeGenerator;
 
 public class TestLexer extends BaseTest {
 	protected boolean debug = false;
@@ -230,4 +232,24 @@ public class TestLexer extends BaseTest {
 		boolean expecting = true; // should be ok
 		assertEquals(expecting, found);
 	}
+
+    @Test public void testNewlineLiterals() throws Exception {
+        Grammar g = new Grammar(
+            "lexer grammar T;\n" +
+            "A : '\\n\\n' ;\n"  // ANTLR sees '\n\n'
+        );
+        String expecting = "match(\"\\n\\n\")";
+
+        Tool antlr = newTool();
+        antlr.setOutputDirectory(null); // write to /dev/null
+        CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+        g.setCodeGenerator(generator);
+        generator.genRecognizer(); // codegen phase sets some vars we need
+        StringTemplate codeST = generator.getRecognizerST();
+        String code = codeST.toString();
+        int m = code.indexOf("match(\"");
+        String found = code.substring(m,m+expecting.length());
+
+        assertEquals(expecting, found);
+    }
 }
