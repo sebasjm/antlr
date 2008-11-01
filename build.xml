@@ -82,12 +82,12 @@
         <mkdir dir="${codegen.dir}" />
         <copy todir="${codegen.dir}" preservelastmodified="true">
             <fileset dir="${src.dir}">
-                <include name="org/antlr/tool/antlr.g" />
-                <include name="org/antlr/tool/antlr.print.g" />
-                <include name="org/antlr/tool/assign.types.g" />
-                <include name="org/antlr/tool/buildnfa.g" />
-                <include name="org/antlr/tool/define.g" />
-                <include name="org/antlr/codegen/codegen.g" />
+                <include name="org/antlr/grammar/v2/antlr.g" />
+                <include name="org/antlr/grammar/v2/antlr.print.g" />
+                <include name="org/antlr/grammar/v2/assign.types.g" />
+                <include name="org/antlr/grammar/v2/buildnfa.g" />
+                <include name="org/antlr/grammar/v2/define.g" />
+                <include name="org/antlr/grammar/v2/codegen.g" />
             </fileset>
             <flattenmapper />
         </copy>
