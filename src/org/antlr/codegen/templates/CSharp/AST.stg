@@ -178,7 +178,7 @@ root_0 = (<ASTLabelType>)adaptor.GetNilNode();
 <! if tree parser and rewrite=true !>
 <if(TREE_PARSER)>
 <if(rewriteMode)>
-<prevRuleRootRef()>.Tree = (<ASTLabelType>)adaptor.rulePostProcessing(root_0);
+<prevRuleRootRef()>.Tree = (<ASTLabelType>)adaptor.RulePostProcessing(root_0);
 input.ReplaceChildren(adaptor.GetParent(retval.Start),
                       adaptor.GetChildIndex(retval.Start),
                       adaptor.GetChildIndex(_last),
