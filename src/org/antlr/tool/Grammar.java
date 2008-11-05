@@ -354,8 +354,11 @@ public class Grammar {
 	 */
 	protected LinkedHashMap nameToSynpredASTMap;
 
-	/** At least one rule has memoize=true */
-	public boolean atLeastOneRuleMemoizes;
+    /** At least one rule has memoize=true */
+    public boolean atLeastOneRuleMemoizes;
+
+    /** At least one backtrack=true in rule or decision or grammar. */
+    public boolean atLeastOneBacktrackOption;
 
 	/** Was this created from a COMBINED grammar? */
 	public boolean implicitLexer;
@@ -2366,7 +2369,10 @@ outer:
 		if ( !optionIsValid(key, value) ) {
 			return null;
 		}
-		if ( options==null ) {
+        if ( key.equals("backtrack") && value.toString().equals("true") ) {
+            atLeastOneBacktrackOption = true;
+        }
+        if ( options==null ) {
 			options = new HashMap();
 		}
 		options.put(key, value);

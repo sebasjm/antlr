@@ -325,10 +325,10 @@ public class CodeGenerator {
 
 		boolean filterMode = grammar.getOption("filter")!=null &&
 							  grammar.getOption("filter").equals("true");
-		boolean canBacktrack = grammar.getSyntacticPredicates()!=null ||
+		boolean canBacktrack = grammar.atLeastOneBacktrackOption ||
 							   filterMode;
 
-		// TODO: move this down further because generating the recognizer
+        // TODO: move this down further because generating the recognizer
 		// alters the model with info on who uses predefined properties etc...
 		// The actions here might refer to something.
 

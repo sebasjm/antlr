@@ -7,6 +7,14 @@ University of San Francisco
 
 CHANGES
 
+November 5, 2008
+
+* Use of backtrack=true anywhere in grammar causes backtracking sensitive
+  code to be generated.  Actions are gated etc...  Previously, that only
+  happened when a syntactic predicate appeared in a DFA.  But, we need
+  to gate actions when backtracking option is set even if no decision
+  is generated to support filtering of trees.
+
 October 25, 2008
 
 * Fixed debug event socket protocol to allow spaces in filenames.

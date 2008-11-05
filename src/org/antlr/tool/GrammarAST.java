@@ -222,6 +222,9 @@ public class GrammarAST extends BaseAST {
 		if ( key.equals("k") ) {
 			grammar.numberOfManualLookaheadOptions++;
 		}
+        if ( key.equals("backtrack") && value.toString().equals("true") ) {
+            grammar.atLeastOneBacktrackOption = true;
+        }        
         options.put(key, value);
 		return key;
     }

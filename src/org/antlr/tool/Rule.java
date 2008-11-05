@@ -542,9 +542,12 @@ public class Rule {
 		if ( options==null ) {
 			options = new HashMap();
 		}
-		if ( key.equals("memoize") && value.toString().equals("true") ) {
-			grammar.atLeastOneRuleMemoizes = true;
-		}
+        if ( key.equals("memoize") && value.toString().equals("true") ) {
+            grammar.atLeastOneRuleMemoizes = true;
+        }
+        if ( key.equals("backtrack") && value.toString().equals("true") ) {
+            grammar.atLeastOneBacktrackOption = true;
+        }
 		if ( key.equals("k") ) {
 			grammar.numberOfManualLookaheadOptions++;
 		}
