@@ -223,7 +223,7 @@ public class GrammarAST extends BaseAST {
 			grammar.numberOfManualLookaheadOptions++;
 		}
         if ( key.equals("backtrack") && value.toString().equals("true") ) {
-            grammar.atLeastOneBacktrackOption = true;
+            grammar.composite.getRootGrammar().atLeastOneBacktrackOption = true;
         }        
         options.put(key, value);
 		return key;

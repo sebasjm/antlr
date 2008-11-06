@@ -166,6 +166,8 @@ rewriteCode(
 	referencedTokenListLabels,
 	referencedRuleLabels,
 	referencedRuleListLabels,
+    referencedWildcardLabels,
+    referencedWildcardListLabels,
 	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 # AST Rewrite

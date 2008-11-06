@@ -325,7 +325,7 @@ public class CodeGenerator {
 
 		boolean filterMode = grammar.getOption("filter")!=null &&
 							  grammar.getOption("filter").equals("true");
-		boolean canBacktrack = grammar.atLeastOneBacktrackOption ||
+		boolean canBacktrack = grammar.composite.getRootGrammar().atLeastOneBacktrackOption ||
 							   filterMode;
 
         // TODO: move this down further because generating the recognizer

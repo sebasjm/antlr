@@ -186,7 +186,8 @@ options {
 				Grammar.LabelElementPair pair = r.getLabel(label);
 				if ( pair!=null &&
 					 (pair.type==Grammar.TOKEN_LIST_LABEL||
-					  pair.type==Grammar.RULE_LIST_LABEL) )
+					  pair.type==Grammar.RULE_LIST_LABEL||
+					  pair.type==Grammar.WILDCARD_TREE_LIST_LABEL) )
 				{
 					hasListLabel=true;
 				}
@@ -1076,6 +1077,8 @@ if ( #rewrite.getType()==REWRITE ) {
             grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.RULE_LIST_LABEL);
         Set<String> wildcardLabels =
             grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.WILDCARD_TREE_LABEL);
+        Set<String> wildcardListLabels =
+            grammar.getLabels(#rewrite.rewriteRefsDeep, Grammar.WILDCARD_TREE_LIST_LABEL);
         // just in case they ref $r for "previous value", make a stream
         // from retval.tree
         StringTemplate retvalST = templates.getInstanceOf("prevRuleRootRef");
@@ -1085,6 +1088,7 @@ if ( #rewrite.getType()==REWRITE ) {
         code.setAttribute("referencedRuleLabels", ruleLabels);
         code.setAttribute("referencedRuleListLabels", ruleListLabels);
         code.setAttribute("referencedWildcardLabels", wildcardLabels);
+        code.setAttribute("referencedWildcardListLabels", wildcardListLabels);
 	}
 }
 else {
@@ -1350,6 +1354,9 @@ rewrite_atom[boolean isRoot] returns [StringTemplate code=null]
 					break;
 				case Grammar.WILDCARD_TREE_LABEL :
 					stName = "rewriteWildcardLabelRef";
+					break;
+				case Grammar.WILDCARD_TREE_LIST_LABEL :
+					stName = "rewriteRuleListLabelRef"; // acts like rule ref list for ref
 					break;
 				case Grammar.RULE_LABEL :
 					stName = "rewriteRuleLabelRef";

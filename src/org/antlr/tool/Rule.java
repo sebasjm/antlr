@@ -83,6 +83,9 @@ public class Rule {
     /** A list of all LabelElementPair attached to tokens like x=. in tree grammar */
     public LinkedHashMap wildcardTreeLabels;
 
+    /** A list of all LabelElementPair attached to tokens like x+=. in tree grammar */
+    public LinkedHashMap wildcardTreeListLabels;
+
 	/** A list of all LabelElementPair attached to single char literals like x='a' */
 	public LinkedHashMap charLabels;
 
@@ -185,6 +188,10 @@ public class Rule {
             case Grammar.WILDCARD_TREE_LABEL :
                 if ( wildcardTreeLabels==null ) wildcardTreeLabels = new LinkedHashMap();
                 wildcardTreeLabels.put(label.getText(), pair);
+                break;
+            case Grammar.WILDCARD_TREE_LIST_LABEL :
+                if ( wildcardTreeListLabels==null ) wildcardTreeListLabels = new LinkedHashMap();
+                wildcardTreeListLabels.put(label.getText(), pair);
                 break;
 			case Grammar.RULE_LABEL :
 				if ( ruleLabels==null ) ruleLabels = new LinkedHashMap();
@@ -546,7 +553,7 @@ public class Rule {
             grammar.atLeastOneRuleMemoizes = true;
         }
         if ( key.equals("backtrack") && value.toString().equals("true") ) {
-            grammar.atLeastOneBacktrackOption = true;
+            grammar.composite.getRootGrammar().atLeastOneBacktrackOption = true;
         }
 		if ( key.equals("k") ) {
 			grammar.numberOfManualLookaheadOptions++;

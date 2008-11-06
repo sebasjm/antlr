@@ -418,7 +418,8 @@ LABEL_REF
 		StringTemplate st;
 		Grammar.LabelElementPair pair = getElementLabel($ID.text);
 		if ( pair.type==Grammar.RULE_LIST_LABEL ||
-             pair.type==Grammar.TOKEN_LIST_LABEL )
+             pair.type==Grammar.TOKEN_LIST_LABEL ||
+             pair.type==Grammar.WILDCARD_TREE_LIST_LABEL )
         {
 			st = template("listLabelRef");
 		}

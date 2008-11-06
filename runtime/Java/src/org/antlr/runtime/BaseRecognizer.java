@@ -874,9 +874,6 @@ public abstract class BaseRecognizer {
 
 	public void traceIn(String ruleName, int ruleIndex, Object inputSymbol)  {
 		System.out.print("enter "+ruleName+" "+inputSymbol);
-		if ( state.failed ) {
-			System.out.println(" failed="+state.failed);
-		}
 		if ( state.backtracking>0 ) {
 			System.out.print(" backtracking="+state.backtracking);
 		}
@@ -888,12 +885,11 @@ public abstract class BaseRecognizer {
 						 Object inputSymbol)
 	{
 		System.out.print("exit "+ruleName+" "+inputSymbol);
-		if ( state.failed ) {
-			System.out.println(" failed="+state.failed);
-		}
 		if ( state.backtracking>0 ) {
-			System.out.print(" backtracking="+state.backtracking);
-		}
+            System.out.print(" backtracking="+state.backtracking);
+            if ( state.failed ) System.out.print(" failed");
+            else System.out.print(" succeeded");
+        }
 		System.out.println();
 	}
 

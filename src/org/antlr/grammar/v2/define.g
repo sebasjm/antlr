@@ -370,7 +370,7 @@ element
     		grammar.defineRuleRefLabel(currentRuleName,#id.getToken(),#el);
     	}
     	else if ( #el.getType()==WILDCARD && grammar.type==Grammar.TREE_PARSER ) {
-    		grammar.defineWildcardTreeRefLabel(currentRuleName,#id.getToken(),#el);
+    		grammar.defineWildcardTreeLabel(currentRuleName,#id.getToken(),#el);
     	}
     	else {
     		grammar.defineTokenRefLabel(currentRuleName,#id.getToken(),#el);
@@ -386,6 +386,9 @@ element
     	    if ( #a2.getType()==RULE_REF ) {
     	    	grammar.defineRuleListLabel(currentRuleName,#id2.getToken(),#a2);
     	    }
+            else if ( #a2.getType()==WILDCARD && grammar.type==Grammar.TREE_PARSER ) {
+                grammar.defineWildcardTreeListLabel(currentRuleName,#id2.getToken(),#a2);
+            }
     	    else {
     	    	grammar.defineTokenListLabel(currentRuleName,#id2.getToken(),#a2);
     	    }

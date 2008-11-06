@@ -67,6 +67,7 @@ public class Grammar {
 	public static final int TOKEN_LIST_LABEL = 4;
     public static final int CHAR_LABEL = 5; // used in lexer for x='a'
     public static final int WILDCARD_TREE_LABEL = 6; // Used in tree grammar x=.
+    public static final int WILDCARD_TREE_LIST_LABEL = 7; // Used in tree grammar x+=.
 
 
     public static String[] LabelTypeToString =
@@ -1677,13 +1678,23 @@ outer:
 		}
 	}
 
-    public void defineWildcardTreeRefLabel(String ruleName,
+    public void defineWildcardTreeLabel(String ruleName,
                                            antlr.Token label,
                                            GrammarAST tokenRef)
     {
         Rule r = getLocallyDefinedRule(ruleName);
         if ( r!=null ) {
             defineLabel(r, label, tokenRef, WILDCARD_TREE_LABEL);
+        }
+    }
+
+    public void defineWildcardTreeListLabel(String ruleName,
+                                           antlr.Token label,
+                                           GrammarAST tokenRef)
+    {
+        Rule r = getLocallyDefinedRule(ruleName);
+        if ( r!=null ) {
+            defineLabel(r, label, tokenRef, WILDCARD_TREE_LIST_LABEL);
         }
     }
 
@@ -2370,7 +2381,7 @@ outer:
 			return null;
 		}
         if ( key.equals("backtrack") && value.toString().equals("true") ) {
-            atLeastOneBacktrackOption = true;
+            composite.getRootGrammar().atLeastOneBacktrackOption = true;
         }
         if ( options==null ) {
 			options = new HashMap();

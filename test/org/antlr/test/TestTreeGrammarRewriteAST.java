@@ -1081,5 +1081,24 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
                                       treeGrammar, "TP", "TLexer", "a", "s", "1 2 3");
         assertEquals("1 2 3\n", found);
     }
-    
+
+    @Test public void testWildcardListLabel2() throws Exception {
+        String grammar =
+            "grammar T;\n" +
+            "options {output=AST; ASTLabelType=CommonTree;}\n" +
+            "a  : x=INT y=INT z=INT -> ^($x ^($y $z) ^($y $z));\n"+
+            "ID : 'a'..'z'+ ;\n" +
+            "INT : '0'..'9'+;\n" +
+            "WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
+
+        String treeGrammar =
+            "tree grammar TP;\n"+
+            "options {output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}\n" +
+            "s : ^(INT (c+=.)+) -> $c+\n" +
+            "  ;\n";
+
+        String found = execTreeParser("T.g", grammar, "TParser", "TP.g",
+                                      treeGrammar, "TP", "TLexer", "a", "s", "1 2 3");
+        assertEquals("(2 3) (2 3)\n", found);
+    }
 }
