@@ -412,7 +412,7 @@ ruleLabelDefs() ::= <<
     :{List list_<it.label.text>=null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{ll|RuleReturnScope <ll.label.text> = null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|<ll:ruleLabelDef(label=it)> <ll.label.text> = null;}; separator="\n">
 >>
 
 lexerRuleLabelDefs() ::= <<

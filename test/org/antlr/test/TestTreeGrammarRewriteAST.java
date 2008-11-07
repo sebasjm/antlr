@@ -873,10 +873,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(12 (abc 34))\n", found);
     }
 
-    @Ignore
-    // TODO: Ter to review why this test fails...
-    //
-    public void testRewriteOfRuleRefRootListLabeled() throws Exception {
+    @Test public void testRewriteOfRuleRefRootListLabeled() throws Exception {
         String grammar =
             "grammar T;\n" +
             "options {output=AST;}\n" +
