@@ -13,7 +13,7 @@ public class TreeVisitor {
      *  before/after having visited all of its children.  Bottom up walk.
      *  Execute both actions even if t has no children.
      */
-    public void visit(Object t, TreeVisitorAction action) {
+    public Object visit(Object t, TreeVisitorAction action) {
         int n = adaptor.getChildCount(t);
         boolean isNil = adaptor.isNil(t);
         if ( action!=null && !isNil ) {
@@ -23,6 +23,7 @@ public class TreeVisitor {
             Object child = adaptor.getChild(t, i);
             visit(child, action);
         }
-        if ( action!=null && !isNil ) action.post(t);
+        if ( action!=null && !isNil ) t = action.post(t);
+        return t;
     }
 }
