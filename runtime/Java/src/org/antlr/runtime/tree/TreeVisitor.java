@@ -11,14 +11,18 @@ public class TreeVisitor {
     
     /** Visit every node in tree t and trigger an action for each node
      *  before/after having visited all of its children.  Bottom up walk.
-     *  Execute both actions even if t has no children.
+     *  Execute both actions even if t has no children.  Ignore return
+     *  results from transforming children since they will have altered
+     *  the child list of this node (their parent).  Return result of
+     *  applying post action to this node.
      */
     public Object visit(Object t, TreeVisitorAction action) {
-        int n = adaptor.getChildCount(t);
+        // System.out.println("visit "+((Tree)t).toStringTree());
         boolean isNil = adaptor.isNil(t);
         if ( action!=null && !isNil ) {
             t = action.pre(t); // if rewritten, walk children of new t
         }
+        int n = adaptor.getChildCount(t);
         for (int i=0; i<n; i++) {
             Object child = adaptor.getChild(t, i);
             visit(child, action);
