@@ -1,6 +1,8 @@
 package org.antlr.runtime.tree;
 
-/** */
+/** Do a depth first walk of a tree, applying pre() and post() actions
+ *  we go.
+ */
 public class TreeVisitor {
     protected TreeAdaptor adaptor;
     
