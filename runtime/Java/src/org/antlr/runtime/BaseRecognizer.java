@@ -757,9 +757,12 @@ public abstract class BaseRecognizer {
 		return rules;
 	}
 
-	public int getBacktrackingLevel() {
-		return state.backtracking;
-	}
+    public int getBacktrackingLevel() { return state.backtracking; }
+
+    public void setBacktrackingLevel(int n) { state.backtracking = n; }
+
+    /** Return whether or not a backtracking attempt failed. */
+    public boolean failed() { return state.failed; }
 
 	/** Used to print out token names like ID during debugging and
 	 *  error reporting.  The generated parsers implement a method

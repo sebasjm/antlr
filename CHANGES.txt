@@ -7,6 +7,13 @@ University of San Francisco
 
 CHANGES
 
+November 8, 2008
+
+* Added methods to BaseRecognizer:
+  public void setBacktrackingLevel(int n) { state.backtracking = n; }
+  /** Return whether or not a backtracking attempt failed. */
+  public boolean failed() { return state.failed; }
+
 November 5, 2008
 
 * Tweaked traceIn/Out to say "fail/succeeded"
