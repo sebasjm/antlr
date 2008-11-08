@@ -71,7 +71,7 @@ public class Grammar {
 
 
     public static String[] LabelTypeToString =
-		{"<invalid>", "rule", "token", "rule-list", "token-list"};
+		{"<invalid>", "rule", "token", "rule-list", "token-list", "wildcard-tree", "wildcard-tree-list"};
 
 	public static final String ARTIFICIAL_TOKENS_RULENAME = "Tokens";
 	public static final String FRAGMENT_RULE_MODIFIER = "fragment";
