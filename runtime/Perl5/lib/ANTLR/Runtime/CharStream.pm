@@ -1,10 +1,12 @@
 package ANTLR::Runtime::CharStream;
 
-use Readonly;
-use Carp;
-
 use strict;
 use warnings;
+
+use base qw( ANTLR::Runtime::IntStream );
+
+use Readonly;
+use Carp;
 
 Readonly our $EOF => -1;
 sub EOF { return $EOF; }

@@ -5,9 +5,11 @@ use English qw( -no_match_vars );
 use Readonly;
 use Carp;
 use Switch;
+
 use ANTLR::Runtime::Class;
 use ANTLR::Runtime::Token;
 use ANTLR::Runtime::CharStream;
+use ANTLR::Runtime::MismatchedTokenException;
 
 use strict;
 use warnings;
@@ -186,7 +188,10 @@ sub match {
                 $self->failed(1);
                 return;
             }
-            my $mte = ANTLR::Runtime::MismatchedTokenException($c, $self->input);
+            my $mte = ANTLR::Runtime::MismatchedTokenException->new({
+                expecting => $c,
+                input => $self->input
+            });
             $self->recover($mte);
             croak $mte;
         }

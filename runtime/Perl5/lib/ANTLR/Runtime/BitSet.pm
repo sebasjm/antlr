@@ -6,7 +6,6 @@ use warnings;
 use Readonly;
 use Carp;
 use List::Util qw( max );
-use ANTLR::Runtime::Class;
 
 use Object::InsideOut qw( ANTLR::Runtime::Object );
 
@@ -14,23 +13,19 @@ use overload
     '|=' => \&or_in_place,
     '""' => \&str;
 
-#ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-#   qw( bits )
-#]);
-
-our $BITS :Constant = 64;  # number of bits / long
+our $BITS     :Constant = 64;  # number of bits / long
 our $LOG_BITS :Constant = 6;  # 2^6 == 64
 
 # We will often need to do a mod operator (i mod nbits).  Its
 # turns out that, for powers of two, this mod operation is
 # same as (i & (nbits-1)).  Since mod is slow, we use a
 # precomputed mod mask to do the mod instead.
-our $MOD_MASK :Constant = BITS - 1;
+our $MOD_MASK :Constant = $BITS - 1;
 
 # The actual data bit
-my @bits :Field :Accessor(Name => 'bits', lvalue => 1);
+my @bits :Field :Name(bits);
 
-sub _init :Init {
+sub init :method :Init {
     my ($self, $args) = @_;
 
     my $bits;
@@ -69,7 +64,7 @@ sub _init :Init {
         croak "Invalid argument";
     }
 
-    $self->bits($bits);
+    $self->bits = $bits;
 }
 
 sub of {
@@ -81,7 +76,7 @@ sub of {
     return $bs;
 }
 
-sub or {
+sub or :method {
     my ($self, $a) = @_;
 
     if (!defined $a) {
@@ -93,7 +88,7 @@ sub or {
     return $s;
 }
 
-sub add {
+sub add :method {
     my ($self, $el) = @_;
 
     $self->grow_to_include($el);
@@ -102,7 +97,7 @@ sub add {
     return;
 }
 
-sub grow_to_include {
+sub grow_to_include :method {
     my ($self, $bit) = @_;
 
     if ($bit > length $self->bits) {
@@ -112,7 +107,7 @@ sub grow_to_include {
     return;
 }
 
-sub or_in_place {
+sub or_in_place :method {
     my ($self, $a) = @_;
 
     my $i = 0;
@@ -127,25 +122,25 @@ sub or_in_place {
     return $self;
 }
 
-sub clone {
+sub clone :method {
     my ($self) = @_;
 
     return ANTLR::Runtime::BitSet->new(bits => $self->bits);
 }
 
-sub size {
+sub size :method {
     my ($self) = @_;
 
     return scalar $self->bits =~ /1/;
 }
 
-sub equals {
+sub equals :method {
     my ($self, $other) = @_;
 
     return $self->bits eq $other->bits;
 }
 
-sub member {
+sub member :method {
     Readonly my $usage => 'bool member($el)';
     croak $usage if @_ != 2;
     my ($self, $el) = @_;
@@ -153,29 +148,29 @@ sub member {
     return (substr $self->bits, $el, 1) eq 1;
 }
 
-sub remove {
+sub remove :method {
     my ($self, $el) = @_;
 
     substr($self->bits, $el, 1) = 0;
 }
 
-sub is_nil {
+sub is_nil :method {
     my ($self) = @_;
 
     return $self->bits =~ /1/ ? 1 : 0;
 }
 
-sub num_bits {
+sub num_bits :method {
     my ($self) = @_;
     return length $self->bits;
 }
 
-sub length_in_long_words {
+sub length_in_long_words :method {
     my ($self) = @_;
     return $self->num_bits() / $self->BITS;
 }
 
-sub to_array {
+sub to_array :method {
     my ($self) = @_;
 
     my $elems = [];
@@ -185,7 +180,7 @@ sub to_array {
     }
 }
 
-sub to_packed_array {
+sub to_packed_array :method {
     my ($self) = @_;
 
     return [
@@ -193,13 +188,13 @@ sub to_packed_array {
     ];
 }
 
-sub str {
+sub str :method {
     my ($self) = @_;
 
     return $self->to_string();
 }
 
-sub to_string {
+sub to_string :method {
     my ($self, $args) = @_;
 
     my $token_names;

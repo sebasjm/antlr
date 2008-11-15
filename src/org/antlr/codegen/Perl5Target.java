@@ -75,4 +75,15 @@ public class Perl5Target extends Target {
 
         return buf.toString();
     }
+
+    public String encodeIntAsCharEscape(final int v) {
+        final int intValue;
+        if ((v & 0x8000) == 0) {
+            intValue = v;
+        } else {
+            intValue = -(0x10000 - v);
+        }
+
+        return String.valueOf(intValue);
+    }
 }

@@ -1,12 +1,15 @@
 package ANTLR::Runtime::ANTLRStringStream;
-use base qw( ANTLR::Runtime::CharStream );
+
+use strict;
+use warnings;
 
 use ANTLR::Runtime::Class;
 use Readonly;
 use Carp;
 
-use strict;
-use warnings;
+use ANTLR::Runtime::CharStreamState;
+
+use base qw( ANTLR::Runtime::CharStream );
 
 sub new {
     Readonly my $usage => 'ANTLRStringStream new($input)';
@@ -20,7 +23,7 @@ sub new {
     $self->{line} = 1;
     $self->{char_position_in_line} = 0;
     $self->{mark_depth} = 0;
-    $self->{markers} = [];
+    $self->{markers} = [ undef ]; # depth 0 means no backtracking, leave blank
     $self->{last_marker} = 0;
 
     return $self;
@@ -120,27 +123,28 @@ sub mark {
         $state = ANTLR::Runtime::CharStreamState->new();
         push @{$self->{markers}}, $state;
     } else {
-        $state = $self->{markers}->get($self->{mark_depth});
+        $state = $self->{markers}->[$self->{mark_depth}];
     }
 
     $state->set_p($self->get_p);
     $state->set_line($self->get_line);
     $state->set_char_position_in_line($self->get_char_position_in_line);
     $self->set_last_marker($self->get_mark_depth);
-    return $self->mark_depth;
+    return $self->get_mark_depth;
 }
 
 sub rewind {
     Readonly my $usage => 'rewind($m)';
     croak $usage if @_ != 1 && @_ != 2;
-    my ($self, $m);
-    if (@_ == 1) {
-        ($self, $m) = (@_, $self->get_last_marker);
+    my $self = shift;
+    my $m;
+    if (@_ == 0) {
+        $m = $self->get_last_marker;
     } else {
-        ($self, $m) = @_;
+        $m = shift;
     }
 
-    my $state = $self->get_markers->get($m);
+    my $state = $self->{markers}->[$m];
     # restore stream state
     $self->seek($state->get_p);
     $self->set_line($state->get_line);

@@ -55,25 +55,32 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 >>
 
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
-      filterMode) ::= <<
+      filterMode, superClass="ANTLR::Runtime::Lexer")  ::= <<
 package <name>;
-use base qw( ANTLR::Runtime::Lexer );
-
-use English qw( -no_match_vars ) ;
-use Readonly;
-use Switch;
-use Carp;
-use ANTLR::Runtime::DFA;
-use ANTLR::Runtime::NoViableAltException;
 
 use strict;
 use warnings;
+
+use English qw( -no_match_vars ) ;
+use Carp;
+use Readonly;
+use Switch;
+
+use ANTLR::Runtime::DFA;
+use ANTLR::Runtime::NoViableAltException;
+
+use base qw( ANTLR::Runtime::Lexer );
 
 sub HIDDEN {
     return ANTLR::Runtime::BaseRecognizer->HIDDEN;
 }
 
-<tokens:{Readonly our $<it.name> => <it.type>;}; separator="\n">
+<tokens:{
+Readonly our $<it.name> => <it.type>;
+sub <it.name> {
+    return <it.type>;
+}
+}; separator="\n">
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <actions.lexer.members>
 
@@ -83,6 +90,7 @@ sub new {
     my ($class, $input) = @_;
 
     my $self = $class->SUPER::new($input);
+    $self->init_dfas();
 
     return $self;
 }
@@ -98,7 +106,20 @@ sub get_grammar_file_name {
 
 <synpreds:{p | <lexerSynpred(p)>}>
 
-<cyclicDFAs:{dfa | $dfa<dfa.decisionNumber> = ANTLR::Runtime::DFA<dfa.decisionNumber>->new($self);}; separator="\n">
+ANTLR::Runtime::Class::create_attributes('<name>',
+    [qw( <cyclicDFAs:{dfa | dfa<dfa.decisionNumber>}; separator=" "> )]
+);
+
+sub init_dfas {
+    my ($self) = @_;
+
+    <cyclicDFAs:{dfa |
+    $self->dfa<dfa.decisionNumber> = <name>::DFA<dfa.decisionNumber>->new({ recognizer => $self });
+    }; separator="\n">
+
+    return;
+}
+
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
 1;
@@ -168,6 +189,8 @@ return false;
 }
 >>
 
+actionGate() ::= "$self->state->backtracking==0"
+
 filteringActionGate() ::= "backtracking==1"
 
 /** How to generate a parser */
@@ -225,7 +248,7 @@ sub get_grammar_file_name {
 
 <synpreds:{p | <synpred(p)>}>
 
-<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = new ANTLR::Runtime::DFA<dfa.decisionNumber>->new($self);}; separator="\n">
+<cyclicDFAs:{dfa | dfa<dfa.decisionNumber> = __PACKAGE__::DFA<dfa.decisionNumber>->new($self);}; separator="\n">
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
 
 
@@ -304,7 +327,11 @@ if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { retu
 
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
-<if(backtracking)>if (failed) return <ruleReturnValue()>;<endif>
+<if(backtracking)>
+if ($self->failed) {
+    return <ruleReturnValue()>;
+}
+<endif>
 >>
 
 /** This rule has failed, exit indicating failure during backtrack */
@@ -380,7 +407,7 @@ my $<a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>;
 }>
 <endif>
 <if(memoize)>
-int <ruleDescriptor.name>_StartIndex = input.index();
+my $<ruleDescriptor.name>_start_index = $self->input->index();
 <endif>
 >>
 
@@ -636,10 +663,7 @@ element() ::= <<
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex,hetero) ::= <<
-<if(label)>
-$<label> = (<labelType>)
-<endif>
-$self->match($self->input, <token>, $FOLLOW_<token>_in_<ruleName><elementIndex>);
+<if(label)>$<label> =<endif>$self->match($self->input, <token>, $FOLLOW_<token>_in_<ruleName><elementIndex>);
 <checkRuleBacktrackFailure()>
 >>
 
@@ -700,6 +724,8 @@ else {
     croak $mse;
 }<\n>
 >>
+
+matchRuleBlockSet ::= matchSet
 
 matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 <matchSet(...)>
@@ -932,7 +958,7 @@ case [<labels:{ <it> }; separator=", ">] { <targetState> }
  *  The <name> attribute is inherited via the parser, lexer, ...
  */
 dfaDecision(decisionNumber,description) ::= <<
-alt<decisionNumber> = dfa<decisionNumber>.predict(input);
+$alt<decisionNumber> = $self->dfa<decisionNumber>->predict($self->input);
 >>
 
 /* Dump DFA tables as run-length-encoded Strings of octal values.
@@ -944,70 +970,86 @@ alt<decisionNumber> = dfa<decisionNumber>.predict(input);
  * the encoding methods.
  */
 cyclicDFA(dfa) ::= <<
-static final String DFA<dfa.decisionNumber>_eotS =
-    "<dfa.javaCompressedEOT; wrap="\"+\n    \"">";
-static final String DFA<dfa.decisionNumber>_eofS =
-    "<dfa.javaCompressedEOF; wrap="\"+\n    \"">";
-static final String DFA<dfa.decisionNumber>_minS =
-    "<dfa.javaCompressedMin; wrap="\"+\n    \"">";
-static final String DFA<dfa.decisionNumber>_maxS =
-    "<dfa.javaCompressedMax; wrap="\"+\n    \"">";
-static final String DFA<dfa.decisionNumber>_acceptS =
-    "<dfa.javaCompressedAccept; wrap="\"+\n    \"">";
-static final String DFA<dfa.decisionNumber>_specialS =
-    "<dfa.javaCompressedSpecial; wrap="\"+\n    \"">}>";
-static final String[] DFA<dfa.decisionNumber>_transitionS = {
-        <dfa.javaCompressedTransition:{s|"<s; wrap="\"+\n\"">"}; separator=",\n">
-};
+Readonly my $DFA<dfa.decisionNumber>_eot => ANTLR::Runtime::DFA->unpack_rle([ <dfa.javaCompressedEOT; separator=", "> ]);
+Readonly my $DFA<dfa.decisionNumber>_eof => ANTLR::Runtime::DFA->unpack_rle([ <dfa.javaCompressedEOF; separator=", "> ]);
+Readonly my $DFA<dfa.decisionNumber>_min => ANTLR::Runtime::DFA->unpack_rle([ <dfa.javaCompressedMin; separator=", "> ]);
+Readonly my $DFA<dfa.decisionNumber>_max => ANTLR::Runtime::DFA->unpack_rle([ <dfa.javaCompressedMax; separator=", "> ]);
+Readonly my $DFA<dfa.decisionNumber>_accept => ANTLR::Runtime::DFA->unpack_rle([ <dfa.javaCompressedAccept; separator=", "> ]);
+Readonly my $DFA<dfa.decisionNumber>_special => ANTLR::Runtime::DFA->unpack_rle([ <dfa.javaCompressedSpecial; separator=", "> ]);
+Readonly my $DFA<dfa.decisionNumber>_transition => [ <dfa.javaCompressedTransition:{s|ANTLR::Runtime::DFA->unpack_rle([ <s; separator=", "> ])}; separator=", "> ];
 
-static final short[] DFA<dfa.decisionNumber>_eot = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eotS);
-static final short[] DFA<dfa.decisionNumber>_eof = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_eofS);
-static final char[] DFA<dfa.decisionNumber>_min = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_minS);
-static final char[] DFA<dfa.decisionNumber>_max = DFA.unpackEncodedStringToUnsignedChars(DFA<dfa.decisionNumber>_maxS);
-static final short[] DFA<dfa.decisionNumber>_accept = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_acceptS);
-static final short[] DFA<dfa.decisionNumber>_special = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_specialS);
-static final short[][] DFA<dfa.decisionNumber>_transition;
+{
+package <name>::DFA<dfa.decisionNumber>;
 
-static {
-    int numStates = DFA<dfa.decisionNumber>_transitionS.length;
-    DFA<dfa.decisionNumber>_transition = new short[numStates][];
-    for (int i=0; i\<numStates; i++) {
-        DFA<dfa.decisionNumber>_transition[i] = DFA.unpackEncodedString(DFA<dfa.decisionNumber>_transitionS[i]);
-    }
+use strict;
+use warnings;
+
+use Object::InsideOut qw( ANTLR::Runtime::DFA );
+
+sub _init :Init {
+    my $self = shift;
+    my $param_ref = __PACKAGE__->unpack_params(@_, {
+        spec => [
+            {
+                name => 'recognizer',
+                isa  => 'ANTLR::Runtime::BaseRecognizer'
+            },
+        ]
+    });
+
+    $self->recognizer = $param_ref->{recognizer};
+    $self->decision_number = <dfa.decisionNumber>;
+    $self->eot = $DFA<dfa.decisionNumber>_eot;
+    $self->eof = $DFA<dfa.decisionNumber>_eof;
+    $self->min = $DFA<dfa.decisionNumber>_min;
+    $self->max = $DFA<dfa.decisionNumber>_max;
+    $self->accept = $DFA<dfa.decisionNumber>_accept;
+    $self->special = $DFA<dfa.decisionNumber>_special;
+    $self->transition = $DFA<dfa.decisionNumber>_transition;
+
+    return;
 }
 
-class DFA<dfa.decisionNumber> extends DFA {
+sub get_description {
+    return "<dfa.description>";
+}
 
-    public DFA<dfa.decisionNumber>(BaseRecognizer recognizer) {
-        this.recognizer = recognizer;
-        this.decisionNumber = <dfa.decisionNumber>;
-        this.eot = DFA<dfa.decisionNumber>_eot;
-        this.eof = DFA<dfa.decisionNumber>_eof;
-        this.min = DFA<dfa.decisionNumber>_min;
-        this.max = DFA<dfa.decisionNumber>_max;
-        this.accept = DFA<dfa.decisionNumber>_accept;
-        this.special = DFA<dfa.decisionNumber>_special;
-        this.transition = DFA<dfa.decisionNumber>_transition;
-    }
-    public String getDescription() {
-        return "<dfa.description>";
-    }
-    <@errorMethod()>
+<@errorMethod()>
+
 <if(dfa.specialStateSTs)>
-    public int specialStateTransition(int s, IntStream input) throws NoViableAltException {
-    	int _s = s;
-        switch ( s ) {
+sub special_state_transition {
+    my ($self, $param_ref) = unpack_params(@_, {
+        spec => [
+            {
+                name => 's',
+                type => SCALAR,
+            },
+            {
+                name => 'input',
+                isa  => 'ANTLR::Runtime::IntStream',
+            }
+        ]
+    });
+    my $s = $param_ref->{s};
+    my $input = $param_ref->{input};
+
+    switch ($s) {
         <dfa.specialStateSTs:{state |
-        case <i0> : <! compressed special state numbers 0..n-1 !>
+        case <i0> \{ <! compressed special state numbers 0..n-1 !>
             <state>}; separator="\n">
         }
+    }
+
 <if(backtracking)>
-        if (backtracking>0) {failed=true; return -1;}<\n>
+    if ($self->backtracking > 0) {
+        $self->failed = 1;
+        return -1;
+    }<\n>
 <endif>
-        NoViableAltException nvae =
-            new NoViableAltException(getDescription(), <dfa.decisionNumber>, _s, input);
-        error(nvae);
-        throw nvae;
+
+    my $nvae = ANTLR::Runtime::NoViableAltException($self->get_description(), <dfa.decisionNumber>, $s, $input);
+    $self->error($nvae);
+    $nvae->throw();
     }<\n>
 <endif>
 }<\n>
@@ -1270,7 +1312,7 @@ input.toString(retval.start,input.LT(-1))
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "getText()"
-lexerRulePropertyRef_type(scope,attr) ::= "_type"
+lexerRulePropertyRef_type(scope,attr) ::= "$_type"
 lexerRulePropertyRef_line(scope,attr) ::= "tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
