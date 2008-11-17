@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+November 17, 2008
+
+* BaseTreeAdaptor.getType() was hosed; always gave 0.  Thanks to Sam Harwell.
+
 November 8, 2008
 
 * Added methods to BaseRecognizer:

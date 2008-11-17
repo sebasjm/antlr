@@ -202,8 +202,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public int getType(Object t) {
-		((Tree)t).getType();
-		return 0;
+		return ((Tree)t).getType();
 	}
 
 	public void setType(Object t, int type) {
