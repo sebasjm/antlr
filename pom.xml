@@ -120,27 +120,58 @@
                     <sourceDirectory>src</sourceDirectory>                  
                 </configuration>
             </plugin>
+
             <plugin>
+
+                <!--
+
+                    Build an uber-jar that is packaged with all the other dependencies,
+                    such as the antlr-runtime and stringtemplate etc. This will be useful
+                    for developers, who then do not need to download anything else or
+                    remember that they need stringtemplate.jar in their CLASSPATH and so
+                    on.
+
+                  -->
+
                 <artifactId>maven-assembly-plugin</artifactId>
+
                 <configuration>
-                    
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <!--
+
+                        Specify that we want the resulting jar to be executable
+                        via java -jar, which we do by modifying the manifest
+                        of course.
+                      -->
+                    <archive>
+
+                        <manifest>
+                            <mainClass>org.antlr.Tool</mainClass>
+                        </manifest>
+                    </archive>
+
                 </configuration>
+
+                <!--
+
+                    We don't want to have to specifically ask for the uber jar, so we attach the
+                    running of this plugin to the execution of the package life-cycle
+                    phase.
+                  -->
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
             </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                   <archive>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                        <mainClass>org.antlr.Tool</mainClass>
-                    </manifest>
-                   </archive>
-                </configuration>
-            </plugin>
-            
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
