@@ -1,5 +1,5 @@
 package ANTLR::Runtime::TokenStream;
-use base qw( ANTLR::Runtime::Stream );
+use base qw( ANTLR::Runtime::IntStream );
 
 use Readonly;
 

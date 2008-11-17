@@ -1,7 +1,8 @@
-blib
+Build
+Build.bat
 Makefile
 Makefile.old
-Build
 _build
+blib
 pm_to_blib
-ANTLR-Runtime-*
+tags

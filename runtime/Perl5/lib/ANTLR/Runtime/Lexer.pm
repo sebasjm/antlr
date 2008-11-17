@@ -292,22 +292,22 @@ sub get_error_message {
     my $msg;
     if ($e->isa('ANTLR::Runtime::MismatchedTokenException')) {
         $msg = 'mismatched character '
-          . $self->get_char_error_display($e->c)
+          . $self->get_char_error_display($e->get_c())
           . ' expecting '
           . $self->get_char_error_display($e->expecting);
     } elsif ($e->isa('ANTLR::Runtime::NoViableAltException')) {
-        $msg = 'no viable alternative at character ' . $self->get_char_error_display($e->c);
+        $msg = 'no viable alternative at character ' . $self->get_char_error_display($e->get_c());
     } elsif ($e->isa('ANTLR::Runtime::EarlyExitException')) {
         $msg = 'required (...)+ loop did not match anything at character '
-          . $self->get_char_error_display($e->c);
+          . $self->get_char_error_display($e->get_c());
     } elsif ($e->isa('ANTLR::Runtime::MismatchedSetException')) {
-        $msg = 'mismatched character ' . $self->get_char_error_display($e->c)
+        $msg = 'mismatched character ' . $self->get_char_error_display($e->get_c())
           . ' expecting set ' . $e->expecting;
     } elsif ($e->isa('ANTLR::Runtime::MismatchedNotSetException')) {
-        $msg = 'mismatched character ' . $self->get_char_error_display($e->c)
+        $msg = 'mismatched character ' . $self->get_char_error_display($e->get_c())
           . ' expecting set ' . $e->expecting;
     } elsif ($e->isa('ANTLR::Runtime::MisMatchedRangeException')) {
-        $msg = 'mismatched character ' . $self->get_char_error_display($e->c)
+        $msg = 'mismatched character ' . $self->get_char_error_display($e->get_c())
           . ' expecting set ' . $self->get_char_error_display($e->a)
           . '..' . $self->get_char_error_display($e->b);
     } else {

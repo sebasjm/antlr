@@ -1,10 +1,16 @@
 package ANTLR::Runtime::CommonToken;
-use base qw( ANTLR::Runtime::Token );
-
-use Readonly;
 
 use strict;
 use warnings;
+
+use Readonly;
+
+use overload
+    'bool' => \&not_eof,
+    fallback => 1,
+    ;
+
+use base qw( ANTLR::Runtime::Token );
 
 ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
 qw( type line char_position_in_line channel input text index start stop )
@@ -131,6 +137,11 @@ sub get_token_index {
 sub set_token_index {
     my ($self, $index) = @_;
     $self->index($index);
+}
+
+sub not_eof {
+    my ($self) = @_;
+    return $self->type != ANTLR::Runtime::Token->EOF;
 }
 
 =begin later

@@ -17,7 +17,7 @@ sub test_new_default :Test(1) {
 }
 
 sub test_new_message :Test(1) {
-    my $ex = ANTLR::Runtime::Exception->new(message => 'test error message');
+    my $ex = ANTLR::Runtime::Exception->new({ message => 'test error message' });
     is $ex->message, 'test error message';
 }
 

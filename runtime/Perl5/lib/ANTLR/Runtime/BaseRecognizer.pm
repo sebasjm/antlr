@@ -101,7 +101,7 @@ sub mismatch {
     croak $usage if @_ != 4;
     my ($self, $input, $ttype, $follow) = @_;
 
-    my $mte = ANTLR::Runtime::MismatchedTokenException->new($ttype, $input);
+    my $mte = ANTLR::Runtime::MismatchedTokenException->new({ expecting => $ttype, input => $input });
 
     $self->recover_from_mismatched_token($input, $mte, $ttype, $follow);
 }
@@ -136,35 +136,35 @@ sub get_error_message {
 
     if ($e->isa('ANTLR::Runtime::MismatchedTokenException')) {
         my $token_name;
-        if ($e->expecting == ANTLR::Runtime::Token->EOF) {
+        if ($e->get_expecting == ANTLR::Runtime::Token->EOF) {
             $token_name = 'EOF';
         } else {
-            $token_name = $token_names->[$e->expecting];
+            $token_name = $token_names->[$e->get_expecting];
         }
 
-        return 'mismatched input ' . $self->get_token_error_display($e->token)
+        return 'mismatched input ' . $self->get_token_error_display($e->get_token)
             . ' expecting ' . $token_name;
     } elsif ($e->isa('ANTLR::Runtime::MismatchedTreeNodeException')) {
         my $token_name;
-        if ($e->expecting == ANTLR::Runtime::Token->EOF) {
+        if ($e->get_expecting == ANTLR::Runtime::Token->EOF) {
             $token_name = 'EOF';
         } else {
-            $token_name = $token_names->[$e->expecting];
+            $token_name = $token_names->[$e->get_expecting];
         }
 
         return 'mismatched tree node: ' . $e->node
             . ' expecting ' . $token_name;
     } elsif ($e->isa('ANTLR::Runtime::NoViableAltException')) {
-        return 'no viable alternative at input ' . $self->get_token_error_display($e->token);
+        return 'no viable alternative at input ' . $self->get_token_error_display($e->get_token);
     } elsif ($e->isa('ANTLR::Runtime::EarlyExitException')) {
         return 'required (...)+ loop did not match anything at input '
-            . get_token_error_display($e->token);
+            . get_token_error_display($e->get_token);
     } elsif ($e->isa('ANTLR::Runtime::MismatchedSetException')) {
-        return 'mismatched input ' . $self->get_token_error_display($e->token)
-            . ' expecting set ' . $e->expecting;
+        return 'mismatched input ' . $self->get_token_error_display($e->get_token)
+            . ' expecting set ' . $e->get_expecting;
     } elsif ($e->isa('ANTLR::Runtime::MismatchedNotSetException')) {
-        return 'mismatched input ' . $self->get_token_error_display($e->token)
-            . ' expecting set ' . $e->expecting;
+        return 'mismatched input ' . $self->get_token_error_display($e->get_token)
+            . ' expecting set ' . $e->get_expecting;
     } elsif ($e->isa('ANTLR::Runtime::FailedPredicateException')) {
         return 'rule ' . $e->rule_name . ' failed predicate: {'
             . $e->predicate_text . '}?';
@@ -178,8 +178,8 @@ sub get_error_header {
     croak $usage if @_ != 2;
     my ($self, $e) = @_;
 
-    my $line = $e->line;
-    my $col = $e->char_position_in_line;
+    my $line = $e->get_line();
+    my $col = $e->get_char_position_in_line();
 
     return "line $line:$col";
 }
@@ -250,7 +250,7 @@ sub compute_error_recovery_set {
 
 sub compute_context_sensitive_rule_FOLLOW {
     Readonly my $usage => 'void compute_context_sensitive_rule_FOLLOW()';
-    croak $usage if @_ != 2;
+    croak $usage if @_ != 1;
     my ($self) = @_;
 
     $self->combine_follows(1);

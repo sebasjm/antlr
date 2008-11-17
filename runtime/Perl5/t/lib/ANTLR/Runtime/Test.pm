@@ -46,10 +46,10 @@ sub g_test_output_is {
     my $tmpdir = tempdir( CLEANUP => 1 );
 
     my $grammar_name;
-    if ($grammar =~ /grammar (\w+)/) {
+    if ($grammar =~ /^(?:(?:lexer|parser|tree)\s+)? grammar \s+ (\w+)/xms) {
         $grammar_name = $1;
     } else {
-        return 0;
+        croak "Can't determine grammar name";
     }
 
     # write grammar file

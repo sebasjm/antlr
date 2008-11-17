@@ -383,7 +383,8 @@ sub <ruleName>() {
     <ruleScopeCleanUp()>
     <finally>
     if ($exception) {
-        croak $exception;
+        #croak $exception;
+        $exception->rethrow();
     }
     <@postamble()>
     return <ruleReturnValue()>;
@@ -707,7 +708,7 @@ if ( <s> ) {
     $self->input->consume();
     <postmatchCode>
 <if(!LEXER)>
-    errorRecovery = false;
+    $self->error_recovery(0);
 <endif>
     <if(backtracking)>failed=false;<endif>
 }
@@ -860,7 +861,12 @@ else {
 <else>
     <ruleBacktrackFailure()>
     my $nvae =
-        ANTLR::Runtime::NoViableAltException->new("<description>", <decisionNumber>, <stateNumber>, $self->input);<\n>
+        ANTLR::Runtime::NoViableAltException->new({
+            grammar_decision_description => "<description>",
+            decision_number => <decisionNumber>,
+            state_number => <stateNumber>,
+            input => $self->input,
+        });<\n>
     <@noViableAltException()>
     croak $nvae;<\n>
 <endif>
@@ -924,7 +930,12 @@ switch ( $self->input->LA(<k>) ) {
     <else>
         <ruleBacktrackFailure()>
         my $nvae =
-            ANTLR::Runtime::NoViableAltException->new("<description>", <decisionNumber>, <stateNumber>, $self->input);<\n>
+            ANTLR::Runtime::NoViableAltException->new({
+                grammar_decision_description => "<description>",
+                decision_number => <decisionNumber>,
+                state_number => <stateNumber>,
+                input => $self->input,
+            });<\n>
         <@noViableAltException()>
         croak $nvae;<\n>
     <endif>
@@ -1047,7 +1058,13 @@ sub special_state_transition {
     }<\n>
 <endif>
 
-    my $nvae = ANTLR::Runtime::NoViableAltException($self->get_description(), <dfa.decisionNumber>, $s, $input);
+    my $nvae =
+        ANTLR::Runtime::NoViableAltException->new({
+            grammar_decision_description => $self->get_description(),
+            decision_number => <dfa.decisionNumber>,
+            state_number => $s,
+            input => $input,
+        });<\n>
     $self->error($nvae);
     $nvae->throw();
     }<\n>
@@ -1352,5 +1369,5 @@ Readonly my $<name> => ANTLR::Runtime::BitSet->new({ words64 => [ <words64:{'<it
 
 codeFileExtension() ::= ".pm"
 
-true() ::= "true"
-false() ::= "false"
+true() ::= "1"
+false() ::= "0"
