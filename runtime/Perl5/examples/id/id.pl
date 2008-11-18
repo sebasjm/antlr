@@ -9,7 +9,7 @@ use IDLexer;
 use strict;
 use warnings;
 
-my $input = ANTLR::Runtime::ANTLRStringStream->new("Hello World!\n42\n");
+my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => "Hello World!\n42\n" });
 my $lexer = IDLexer->new($input);
 
 while (1) {

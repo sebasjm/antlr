@@ -11,7 +11,7 @@ use MExprLexer;
 use MExprParser;
 
 while (<>) {
-    my $input = ANTLR::Runtime::ANTLRStringStream->new($_);
+    my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => $_ });
     my $lexer = MExprLexer->new($input);
 
     my $tokens = ANTLR::Runtime::CommonTokenStream->new({ token_source => $lexer });

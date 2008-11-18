@@ -9,7 +9,7 @@ use TLexer;
 use strict;
 use warnings;
 
-my $input = ANTLR::Runtime::ANTLRStringStream->new('010');
+my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => '010' });
 my $lexer = TLexer->new($input);
 
 while (1) {

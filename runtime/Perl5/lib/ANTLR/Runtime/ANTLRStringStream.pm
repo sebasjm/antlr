@@ -13,12 +13,11 @@ use base qw( ANTLR::Runtime::CharStream );
 
 sub new {
     Readonly my $usage => 'ANTLRStringStream new($input)';
-    croak $usage if @_ != 2;
-    my ($class, $input) = @_;
+    croak $usage if @_ != 1 && @_ != 2;
+    my ($class, $arg_ref) = @_;
 
     my $self = bless {}, $class;
-
-    $self->{input} = $input;
+    $self->{input} = $arg_ref->{input};
     $self->{p} = 0;
     $self->{line} = 1;
     $self->{char_position_in_line} = 0;

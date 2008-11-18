@@ -16,7 +16,7 @@ my $in;
     $in = <>;
 }
 
-my $input = ANTLR::Runtime::ANTLRStringStream->new($in);
+my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => $in });
 my $lexer = ExprLexer->new($input);
 
 my $tokens = ANTLR::Runtime::CommonTokenStream->new({ token_source => $lexer });

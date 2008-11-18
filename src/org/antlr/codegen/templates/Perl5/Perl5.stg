@@ -383,8 +383,8 @@ sub <ruleName>() {
     <ruleScopeCleanUp()>
     <finally>
     if ($exception) {
-        #croak $exception;
-        $exception->rethrow();
+        croak $exception;
+        #$exception->rethrow();
     }
     <@postamble()>
     return <ruleReturnValue()>;

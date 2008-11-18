@@ -9,14 +9,14 @@ use Test::More;
 use ANTLR::Runtime::ANTLRStringStream;
 
 sub test_new_string :Test(2) {
-    my $s = ANTLR::Runtime::ANTLRStringStream->new('ABC');
+    my $s = ANTLR::Runtime::ANTLRStringStream->new({ input => 'ABC' });
     is ($s->LA(1), 'A');
     $s->consume();
     is ($s->LA(1), 'B');
 }
 
 sub test_LA :Test(5) {
-    my $s = ANTLR::Runtime::ANTLRStringStream->new('ABC');
+    my $s = ANTLR::Runtime::ANTLRStringStream->new({ input => 'ABC' });
     is($s->LA(0), undef);
     is($s->LA(1), 'A');
     is($s->LA(2), 'B');
