@@ -7,7 +7,17 @@
     <version>3.2-SNAPSHOT</version>
     <name>antlr</name>
     <url>http://maven.apache.org</url>
-    
+
+  <!--
+
+    Define where the ANTLR Tool jar is deployed both for
+    the main ANTLR repository, which syncs with the maven main
+    repository, and the snapshot repository, which can be
+    used by developers that need the latest development version of
+    something, but is used here to ensure that snapshot builds of the
+    ANTLR tool pick up the latest snapshot of the runtime and string tempalte
+    and whatever else it might need in the future.
+    -->
   <distributionManagement>
 
       <repository>
@@ -24,7 +34,41 @@
 
   </distributionManagement>
   
-    <dependencies>
+  <!--
+  
+    Inform Maven of the ANTLR snapshot repository, which it will
+    need to consult to get the latest snapshot build of the runtime
+    if it was not built and installed locally.
+    -->
+  <repositories>
+
+      <!--
+        This is the ANTLR repository.
+        -->
+      <repository>
+          <id>antlr-snapshot</id>
+          <name>ANTLR Testing Snapshot Repository</name>
+          <url>http://www.antlr.org/antlr-snapshot</url>
+          <snapshots>
+              <enabled>true</enabled>
+              <updatePolicy>always</updatePolicy>
+          </snapshots>
+      </repository>
+      
+  </repositories>
+
+  <!--
+
+    Tell Maven which other artifacts we need in order to
+    build, run and test the ANTLR Tool. The ANTLR Tool uses earlier versions
+    of ANTLR at runtime (for the moment), uses the current
+    released version of ANTLR String template, but obviously is
+    reliant on the latest snapshot of the runtime, which will either be
+    taken from the antlr-snapshot repository, or your local .m2
+    repository if you built and installed that locally.
+
+    -->
+  <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -48,6 +92,7 @@
             <artifactId>antlr-runtime</artifactId>
             <version>3.2-SNAPSHOT</version>
             <scope>compile</scope>
+
         </dependency>
         
     </dependencies>
@@ -177,5 +222,14 @@
             </plugin>
             
         </plugins>
+
+    <extensions>
+        <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-ssh-external</artifactId>
+            <version>1.0-beta-2</version>
+        </extension>
+    </extensions>
+
     </build>
 </project>
