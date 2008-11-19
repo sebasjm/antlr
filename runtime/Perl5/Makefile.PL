@@ -24,5 +24,5 @@ WriteMakefile(
                       'Object::InsideOut' => '3.35',
                       'Test::Class'       => '0.28',
                      },
-    test          => { TESTS => 't/*.t' },
+    test          => { TESTS => 't/*.t t/examples/*.t' },
 );

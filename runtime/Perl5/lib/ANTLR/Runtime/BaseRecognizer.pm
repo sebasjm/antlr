@@ -4,6 +4,9 @@ use Readonly;
 use Carp;
 use ANTLR::Runtime::Class;
 use ANTLR::Runtime::Token;
+use ANTLR::Runtime::UnwantedTokenException;
+use ANTLR::Runtime::MissingTokenException;
+use ANTLR::Runtime::MismatchedTokenException;
 
 use strict;
 use warnings;
@@ -71,19 +74,20 @@ sub match {
     croak $usage if @_ != 4;
     my ($self, $input, $ttype, $follow) = @_;
 
+    my $matched_symbol = $self->get_current_input_symbol($input);
     if ($input->LA(1) eq $ttype) {
         $input->consume();
         $self->error_recovery(0);
         $self->failed(0);
-        return;
+        return $matched_symbol;
     }
 
     if ($self->backtracking > 0) {
         $self->failed(1);
-        return;
+        return $matched_symbol;
     }
 
-    $self->mismatch($input, $ttype, $follow);
+    return $self->recover_from_mismatched_token($input, $ttype, $follow);
 }
 
 sub match_any {
@@ -94,6 +98,32 @@ sub match_any {
     $self->error_recovery(0);
     $self->failed(0);
     $input->consume();
+}
+
+sub mismatch_is_unwanted_token {
+    my ($self, $input, $ttype) = @_;
+    return $input->LA(2) == $ttype;
+}
+
+sub mismatch_is_missing_token {
+    my ($self, $input, $follow) = @_;
+
+    if (!defined $follow) {
+        return 0;
+    }
+
+    if ($follow->member(ANTLR::Runtime::Token->EOR_TOKEN_TYPE)) {
+        my $viable_tokens_following_this_rule = $self->compute_context_sensitive_rule_FOLLOW();
+        $follow = $follow->or($viable_tokens_following_this_rule);
+        if ($self->state->fsp >= 0) {
+            $follow->remove(ANTLR::Runtime::Token->EOR_TOKEN_TYPE);
+        }
+    }
+
+    if ($follow->member($input->LA(1)) || $follow->member(ANTLR::Runtime::Token->EOR_TOKEN_TYPE)) {
+        return 1;
+    }
+    return 0;
 }
 
 sub mismatch {
@@ -275,23 +305,42 @@ sub combine_follows {
 }
 
 sub recover_from_mismatched_token {
-    Readonly my $usage => 'void recover_from_mismatched_token(IntStream input, RecognitionException e, int ttype, BitSet follow)';
-    croak $usage if @_ != 5;
-    my ($self, $input, $e, $ttype, $follow) = @_;
+    Readonly my $usage => 'void recover_from_mismatched_token(IntStream input, int ttype, BitSet follow)';
+    croak $usage if @_ != 4;
+    my ($self, $input, $ttype, $follow) = @_;
 
-    if ($input->LA(2) eq $ttype) {
-        $self->report_error($e);
+    if ($self->mismatch_is_unwanted_token($input, $ttype)) {
+        my $ex = ANTLR::Runtime::UnwantedTokenException->new({
+            expecting => $ttype,
+            input => $input
+        });
 
         $self->begin_resync();
         $input->consume();
         $self->end_resync();
+        $self->report_error($ex);
+
+        my $matched_symbol = $self->get_current_input_symbol($input);
         $input->consume();
-        return;
+        return $matched_symbol;
     }
 
-    if (!$self->recover_from_mismatched_element($input, $e, $follow)) {
-        croak $e;
+    if ($self->mismatch_is_missing_token($input, $follow)) {
+        my $inserted = $self->get_missing_symbol();
+        my $ex = ANTLR::Runtime::MissingTokenException({
+            expecting => $ttype,
+            input => $input,
+            inserted => $inserted,
+        });
+        $self->report_error($ex);
+        return $inserted;
     }
+
+    my $ex = ANTLR::Runtime::MismatchedTokenException({
+        expecting => $$ttype,
+        input => $input,
+    });
+    $ex->throw();
 }
 
 sub recover_from_mismatched_set {
@@ -323,6 +372,21 @@ sub recover_from_mismatched_element {
     }
 
     return 0;
+}
+
+sub get_current_input_symbol {
+    my ($self, $input) = @_;
+    return undef;
+}
+
+sub get_missing_symbol {
+    my ($self, $arg_ref) = @_;
+    my $input = $arg_ref->{input};
+    my $exception = $arg_ref->{exception};
+    my $expected_token_type = $arg_ref->{expected_token_type};
+    my $follow = $arg_ref->{follow};
+
+    return undef;
 }
 
 sub consume_until {

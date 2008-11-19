@@ -14,6 +14,7 @@ my $build = Module::Build->new(
    build_requires => {
        'Test::Class'       => '0.28',
        'Java::JVM::Classfile' => '0.20',
-   }
+   },
+   test_files => 't/*.t t/examples/*.t',
 );
 $build->create_build_script;
