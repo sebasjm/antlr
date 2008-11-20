@@ -31,6 +31,7 @@ package org.antlr.test;
 import org.antlr.Tool;
 import org.antlr.analysis.Label;
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Message;
 import org.antlr.tool.GrammarSemanticsMessage;
@@ -38,6 +39,7 @@ import org.antlr.tool.ANTLRErrorListener;
 
 
 import org.junit.Before;
+import org.junit.After;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -61,17 +63,35 @@ public abstract class BaseTest {
      */
     public static final String CLASSPATH = System.getProperty("java.class.path") + (SUREFIRE_CLASSPATH.equals("") ? "" : pathSep + SUREFIRE_CLASSPATH); 
     
-	public final String tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr-"+System.currentTimeMillis()).getAbsolutePath();
+	public String tmpdir = null;
 
-	/** If error during execution, store stderr here */
-	protected String stderr;
+	/** If error during parser execution, store stderr here; can't return
+     *  stdout and stderr.  This doesn't trap errors from running antlr.
+     */
+	protected String stderrDuringParse;
 
     @Before
 	public void setUp() throws Exception {
-		ErrorManager.resetErrorState();
-	}
+        // new output dir for each test
+        tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr-"+getClass().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+        ErrorManager.resetErrorState();
+        // force reset of static caches
+        new StringTemplateGroup("") {
+            {
+                StringTemplateGroup.nameToGroupMap = Collections.synchronizedMap(new HashMap());
+                StringTemplateGroup.nameToInterfaceMap = Collections.synchronizedMap(new HashMap());
+            }
+        };
+        StringTemplate.resetTemplateCounter();
+        StringTemplate.defaultGroup = new StringTemplateGroup("defaultGroup", ".");
+    }
 
-	protected Tool newTool(String[] args) {
+    @After
+    public void tearDown() throws Exception {
+        // remove tmpdir if no error.  How?
+    }
+
+    protected Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
 		tool.setOutputDirectory(tmpdir);
 		return tool;
@@ -147,7 +167,7 @@ public abstract class BaseTest {
 			final ErrorQueue equeue = new ErrorQueue();
 			ErrorManager.setErrorListener(equeue);
 			*/
-			Tool antlr = new Tool(optionsA);
+			Tool antlr = newTool(optionsA);
 			antlr.process();
 			ANTLRErrorListener listener = ErrorManager.getErrorListener();
 			if ( listener instanceof ErrorQueue ) {
@@ -159,7 +179,10 @@ public abstract class BaseTest {
 						Message msg = (Message) equeue.errors.get(i);
 						System.err.println(msg);
 					}
-				}
+                    System.out.println("!!!\ngrammar:");
+                    System.out.println(grammarStr);
+                    System.out.println("###");
+                }
 			}
 		}
 		catch (Exception e) {
@@ -331,6 +354,7 @@ public abstract class BaseTest {
 									   boolean treeParserBuildsTrees,
 									   boolean debug)
 	{
+        this.stderrDuringParse = null;
 		if ( treeParserBuildsTrees && parserBuildsTrees ) {
 			writeTreeAndTreeTestFile(parserName,
 									 treeParserName,
@@ -369,9 +393,8 @@ public abstract class BaseTest {
 				"java", "-classpath", tmpdir+pathSep+CLASSPATH,
 				"Test", new File(tmpdir, "input").getAbsolutePath()
 			};
-			String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
+			//String cmdLine = "java -classpath "+CLASSPATH+pathSep+tmpdir+" Test " + new File(tmpdir, "input").getAbsolutePath();
 			//System.out.println("execParser: "+cmdLine);
-			this.stderr = null;
 			Process process =
 				Runtime.getRuntime().exec(args, null, new File(tmpdir));
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -384,8 +407,8 @@ public abstract class BaseTest {
 			String output = null;
 			output = stdoutVacuum.toString();
 			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderr = stderrVacuum.toString();
-				System.err.println("exec stderrVacuum: "+ stderrVacuum);
+				this.stderrDuringParse = stderrVacuum.toString();
+				//System.err.println("exec stderrVacuum: "+ stderrVacuum);
 			}
 			return output;
 		}
@@ -749,10 +772,10 @@ public abstract class BaseTest {
 	}
 
 	public String getFirstLineOfException() {
-		if ( this.stderr==null ) {
+		if ( this.stderrDuringParse ==null ) {
 			return null;
 		}
-		String[] lines = this.stderr.split("\n");
+		String[] lines = this.stderrDuringParse.split("\n");
 		String prefix="Exception in thread \"main\" ";
 		return lines[0].substring(prefix.length(),lines[0].length());
 	}

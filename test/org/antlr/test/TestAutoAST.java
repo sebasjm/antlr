@@ -27,7 +27,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.test;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -675,7 +674,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "decl", "int 34 x=1;", debug);
-		assertEquals("line 1:4 extraneous input '34' expecting ID\n", this.stderr);
+		assertEquals("line 1:4 extraneous input '34' expecting ID\n", this.stderrDuringParse);
 		assertEquals("(int x 1)\n", found); // tree gets correct x and 1 tokens
 	}
 
@@ -691,7 +690,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "decl", "int =1;", debug);
-		assertEquals("line 1:4 missing ID at '='\n", this.stderr);
+		assertEquals("line 1:4 missing ID at '='\n", this.stderrDuringParse);
 		assertEquals("(int <missing ID> 1)\n", found); // tree gets invented ID token
 	}
 
@@ -707,7 +706,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "decl", "x=1;", debug);
-		assertEquals("line 1:0 mismatched input 'x' expecting set null\n", this.stderr);
+		assertEquals("line 1:0 mismatched input 'x' expecting set null\n", this.stderrDuringParse);
 		assertEquals("(<error: x> x 1)\n", found); // tree gets invented ID token
 	}
 
@@ -721,7 +720,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc", debug);
-		assertEquals("line 0:-1 missing INT at '<EOF>'\n", this.stderr);
+		assertEquals("line 0:-1 missing INT at '<EOF>'\n", this.stderrDuringParse);
 		assertEquals("abc <missing INT>\n", found);
 	}
 
@@ -736,7 +735,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc", debug);
-		assertEquals("line 0:-1 mismatched input '<EOF>' expecting INT\n", this.stderr);
+		assertEquals("line 0:-1 mismatched input '<EOF>' expecting INT\n", this.stderrDuringParse);
 		assertEquals("<mismatched token: [@-1,0:0='<no text>',<-1>,0:-1], resync=abc>\n", found);
 	}
 
@@ -752,7 +751,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "abc ick 34", debug);
-		assertEquals("line 1:4 extraneous input 'ick' expecting INT\n", this.stderr);
+		assertEquals("line 1:4 extraneous input 'ick' expecting INT\n", this.stderrDuringParse);
 		assertEquals("abc 34\n", found);
 	}
 
@@ -766,7 +765,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "34", debug);
-		assertEquals("line 1:0 missing ID at '34'\n", this.stderr);
+		assertEquals("line 1:0 missing ID at '34'\n", this.stderrDuringParse);
 		assertEquals("<missing ID> 34\n", found);
 	}
 
@@ -785,7 +784,7 @@ public class TestAutoAST extends BaseTest {
 		// finds an error at the first token, 34, and re-syncs.
 		// re-synchronizing does not consume a token because 34 follows
 		// ref to rule b (start of c). It then matches 34 in c.
-		assertEquals("line 1:0 missing ID at '34'\n", this.stderr);
+		assertEquals("line 1:0 missing ID at '34'\n", this.stderrDuringParse);
 		assertEquals("<missing ID> 34\n", found);
 	}
 
@@ -802,7 +801,7 @@ public class TestAutoAST extends BaseTest {
 			"WS : (' '|'\\n') {$channel=HIDDEN;} ;\n";
 		String found = execParser("foo.g", grammar, "fooParser", "fooLexer",
 								  "a", "*", debug);
-		assertEquals("line 1:0 no viable alternative at input '*'\n", this.stderr);
+		assertEquals("line 1:0 no viable alternative at input '*'\n", this.stderrDuringParse);
 		assertEquals("<unexpected: [@0,0:0='*',<6>,1:0], resync=*>\n", found);
 	}
 

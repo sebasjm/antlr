@@ -596,7 +596,8 @@ public class ErrorManager {
 	}
 
 	public static void resetErrorState() {
-		ErrorState ec = new ErrorState();
+        threadToListenerMap = new HashMap();        
+        ErrorState ec = new ErrorState();
 		threadToErrorStateMap.put(Thread.currentThread(), ec);
 	}
 
