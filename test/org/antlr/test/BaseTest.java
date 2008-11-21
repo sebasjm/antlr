@@ -40,6 +40,7 @@ import org.antlr.tool.ANTLRErrorListener;
 
 import org.junit.Before;
 import org.junit.After;
+import org.junit.Assert;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -65,6 +66,9 @@ public abstract class BaseTest {
     
 	public String tmpdir = null;
 
+    /** reset during setUp and set to true if we find a problem */  
+    protected boolean lastTestFailed = false;
+
 	/** If error during parser execution, store stderr here; can't return
      *  stdout and stderr.  This doesn't trap errors from running antlr.
      */
@@ -72,6 +76,7 @@ public abstract class BaseTest {
 
     @Before
 	public void setUp() throws Exception {
+        lastTestFailed = false; // hope for the best, but set to true in asserts that fail
         // new output dir for each test
         tmpdir = new File(System.getProperty("java.io.tmpdir"), "antlr-"+getClass().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
         ErrorManager.resetErrorState();
@@ -88,7 +93,9 @@ public abstract class BaseTest {
 
     @After
     public void tearDown() throws Exception {
-        // remove tmpdir if no error.  How?
+        // remove tmpdir if no error.
+        if ( !lastTestFailed ) eraseTempDir();
+
     }
 
     protected Tool newTool(String[] args) {
@@ -761,15 +768,31 @@ public abstract class BaseTest {
 		writeFile(tmpdir, "Test.java", outputFileST.toString());
 	}
 
-	protected void eraseFiles(final String filesEndingWith) {
-		File tmpdirF = new File(tmpdir);
-		String[] files = tmpdirF.list();
-		for(int i = 0; files!=null && i < files.length; i++) {
-			if ( files[i].endsWith(filesEndingWith) ) {
-				new File(tmpdir+"/"+files[i]).delete();
-			}
-		}
-	}
+    protected void eraseFiles(final String filesEndingWith) {
+        File tmpdirF = new File(tmpdir);
+        String[] files = tmpdirF.list();
+        for(int i = 0; files!=null && i < files.length; i++) {
+            if ( files[i].endsWith(filesEndingWith) ) {
+                new File(tmpdir+"/"+files[i]).delete();
+            }
+        }
+    }
+
+    protected void eraseFiles() {
+        File tmpdirF = new File(tmpdir);
+        String[] files = tmpdirF.list();
+        for(int i = 0; files!=null && i < files.length; i++) {
+            new File(tmpdir+"/"+files[i]).delete();
+        }
+    }
+
+    protected void eraseTempDir() {
+        File tmpdirF = new File(tmpdir);
+        if ( tmpdirF.exists() ) {
+            eraseFiles();
+            tmpdirF.delete();
+        }
+    }
 
 	public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {
@@ -831,4 +854,23 @@ public abstract class BaseTest {
         System.out.println("Tree map looks like: " + nset.toString());
         return nset.toString();
     }
+
+    // override to track errors
+
+    public void assertEquals(String msg, Object a, Object b) { try {Assert.assertEquals(msg,a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(Object a, Object b) { try {Assert.assertEquals(a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(String msg, long a, long b) { try {Assert.assertEquals(msg,a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertEquals(long a, long b) { try {Assert.assertEquals(a,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+
+    public void assertTrue(String msg, boolean b) { try {Assert.assertTrue(msg,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertTrue(boolean b) { try {Assert.assertTrue(b);} catch (Error e) {lastTestFailed=true; throw e;} }
+
+    public void assertFalse(String msg, boolean b) { try {Assert.assertFalse(msg,b);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertFalse(boolean b) { try {Assert.assertFalse(b);} catch (Error e) {lastTestFailed=true; throw e;} }
+
+    public void assertNotNull(String msg, Object p) { try {Assert.assertNotNull(msg, p);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNotNull(Object p) { try {Assert.assertNotNull(p);} catch (Error e) {lastTestFailed=true; throw e;} }
+
+    public void assertNull(String msg, Object p) { try {Assert.assertNull(msg, p);} catch (Error e) {lastTestFailed=true; throw e;} }
+    public void assertNull(Object p) { try {Assert.assertNull(p);} catch (Error e) {lastTestFailed=true; throw e;} }
 }
