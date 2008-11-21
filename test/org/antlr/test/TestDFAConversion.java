@@ -633,9 +633,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-    @Ignore
-    // TODO: Ter to review why this test fails...
-    //
+    @Test
     public void testInvokeRule() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -653,9 +651,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testDoubleInvokeRuleLeftEdge() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -693,9 +689,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testAStar_immediateTailRecursion() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -731,9 +725,7 @@ public class TestDFAConversion extends BaseTest {
 				   msg instanceof GrammarSemanticsMessage);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testAStar_immediateTailRecursion2() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -908,9 +900,7 @@ public class TestDFAConversion extends BaseTest {
 
 	// A R B I T R A R Y  L O O K A H E A D
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testAStarBOrAStarC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -933,9 +923,7 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testAStarBOrAPlusC() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -958,9 +946,7 @@ public class TestDFAConversion extends BaseTest {
 	}
 
 
-    @Ignore
-    // TODO: Ter to review why this test fails...
-    //
+    @Test
     public void testAOrBPlusOrAPlus() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar t;\n"+
@@ -1471,9 +1457,7 @@ As a result, alternative(s) 2 were disabled for that input
 		assertEquals("mismatched alt", expectedAlt, msg.alt);
 	}
 
-    @Ignore
-    // TODO: Ter to review why this test fails...
-    //
+    @Test
     public void testWildcardInTreeGrammar() throws Exception {
         Grammar g = new Grammar(
             "tree grammar t;\n" +
@@ -1491,9 +1475,7 @@ As a result, alternative(s) 2 were disabled for that input
                       nonDetAlts, ambigInput, danglingAlts, numWarnings);
     }
 
-    @Ignore
-    // TODO: Ter to review why this test fails...
-    //
+    @Test
     public void testWildcardInTreeGrammar2() throws Exception {
         Grammar g = new Grammar(
             "tree grammar t;\n" +

@@ -128,9 +128,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testOrPredicates() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
@@ -440,9 +438,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
-    @Ignore
-    // TODO: Ter to review why this test fails...
-    //
+    @Test
     public void testGatedPred() throws Exception {
 		// gated preds are present on all arcs in predictor
 		Grammar g = new Grammar(
@@ -473,9 +469,7 @@ public class TestSemanticPredicates extends BaseTest {
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testGatedPredInCyclicDFA() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
@@ -720,13 +714,11 @@ public class TestSemanticPredicates extends BaseTest {
 					  danglingAlts, numWarnings, false);
 	}
 
-	@Ignore
+	@Test
     /** For a DFA state with lots of configurations that have the same
 	 *  predicate, don't just OR them all together as it's a waste to
 	 *  test a||a||b||a||a etc...  ANTLR makes a unique set and THEN
 	 *  OR's them together.
-     * 
-     * TODO: Ter to review why this test fails...
 	 */
     public void testUniquePredicateOR() throws Exception {
 		Grammar g = new Grammar(
@@ -756,9 +748,7 @@ public class TestSemanticPredicates extends BaseTest {
 					  danglingAlts, numWarnings, false);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+    @Test
     public void testSemanticContextPreventsEarlyTerminationOfClosure() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n" +

@@ -45,9 +45,7 @@ import static org.junit.Assert.*;
 public class TestTemplates extends BaseTest {
 	private static final String LINE_SEP = System.getProperty("line.separator");
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testTemplateConstructor() throws Exception {
 		String action = "x = %foo(name={$ID.text});";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
@@ -85,9 +83,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //
+	@Test
     public void testTemplateConstructorNoArgs() throws Exception {
 		String action = "x = %foo();";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\");";
@@ -124,9 +120,7 @@ public class TestTemplates extends BaseTest {
 		assertEquals(expecting, found);
 	}
 
-	@Ignore
-    // TODO: Ter to review why this test fails...
-    //    
+	@Test
     public void testIndirectTemplateConstructor() throws Exception {
 		String action = "x = %({\"foo\"})(name={$ID.text});";
 		String expecting = "x = templateLib.getInstanceOf(\"foo\"," +
