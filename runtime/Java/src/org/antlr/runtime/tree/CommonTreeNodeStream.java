@@ -130,6 +130,20 @@ public class CommonTreeNodeStream implements TreeNodeStream {
 		eof = adaptor.create(Token.EOF, "EOF");
 	}
 
+    /** Reuse an existing node stream's buffer of nodes.  Do not point at a
+     *  node stream that can change.  Must have static node list.  start/stop
+     *  are indexes into the parent.nodes stream.  We avoid making a new
+     *  list of nodes like this.
+     */
+    public CommonTreeNodeStream(CommonTreeNodeStream parent, int start, int stop) {
+        this.root = parent.root;
+        this.adaptor = parent.adaptor;
+        this.nodes = parent.nodes.subList(start, stop);
+        this.down = parent.down;
+        this.up = parent.up;
+        this.eof = parent.eof;
+    }
+
 	/** Walk tree with depth-first-search and fill nodes buffer.
 	 *  Don't do DOWN, UP nodes if its a list (t is isNil).
 	 */
