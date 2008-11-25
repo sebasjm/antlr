@@ -48,9 +48,7 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	 *  but reflection is slow.
 	 */
 	public Object dupNode(Object t) {
-		if ( t==null ) {
-			return null;
-		}
+		if ( t==null ) return null;
 		return ((Tree)t).dupNode();
 	}
 
@@ -94,46 +92,32 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	 *  Might be useful info so I'll not force to be i..i.
 	 */
 	public void setTokenBoundaries(Object t, Token startToken, Token stopToken) {
-		if ( t==null ) {
-			return;
-		}
+		if ( t==null ) return;
 		int start = 0;
 		int stop = 0;
-		if ( startToken!=null ) {
-			start = startToken.getTokenIndex();
-		}
-		if ( stopToken!=null ) {
-			stop = stopToken.getTokenIndex();
-		}
+		if ( startToken!=null ) start = startToken.getTokenIndex();
+		if ( stopToken!=null ) stop = stopToken.getTokenIndex();
 		((Tree)t).setTokenStartIndex(start);
 		((Tree)t).setTokenStopIndex(stop);
 	}
 
 	public int getTokenStartIndex(Object t) {
-		if ( t==null ) {
-			return -1;
-		}
+		if ( t==null ) return -1;
 		return ((Tree)t).getTokenStartIndex();
 	}
 
 	public int getTokenStopIndex(Object t) {
-		if ( t==null ) {
-			return -1;
-		}
+		if ( t==null ) return -1;
 		return ((Tree)t).getTokenStopIndex();
 	}
 
 	public String getText(Object t) {
-		if ( t==null ) {
-			return null;
-		}
+		if ( t==null ) return null;
 		return ((Tree)t).getText();
 	}
 
     public int getType(Object t) {
-		if ( t==null ) {
-			return Token.INVALID_TOKEN_TYPE;
-		}
+		if ( t==null ) return Token.INVALID_TOKEN_TYPE;
 		return ((Tree)t).getType();
 	}
 
@@ -149,33 +133,31 @@ public class CommonTreeAdaptor extends BaseTreeAdaptor {
 	}
 
 	public Object getChild(Object t, int i) {
-		if ( t==null ) {
-			return null;
-		}
+		if ( t==null ) return null;
         return ((Tree)t).getChild(i);
     }
 
     public int getChildCount(Object t) {
-		if ( t==null ) {
-			return 0;
-		}
+		if ( t==null ) return 0;
         return ((Tree)t).getChildCount();
     }
 
 	public Object getParent(Object t) {
-		return ((Tree)t).getParent();
+		if ( t==null ) return null;
+        return ((Tree)t).getParent();
 	}
 
 	public void setParent(Object t, Object parent) {
-		((Tree)t).setParent((Tree)parent);
+        if ( t!=null ) ((Tree)t).setParent((Tree)parent);
 	}
 
 	public int getChildIndex(Object t) {
+        if ( t==null ) return 0;
 		return ((Tree)t).getChildIndex();
 	}
 
 	public void setChildIndex(Object t, int index) {
-		((Tree)t).setChildIndex(index);
+        if ( t!=null ) ((Tree)t).setChildIndex(index);
 	}
 
 	public void replaceChildren(Object parent, int startChildIndex, int stopChildIndex, Object t) {

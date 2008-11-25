@@ -9,6 +9,8 @@ CHANGES
 
 November 24, 2008
 
+* null-ptr protected getParent and a few others.
+
 * Added new ctor to CommonTreeNodeStream for walking subtrees.  Avoids
   having to make new serialized stream as it can reuse overall node stream
   buffer.
