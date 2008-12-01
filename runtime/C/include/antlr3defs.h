@@ -109,6 +109,8 @@ typedef	UINT16	ANTLR3_UINT16,	*pANTLR3_UINT16;
 typedef	UINT32	ANTLR3_UINT32,	*pANTLR3_UINT32;
 typedef	UINT64	ANTLR3_UINT64,	*pANTLR3_UINT64;
 typedef UINT64  ANTLR3_BITWORD, *pANTLR3_BITWORD;
+typedef	UINT8	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
+
 #else
 // Mingw uses stdint.h and fails to define standard Microsoft typedefs
 // such as UINT16, hence we must use stdint.h for Mingw.
@@ -127,9 +129,12 @@ typedef uint16_t      	ANTLR3_UINT16,  *pANTLR3_UINT16;
 typedef uint32_t	    ANTLR3_UINT32,  *pANTLR3_UINT32;
 typedef uint64_t	    ANTLR3_UINT64,  *pANTLR3_UINT64;
 typedef uint64_t	    ANTLR3_BITWORD, *pANTLR3_BITWORD;
+
+typedef	uint8_t			ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
+
 #endif
 
-typedef	UINT8	ANTLR3_BOOLEAN, *pANTLR3_BOOLEAN;
+
 
 #define	ANTLR3_UINT64_LIT(lit)	    lit##ULL
 
