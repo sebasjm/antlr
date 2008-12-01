@@ -169,7 +169,7 @@ newPoolToken	    (pANTLR3_TOKEN_FACTORY factory)
 
     /* We have our token pointer now, so we can initialize it to the predefined model.
      */
-    ANTLR3_MEMMOVE((void *)token, (const void *)&factory->unTruc, (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TOKEN));
+    ANTLR3_MEMCPY((void *)token, (const void *)&factory->unTruc, (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TOKEN));
 
     /* And we are done
      */

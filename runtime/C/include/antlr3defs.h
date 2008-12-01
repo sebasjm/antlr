@@ -432,6 +432,12 @@ typedef ANTLR3_UINT32				ANTLR3_INTKEY;
 ///
 #define	ANTLR3_STRDUP(instr)					(pANTLR3_UINT8)(strdup  ((const char *)(instr)))
 #endif
+#ifndef ANTLR3_MEMCPY
+/// Default definition of ANTLR3_MEMCPY. You can override this before including
+/// antlr3.h if you wish to use your own implementation.
+///
+#define	ANTLR3_MEMCPY(target, source, size)	memcpy((void *)(target), (const void *)(source), (size_t)(size))
+#endif
 #ifndef ANTLR3_MEMMOVE
 /// Default definition of ANTLR3_MEMMOVE. You can override this before including
 /// antlr3.h if you wish to use your own implementation.

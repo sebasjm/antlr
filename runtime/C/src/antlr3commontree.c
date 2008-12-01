@@ -133,7 +133,7 @@ newPoolTree	    (pANTLR3_ARBORETUM factory)
 
 	// We have our token pointer now, so we can initialize it to the predefined model.
 	//
-	ANTLR3_MEMMOVE((void *)tree, (const void *)&(factory->unTruc), (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TREE));
+	ANTLR3_MEMCPY((void *)tree, (const void *)&(factory->unTruc), (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TREE));
 
 	// The super points to the common tree so we must override the one used by
 	// by the pre-built tree as otherwise we will always poitn to the same initial

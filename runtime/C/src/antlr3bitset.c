@@ -144,7 +144,7 @@ antlr3BitsetCopy(pANTLR3_BITSET_LIST blist)
 		return	NULL;
     }
 
-	ANTLR3_MEMMOVE(bitset->blist.bits, blist->bits, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
+	ANTLR3_MEMCPY(bitset->blist.bits, blist->bits, (ANTLR3_UINT64)(numElements * sizeof(ANTLR3_BITWORD)));
 
     // All seems good
     //
@@ -167,7 +167,7 @@ antlr3BitsetClone(pANTLR3_BITSET inSet)
 
     // Install the actual bits in the source set
     //
-    ANTLR3_MEMMOVE(bitset->blist.bits, inSet->blist.bits, (ANTLR3_UINT64)(inSet->blist.length * sizeof(ANTLR3_BITWORD)));
+    ANTLR3_MEMCPY(bitset->blist.bits, inSet->blist.bits, (ANTLR3_UINT64)(inSet->blist.length * sizeof(ANTLR3_BITWORD)));
 
     // All seems good
     //
@@ -376,7 +376,7 @@ grow(pANTLR3_BITSET bitset, ANTLR3_INT32 newSize)
     {
 		// Copy existing bits
 		//
-		ANTLR3_MEMMOVE((void *)newBits, (const void *)bitset->blist.bits, (size_t)(bitset->blist.length * sizeof(ANTLR3_BITWORD)));
+		ANTLR3_MEMCPY((void *)newBits, (const void *)bitset->blist.bits, (size_t)(bitset->blist.length * sizeof(ANTLR3_BITWORD)));
 
 		// Out with the old bits... de de de derrr
 		//
