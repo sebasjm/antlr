@@ -1,9 +1,7 @@
 package ANTLR::Runtime::Stream;
+use ANTLR::Runtime::Class;
 
 use Readonly;
-
-use strict;
-use warnings;
 
 sub consume {
     Readonly my $usage => 'void consume()';

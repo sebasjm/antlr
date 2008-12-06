@@ -1,10 +1,7 @@
 package ANTLR::Runtime::IntStream;
-
-use strict;
-use warnings;
+use ANTLR::Runtime::Class;
 
 sub consume {
 }
-
 
 1;

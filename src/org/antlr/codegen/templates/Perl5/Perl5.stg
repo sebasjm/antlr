@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"]
  Copyright (c) 2005-2006 Terence Parr
- Copyright (c) 2007 Ronald Blaschke
+ Copyright (c) 2007-2008 Ronald Blaschke
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -57,23 +57,22 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
       filterMode, superClass="ANTLR::Runtime::Lexer")  ::= <<
 package <name>;
+use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
-
-use English qw( -no_match_vars ) ;
 use Carp;
+use English qw( -no_match_vars ) ;
 use Readonly;
 use Switch;
 
+use ANTLR::Runtime::BaseRecognizer;
 use ANTLR::Runtime::DFA;
 use ANTLR::Runtime::NoViableAltException;
 
-use base qw( ANTLR::Runtime::Lexer );
+extends 'ANTLR::Runtime::Lexer';
 
-sub HIDDEN {
-    return ANTLR::Runtime::BaseRecognizer->HIDDEN;
-}
+use constant {
+    HIDDEN => ANTLR::Runtime::BaseRecognizer->HIDDEN
+};
 
 <tokens:{
 Readonly our $<it.name> => <it.type>;
@@ -84,15 +83,10 @@ sub <it.name> {
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <actions.lexer.members>
 
-sub new {
-    Readonly my $usage => '<name> new($input)';
-    croak $usage if @_ != 2;
-    my ($class, $input) = @_;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-    my $self = $class->SUPER::new($input);
     $self->init_dfas();
-
-    return $self;
 }
 
 sub get_grammar_file_name {
@@ -106,15 +100,13 @@ sub get_grammar_file_name {
 
 <synpreds:{p | <lexerSynpred(p)>}>
 
-ANTLR::Runtime::Class::create_attributes('<name>',
-    [qw( <cyclicDFAs:{dfa | dfa<dfa.decisionNumber>}; separator=" "> )]
-);
+<cyclicDFAs:{dfa | has 'dfa<dfa.decisionNumber>';}; separator="\n">
 
 sub init_dfas {
     my ($self) = @_;
 
     <cyclicDFAs:{dfa |
-    $self->dfa<dfa.decisionNumber> = <name>::DFA<dfa.decisionNumber>->new({ recognizer => $self });
+    $self->dfa<dfa.decisionNumber>(<name>::DFA<dfa.decisionNumber>->new({ recognizer => $self }));
     }; separator="\n">
 
     return;
@@ -349,8 +341,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 # $ANTLR start <ruleName>
 # <fileName>:<description>
 sub <ruleName>() {
-# <ruleDescriptor.parameterScope:parameterScope(scope=it)>
-    my ($self) = @_;
+    my ($self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>) = @_;
     <if(trace)>$self->traceIn("<ruleName>", <ruleDescriptor.index>);<endif>
     <ruleScopeSetUp()>
     <ruleDeclarations()>
@@ -400,8 +391,8 @@ catch (<e.decl>) {
 
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval = new <returnType()>();
-retval.start = input.LT(1);<\n>
+my $retval = <returnType()>->new();
+$retval->set_start($self->input->LT(1));<\n>
 <else>
 <ruleDescriptor.returnScope.attributes:{ a |
 my $<a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>;
@@ -462,7 +453,7 @@ $retval
 ruleCleanUp() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!TREE_PARSER)>
-retval.stop = input.LT(-1);<\n>
+$retval->set_stop($self->input->LT(-1));<\n>
 <endif>
 <endif>
 >>
@@ -991,13 +982,14 @@ Readonly my $DFA<dfa.decisionNumber>_transition => [ <dfa.javaCompressedTransiti
 
 {
 package <name>::DFA<dfa.decisionNumber>;
+use ANTLR::Runtime::Class;
 
 use strict;
 use warnings;
 
-use Object::InsideOut qw( ANTLR::Runtime::DFA );
+extends 'ANTLR::Runtime::DFA';
 
-sub _init :Init {
+sub BUILD {
     my $self = shift;
     my $param_ref = __PACKAGE__->unpack_params(@_, {
         spec => [
@@ -1008,17 +1000,15 @@ sub _init :Init {
         ]
     });
 
-    $self->recognizer = $param_ref->{recognizer};
-    $self->decision_number = <dfa.decisionNumber>;
-    $self->eot = $DFA<dfa.decisionNumber>_eot;
-    $self->eof = $DFA<dfa.decisionNumber>_eof;
-    $self->min = $DFA<dfa.decisionNumber>_min;
-    $self->max = $DFA<dfa.decisionNumber>_max;
-    $self->accept = $DFA<dfa.decisionNumber>_accept;
-    $self->special = $DFA<dfa.decisionNumber>_special;
-    $self->transition = $DFA<dfa.decisionNumber>_transition;
-
-    return;
+    $self->recognizer($param_ref->{recognizer});
+    $self->decision_number(<dfa.decisionNumber>);
+    $self->eot($DFA<dfa.decisionNumber>_eot);
+    $self->eof($DFA<dfa.decisionNumber>_eof);
+    $self->min($DFA<dfa.decisionNumber>_min);
+    $self->max($DFA<dfa.decisionNumber>_max);
+    $self->accept($DFA<dfa.decisionNumber>_accept);
+    $self->special($DFA<dfa.decisionNumber>_special);
+    $self->transition($DFA<dfa.decisionNumber>_transition);
 }
 
 sub get_description {
@@ -1202,15 +1192,20 @@ my $<label.label.text> = <initValue(typeName=ruleLabelType(referencedRule=label.
  */
 returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-public static class <returnType()> extends <if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope {
+{
+    package <returnType()>;
+    use ANTLR::Runtime::Class;
+
+    extends 'ANTLR::Runtime::<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope';
+
     <scope.attributes:{public <it.decl>;}; separator="\n">
     <@ruleReturnMembers()>
-};
+}
 <endif>
 >>
 
 parameterScope(scope) ::= <<
-<scope.attributes:{<it.decl>}; separator=", ">
+<scope.attributes:{$<it.name>}; separator=", ">
 >>
 
 parameterAttributeRef(attr) ::= "$<attr.name>"
@@ -1297,7 +1292,7 @@ input.getTokenStream().toString(
   input.getTreeAdaptor().getTokenStartIndex(<scope>.start),
   input.getTreeAdaptor().getTokenStopIndex(<scope>.start))
 <else>
-input.toString(<scope>.start,<scope>.stop)
+substr($self->input, $<scope>->start, $<scope>->stop)
 <endif>
 >>
 

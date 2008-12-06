@@ -1,10 +1,9 @@
 package ANTLR::Runtime::TokenStream;
-use base qw( ANTLR::Runtime::IntStream );
+use ANTLR::Runtime::Class;
 
 use Readonly;
 
-use strict;
-use warnings;
+extends 'ANTLR::Runtime::IntStream';
 
 sub LT {
     Readonly my $usage => 'Token LT(int k)';

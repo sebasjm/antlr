@@ -8,10 +8,8 @@ use Attribute::Handlers;
 use List::MoreUtils qw( zip );
 use Params::Validate qw( validate );
 
-use Object::InsideOut qw( Exporter );
-
 BEGIN {
-    our @EXPORT = qw( unpack_params );
+    our @EXPORT = qw( unpack_params has );
 }
 
 sub Constant :ATTR(BEGIN) {
@@ -61,8 +59,7 @@ sub MODIFY_ARRAY_ATTRIBUTES {
             push @filtered_attributes, $attribute;
         }
     }
-
-    return Object::InsideOut::MODIFY_ARRAY_ATTRIBUTES($package, $referent, @filtered_attributes);
+    return;
 }
 
 sub Abstract :ATTR(CODE) {
@@ -144,6 +141,66 @@ sub unpack_method_args {
     };
 
     return ($obj, @{ $unpacked_args_ref }{ @param_names });
+}
+
+#---
+
+
+sub new {
+    my ($class, @args) = @_;
+    my $self = bless {}, $class;
+    my $arg_ref = $class->BUILDARGS(@args);
+    $self->BUILDALL($arg_ref);
+    return $self;
+}
+
+sub BUILDARGS {
+    my ($class, @args) = @_;
+
+    if (@args == 1) {
+        if (ref $args[0] eq 'HASH') {
+            return $args[0];
+        }
+        else {
+            croak "Single parameters to new must be a hash reference";
+        }
+    }
+    else {
+        return {@args};
+    }
+}
+
+sub linearized_isa {
+    my ($class) = @_;
+    return @{ mro::get_linear_isa($class) };
+}
+
+sub BUILDALL {
+    my ($self, $arg_ref) = @_;
+    foreach my $method (map { "${_}::BUILD" } reverse linearized_isa(ref $self)) {
+        if ($self->can($method)) {
+            $self->$method($arg_ref);
+        }
+    }
+    return;
+}
+
+sub DEMOLISHALL {
+    my ($self) = @_;
+    foreach my $method (map { "${_}::DEMOLISH" } reverse linearized_isa(ref $self)) {
+        if ($self->can($method)) {
+            $self->$method();
+        }
+    }
+    return;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+
+    local $@ if $@;
+    $self->DEMOLISHALL;
+    return;
 }
 
 1;

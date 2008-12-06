@@ -18,11 +18,10 @@ WriteMakefile(
     LICENSE       => 'perl',
     ABSTRACT_FROM => 'lib/ANTLR/Runtime.pm',
     AUTHOR        => 'Ronald Blaschke <ron@rblasch.org>',
-    PREREQ_PM     => { 
+    PREREQ_PM     => {
                       'Carp'              => '1.04',
                       'Readonly'          => '1.03',
-                      'Object::InsideOut' => '3.35',
                       'Test::Class'       => '0.28',
                      },
-    test          => { TESTS => 't/*.t t/examples/*.t' },
+    test          => { TESTS => 't/classes/ANTLR/Runtime/*.t t/*.t t/examples/*.t' },
 );

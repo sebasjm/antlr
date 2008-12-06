@@ -34,6 +34,9 @@ import org.antlr.tool.RuleLabelScope;
 
 public class Perl5Target extends Target {
     public Perl5Target() {
+        targetCharValueEscape['$'] = "\\$";
+        targetCharValueEscape['@'] = "\\@";
+        targetCharValueEscape['%'] = "\\%";
         AttributeScope.tokenScope.addAttribute("self", null);
         RuleLabelScope.predefinedLexerRulePropertiesScope.addAttribute("self", null);
     }

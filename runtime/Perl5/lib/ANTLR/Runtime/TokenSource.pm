@@ -1,7 +1,5 @@
 package ANTLR::Runtime::TokenSource;
-
-use strict;
-use warnings;
+use ANTLR::Runtime::Class;
 
 # Return a Token object from your input stream (usually a CharStream).
 # Do not fail/return upon lexing error; keep chewing on the characters
@@ -10,7 +8,6 @@ sub next_token {
 }
 
 1;
-
 __END__
 
 =head1 NAME

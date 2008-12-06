@@ -1,15 +1,14 @@
 package ANTLR::Runtime::CharStream;
+use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
-
-use base qw( ANTLR::Runtime::IntStream );
-
-use Readonly;
 use Carp;
+use Readonly;
 
-Readonly our $EOF => -1;
-sub EOF { return $EOF; }
+extends 'ANTLR::Runtime::IntStream';
+
+use constant {
+    EOF => -1
+};
 
 sub substring {
 }

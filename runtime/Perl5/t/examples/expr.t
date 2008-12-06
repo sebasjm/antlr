@@ -73,7 +73,7 @@ b = 13
 EOT
 
 my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => $in });
-my $lexer = ExprLexer->new($input);
+my $lexer = ExprLexer->new({ input => $input });
 
 my $tokens = ANTLR::Runtime::CommonTokenStream->new({ token_source => $lexer });
 my $parser = ExprParser->new($tokens);

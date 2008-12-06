@@ -1,19 +1,17 @@
 package ANTLR::Runtime::MissingTokenException;
-
-use strict;
-use warnings;
+use ANTLR::Runtime::Class;
 
 use overload
     '""' => \&to_string;
 
-use Object::InsideOut qw( ANTLR::Runtime::MismatchedTokenException );
+extends 'ANTLR::Runtime::MismatchedTokenException';
 
-my @inserted :Field :Accessor(Name => 'inserted', Private => 1, lvalue => 1);
+has 'inserted';
 
-sub init :Init {
+sub BUILD {
     my ($self, $arg_ref) = @_;
     my $inserted = $arg_ref->{inserted};
-    $self->inserted = $inserted;
+    $self->inserted($inserted);
 }
 
 sub get_missing_type {

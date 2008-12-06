@@ -1,4 +1,5 @@
 package ANTLR::Runtime::Lexer;
+use ANTLR::Runtime::Class;
 use base qw( ANTLR::Runtime::BaseRecognizer ANTLR::Runtime::TokenSource );
 
 use English qw( -no_match_vars );
@@ -11,27 +12,28 @@ use ANTLR::Runtime::Token;
 use ANTLR::Runtime::CharStream;
 use ANTLR::Runtime::MismatchedTokenException;
 
-use strict;
-use warnings;
+extends qw( ANTLR::Runtime::BaseRecognizer ANTLR::Runtime::Token );
 
-ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-    qw( input token token_start_char_index token_start_line token_start_char_position_in_line channel type text )
-]);
+has 'input';
+has 'token';
+has 'token_start_char_index';
+has 'token_start_line';
+has 'token_start_char_position_in_line';
+has 'channel';
+has 'type';
+has 'text';
 
-sub new {
-    my ($class, $input) = @_;
-    my $self = $class->SUPER::new();
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-    $self->{input} = $input;
-    $self->{token} = undef;
-    $self->{token_start_char_index} = -1;
-    $self->{token_start_line} = undef;
-    $self->{token_start_char_position_in_line} = undef;
-    $self->{channel} = undef;
-    $self->{type} = undef;
-    $self->{text} = undef;
-
-    return $self;
+    $self->input($arg_ref->{input});
+    $self->token(undef);
+    $self->token_start_char_index(-1);
+    $self->token_start_line(undef);
+    $self->token_start_char_position_in_line(undef);
+    $self->channel(undef);
+    $self->type(undef);
+    $self->text(undef);
 }
 
 ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {

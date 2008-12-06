@@ -1,8 +1,6 @@
 package ANTLR::Runtime::MismatchedSetException;
+use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
-
-use base qw( ANTLR::Runtime::Exception );
+extends 'ANTLR::Runtime::Exception';
 
 1;

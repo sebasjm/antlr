@@ -1,27 +1,20 @@
 package ANTLR::Runtime::DFA;
+use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
-
-use Object::InsideOut qw( ANTLR::Runtime::Object );
 use Params::Validate qw( :types );
 use Error qw( :try );
 
-my @eot :Field :Accessor(Name => 'eot', Restricted => 1, lvalue => 1);
-my @eof :Field :Accessor(Name => 'eof', Restricted => 1, lvalue => 1);
-my @min :Field :Accessor(Name => 'min', Restricted => 1, lvalue => 1);
-my @max :Field :Accessor(Name => 'max', Restricted => 1, lvalue => 1);
-my @accept :Field :Accessor(Name => 'accept', Restricted => 1, lvalue => 1);
-my @special :Field :Accessor(Name => 'special', Restricted => 1, lvalue => 1);
-my @transition :Field :Accessor(Name => 'transition', Restricted => 1, lvalue => 1);
-my @decision_number :Field :Accessor(Name => 'decision_number', Restricted => 1, lvalue => 1);
+has 'eot';
+has 'eof';
+has 'min';
+has 'max';
+has 'accept';
+has 'special';
+has 'transition';
+has 'decision_number';
 
 # Which recognizer encloses this DFA?  Needed to check backtracking
-my @recognizer :Field :Accessor(Name => 'recognizer', Restricted => 1, lvalue => 1);
-
-sub init :Init {
-
-}
+has 'recognizer';
 
 sub get_description {
     return "n/a";

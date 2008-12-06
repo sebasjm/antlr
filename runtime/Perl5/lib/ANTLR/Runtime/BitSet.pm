@@ -1,31 +1,29 @@
 package ANTLR::Runtime::BitSet;
+use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
-
-use Readonly;
 use Carp;
+use Readonly;
 use List::Util qw( max );
-
-use Object::InsideOut qw( ANTLR::Runtime::Object );
 
 use overload
     '|=' => \&or_in_place,
     '""' => \&str;
 
-our $BITS     :Constant = 64;  # number of bits / long
-our $LOG_BITS :Constant = 6;  # 2^6 == 64
+use constant {
+    BITS => 64,    # number of bits / long
+    LOG_BITS => 6, # 2^6 == 64
+};
 
 # We will often need to do a mod operator (i mod nbits).  Its
 # turns out that, for powers of two, this mod operation is
 # same as (i & (nbits-1)).  Since mod is slow, we use a
 # precomputed mod mask to do the mod instead.
-our $MOD_MASK :Constant = $BITS - 1;
+use constant MOD_MASK => BITS - 1;
 
 # The actual data bit
-my @bits :Field :Name(bits);
+has 'bits';
 
-sub init :method :Init {
+sub BUILD {
     my ($self, $args) = @_;
 
     my $bits;
@@ -64,7 +62,7 @@ sub init :method :Init {
         croak "Invalid argument";
     }
 
-    $self->bits = $bits;
+    $self->bits($bits);
 }
 
 sub of {
@@ -92,7 +90,9 @@ sub add :method {
     my ($self, $el) = @_;
 
     $self->grow_to_include($el);
-    substr($self->bits, $el, 1) = 1;
+    my $bits = $self->bits;
+    substr($bits, $el, 1) = 1;
+    $self->bits($bits);
 
     return;
 }
@@ -151,7 +151,9 @@ sub member :method {
 sub remove :method {
     my ($self, $el) = @_;
 
-    substr($self->bits, $el, 1) = 0;
+    my $bits = $self->bits;
+    substr($bits, $el, 1) = 0;
+    $self->bits($bits);
 }
 
 sub is_nil :method {
@@ -184,7 +186,7 @@ sub to_packed_array :method {
     my ($self) = @_;
 
     return [
-        $self->bits =~ /.{$BITS}/g
+        $self->bits =~ /.{BITS}/g
     ];
 }
 
@@ -220,7 +222,6 @@ sub to_string :method {
 }
 
 1;
-
 __END__
 
 

@@ -35,7 +35,7 @@ use ANTLR::Runtime::ANTLRStringStream;
 use INTLexer;
 
 my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => '123' });
-my $lexer = INTLexer->new($input);
+my $lexer = INTLexer->new({ input => $input });
 while ((my $_ = $lexer->next_token())) {
     print $_->get_text(), "\n";
 }
@@ -60,7 +60,7 @@ use ANTLR::Runtime::ANTLRStringStream;
 use IDLexer;
 
 my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => "Hello World!\n42\n" });
-my $lexer = IDLexer->new($input);
+my $lexer = IDLexer->new({ input => $input });
 
 while (1) {
     my $token = $lexer->next_token();

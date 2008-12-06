@@ -1,44 +1,36 @@
 package ANTLR::Runtime::BaseRecognizer;
+use ANTLR::Runtime::Class;
 
 use Readonly;
 use Carp;
-use ANTLR::Runtime::Class;
+
 use ANTLR::Runtime::Token;
 use ANTLR::Runtime::UnwantedTokenException;
 use ANTLR::Runtime::MissingTokenException;
 use ANTLR::Runtime::MismatchedTokenException;
 
-use strict;
-use warnings;
+use constant {
+    MEMO_RULE_FAILED => -2,
+    MEMO_RULE_UNKNOWN => -1,
+    INITIAL_FOLLOW_STACK_SIZE => 100,
 
-Readonly my $MEMO_RULE_FAILED => -2;
-sub MEMO_RULE_FAILED { return $MEMO_RULE_FAILED; }
-sub MEMO_RULE_FAILED_I { return $MEMO_RULE_FAILED; }
+    # copies from Token object for convenience in actions
+    DEFAULT_TOKEN_CHANNEL => ANTLR::Runtime::Token->DEFAULT_CHANNEL,
+    HIDDEN => ANTLR::Runtime::Token->HIDDEN_CHANNEL,
 
-Readonly my $MEMO_RULE_UNKNOWN => -1;
-sub MEMO_RULE_UNKNOWN { return $MEMO_RULE_UNKNOWN; }
+    NEXT_TOKEN_RULE_NAME => 'next_token',
+};
 
-Readonly my $INITIAL_FOLLOW_STACK_SIZE => 100;
-sub INITIAL_FOLLOW_STACK_SIZE { return $INITIAL_FOLLOW_STACK_SIZE; }
+has 'following';
+has '_fsp';
+has 'error_recovery';
+has 'last_error_index';
+has 'failed';
+has 'backtracking';
+has 'rule_memo';
 
-# copies from Token object for convenience in actions
-Readonly my $DEFAULT_TOKEN_CHANNEL => ANTLR::Runtime::Token->DEFAULT_CHANNEL;
-sub DEFAULT_TOKEN_CHANNEL { return $DEFAULT_TOKEN_CHANNEL; }
-
-Readonly my $HIDDEN => ANTLR::Runtime::Token->HIDDEN_CHANNEL;
-sub HIDDEN { return $HIDDEN; }
-
-Readonly my $NEXT_TOKEN_RULE_NAME => 'next_token';
-sub NEXT_TOKEN_RULE_NAME { return $NEXT_TOKEN_RULE_NAME; }
-
-ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-  qw( following _fsp error_recovery last_error_index failed backtracking rule_memo )
-]);
-
-sub new {
-    my ($class) = @_;
-
-    my $self = bless {}, $class;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
     $self->following([]);
     $self->_fsp(-1);
@@ -47,8 +39,6 @@ sub new {
     $self->failed(0);
     $self->backtracking(0);
     $self->rule_memo([]);
-
-    return $self;
 }
 
 sub reset {
@@ -436,7 +426,7 @@ sub get_rule_invocation_stack {
             next;
         }
 
-        if ($subroutine eq $NEXT_TOKEN_RULE_NAME) {
+        if ($subroutine eq NEXT_TOKEN_RULE_NAME) {
             next;
         }
 

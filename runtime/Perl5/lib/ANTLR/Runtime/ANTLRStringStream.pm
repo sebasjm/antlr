@@ -1,52 +1,64 @@
 package ANTLR::Runtime::ANTLRStringStream;
-
-use strict;
-use warnings;
-
 use ANTLR::Runtime::Class;
-use Readonly;
+
 use Carp;
+use Readonly;
 
 use ANTLR::Runtime::CharStreamState;
 
-use base qw( ANTLR::Runtime::CharStream );
+extends 'ANTLR::Runtime::CharStream';
 
-sub new {
-    Readonly my $usage => 'ANTLRStringStream new($input)';
-    croak $usage if @_ != 1 && @_ != 2;
-    my ($class, $arg_ref) = @_;
+has 'input';
+has 'p';
+has 'line';
+has 'char_position_in_line';
+has 'mark_depth';
+has 'markers';
+has 'last_marker';
 
-    my $self = bless {}, $class;
-    $self->{input} = $arg_ref->{input};
-    $self->{p} = 0;
-    $self->{line} = 1;
-    $self->{char_position_in_line} = 0;
-    $self->{mark_depth} = 0;
-    $self->{markers} = [ undef ]; # depth 0 means no backtracking, leave blank
-    $self->{last_marker} = 0;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-    return $self;
+    $self->input($arg_ref->{input});
+    $self->p(0);
+    $self->line(1);
+    $self->char_position_in_line(0);
+    $self->mark_depth(0);
+    $self->markers([ undef ]);  # depth 0 means no backtracking, leave blank
+    $self->last_marker(0);
 }
 
-ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {
-    input => 'rw',
-    p     => 'rw',
-    line  => 'rw',
-    char_position_in_line => 'rw',
-    mark_depth => 'rw',
-    markers => 'rw',
-    last_marker => 'rw'
-});
+sub get_line {
+    my ($self) = @_;
+    return $self->line;
+}
+
+sub set_line {
+    my ($self, $value) = @_;
+    $self->line($value);
+    return;
+}
+
+sub get_char_position_in_line {
+    my ($self) = @_;
+    return $self->char_position_in_line;
+}
+
+sub set_char_position_in_line {
+    my ($self, $value) = @_;
+    $self->char_position_in_line($value);
+    return;
+}
 
 sub reset {
     Readonly my $usage => 'reset()';
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    $self->{p} = 0;
-    $self->{line} = 1;
-    $self->{char_position_in_line} = 0;
-    $self->{mark_depth} = 0;
+    $self->p(0);
+    $self->line(1);
+    $self->char_position_in_line(0);
+    $self->mark_depth(0);
 }
 
 sub consume {
@@ -54,13 +66,13 @@ sub consume {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    if ($self->{p} < length $self->{input}) {
-        ++$self->{char_position_in_line};
-        if (substr($self->{input}, $self->{p}, 1) eq "\n") {
-            ++$self->{line};
-            $self->{char_position_in_line} = 0;
+    if ($self->p < length $self->input) {
+        $self->char_position_in_line($self->char_position_in_line + 1);
+        if (substr($self->input, $self->p, 1) eq "\n") {
+            $self->line($self->line + 1);
+            $self->char_position_in_line(0);
         }
-        ++$self->{p};
+        $self->p($self->p + 1);
     }
 }
 
@@ -75,16 +87,16 @@ sub LA {
 
     if ($i < 0) {
         ++$i; # e.g., translate LA(-1) to use offset i=0; then input[p+0-1]
-        if ($self->{p} + $i - 1 < 0) {
+        if ($self->p + $i - 1 < 0) {
             return $self->EOF;
         }
     }
 
-    if ($self->{p} + $i - 1 >= length $self->{input}) {
+    if ($self->p + $i - 1 >= length $self->input) {
         return $self->EOF;
     }
 
-    return substr $self->{input}, $self->{p} + $i - 1, 1;
+    return substr $self->input, $self->p + $i - 1, 1;
 }
 
 sub LT {
@@ -100,7 +112,7 @@ sub index {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    return $self->{p};
+    return $self->p;
 }
 
 sub size {
@@ -108,7 +120,7 @@ sub size {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    return length $self->{input};
+    return length $self->input;
 }
 
 sub mark {
@@ -116,20 +128,21 @@ sub mark {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    ++$self->{mark_depth};
+    $self->mark_depth($self->mark_depth + 1);
     my $state;
-    if ($self->{mark_depth} >= @{$self->{markers}}) {
+    if ($self->mark_depth >= @{$self->markers}) {
         $state = ANTLR::Runtime::CharStreamState->new();
-        push @{$self->{markers}}, $state;
+        push @{$self->markers}, $state;
     } else {
-        $state = $self->{markers}->[$self->{mark_depth}];
+        $state = $self->markers->[$self->mark_depth];
     }
 
-    $state->set_p($self->get_p);
-    $state->set_line($self->get_line);
-    $state->set_char_position_in_line($self->get_char_position_in_line);
-    $self->set_last_marker($self->get_mark_depth);
-    return $self->get_mark_depth;
+    $state->set_p($self->p);
+    $state->set_line($self->line);
+    $state->set_char_position_in_line($self->char_position_in_line);
+    $self->last_marker($self->mark_depth);
+
+    return $self->mark_depth;
 }
 
 sub rewind {
@@ -138,16 +151,16 @@ sub rewind {
     my $self = shift;
     my $m;
     if (@_ == 0) {
-        $m = $self->get_last_marker;
+        $m = $self->last_marker;
     } else {
         $m = shift;
     }
 
-    my $state = $self->{markers}->[$m];
+    my $state = $self->markers->[$m];
     # restore stream state
     $self->seek($state->get_p);
-    $self->set_line($state->get_line);
-    $self->set_char_position_in_line($state->get_char_position_in_line);
+    $self->line($state->get_line);
+    $self->char_position_in_line($state->get_char_position_in_line);
     $self->release($m);
 }
 
@@ -157,9 +170,9 @@ sub release {
     my ($self, $marker) = @_;
 
     # unwind any other markers made after m and release m
-    $self->set_mark_depth($marker);
+    $self->mark_depth($marker);
     # release this marker
-    $self->set_mark_depth($self->get_mark_depth - 1);
+    $self->mark_depth($self->mark_depth - 1);
 }
 
 # consume() ahead unit p == index; can't just set p = index as we must update
@@ -169,14 +182,14 @@ sub seek {
     croak $usage if @_ != 2;
     my ($self, $index) = @_;
 
-    if ($index <= $self->get_p) {
+    if ($index <= $self->p) {
         # just jump; don't update stream state (line, ...)
-        $self->set_p($index);
+        $self->p($index);
         return;
     }
 
     # seek forward, consume until p hits index
-    while ($self->get_p < $index) {
+    while ($self->p < $index) {
         $self->consume();
     }
 }
@@ -186,7 +199,7 @@ sub substring {
     croak $usage if @_ != 3;
     my ($self, $start, $stop) = @_;
 
-    return substr $self->get_input, $start, $stop - $start + 1;
+    return substr $self->input, $start, $stop - $start + 1;
 }
 
 1;

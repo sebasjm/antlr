@@ -1,12 +1,10 @@
 package ANTLR::Runtime::UnwantedTokenException;
-
-use strict;
-use warnings;
+use ANTLR::Runtime::Class;
 
 use overload
     '""' => \&to_string;
 
-use Object::InsideOut qw( ANTLR::Runtime::MismatchedTokenException );
+extends 'ANTLR::Runtime::MismatchedTokenException';
 
 sub get_unexpected_token {
     my ($self) = @_;

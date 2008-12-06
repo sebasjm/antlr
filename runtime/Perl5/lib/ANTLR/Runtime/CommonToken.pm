@@ -1,7 +1,5 @@
 package ANTLR::Runtime::CommonToken;
-
-use strict;
-use warnings;
+use ANTLR::Runtime::Class;
 
 use Readonly;
 
@@ -10,76 +8,75 @@ use overload
     fallback => 1,
     ;
 
-use base qw( ANTLR::Runtime::Token );
+extends 'ANTLR::Runtime::Token';
 
-ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-qw( type line char_position_in_line channel input text index start stop )
-]);
+has 'type';
+has 'line';
+has 'char_position_in_line';
+has 'channel';
+has 'input';
+has 'text';
+has 'index';
+has 'start';
+has 'stop';
 
-sub new {
-    Readonly my $usage => '__PACKAGE__ new($args)';
-    croak $usage if @_ != 2;
-    my ($class, $args) = @_;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-    my $self = bless {}, $class;
-
-    $self->{type} = undef;
-    $self->{line} = undef;
+    $self->type(undef);
+    $self->line(undef);
     # set to invalid position
-    $self->{char_position_in_line} = -1;
-    $self->{channel} = $self->DEFAULT_CHANNEL;
-    $self->{input} = undef;
+    $self->char_position_in_line(-1);
+    $self->channel($self->DEFAULT_CHANNEL);
+    $self->input(undef);
 
     # We need to be able to change the text once in a while.  If
     # this is non-null, then getText should return this.  Note that
     # start/stop are not affected by changing this.
-    $self->{text} = undef;
+    $self->text(undef);
 
     # What token number is this from 0..n-1 tokens; < 0 implies invalid index
-    $self->{index} = -1;
+    $self->index(-1);
 
     # The char position into the input buffer where this token starts
-    $self->{start} = undef;
+    $self->start(undef);
 
     # The char position into the input buffer where this token stops
-    $self->{stop} = undef;
+    $self->stop(undef);
 
-
-    if (exists $args->{type}) {
-        $self->{type} = $args->{type};
+    if (exists $arg_ref->{type}) {
+        $self->type($arg_ref->{type});
     }
 
-    if (exists $args->{input}) {
-        $self->{input} = $args->{input};
+    if (exists $arg_ref->{input}) {
+        $self->input($arg_ref->{input});
     }
 
-    if (exists $args->{channel}) {
-        $self->{channel} = $args->{channel};
+    if (exists $arg_ref->{channel}) {
+        $self->channel($arg_ref->{channel});
     }
 
-    if (exists $args->{start}) {
-        $self->{start} = $args->{start};
+    if (exists $arg_ref->{start}) {
+        $self->start($arg_ref->{start});
     }
 
-    if (exists $args->{stop}) {
-        $self->{stop} = $args->{stop};
+    if (exists $arg_ref->{stop}) {
+        $self->stop($arg_ref->{stop});
     }
 
-    if (exists $args->{text}) {
-        $self->{text} = $args->{text};
+    if (exists $arg_ref->{text}) {
+        $self->text($arg_ref->{text});
     }
 
-    if (exists $args->{token}) {
-        my $token = $args->{token};
-        $self->{text} = $token->get_text();
-        $self->{type} = $token->get_type();
-        $self->{line} = $token->get_line();
-        $self->{index} = $token->get_token_index();
-        $self->{char_position_in_line} = $token->get_char_position_in_line();
-        $self->{channel} = $token->get_channel();
+    if (exists $arg_ref->{token}) {
+        my $token = $arg_ref->{token};
+        $self->text($token->get_text());
+        $self->type($token->get_type());
+        $self->line($token->get_line());
+        $self->index($token->get_token_index());
+        $self->char_position_in_line($token->get_char_position_in_line());
+        $self->channel($token->get_channel());
     }
-
-    return $self;
 }
 
 ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {
@@ -166,6 +163,5 @@ sub not_eof {
 =end later
 
 =cut
-
 
 1;

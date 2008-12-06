@@ -59,7 +59,7 @@ my @examples = (
 
 foreach my $example (@examples) {
     my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => $example });
-    my $lexer = SimpleCalcLexer->new($input);
+    my $lexer = SimpleCalcLexer->new({ input => $input });
     my $tokens = ANTLR::Runtime::CommonTokenStream->new({ token_source => $lexer });
     my $parser = SimpleCalcParser->new($tokens);
     eval {

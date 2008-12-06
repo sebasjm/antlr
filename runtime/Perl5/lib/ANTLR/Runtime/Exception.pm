@@ -1,12 +1,11 @@
 package ANTLR::Runtime::Exception;
-
-use strict;
-use warnings;
+use ANTLR::Runtime::Class;
 
 use Exception::Class;
-use Object::InsideOut qw( ANTLR::Runtime::Object Exception::Class::Base );
 
-sub init :Init {
+has 'base';
+
+sub BUILD {
     my ($self, $arg_ref) = @_;
 
     my %base_args;
@@ -14,8 +13,21 @@ sub init :Init {
         $base_args{message} = $message;
     }
     my $base = Exception::Class::Base->new(%base_args);
-    $self->inherit($base);
-    return;
+
+    $self->base($base);
+}
+
+sub message {
+    my ($self, @args) = @_;
+    return $self->base->message(@args);
+}
+
+sub throw {
+    return Exception::Class::Base::throw(@_);
+}
+
+sub caught {
+    return Exception::Class::Base::caught(@_);
 }
 
 sub description {

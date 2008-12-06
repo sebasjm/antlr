@@ -1,5 +1,5 @@
 package ANTLR::Runtime::CommonTokenStream;
-use base qw( ANTLR::Runtime::TokenStream );
+use ANTLR::Runtime::Class;
 
 use Readonly;
 use UNIVERSAL qw( isa );
@@ -12,31 +12,20 @@ use ANTLR::Runtime::CharStream;
 use ANTLR::Runtime::Class;
 use ANTLR::Runtime::Token;
 
+has 'token_source';
+has 'tokens';
+has 'channel_override_map';
+has 'discard_set';
+has 'channel';
+has 'discard_off_channel_tokens';
+has 'last_marker';
+has 'p';
 
-use strict;
-use warnings;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-qw(
-    token_source
-    tokens
-    channel_override_map
-    discard_set
-    channel
-    discard_off_channel_tokens
-    last_marker
-    p
-)]);
-
-sub new {
-    Readonly my $usage => 'CommonTokenStream new($args)';
-    croak $usage if @_ != 2;
-    my ($class, $args) = @_;
-
-    my $self = bless {}, $class;
-
-    if (exists $args->{token_source}) {
-        $self->token_source($args->{token_source});
+    if (exists $arg_ref->{token_source}) {
+        $self->token_source($arg_ref->{token_source});
     } else {
         $self->token_source(undef);
     }
@@ -45,8 +34,8 @@ sub new {
     $self->channel_override_map(undef);
     $self->discard_set(undef);
 
-    if (exists $args->{channel}) {
-        $self->channel($args->{channel});
+    if (exists $arg_ref->{channel}) {
+        $self->channel($arg_ref->{channel});
     } else {
         $self->channel(ANTLR::Runtime::Token->DEFAULT_CHANNEL);
     }
@@ -54,8 +43,6 @@ sub new {
     $self->discard_off_channel_tokens(0);
     $self->last_marker(0);
     $self->p(-1);
-
-    return $self;
 }
 
 ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {

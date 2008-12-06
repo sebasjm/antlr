@@ -1,28 +1,18 @@
 package ANTLR::Runtime::ANTLRFileStream;
-
-use strict;
-use warnings;
-
-use Readonly;
-use Carp;
-
 use ANTLR::Runtime::Class;
 
-use base qw( ANTLR::Runtime::ANTLRStringStream );
+use Carp;
+use Readonly;
 
-ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-    qw( file_name )
-]);
+extends 'ANTLR::Runtime::ANTLRStringStream';
 
-sub new {
-    Readonly my $usage => 'ANTLRFileStream new(file_name, encoding)';
-    croak $usage if @_ != 2;
-    my ($class, $arg_ref) = @_;
+has 'file_name';
 
-    my $self = $class->SUPER::new();
+sub BUILD {
+    my ($self, $arg_ref) = @_;
+
     $self->file_name($arg_ref->{file_name});
     $self->load(@$arg_ref{qw( file_name encoding )});
-    return $self;
 }
 
 sub load {
@@ -47,7 +37,7 @@ sub load {
         local $/;
         $content = <$fh>;
     }
-    $self->{input} = $content;
+    $self->input($content);
     return;
 }
 
