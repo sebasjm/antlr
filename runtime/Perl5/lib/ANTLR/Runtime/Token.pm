@@ -46,16 +46,4 @@ sub SKIP_TOKEN() {
     return ANTLR::Runtime::CommonToken->new({ type => INVALID_TOKEN_TYPE });
 }
 
-# Get the text of the token
-has 'text';
-has 'type';
-# The line number on which this token was matched; line=1..n
-has 'line';
-# The index of the first character relative to the beginning of the line 0..n-1
-has 'char_position_in_line';
-has 'channel';
-# An index from 0..n-1 of the token object in the input stream.
-#This must be valid in order to use the ANTLRWorks debugger.
-has 'token_index';
-
 1;

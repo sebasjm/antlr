@@ -1,6 +1,5 @@
 package ANTLR::Runtime::Lexer;
 use ANTLR::Runtime::Class;
-use base qw( ANTLR::Runtime::BaseRecognizer ANTLR::Runtime::TokenSource );
 
 use English qw( -no_match_vars );
 use Readonly;
@@ -12,39 +11,15 @@ use ANTLR::Runtime::Token;
 use ANTLR::Runtime::CharStream;
 use ANTLR::Runtime::MismatchedTokenException;
 
-extends qw( ANTLR::Runtime::BaseRecognizer ANTLR::Runtime::Token );
+extends 'ANTLR::Runtime::BaseRecognizer', 'ANTLR::Runtime::TokenSource';
 
 has 'input';
-has 'token';
-has 'token_start_char_index';
-has 'token_start_line';
-has 'token_start_char_position_in_line';
-has 'channel';
-has 'type';
-has 'text';
 
 sub BUILD {
     my ($self, $arg_ref) = @_;
 
     $self->input($arg_ref->{input});
-    $self->token(undef);
-    $self->token_start_char_index(-1);
-    $self->token_start_line(undef);
-    $self->token_start_char_position_in_line(undef);
-    $self->channel(undef);
-    $self->type(undef);
-    $self->text(undef);
 }
-
-ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {
-    input => 'rw',
-    token => 'rw',
-    token_start_char_index => 'rw',
-    token_start_line => 'rw',
-    token_start_char_position_in_line => 'rw',
-    channel => 'rw',
-    type => 'rw',
-});
 
 sub reset {
     Readonly my $usage => 'reset()';
@@ -55,17 +30,19 @@ sub reset {
     $self->SUPER::reset();
 
     # wack Lexer state variables
-    $self->set_token(undef);
-    $self->set_type(ANTLR::Runtime::Token->INVALID_TOKEN_TYPE);
-    $self->set_channel(ANTLR::Runtime::Token->DEFAULT_CHANNEL);
-    $self->set_token_start_char_index(-1);
-    $self->set_token_start_char_position_in_line(-1);
-    $self->set_start_line(-1);
-    $self->set_text(undef);
-
-    if (defined $self->get_input) {
+    if (defined $self->input) {
         # rewind the input
-        $self->get_input->seek(0);
+        $self->input->seek(0);
+    }
+
+    if (defined $self->state) {
+        $self->state->token(undef);
+        $self->state->type(ANTLR::Runtime::Token->INVALID_TOKEN_TYPE);
+        $self->state->channel(ANTLR::Runtime::Token->DEFAULT_CHANNEL);
+        $self->state->token_start_char_index(-1);
+        $self->state->token_start_char_position_in_line(-1);
+        $self->state->start_line(-1);
+        $self->state->text(undef);
     }
 }
 
@@ -77,14 +54,14 @@ sub next_token {
     my ($self) = @_;
 
     while (1) {
-        $self->set_token(undef);
-        $self->set_channel(ANTLR::Runtime::Token->DEFAULT_CHANNEL);
-        $self->set_token_start_char_index($self->get_input->index());
-        $self->set_token_start_char_position_in_line($self->get_input->get_char_position_in_line);
-        $self->set_token_start_line($self->get_input->get_line);
-        $self->set_text(undef);
+        $self->state->token(undef);
+        $self->state->channel(ANTLR::Runtime::Token->DEFAULT_CHANNEL);
+        $self->state->token_start_char_index($self->input->index());
+        $self->state->token_start_char_position_in_line($self->input->get_char_position_in_line());
+        $self->state->token_start_line($self->input->get_line());
+        $self->state->text(undef);
 
-        if ($self->get_input->LA(1) eq ANTLR::Runtime::CharStream->EOF) {
+        if ($self->input->LA(1) eq ANTLR::Runtime::CharStream->EOF) {
             return ANTLR::Runtime::Token->EOF_TOKEN;
         }
 
@@ -92,14 +69,15 @@ sub next_token {
         my $op = '';
         eval {
             $self->m_tokens();
-            if (!defined $self->token) {
+            if (!defined $self->state->token) {
                 $self->emit();
-            } elsif ($self->token == ANTLR::Runtime::Token->SKIP_TOKEN) {
+            }
+            elsif ($self->state->token == ANTLR::Runtime::Token->SKIP_TOKEN) {
                 $op = 'next';
                 return;
             }
             $op = 'return';
-            $rv = $self->token;
+            $rv = $self->state->token;
         };
         return $rv if $op eq 'return';
         next if $op eq 'next';
@@ -126,7 +104,8 @@ sub skip {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    $self->set_token(ANTLR::Runtime::Token->SKIP_TOKEN);
+    $self->state->token(ANTLR::Runtime::Token->SKIP_TOKEN);
+    return;
 }
 
 # This is the lexer entry point that sets instance var 'token'
@@ -140,9 +119,19 @@ sub set_char_stream {
     croak $usage if @_ != 2;
     my ($self, $input) = @_;
 
-    $self->set_input(undef);
+    $self->input(undef);
     $self->reset();
-    $self->set_input($input);
+    $self->input($input);
+}
+
+sub get_char_stream {
+    my ($self) = @_;
+    return $self->input;
+}
+
+sub get_source_name {
+    my ($self) = @_;
+    return $self->input->get_source_name();
 }
 
 sub emit {
@@ -158,15 +147,15 @@ sub emit {
 	# custom Token objects.
         my $t = ANTLR::Runtime::CommonToken->new({
             input => $self->input,
-            type  => $self->type,
-            channel => $self->channel,
-            start => $self->token_start_char_index,
+            type  => $self->state->type,
+            channel => $self->state->channel,
+            start => $self->state->token_start_char_index,
             stop => $self->get_char_index() - 1
         });
 
-        $t->set_line($self->token_start_line);
-        $t->set_text($self->text);
-        $t->set_char_position_in_line($self->token_start_char_position_in_line);
+        $t->set_line($self->state->token_start_line);
+        $t->set_text($self->state->text);
+        $t->set_char_position_in_line($self->state->token_start_char_position_in_line);
         $self->emit($t);
         return $t;
     } elsif (@_ == 2) {
@@ -175,7 +164,7 @@ sub emit {
 	# for efficiency reasons.  Subclass and override this method and
 	# nextToken (to push tokens into a list and pull from that list rather
 	# than a single variable as this implementation does).
-        $self->token($token);
+        $self->state->token($token);
     }
 }
 
@@ -186,8 +175,8 @@ sub match {
 
     foreach my $c (split //, $s) {
         if ($self->input->LA(1) ne $c) {
-            if ($self->backtracking > 0) {
-                $self->failed(1);
+            if ($self->state->backtracking > 0) {
+                $self->state->failed(1);
                 return;
             }
             my $mte = ANTLR::Runtime::MismatchedTokenException->new({
@@ -198,7 +187,7 @@ sub match {
             croak $mte;
         }
         $self->input->consume();
-        $self->failed(0);
+        $self->state->failed(0);
     }
 }
 
@@ -207,7 +196,7 @@ sub match_any {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    $self->consume();
+    $self->input->consume();
 }
 
 sub match_range {
@@ -216,8 +205,8 @@ sub match_range {
     my ($self, $a, $b) = @_;
 
     if ($self->input->LA(1) lt $a || $self->input->LA(1) gt $b) {
-        if ($self->backtracking > 0) {
-            $self->failed(1);
+        if ($self->state->backtracking > 0) {
+            $self->state->failed(1);
             return;
         }
 
@@ -227,7 +216,7 @@ sub match_range {
     }
 
     $self->input->consume();
-    $self->failed(0);
+    $self->state->failed(0);
 }
 
 sub get_line {
@@ -262,10 +251,10 @@ sub get_text {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    if (defined $self->text) {
-        return $self->text;
+    if (defined $self->state->text) {
+        return $self->state->text;
     }
-    return $self->input->substring($self->token_start_char_index, $self->get_char_index() - 1);
+    return $self->input->substring($self->state->token_start_char_index, $self->get_char_index() - 1);
 }
 
 # Set the complete text of this token; it wipes any previous
@@ -275,7 +264,7 @@ sub set_text {
     croak $usage if @_ != 2;
     my ($self, $text) = @_;
 
-    $self->text($text);
+    $self->state->text($text);
 }
 
 sub report_error {

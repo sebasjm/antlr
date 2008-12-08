@@ -46,12 +46,12 @@ sub BUILD {
     }
     else {
         $self->input(undef);
-        $self->index(undef);
+        $self->index(0);
         $self->token(undef);
         $self->node(undef);
-        $self->c(undef);
-        $self->line(undef);
-        $self->char_position_in_line(undef);
+        $self->c(0);
+        $self->line(0);
+        $self->char_position_in_line(0);
     }
 }
 

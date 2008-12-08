@@ -74,12 +74,9 @@ use constant {
     HIDDEN => ANTLR::Runtime::BaseRecognizer->HIDDEN
 };
 
-<tokens:{
-Readonly our $<it.name> => <it.type>;
-sub <it.name> {
-    return <it.type>;
-}
-}; separator="\n">
+use constant {
+    <tokens:{ <it.name> => <it.type>, }; separator="\n">
+};
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScope(scope=it)><endif>}>
 <actions.lexer.members>
 
@@ -190,7 +187,7 @@ genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
               ASTLabelType="Object", labelType, members) ::= <<
 package <name>;
-use base qw ( <@superClassName><superClass><@end> );
+use ANTLR::Runtime::Class;
 
 use English qw( -no_match_vars ) ;
 use Readonly;
@@ -198,14 +195,15 @@ use Switch;
 use Carp;
 use ANTLR::Runtime::BitSet;
 
-use strict;
-use warnings;
+extends '<@superClassName><superClass><@end>';
 
 Readonly my $token_names => [
     "\<invalid>", "\<EOR>", "\<DOWN>", "\<UP>", <tokenNames; separator=", ">
 ];
 
-<tokens:{Readonly our $<it.name> => <it.type>;<\n>sub <it.name> { return $<it.name>; }}; separator="\n">
+use constant {
+<tokens:{ <it.name> => <it.type>, }; separator="\n">
+};
 
 <bitsets:bitset(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>
@@ -214,15 +212,12 @@ Readonly my $token_names => [
 <@members>
 <! WARNING. bug in ST: this is cut-n-paste into Dbg.stg !>
 
-sub new {
-    my ($class, $input) = @_;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-    my $self = $class->SUPER::new($input);
 <if(backtracking)>
-    $self->rule_memo({});<\n>
+    $self->state->rule_memo({});<\n>
 <endif>
-
-    return $self;
 }
 <@end>
 
@@ -320,7 +315,7 @@ if ( backtracking>0 && alreadyParsedRule(input, <ruleDescriptor.index>) ) { retu
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
 <if(backtracking)>
-if ($self->failed) {
+if ($self->state->failed) {
     return <ruleReturnValue()>;
 }
 <endif>
@@ -365,6 +360,7 @@ sub <ruleName>() {
     if (ref $exception && $exception->isa('ANTLR::Runtime::RecognitionException')) {
         $self->report_error($exception);
         $self->recover($self->input, $exception);
+        $exception = undef;
     }<\n>
 <endif>
 <endif>
@@ -483,13 +479,15 @@ sub m_<ruleName> {
         <ruleDescriptor.actions.init>
         <block><\n>
 <else>
-        my $_type = $<ruleName>;
+        my $_type = <ruleName>;
+        my $_channel = $self->DEFAULT_TOKEN_CHANNEL;
         <ruleMemoization(name=ruleName)>
         <lexerRuleLabelDefs()>
         <ruleDescriptor.actions.init>
         <block>
         <ruleCleanUp()>
-        $self->set_type($_type);
+        $self->state->type($_type);
+        $self->state->channel($_channel);
         <(ruleDescriptor.actions.after):execAction()>
 <endif>
     };
@@ -699,7 +697,7 @@ if ( <s> ) {
     $self->input->consume();
     <postmatchCode>
 <if(!LEXER)>
-    $self->error_recovery(0);
+    $self->state->error_recovery(0);
 <endif>
     <if(backtracking)>failed=false;<endif>
 }
@@ -709,11 +707,14 @@ else {
         ANTLR::Runtime::MismatchedSetException->new(undef, $self->input);
     <@mismatchedSetException()>
 <if(LEXER)>
-    $self->recover($mse);<\n>
+    $self->recover($mse);
+    $mse->throw();
 <else>
+    $mse->throw();
+    <! use following code to make it recover inline; remove throw mse;
     $self->recoverFromMismatchedSet($self->input, $mse, $FOLLOW_set_in_<ruleName><elementIndex>);
+    !>
 <endif>
-    croak $mse;
 }<\n>
 >>
 
@@ -770,7 +771,7 @@ $<label> = $self-><rule.name>(<args; separator=", ">);<\n>
 <else>
 $self-><rule.name>(<args; separator=", ">);<\n>
 <endif>
-$self->{_fsp}--;
+$self->state->_fsp($self->state->_fsp - 1);
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1042,8 +1043,8 @@ sub special_state_transition {
     }
 
 <if(backtracking)>
-    if ($self->backtracking > 0) {
-        $self->failed = 1;
+    if ($self->state->backtracking > 0) {
+        $self->state->failed = 1;
         return -1;
     }<\n>
 <endif>
@@ -1328,7 +1329,7 @@ lexerRulePropertyRef_type(scope,attr) ::= "$_type"
 lexerRulePropertyRef_line(scope,attr) ::= "tokenStartLine"
 lexerRulePropertyRef_pos(scope,attr) ::= "tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
-lexerRulePropertyRef_channel(scope,attr) ::= "$self->{channel}"
+lexerRulePropertyRef_channel(scope,attr) ::= "$_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(getCharIndex()-1)"
 lexerRulePropertyRef_self(scope,attr) ::= "$self"

@@ -22,8 +22,8 @@ factor  : NUMBER ;
  * LEXER RULES
  *------------------------------------------------------------------*/
 
-NUMBER     : (DIGIT)+ ;
+NUMBER : (DIGIT)+ ;
 
-WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+ { $channel = HIDDEN; } ;
+WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+ { $channel = $self->HIDDEN; } ;
 
 fragment DIGIT : '0'..'9' ;

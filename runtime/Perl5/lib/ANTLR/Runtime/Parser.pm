@@ -1,25 +1,17 @@
 package ANTLR::Runtime::Parser;
-use base qw( ANTLR::Runtime::BaseRecognizer );
+use ANTLR::Runtime::Class;
 
 use Readonly;
 use Carp;
-use ANTLR::Runtime::Class;
 
-use strict;
-use warnings;
+extends 'ANTLR::Runtime::BaseRecognizer';
 
-ANTLR::Runtime::Class::create_attributes(__PACKAGE__, [
-    qw( input )
-]);
+has 'input';
 
-sub new {
-    my ($class, $input) = @_;
+sub BUILD {
+    my ($self, $arg_ref) = @_;
 
-    my $self = $class->SUPER::new();
-
-    $self->set_token_stream($input);
-
-    return $self;
+    $self->set_token_stream($arg_ref->{input});
 }
 
 sub reset {
@@ -57,9 +49,9 @@ sub get_missing_symbol {
         type => $expected_token_type,
         text => $token_text
     });
-    my $current = $self->input->LT(1);
+    my $current = $input->LT(1);
     if ($current->get_type() == ANTLR::Runtime::Token->EOF) {
-        $current = $self->input->LT(-1);
+        $current = $input->LT(-1);
     }
     $t->set_line($current->get_line());
     $t->set_char_position_in_line($current->get_char_position_in_line());
@@ -84,6 +76,11 @@ sub get_token_stream {
     my ($self) = @_;
 
     return $self->input;
+}
+
+sub get_source_name {
+    my ($self) = @_;
+    return $self->input->get_source_name();
 }
 
 sub trace_in {

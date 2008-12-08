@@ -30,7 +30,6 @@ term	: factor ( ( MULT | DIV ) factor )* ;
 
 factor	: NUMBER ;
 
-
 /*------------------------------------------------------------------
  * LEXER RULES
  *------------------------------------------------------------------*/
@@ -61,13 +60,18 @@ foreach my $example (@examples) {
     my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => $example });
     my $lexer = SimpleCalcLexer->new({ input => $input });
     my $tokens = ANTLR::Runtime::CommonTokenStream->new({ token_source => $lexer });
-    my $parser = SimpleCalcParser->new($tokens);
+    my $parser = SimpleCalcParser->new({ input => $tokens });
     eval {
         $parser->expr();
-        print "$example: good\n";
+        if ($parser->get_number_of_syntax_errors() == 0) {
+            print "$example: good\n";
+        }
+        else {
+            print "$example: bad\n";
+        }
     };
     if (my $ex = ANTLR::Runtime::RecognitionException->caught()) {
-        print "$example: bad\n";
+        print "$example: error\n";
     } elsif ($ex = Exception::Class->caught()) {
         print "$example: error: $ex\n";
         ref $ex ? $ex->rethrow() : die $ex;

@@ -76,7 +76,7 @@ my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => $in });
 my $lexer = ExprLexer->new({ input => $input });
 
 my $tokens = ANTLR::Runtime::CommonTokenStream->new({ token_source => $lexer });
-my $parser = ExprParser->new($tokens);
+my $parser = ExprParser->new({ input => $tokens });
 $parser->prog();
 CODE
 2

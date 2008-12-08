@@ -26,6 +26,10 @@ sub throw {
     return Exception::Class::Base::throw(@_);
 }
 
+sub rethrow {
+    return Exception::Class::Base::rethrow(@_);
+}
+
 sub caught {
     return Exception::Class::Base::caught(@_);
 }

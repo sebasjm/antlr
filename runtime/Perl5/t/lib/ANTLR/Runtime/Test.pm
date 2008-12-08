@@ -35,6 +35,18 @@ sub write_file {
     return;
 }
 
+sub get_perl {
+    if (defined $ENV{HARNESS_PERL}) {
+        return $ENV{HARNESS_PERL};
+    }
+
+    if ($^O =~ /^(MS)?Win32$/) {
+        return Win32::GetShortPathName($^X);
+    }
+
+    return $^X;
+}
+
 sub g_test_output_is {
     my ($args) = @_;
     my $grammar = $args->{grammar};
@@ -81,7 +93,7 @@ sub g_test_output_is {
         }
 
         # run test program
-        $test_result = run_program([ $^X, "-Mblib=$cwd", 'test.pl']);
+        $test_result = run_program([ get_perl(), "-Mblib=$cwd", 'test.pl']);
         if ($test_result->{exit_code} >> 8 != 0) {
             croak $test_result->{err};
         }

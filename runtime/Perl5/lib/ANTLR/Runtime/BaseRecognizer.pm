@@ -4,6 +4,7 @@ use ANTLR::Runtime::Class;
 use Readonly;
 use Carp;
 
+use ANTLR::Runtime::RecognizerSharedState;
 use ANTLR::Runtime::Token;
 use ANTLR::Runtime::UnwantedTokenException;
 use ANTLR::Runtime::MissingTokenException;
@@ -21,42 +22,42 @@ use constant {
     NEXT_TOKEN_RULE_NAME => 'next_token',
 };
 
-has 'following';
-has '_fsp';
-has 'error_recovery';
-has 'last_error_index';
-has 'failed';
-has 'backtracking';
-has 'rule_memo';
+# State of a lexer, parser, or tree parser are collected into a state
+# object so the state can be shared.  This sharing is needed to
+# have one grammar import others and share same error variables
+# and other state variables.  It's a kind of explicit multiple
+# inheritance via delegation of methods and shared state.
+has 'state';
 
 sub BUILD {
     my ($self, $arg_ref) = @_;
 
-    $self->following([]);
-    $self->_fsp(-1);
-    $self->error_recovery(0);
-    $self->last_error_index(-1);
-    $self->failed(0);
-    $self->backtracking(0);
-    $self->rule_memo([]);
+    if (exists $arg_ref->{state}) {
+        $self->state($arg_ref->{state});
+    }
+    else {
+        $self->state(ANTLR::Runtime::RecognizerSharedState->new());
+    }
 }
 
 sub reset {
-    Readonly my $usage => 'void reset()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
-    $self->_fsp(-1);
-    $self->error_recovery(0);
-    $self->last_error_index(-1);
-    $self->failed(0);
+    if (!defined $self->state) {
+        return;
+    }
+
+    my $state = $self->state;
+    $state->_fsp(-1);
+    $state->error_recovery(0);
+    $state->last_error_index(-1);
+    $state->failed(0);
+    $state->syntax_errors(0);
 
     # wack everything related to backtracking and memoization
-    $self->backtracking(0);
+    $state->backtracking(0);
     # wipe cache
-    foreach my $rule (@{$self->rule_memo}) {
-        $rule = undef;
-    }
+    $state->rule_memo([]);
 }
 
 sub match {
@@ -67,13 +68,13 @@ sub match {
     my $matched_symbol = $self->get_current_input_symbol($input);
     if ($input->LA(1) eq $ttype) {
         $input->consume();
-        $self->error_recovery(0);
-        $self->failed(0);
+        $self->state->error_recovery(0);
+        $self->state->failed(0);
         return $matched_symbol;
     }
 
-    if ($self->backtracking > 0) {
-        $self->failed(1);
+    if ($self->state->backtracking > 0) {
+        $self->state->failed(1);
         return $matched_symbol;
     }
 
@@ -85,8 +86,8 @@ sub match_any {
     croak $usage if @_ != 2;
     my ($self, $input) = @_;
 
-    $self->error_recovery(0);
-    $self->failed(0);
+    $self->state->error_recovery(0);
+    $self->state->failed(0);
     $input->consume();
 }
 
@@ -105,7 +106,7 @@ sub mismatch_is_missing_token {
     if ($follow->member(ANTLR::Runtime::Token->EOR_TOKEN_TYPE)) {
         my $viable_tokens_following_this_rule = $self->compute_context_sensitive_rule_FOLLOW();
         $follow = $follow->or($viable_tokens_following_this_rule);
-        if ($self->state->fsp >= 0) {
+        if ($self->state->_fsp >= 0) {
             $follow->remove(ANTLR::Runtime::Token->EOR_TOKEN_TYPE);
         }
     }
@@ -121,9 +122,24 @@ sub mismatch {
     croak $usage if @_ != 4;
     my ($self, $input, $ttype, $follow) = @_;
 
-    my $mte = ANTLR::Runtime::MismatchedTokenException->new({ expecting => $ttype, input => $input });
-
-    $self->recover_from_mismatched_token($input, $mte, $ttype, $follow);
+    if ($self->mismatch_is_unwanted_token($input, $ttype)) {
+        ANTLR::Runtime::UnwantedTokenException->new({
+            expecting => $ttype,
+            input => $input
+        })->throw();
+    }
+    elsif ($self->mismatch_is_missing_token($input, $follow)) {
+        ANTLR::Runtime::MissingTokenException->new({
+            expecting => $ttype,
+            input => $input
+        })->throw();
+    }
+    else {
+        ANTLR::Runtime::MismatchedTokenException->new({
+            expecting => $ttype,
+            input => $input
+        })->throw();
+    }
 }
 
 sub report_error {
@@ -131,12 +147,14 @@ sub report_error {
     croak $usage if @_ != 2;
     my ($self, $e) = @_;
 
-    if ($self->error_recovery) {
+    if ($self->state->error_recovery) {
         return;
     }
-    $self->error_recovery(1);
+    $self->state->syntax_errors($self->state->syntax_errors + 1);
+    $self->state->error_recovery(1);
 
     $self->display_recognition_error($self->get_token_names(), $e);
+    return;
 }
 
 sub display_recognition_error {
@@ -193,6 +211,11 @@ sub get_error_message {
     }
 }
 
+sub get_number_of_syntax_errors {
+    my ($self) = @_;
+    return $self->state->syntax_errors;
+}
+
 sub get_error_header {
     Readonly my $usage => 'String get_error_header(RecognitionException e)';
     croak $usage if @_ != 2;
@@ -239,7 +262,7 @@ sub recover {
     croak $usage if @_ != 3;
     my ($self, $input, $re) = @_;
 
-    if ($self->last_error_index == $input->index()) {
+    if ($self->state->last_error_index == $input->index()) {
 	# uh oh, another error at same token index; must be a case
 	# where LT(1) is in the recovery token set so nothing is
 	# consumed; consume a single token so at least to prevent
@@ -247,7 +270,7 @@ sub recover {
         $input->consume();
     }
 
-    my $last_error_index = $input->index();
+    $self->state->last_error_index($input->index());
     my $follow_set = $self->compute_error_recovery_set();
     $self->begin_resync();
     $self->consume_until($input, $follow_set);
@@ -281,16 +304,16 @@ sub combine_follows {
     croak $usage if @_ != 2;
     my ($self, $exact) = @_;
 
-    my $top = $self->_fsp;
+    my $top = $self->state->_fsp;
     my $follow_set = ANTLR::Runtime::BitSet->new();
 
-    foreach my $local_follow_set (reverse @{$self->following}) {
+    foreach my $local_follow_set (reverse @{$self->state->following}) {
         $follow_set |= $local_follow_set;
         if ($exact && $local_follow_set->member(ANTLR::Runtime::Token->EOR_TOKEN_TYPE)) {
             last;
         }
     }
-    $follow_set->remove(ANTLR::Runtime::Token->EOR_TOKEN_TYPE);
+    #$follow_set->remove(ANTLR::Runtime::Token->EOR_TOKEN_TYPE);
     return $follow_set;
 }
 
@@ -316,7 +339,11 @@ sub recover_from_mismatched_token {
     }
 
     if ($self->mismatch_is_missing_token($input, $follow)) {
-        my $inserted = $self->get_missing_symbol();
+        my $inserted = $self->get_missing_symbol({
+                input => $input,
+                expected_token_type => $ttype,
+                follow => $follow,
+        });
         my $ex = ANTLR::Runtime::MissingTokenException({
             expecting => $ttype,
             input => $input,
@@ -326,11 +353,10 @@ sub recover_from_mismatched_token {
         return $inserted;
     }
 
-    my $ex = ANTLR::Runtime::MismatchedTokenException({
-        expecting => $$ttype,
-        input => $input,
-    });
-    $ex->throw();
+    ANTLR::Runtime::MismatchedTokenException->new({
+        expecting => $ttype,
+        input => $input
+    })->throw();
 }
 
 sub recover_from_mismatched_set {
@@ -338,9 +364,17 @@ sub recover_from_mismatched_set {
     croak $usage if @_ != 4;
     my ($self, $input, $e, $follow) = @_;
 
-    if (!$self->recover_from_mismatched_element($input, $e, $follow)) {
-        croak $e;
+    if ($self->mismatch_is_missing_token($input, $follow)) {
+        $self->report_error($e);
+        return $self->get_missing_symbol({
+                input => $input,
+                exception => $e,
+                expected_token_type => ANTLR::Runtime::Token->INVALID_TOKEN_TYPE,
+                follow => $follow,
+            });
     }
+
+    $e->throw();
 }
 
 sub recover_from_mismatched_element {
@@ -407,7 +441,8 @@ sub push_follow {
     croak $usage if @_ != 2;
     my ($self, $fset) = @_;
 
-    push @{$self->following}, $fset;
+    push @{$self->state->following}, $fset;
+    $self->state->_fsp($self->state->_fsp + 1);
 }
 
 sub get_rule_invocation_stack {
@@ -443,7 +478,17 @@ sub get_backtracking_level {
     croak $usage if @_ != 1;
     my ($self) = @_;
 
-    return $self->backtracking;
+    return $self->state->backtracking;
+}
+
+sub set_backtracking_level {
+    my ($self, $n) = @_;
+    $self->state->backtracking($n);
+}
+
+sub failed {
+    my ($self) = @_;
+    return $self->state->failed;
 }
 
 sub get_token_names {
@@ -475,7 +520,7 @@ sub get_rule_memoization {
         $self->rule_memo->[$rule_index] = {};
     }
 
-    my $stop_index = $self->rule_memo->[$rule_index]->{$rule_start_index};
+    my $stop_index = $self->state->rule_memo->[$rule_index]->{$rule_start_index};
     if (!defined $stop_index) {
         return $self->MEMO_RULE_UNKNOWN;
     }
@@ -487,13 +532,13 @@ sub alredy_parsed_rule {
     croak $usage if @_ != 3;
     my ($self, $input, $rule_index) = @_;
 
-    my $stop_index = get_rule_memoization($rule_index, $input->index());
+    my $stop_index = $self->get_rule_memoization($rule_index, $input->index());
     if ($stop_index == $self->MEMO_RULE_UNKNOWN) {
         return 0;
     }
 
     if ($stop_index == $self->MEMO_RULE_FAILED) {
-        $self->failed(1);
+        $self->state->failed(1);
     } else {
         $input->seek($stop_index + 1);
     }
@@ -505,9 +550,9 @@ sub memoize {
     croak $usage if @_ != 4;
     my ($self, $input, $rule_index, $rule_start_index) = @_;
 
-    my $stop_token_index = $self->failed ? $self->MEMO_RULE_FAILED : $input->index() - 1;
-    if (defined $self->rule_memo->[$rule_index]) {
-        $self->rule_memo->[$rule_index]->{$rule_start_index} = $stop_token_index;
+    my $stop_token_index = $self->state->failed ? $self->MEMO_RULE_FAILED : $input->index() - 1;
+    if (defined $self->state->rule_memo->[$rule_index]) {
+        $self->state->rule_memo->[$rule_index]->{$rule_start_index} = $stop_token_index;
     }
 }
 
@@ -517,7 +562,7 @@ sub get_rule_memoization_cache_size {
     my ($self) = @_;
 
     my $n = 0;
-    foreach my $m (@{$self->rule_memo}) {
+    foreach my $m (@{$self->state->rule_memo}) {
         $n += keys %{$m} if defined $m;
     }
 
@@ -530,11 +575,11 @@ sub trace_in {
     my ($self, $rule_name, $rule_index, $input_symbol) = @_;
 
     print "enter $rule_name $input_symbol";
-    if ($self->failed) {
-        print ' failed=', $self->failed;
+    if ($self->state->failed) {
+        print ' failed=', $self->state->failed;
     }
-    if ($self->backtracking > 0) {
-        print ' backtracking=', $self->backtracking;
+    if ($self->state->backtracking > 0) {
+        print ' backtracking=', $self->state->backtracking;
     }
     print "\n";
 }
@@ -545,11 +590,11 @@ sub trace_out {
     my ($self, $rule_name, $rule_index, $input_symbol) = @_;
 
     print "exit $rule_name $input_symbol";
-    if ($self->failed) {
-        print ' failed=', $self->failed;
+    if ($self->state->failed) {
+        print ' failed=', $self->state->failed;
     }
-    if ($self->backtracking > 0) {
-        print ' backtracking=', $self->backtracking;
+    if ($self->state->backtracking > 0) {
+        print ' backtracking=', $self->state->backtracking;
     }
     print "\n";
 }

@@ -24,7 +24,7 @@ sub BUILD {
     my ($self, $arg_ref) = @_;
 
     $self->type(undef);
-    $self->line(undef);
+    $self->line(0);
     # set to invalid position
     $self->char_position_in_line(-1);
     $self->channel($self->DEFAULT_CHANNEL);

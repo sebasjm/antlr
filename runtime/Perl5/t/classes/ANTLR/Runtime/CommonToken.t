@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1;
+plan tests => 4;
 
 use ANTLR::Runtime::CommonToken;
 
@@ -17,3 +17,7 @@ use ANTLR::Runtime::CommonToken;
     });
     is($token->get_start_index(), 0);
 }
+
+ok(ANTLR::Runtime::Token->EOF_TOKEN == ANTLR::Runtime::Token->EOF_TOKEN);
+ok(!(ANTLR::Runtime::Token->EOF_TOKEN != ANTLR::Runtime::Token->EOF_TOKEN));
+ok(!ANTLR::Runtime::Token->EOF_TOKEN);

@@ -12,6 +12,8 @@ use ANTLR::Runtime::CharStream;
 use ANTLR::Runtime::Class;
 use ANTLR::Runtime::Token;
 
+extends 'ANTLR::Runtime::TokenStream';
+
 has 'token_source';
 has 'tokens';
 has 'channel_override_map';
@@ -26,7 +28,8 @@ sub BUILD {
 
     if (exists $arg_ref->{token_source}) {
         $self->token_source($arg_ref->{token_source});
-    } else {
+    }
+    else {
         $self->token_source(undef);
     }
 
@@ -44,9 +47,6 @@ sub BUILD {
     $self->last_marker(0);
     $self->p(-1);
 }
-
-ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {
-});
 
 sub set_token_source {
     Readonly my $usage => 'void set_token_source(TokenSource token_source)';
@@ -351,6 +351,11 @@ sub get_token_source {
     my ($self) = @_;
 
     return $self->token_source;
+}
+
+sub get_source_name {
+    my ($self) = @_;
+    return $self->get_token_source()->get_source_name();
 }
 
 sub str {
