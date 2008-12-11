@@ -2120,7 +2120,7 @@ lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 /* <description> */
 <if(label)>
 {
-    ANTLR3_UINT32 <label>Start<elementIndex> = GETCHARINDEX();
+    ANTLR3_MARKER <label>Start<elementIndex> = GETCHARINDEX();
     <if(scope)>ctx-><scope:delegateName()>-><endif>m<rule.name>(ctx<if(scope)>-><scope:delegateName()><endif> <if(args)>, <endif><args; separator=", ">); 
     <checkRuleBacktrackFailure()>
     <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
