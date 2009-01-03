@@ -46,6 +46,7 @@ namespace Antlr.Runtime.Tree
 	/// an empty node whose children represent the list.  An empty, but
 	/// non-null node is called "nil".
 	/// </summary>
+	[Serializable]
 	public abstract class BaseTree : ITree
 	{
 		public BaseTree()
@@ -355,6 +356,40 @@ namespace Antlr.Runtime.Tree
 			get { return null; }
 			set { }
 		}
+
+	    /// <summary>
+	    ///  Walk upwards looking for ancestor with this token type.
+	    /// </summary>
+	    public bool HasAncestor(int ttype) { return GetAncestor(ttype)!=null; }
+	
+	    /// <summary>
+	    /// Walk upwards and get first ancestor with this token type.
+	    /// </summary>
+	    public ITree GetAncestor(int ttype) {
+	        ITree t = this;
+	        t = t.Parent;
+	        while ( t!=null ) {
+	            if ( t.Type == ttype ) return t;
+	            t = t.Parent;
+	        }
+	        return null;
+	    }
+	
+	    /// <summary>
+	    /// Return a list of all ancestors of this node.  The first node of
+	    /// list is the root and the last is the parent of this node.
+	    /// </summary>
+	    public IList GetAncestors() {
+	        if ( Parent==null ) return null;
+	        IList ancestors = new ArrayList();
+	        ITree t = this;
+	        t = t.Parent;
+	        while ( t!=null ) {
+	            ancestors.Insert(0, t); // insert at start
+	            t = t.Parent;
+	        }
+	        return ancestors;
+	    }
 
 		/// <summary>
 		/// Print out a whole tree not just a node

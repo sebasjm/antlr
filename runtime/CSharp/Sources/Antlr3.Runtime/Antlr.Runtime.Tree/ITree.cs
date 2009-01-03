@@ -35,6 +35,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Antlr.Runtime.Tree
 {
 	using System;
+	using System.Collections;
 	using Token = Antlr.Runtime.Token;
 	
 	/// <summary>
@@ -63,6 +64,31 @@ namespace Antlr.Runtime.Tree
 			get; 
 			set; 
 		}
+
+	    /// <summary>
+	    /// Is there is a node above with token type ttype?
+	    /// </summary>
+	    bool HasAncestor(int ttype);
+	
+	    /// <summary>
+	    /// Walk upwards and get first ancestor with this token type.
+	    /// </summary>
+	    /// <param name="ttype">
+	    /// A <see cref="System.Int32"/>
+	    /// </param>
+	    /// <returns>
+	    /// A <see cref="ITree"/>
+	    /// </returns>
+	    ITree GetAncestor(int ttype);
+	
+	    /// <summary>
+	    /// Return a list of all ancestors of this node.  The first node of
+	    /// list is the root and the last is the parent of this node.
+	    /// </summary>
+	    /// <returns>
+	    /// A <see cref="IList"/>
+	    /// </returns>
+	    IList GetAncestors();
 
 		/// <summary>This node is what child index? 0..n-1</summary>
 		int ChildIndex

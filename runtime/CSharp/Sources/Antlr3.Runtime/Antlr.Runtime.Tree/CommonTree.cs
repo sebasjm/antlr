@@ -45,6 +45,7 @@ namespace Antlr.Runtime.Tree
 	/// Better to spend the space in every tree node.  If you don't want these 
 	/// extra fields, it's easy to cut them out in your own BaseTree subclass.
 	/// </remarks>
+	[Serializable]
 	public class CommonTree : BaseTree
 	{
 		public CommonTree()

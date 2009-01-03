@@ -33,10 +33,12 @@ namespace Antlr.Runtime
 {
 
 	/** A node representing erroneous token range in token stream */
+	[Serializable]
 	public class CommonErrorNode : CommonTree {
 		public IIntStream input;
 		public IToken start;
 		public IToken stop;
+		[NonSerialized]
 		public RecognitionException trappedException;
 	
 		public CommonErrorNode(ITokenStream input, IToken start, IToken stop,

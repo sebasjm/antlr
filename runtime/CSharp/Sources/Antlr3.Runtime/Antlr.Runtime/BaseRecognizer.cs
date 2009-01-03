@@ -87,7 +87,11 @@ namespace Antlr.Runtime
 		public int BacktrackingLevel
 		{
 			get { return state.backtracking; }
+			set { state.backtracking = value; }
 		}
+
+        /** Return whether or not a backtracking attempt failed. */
+	    public bool Failed() { return state.failed; }
 
 		/// <summary>Reset the parser's state. Subclasses must rewind the input stream.</summary>
 		public virtual void Reset()
@@ -681,10 +685,6 @@ namespace Antlr.Runtime
 		public virtual void TraceIn(string ruleName, int ruleIndex, object inputSymbol)
 		{
 			Console.Out.Write("enter " + ruleName + " " + inputSymbol);
-			if (state.failed)
-			{
-				Console.Out.WriteLine(" failed=" + state.failed);
-			}
 			if (state.backtracking > 0)
 			{
 				Console.Out.Write(" backtracking=" + state.backtracking);
@@ -692,16 +692,15 @@ namespace Antlr.Runtime
 			Console.Out.WriteLine();
 		}
 
-		public virtual void TraceOut(string ruleName, int ruleIndex, object inputSymbol)
-		{
+		public virtual void TraceOut(string ruleName, int ruleIndex, object inputSymbol) {
 			Console.Out.Write("exit " + ruleName + " " + inputSymbol);
-			if (state.failed)
-			{
-				Console.Out.WriteLine(" failed=" + state.failed);
-			}
-			if (state.backtracking > 0)
-			{
+			if (state.backtracking > 0) {
 				Console.Out.Write(" backtracking=" + state.backtracking);
+				if (state.failed) {
+					Console.Out.WriteLine(" failed" + state.failed);
+				} else {
+					Console.Out.WriteLine(" succeeded" + state.failed);
+				}
 			}
 			Console.Out.WriteLine();
 		}
@@ -728,6 +727,8 @@ namespace Antlr.Runtime
 	 	/// to get single token insertion and deletion. Use this to turn off
 		/// single token insertion and deletion. Override mismatchRecover
 		/// to call this instead.
+	    /// 
+	    /// TODO: fix this comment, mismatchRecover doesn't exist, for example
 		/// </summary>
 		protected internal virtual void Mismatch(IIntStream input, int ttype, BitSet follow)
 		{

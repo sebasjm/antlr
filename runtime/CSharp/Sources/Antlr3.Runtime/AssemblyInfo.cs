@@ -45,7 +45,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("ANTLR3 C# Runtime for .NET")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright (c) 2005-2007 Kunle Odutola, 2007-2008 Johannes Luber")]
+[assembly: AssemblyCopyright("Copyright (c) 2005-2007 Kunle Odutola, 2007-2009 Johannes Luber")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -63,7 +63,7 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("3.1.1.*")]
+[assembly: AssemblyVersion("3.1.2.*")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

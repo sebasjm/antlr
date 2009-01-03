@@ -46,7 +46,8 @@ namespace Antlr.Runtime.Tree
 	/// use your subclass.
 	/// 
 	/// To get your parser to build nodes of a different type, override
-	/// Create(Token).
+	/// Create(Token), ErrorNode(), and to be safe, YourTreeClass.DupNode().
+ 	/// DupNode() is called to duplicate nodes during rewrite operations.
 	/// </summary>
 	public class CommonTreeAdaptor : BaseTreeAdaptor
 	{
@@ -207,22 +208,24 @@ namespace Antlr.Runtime.Tree
 
 		override public object GetParent(object t)
 		{
+			if ( t==null ) return null;
 			return ((ITree)t).Parent;
 		}
 
 		override public void SetParent(object t, object parent)
 		{
-			((ITree)t).Parent = (ITree)parent;
+			if ( t==null ) ((ITree)t).Parent = (ITree)parent;
 		}
 
 		override public int GetChildIndex(object t)
 		{
+			if ( t==null ) return 0;
 			return ((ITree)t).ChildIndex;
 		}
 
 		override public void SetChildIndex(object t, int index)
 		{
-			((ITree)t).ChildIndex = index;
+			if ( t==null ) ((ITree)t).ChildIndex = index;
 		}
 
 		override public void ReplaceChildren(object parent, int startChildIndex, int stopChildIndex, object t)

@@ -490,19 +490,19 @@ ruleScopeCleanUp() ::= <<
 >>
 
 ruleLabelDefs() ::= <<
-<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
+<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels,
+  ruleDescriptor.wildcardTreeLabels,ruleDescriptor.wildcardTreeListLabels]
     :{<labelType> <it.label.text> = null;}; separator="\n"
 >
-<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
+<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels,ruleDescriptor.wildcardTreeListLabels]
     :{IList list_<it.label.text> = null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
-<ruleDescriptor.ruleListLabels:{ll|<ruleLabelType(referencedRule=ll.referencedRule)> <ll.label.text> = null;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{ll|<ll:ruleLabelDef(label=it)> <ll.label.text> = null;}; separator="\n">
 >>
 
 lexerRuleLabelDefs() ::= <<
 <[ruleDescriptor.tokenLabels,
-  ruleDescriptor.tokenListLabels,
   ruleDescriptor.ruleLabels]
     :{<labelType> <it.label.text> = null;}; separator="\n"
 >
@@ -1429,17 +1429,10 @@ ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.ST = <expr>;"
 /** How to execute an action (only when not backtracking) */
 execAction(action) ::= <<
 <if(backtracking)>
-<if(actions.(actionScope).synpredgate)>
 if ( <actions.(actionScope).synpredgate> )
 {
   <action>
 }
-<else>
-if ( state.backtracking == 0 ) 
-{
-  <action>
-}
-<endif>
 <else>
 <action>
 <endif>

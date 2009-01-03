@@ -169,6 +169,22 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
+/** Match . wildcard and auto dup the node/subtree */
+wildcard(token,label,elementIndex,hetero) ::= <<
+_last = (<ASTLabelType>)input.LT(1);
+<super.wildcard(...)>
+<if(!rewriteMode)>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
+<label>_tree = (<ASTLabelType>)adaptor.DupTree(<label>);
+adaptor.AddChild(root_<treeLevel>, <label>_tree);
+<if(backtracking)>}<endif>
+<else> <! rewrite mode !>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
+if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>;
+<endif>
+>>
+
+
 // SET AST
 
 matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<

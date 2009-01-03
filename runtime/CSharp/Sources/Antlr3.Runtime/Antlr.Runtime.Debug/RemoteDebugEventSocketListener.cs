@@ -593,7 +593,7 @@ namespace Antlr.Runtime.Debug
 					eventLabel = eventWithoutString;
 				}
 
-				string[] strings = eventLabel.Split(new char[] { ' ', '\t' });
+				string[] strings = eventLabel.Split('\t');
 				int i = 0;
 				for ( ; i < strings.Length; i++)
 				{

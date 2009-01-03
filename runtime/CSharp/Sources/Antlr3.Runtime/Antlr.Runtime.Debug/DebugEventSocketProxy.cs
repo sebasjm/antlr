@@ -146,65 +146,65 @@ namespace Antlr.Runtime.Debug
 
 		public override void EnterRule(string grammarFileName, string ruleName)
 		{
-			Transmit("enterRule " + grammarFileName + " " + ruleName);
+			Transmit("enterRule\t" + grammarFileName + "\t" + ruleName);
 		}
 
 		public override void EnterAlt(int alt)
 		{
-			Transmit("enterAlt " + alt);
+			Transmit("enterAlt\t" + alt);
 		}
 
 		public override void ExitRule(string grammarFileName, string ruleName)
 		{
-			Transmit("exitRule " + grammarFileName + " " + ruleName);
+			Transmit("exitRule\t" + grammarFileName + "\t" + ruleName);
 		}
 
 		public override void EnterSubRule(int decisionNumber)
 		{
-			Transmit("enterSubRule " + decisionNumber);
+			Transmit("enterSubRule\t" + decisionNumber);
 		}
 
 		public override void ExitSubRule(int decisionNumber)
 		{
-			Transmit("exitSubRule " + decisionNumber);
+			Transmit("exitSubRule\t" + decisionNumber);
 		}
 
 		public override void EnterDecision(int decisionNumber)
 		{
-			Transmit("enterDecision " + decisionNumber);
+			Transmit("enterDecision\t" + decisionNumber);
 		}
 
 		public override void ExitDecision(int decisionNumber)
 		{
-			Transmit("exitDecision " + decisionNumber);
+			Transmit("exitDecision\t" + decisionNumber);
 		}
 
 		public override void ConsumeToken(IToken t)
 		{
 			string buf = SerializeToken(t);
-			Transmit("consumeToken " + buf);
+			Transmit("consumeToken\t" + buf);
 		}
 
 		public override void ConsumeHiddenToken(IToken t)
 		{
 			string buf = SerializeToken(t);
-			Transmit("consumeHiddenToken " + buf);
+			Transmit("consumeHiddenToken\t" + buf);
 		}
 
 		public override void LT(int i, IToken t)
 		{
 			if (t != null)
-				Transmit("LT " + i + " " + SerializeToken(t));
+				Transmit("LT\t" + i + "\t" + SerializeToken(t));
 		}
 
 		public override void Mark(int i)
 		{
-			Transmit("mark " + i);
+			Transmit("mark\t" + i);
 		}
 
 		public override void Rewind(int i)
 		{
-			Transmit("rewind " + i);
+			Transmit("rewind\t" + i);
 		}
 
 		public override void Rewind()
@@ -214,30 +214,30 @@ namespace Antlr.Runtime.Debug
 
 		public override void BeginBacktrack(int level)
 		{
-			Transmit("beginBacktrack " + level);
+			Transmit("beginBacktrack\t" + level);
 		}
 
 		public override void EndBacktrack(int level, bool successful)
 		{
-			Transmit("endBacktrack " + level + " " + (successful ? true.ToString() : false.ToString()));
+			Transmit("endBacktrack\t" + level + "\t" + (successful ? true.ToString() : false.ToString()));
 		}
 
 		public override void Location(int line, int pos)
 		{
-			Transmit("location " + line + " " + pos);
+			Transmit("location\t" + line + "\t" + pos);
 		}
 
 		public override void RecognitionException(RecognitionException e)
 		{
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append("exception ");
+			buf.Append("exception\t");
 			buf.Append(e.GetType().FullName);
 			// dump only the data common to all exceptions for now
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(e.Index);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(e.Line);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(e.CharPositionInLine);
 			Transmit(buf.ToString());
 		}
@@ -255,7 +255,7 @@ namespace Antlr.Runtime.Debug
 		public override void SemanticPredicate(bool result, string predicate)
 		{
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append("semanticPredicate ");
+			buf.Append("semanticPredicate\t");
 			buf.Append(result);
 			SerializeText(buf, predicate);
 			Transmit(buf.ToString());
@@ -267,7 +267,7 @@ namespace Antlr.Runtime.Debug
 		public override void ConsumeNode(object t)
 		{
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append("consumeNode ");
+			buf.Append("consumeNode\t");
 			SerializeNode(buf, t);
 			Transmit(buf.ToString());
 		}
@@ -278,7 +278,7 @@ namespace Antlr.Runtime.Debug
 			string text = adaptor.GetNodeText(t);
 			int type = adaptor.GetNodeType(t);
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append("LN "); // lookahead node; distinguish from LT in protocol
+			buf.Append("LN\t"); // lookahead node; distinguish from LT in protocol
 			buf.Append(i);
 			SerializeNode(buf, t);
 			Transmit(buf.ToString());
@@ -292,16 +292,16 @@ namespace Antlr.Runtime.Debug
 		public override void GetNilNode(object t)
 		{
 			int ID = adaptor.GetUniqueID(t);
-			Transmit("nilNode " + ID);
+			Transmit("nilNode\t" + ID);
 		}
 
 		public override void ErrorNode(object t) {
 			int ID = adaptor.GetUniqueID(t);
 			String text = t.ToString();
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append("errorNode ");
+			buf.Append("errorNode\t");
 			buf.Append(ID);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(Token.INVALID_TOKEN_TYPE);
 			SerializeText(buf, text);
 			Transmit(buf.ToString());
@@ -313,9 +313,9 @@ namespace Antlr.Runtime.Debug
 			string text = adaptor.GetNodeText(t);
 			int type = adaptor.GetNodeType(t);
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append("createNodeFromTokenElements ");
+			buf.Append("createNodeFromTokenElements\t");
 			buf.Append(ID);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(type);
 			SerializeText(buf, text);
 			Transmit(buf.ToString());
@@ -325,27 +325,27 @@ namespace Antlr.Runtime.Debug
 		{
 			int ID = adaptor.GetUniqueID(node);
 			int tokenIndex = token.TokenIndex;
-			Transmit("createNode " + ID + " " + tokenIndex);
+			Transmit("createNode\t" + ID + "\t" + tokenIndex);
 		}
 
 		public override void BecomeRoot(object newRoot, object oldRoot)
 		{
 			int newRootID = adaptor.GetUniqueID(newRoot);
 			int oldRootID = adaptor.GetUniqueID(oldRoot);
-			Transmit("becomeRoot " + newRootID + " " + oldRootID);
+			Transmit("becomeRoot\t" + newRootID + "\t" + oldRootID);
 		}
 
 		public override void AddChild(object root, object child)
 		{
 			int rootID = adaptor.GetUniqueID(root);
 			int childID = adaptor.GetUniqueID(child);
-			Transmit("addChild " + rootID + " " + childID);
+			Transmit("addChild\t" + rootID + "\t" + childID);
 		}
 
 		public override void SetTokenBoundaries(object t, int tokenStartIndex, int tokenStopIndex)
 		{
 			int ID = adaptor.GetUniqueID(t);
-			Transmit("setTokenBoundaries " + ID + " " + tokenStartIndex + " " + tokenStopIndex);
+			Transmit("setTokenBoundaries\t" + ID + "\t" + tokenStartIndex + "\t" + tokenStopIndex);
 		}
 
 		#endregion
@@ -360,10 +360,10 @@ namespace Antlr.Runtime.Debug
 		protected internal virtual string SerializeToken(IToken t)
 		{
 			StringBuilder buf = new StringBuilder(50);
-			buf.Append(t.TokenIndex); buf.Append(' ');
-			buf.Append(t.Type); buf.Append(' ');
-			buf.Append(t.Channel); buf.Append(' ');
-			buf.Append(t.Line); buf.Append(' ');
+			buf.Append(t.TokenIndex); buf.Append('\t');
+			buf.Append(t.Type); buf.Append('\t');
+			buf.Append(t.Channel); buf.Append('\t');
+			buf.Append(t.Line); buf.Append('\t');
 			buf.Append(t.CharPositionInLine);
 			SerializeText(buf, t.Text);
 			return buf.ToString();
@@ -382,9 +382,9 @@ namespace Antlr.Runtime.Debug
 			int ID = adaptor.GetUniqueID(t);
 			string text = adaptor.GetNodeText(t);
 			int type = adaptor.GetNodeType(t);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(ID);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(type);
 			IToken token = adaptor.GetToken(t);
 			int line = -1;
@@ -394,19 +394,19 @@ namespace Antlr.Runtime.Debug
 				line = token.Line;
 				pos = token.CharPositionInLine;
 			}
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(line);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(pos);
 			int tokenIndex = adaptor.GetTokenStartIndex(t);
-			buf.Append(" ");
+			buf.Append("\t");
 			buf.Append(tokenIndex);
 			SerializeText(buf, text);
 		}
 
 		protected void SerializeText(StringBuilder buf, string text)
 		{
-			buf.Append(" \"");
+			buf.Append("\t\"");
 			if (text == null)
 			{
 				text = "";

@@ -238,8 +238,7 @@ namespace Antlr.Runtime.Tree
 		
 		public virtual int GetNodeType(object t)
 		{
-			int generatedAux = ((ITree) t).Type;
-			return 0;
+			return ((ITree) t).Type;
 		}
 
 		public virtual void SetNodeType(object t, int type)

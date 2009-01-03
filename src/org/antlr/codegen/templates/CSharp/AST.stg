@@ -71,7 +71,8 @@ ruleDeclarations() ::= <<
 
 ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
-<ruleDescriptor.tokenLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
+<[ruleDescriptor.tokenLabels,ruleDescriptor.wildcardTreeLabels,
+  ruleDescriptor.wildcardTreeListLabels]:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<ASTLabelType> <it.label.text>_tree=null;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{RewriteRule<rewriteElementType>Stream stream_<it> = new RewriteRule<rewriteElementType>Stream(adaptor,"token <it>");}; separator="\n">
@@ -122,10 +123,6 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
-wildcardTrack(label,elementIndex) ::= <<
-<super.wildcard(...)>
->>
-
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
@@ -159,8 +156,8 @@ rewriteCode(
 	referencedTokenListLabels,
 	referencedRuleLabels,
 	referencedRuleListLabels,
-    referencedWildcardLabels,
-    referencedWildcardListLabels,
+	referencedWildcardLabels,
+	referencedWildcardListLabels,
 	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 
@@ -170,6 +167,7 @@ rewriteCode(
 // rule labels:       <referencedRuleLabels; separator=", ">
 // token list labels: <referencedTokenListLabels; separator=", ">
 // rule list labels:  <referencedRuleListLabels; separator=", ">
+// wildcard labels: <[referencedWildcardLabels,referencedWildcardListLabels]; separator=", ">
 <if(backtracking)>
 if ( <actions.(actionScope).synpredgate> ) {<\n>
 <endif>
@@ -208,8 +206,16 @@ rewriteCodeLabels() ::= <<
     :{RewriteRule<rewriteElementType>Stream stream_<it> = new RewriteRule<rewriteElementType>Stream(adaptor,"token <it>", list_<it>);};
     separator="\n"
 >
+<referencedWildcardLabels
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor,"wildcard <it>",<it>);};
+    separator="\n"
+>
+<referencedWildcardListLabels
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor,"wildcard <it>",list_<it>);};
+    separator="\n"
+>
 <referencedRuleLabels
-    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "token <it>", (<it>!=null ? <it>.Tree : null));};
+    :{RewriteRuleSubtreeStream stream_<it> = new RewriteRuleSubtreeStream(adaptor, "rule <it>", <it>!=null ? <it>.Tree : null);};
     separator="\n"
 >
 <referencedRuleListLabels
@@ -381,6 +387,10 @@ root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.NextNode(),
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = (<ASTLabelType>)adaptor.BecomeRoot(stream_<label>.NextNode(), root_<treeLevel>);<\n>
+>>
+
+rewriteWildcardLabelRef(label) ::= <<
+adaptor.AddChild(root_<treeLevel>, stream_<label>.NextTree());<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<

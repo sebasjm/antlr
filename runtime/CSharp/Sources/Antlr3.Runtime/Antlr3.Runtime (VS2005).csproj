@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -48,7 +49,6 @@
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <OutputType>Library</OutputType>
-    <AssemblyName>Antlr3.Runtime</AssemblyName>
     <RootNamespace>Antlr.Runtime</RootNamespace>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -73,7 +73,6 @@
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <OutputType>Library</OutputType>
-    <AssemblyName>Antlr3.Runtime</AssemblyName>
     <RootNamespace>Antlr.Runtime</RootNamespace>
     <Optimize>true</Optimize>
   </PropertyGroup>
@@ -108,8 +107,6 @@
     <Compile Include="Antlr.Runtime\MissingTokenException.cs" />
     <Compile Include="Antlr.Runtime.Tree\CommonErrorNode.cs" />
     <Compile Include="Antlr.Runtime\UnwantedTokenException.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Antlr.Runtime.Collections\CollectionUtils.cs" />
     <Compile Include="Antlr.Runtime.Collections\HashList.cs" />
     <Compile Include="Antlr.Runtime.Collections\StackList.cs" />
@@ -124,8 +121,6 @@
     <Compile Include="Antlr.Runtime.Tree\ParseTree.cs" />
     <Compile Include="Antlr.Runtime.Tree\TreeParser.cs" />
     <Compile Include="Antlr.Runtime.Tree\TreeRuleReturnScope.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Antlr.Runtime.Debug\DebugEventSocketProxy.cs" />
     <Compile Include="Antlr.Runtime.Debug\DebugParser.cs" />
     <Compile Include="Antlr.Runtime.Debug\DebugTokenStream.cs" />
@@ -133,29 +128,12 @@
     <Compile Include="Antlr.Runtime.Debug\DebugTreeAdaptor.cs" />
     <Compile Include="Antlr.Runtime\Constants.cs" />
     <Compile Include="Messages.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Messages.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Antlr.Runtime.Debug\DebugTreeNodeStream.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Antlr.Runtime.Debug\BlankDebugEventListener.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Antlr.Runtime.Debug\RemoteDebugEventSocketListener.cs" />
     <Compile Include="Antlr.Runtime.Debug\TraceDebugEventListener.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Antlr.Runtime.Debug\DebugEventHub.cs" />
     <Compile Include="Antlr.Runtime.Debug\DebugEventRepeater.cs" />
     <Compile Include="Antlr.Runtime.Debug\DebugTreeParser.cs" />
@@ -184,6 +162,14 @@
     <Compile Include="Antlr.Runtime\ITokenStream.cs" />
     <Compile Include="Antlr.Runtime\Lexer.cs" />
     <Compile Include="Antlr.Runtime\TokenRewriteStream.cs" />
+    <Compile Include="Antlr.Runtime.Tree\ITreeVisitorAction.cs" />
+    <Compile Include="Antlr.Runtime.Tree\TreeVisitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Messages.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -194,4 +180,11 @@
     <ProjectGuid>{CF15D0D5-BE72-4F98-B70F-229ABA1DF0E8}</ProjectGuid>
     <RootNamespace>Antlr.Runtime</RootNamespace>
   </PropertyGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <GtkDesignInfo />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>
