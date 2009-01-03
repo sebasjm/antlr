@@ -93,6 +93,10 @@ package org.antlr.runtime.tree {
 		protected var calls:Array;
 	
 		public function CommonTreeNodeStream(tree:Object, adaptor:TreeAdaptor = null, initialBufferSize:int = DEFAULT_INITIAL_BUFFER_SIZE) {
+		    if (tree == null) {
+		        // return uninitalized for static resuse function
+		        return;
+		    }
 			this.root = tree;
 			this.adaptor = adaptor == null ? new CommonTreeAdaptor() : adaptor;
 			
@@ -102,6 +106,22 @@ package org.antlr.runtime.tree {
 			eof = this.adaptor.createFromType(TokenConstants.EOF, "EOF");
 		}
 	
+        /** Reuse an existing node stream's buffer of nodes.  Do not point at a
+         *  node stream that can change.  Must have static node list.  start/stop
+         *  are indexes into the parent.nodes stream.  We avoid making a new
+         *  list of nodes like this.
+         */
+        public static function reuse(parent:CommonTreeNodeStream, start:int, stop:int):CommonTreeNodeStream {
+            var stream:CommonTreeNodeStream = new CommonTreeNodeStream(null);
+            stream.root = parent.root;
+            stream.adaptor = parent.adaptor;
+            stream.nodes = parent.nodes.slice(start, stop);
+            stream.down = parent.down;
+            stream.up = parent.up;
+            stream.eof = parent.eof;
+            return stream;    
+        }
+        
 		/** Walk tree with depth-first-search and fill nodes buffer.
 		 *  Don't do DOWN, UP nodes if its a list (t is isNil).
 		 */

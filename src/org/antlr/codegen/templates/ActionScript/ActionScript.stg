@@ -253,7 +253,8 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRu
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start <ruleName>
-public final function <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>):void {   
+public final function <ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope(scope=it)>):void {
+    <ruleLabelDefs()>
 <if(trace)>
     traceIn("<ruleName>_fragment", <ruleDescriptor.index>);
     try {
@@ -386,10 +387,11 @@ ruleScopeCleanUp() ::= <<
 >>
 
 ruleLabelDefs() ::= <<
-<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
+<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels,
+  ruleDescriptor.wildcardTreeLabels,ruleDescriptor.wildcardTreeListLabels]
     :{var <it.label.text>:<labelType>=null;}; separator="\n"
 >
-<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
+<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels,ruleDescriptor.wildcardTreeListLabels]
     :{var list_<it.label.text>:Array=null;}; separator="\n"
 >
 <ruleDescriptor.ruleLabels:ruleLabelDef(label=it); separator="\n">
@@ -404,7 +406,6 @@ lexerRuleLabelDefs() ::= <<
 >
 <ruleDescriptor.charLabels:{var <it.label.text>:int;}; separator="\n">
 <[ruleDescriptor.tokenListLabels,
-  ruleDescriptor.ruleListLabels,
   ruleDescriptor.ruleListLabels]
     :{var list_<it.label.text>:Array=null;}; separator="\n"
 >

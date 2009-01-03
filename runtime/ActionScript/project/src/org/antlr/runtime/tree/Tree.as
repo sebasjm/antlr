@@ -20,6 +20,18 @@ package org.antlr.runtime.tree {
 		function get parent():Tree;
 	
 		function set parent(t:Tree):void;
+		
+		/** Is there is a node above with token type ttype? */
+        function hasAncestor(ttype:int):Boolean;
+    
+        /** Walk upwards and get first ancestor with this token type. */
+        function getAncestor(ttype:int):Tree;
+    
+        /** Return a list of all ancestors of this node.  The first node of
+         *  list is the root and the last is the parent of this node.
+         */
+        function get ancestors():Array;
+
 	
 		/** This node is what child index? 0..n-1 */
 		function get childIndex():int;

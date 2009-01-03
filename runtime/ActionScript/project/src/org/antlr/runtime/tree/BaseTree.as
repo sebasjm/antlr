@@ -262,6 +262,35 @@ package org.antlr.runtime.tree {
 		public function set parent(t:Tree):void {
 		}
 
+        /** Walk upwards looking for ancestor with this token type. */
+        public function hasAncestor(ttype:int):Boolean { return getAncestor(ttype)!=null; }
+    
+        /** Walk upwards and get first ancestor with this token type. */
+        public function getAncestor(ttype:int):Tree {
+            var t:Tree = this;
+            t = t.parent;
+            while ( t!=null ) {
+                if ( t.type==ttype ) return t;
+                t = t.parent;
+            }
+            return null;
+        }
+    
+        /** Return a list of all ancestors of this node.  The first node of
+         *  list is the root and the last is the parent of this node.
+         */
+        public function get ancestors():Array {
+            if ( parent==null ) return null;
+            var ancestors:Array = new Array();
+            var t:Tree = this;
+            t = t.parent;
+            while ( t!=null ) {
+                ancestors.unshift(t); // insert at start
+                t = t.parent;
+            }
+            return ancestors;
+        }
+
 		/** Print out a whole tree not just a node */
 	    public function toStringTree():String {
 			if ( _children==null || _children.length==0 ) {

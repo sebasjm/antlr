@@ -668,6 +668,15 @@ package org.antlr.runtime {
 			return state.backtracking;
 		}
 	
+        public function set backtrakingLevel(n:int):void {
+            state.backtracking = n;
+        }
+        
+        /** Return whether or not a backtracking attempt failed. */
+        public function get failed():Boolean {
+            return state.failed;
+        }
+        
 		/** Used to print out token names like ID during debugging and
 		 *  error reporting.  The generated parsers implement a method
 		 *  that overrides this to point to their String[] tokenNames.
@@ -781,9 +790,6 @@ package org.antlr.runtime {
 	
 		public function traceInSymbol(ruleName:String, ruleIndex:int, inputSymbol:Object):void  {
 			trace("enter "+ruleName+" "+inputSymbol);
-			if ( state.failed ) {
-				trace(" failed="+state.failed);
-			}
 			if ( state.backtracking>0 ) {
 				trace(" backtracking="+state.backtracking);
 			}
@@ -795,11 +801,10 @@ package org.antlr.runtime {
 							  inputSymbol:Object):void
 		{
 			trace("exit "+ruleName+" "+inputSymbol);
-			if ( state.failed ) {
-				trace(" failed="+state.failed);
-			}
 			if ( state.backtracking>0 ) {
 				trace(" backtracking="+state.backtracking);
+				if ( state.failed ) trace(" failed");
+                else trace(" succeeded");
 			}
 			trace();
 		}

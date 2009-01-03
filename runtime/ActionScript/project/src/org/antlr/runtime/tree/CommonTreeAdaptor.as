@@ -10,7 +10,8 @@ package org.antlr.runtime.tree {
 	 *  use your subclass.
 	 *
 	 *  To get your parser to build nodes of a different type, override
-	 *  create(Token).
+     *  create(Token), errorNode(), and to be safe, YourTreeClass.dupNode().
+     *  dupNode is called to duplicate nodes during rewrite operations.
 	 */
 	public class CommonTreeAdaptor extends BaseTreeAdaptor {
 		/** Duplicate a node.  This is part of the factory;
@@ -135,19 +136,29 @@ package org.antlr.runtime.tree {
 	    }
 
 		public override function getParent(t:Object):Object {
+		    if (t == null) {
+		        return null;
+		    }
 			return Tree(t).parent;
 		}
 	
 		public override function setParent(t:Object, parent:Object):void {
-			Tree(t).parent = Tree(parent);
+			if (t != null) {
+			     Tree(t).parent = Tree(parent);
+			}
 		}
 	
 		public override function getChildIndex(t:Object):int {
+		    if (t == null) {
+		        return 0;
+		    }
 			return Tree(t).childIndex;
 		}
 	
 		public override function setChildIndex(t:Object, index:int):void {
-			Tree(t).childIndex = index;
+			if (t != null) {
+			     Tree(t).childIndex = index;
+			}
 		}
 	
 		public override function replaceChildren(parent:Object, startChildIndex:int, stopChildIndex:int, t:Object):void {

@@ -64,7 +64,8 @@ var root_0:<ASTLabelType> = null;<\n>
 
 ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
-<ruleDescriptor.tokenLabels:{var <it.label.text>_tree:<ASTLabelType>=null;}; separator="\n">
+<[ruleDescriptor.tokenLabels,ruleDescriptor.wildcardTreeLabels,
+  ruleDescriptor.wildcardTreeListLabels]:{var <it.label.text>_tree:<ASTLabelType>=null;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{var <it.label.text>_tree:<ASTLabelType>=null;}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{var stream_<it>:RewriteRule<rewriteElementType>Stream=new RewriteRule<rewriteElementType>Stream(adaptor,"token <it>");}; separator="\n">
@@ -113,10 +114,6 @@ tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <tokenRefRuleRootTrack(...)>
 <listLabel(elem=label,...)>
->>
-
-wildcardTrack(label,elementIndex) ::= <<
-<super.wildcard(...)>
 >>
 
 /** rule when output=AST and tracking for rewrite */
@@ -202,12 +199,20 @@ rewriteCodeLabels() ::= <<
     :{var stream_<it>:RewriteRule<rewriteElementType>Stream=new RewriteRule<rewriteElementType>Stream(adaptor,"token <it>", list_<it>);};
     separator="\n"
 >
+<referencedWildcardLabels
+    :{var  stream_<it>:RewriteRuleSubtreeStream=new RewriteRuleSubtreeStream(adaptor,"wildcard <it>",<it>);};
+    separator="\n"
+>
+<referencedWildcardListLabels
+    :{var stream_<it>:RewriteRuleSubtreeStream=new RewriteRuleSubtreeStream(adaptor,"wildcard <it>",list_<it>);};
+    separator="\n"
+>
 <referencedRuleLabels
-    :{var stream_<it>:RewriteRuleSubtreeStream=new RewriteRuleSubtreeStream(adaptor,"token <it>",<it>!=null?<it>.tree:null);};
+    :{var stream_<it>:RewriteRuleSubtreeStream=new RewriteRuleSubtreeStream(adaptor,"rule <it>",<it>!=null?<it>.tree:null);};
     separator="\n"
 >
 <referencedRuleListLabels
-    :{var stream_<it>:RewriteRuleSubtreeStream=new RewriteRuleSubtreeStream(adaptor,"token <it>",list_<it>);};
+    :{var stream_<it>:RewriteRuleSubtreeStream=new RewriteRuleSubtreeStream(adaptor,"rule <it>",list_<it>);};
     separator="\n"
 >
 >>
@@ -371,6 +376,10 @@ root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(stream_<label>.nextNode(), 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>));<\n>
+>>
+
+rewriteWildcardLabelRef(label) ::= <<
+adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree());<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<

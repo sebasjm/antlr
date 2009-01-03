@@ -1,5 +1,5 @@
-package org.antlr.runtime.tree
-{
+package org.antlr.runtime.tree {
+    
 	import flash.utils.Dictionary;
 	
 	import mx.utils.ObjectUtil;
@@ -26,10 +26,12 @@ package org.antlr.runtime.tree
     	 *  override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
     	 *  if no token payload but you might have to set token type for diff
     	 *  node type.
+    	 * 
+         *  You don't have to subclass CommonErrorNode; you will likely need to
+         *  subclass your own tree node class to avoid class cast exception.
     	 */
     	public function errorNode(input:TokenStream, start:Token, stop:Token,
-    							e:RecognitionException):Object
-    	{
+    							e:RecognitionException):Object {
     		var t:CommonErrorNode = new CommonErrorNode(input, start, stop, e);
     		//System.out.println("returning error node '"+t+"' @index="+input.index());
     		return t;
@@ -162,8 +164,7 @@ package org.antlr.runtime.tree
 		}
 	
 		public function getType(t:Object):int {
-			Tree(t).type;
-			return 0;
+			return Tree(t).type;
 		}
 	
 		public function setType(t:Object, type:int):void {
