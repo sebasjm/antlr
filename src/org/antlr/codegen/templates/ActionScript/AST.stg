@@ -119,7 +119,7 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( this.<actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>.add(<label>.tree);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>.add(<label>.tree);
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -161,7 +161,7 @@ rewriteCode(
 // token list labels: <referencedTokenListLabels; separator=", ">
 // rule list labels: <referencedRuleListLabels; separator=", ">
 <if(backtracking)>
-if ( this.<actions.(actionScope).synpredgate> ) {<\n>
+if ( <actions.(actionScope).synpredgate> ) {<\n>
 <endif>
 <prevRuleRootRef()>.tree = root_0;
 <rewriteCodeLabels()>
