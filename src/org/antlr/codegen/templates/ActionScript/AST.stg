@@ -42,11 +42,11 @@ import org.antlr.runtime.tree.*;<\n>
 /** Add an adaptor property that knows how to build trees */
 parserMembers() ::= <<
 protected var adaptor:TreeAdaptor = new CommonTreeAdaptor();<\n>
-public function set treeAdaptor(adaptor:TreeAdaptor):void {
+override public function set treeAdaptor(adaptor:TreeAdaptor):void {
     this.adaptor = adaptor;
     <grammar.directDelegates:{g|<g:delegateName()>.treeAdaptor = this.adaptor;}>
 }
-public function get treeAdaptor():TreeAdaptor {
+override public function get treeAdaptor():TreeAdaptor {
     return adaptor;
 }
 >>

@@ -26,6 +26,8 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.runtime {
+    import org.antlr.runtime.tree.TreeAdaptor;
+    
 	/** A parser for TokenStreams.  "parser grammars" result in a subclass
 	 *  of this.
 	 */
@@ -79,6 +81,15 @@ package org.antlr.runtime {
 	
 		public override function get sourceName():String {
 			return input.sourceName;
+		}
+		
+		public function set treeAdaptor(adaptor:TreeAdaptor):void {
+		    // do nothing, implemented in generated code
+		}
+		
+		public function get treeAdaptor():TreeAdaptor {
+		    // implementation provided in generated code
+		    return null;
 		}
 		
 		public function traceIn(ruleName:String, ruleIndex:int):void  {
