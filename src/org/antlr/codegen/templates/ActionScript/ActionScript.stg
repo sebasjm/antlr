@@ -734,11 +734,14 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  *  target rule name, but now is type Rule, whose toString is
  *  same: the rule name.  Now though you can access full rule
  *  descriptor stuff.
+ *
+ * GMS: Note:  do not use post-decrement operator!  ASC produces bad code for exceptions in this case.
+ *      See: https://bugs.adobe.com/jira/browse/ASC-3625
  */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 pushFollow(FOLLOW_<rule.name>_in_<ruleName><elementIndex>);
 <if(label)><label>=<endif><if(scope)><scope:delegateName()>.<endif><rule.name>(<args; separator=", ">);<\n>
-state._fsp--;
+state._fsp = state._fsp - 1;
 <checkRuleBacktrackFailure()>
 >>
 
