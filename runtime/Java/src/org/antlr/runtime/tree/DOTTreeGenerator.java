@@ -54,12 +54,12 @@ public class DOTTreeGenerator {
 
 	public static StringTemplate _treeST =
 		new StringTemplate(
-			"digraph {\n" +
-			"  ordering=out;\n" +
-			"  ranksep=.4;\n" +
-			"  node [shape=plaintext, fixedsize=true, fontsize=11, fontname=\"Courier\",\n" +
-			"        width=.25, height=.25];\n" +
-			"  edge [arrowsize=.5]\n" +
+			"digraph {\n\n" +
+			"\tordering=out;\n" +
+			"\tranksep=.4;\n" +
+			"\tbgcolor=\"lightgrey\"; node [shape=box, fixedsize=false, fontsize=12, fontname=\"Helvetica-bold\", fontcolor=\"blue\"\n" +
+			"\t\twidth=.25, height=.25, color=\"black\", fillcolor=\"white\", style=\"filled, solid, bold\"];\n" +
+			"\tedge [arrowsize=.5, color=\"black\", style=\"bold\"]\n\n" +
 			"  $nodes$\n" +
 			"  $edges$\n" +
 			"}\n");
@@ -174,8 +174,8 @@ public class DOTTreeGenerator {
 			StringTemplate edgeST = _edgeST.getInstanceOf();
 			edgeST.setAttribute("parent", parentName);
 			edgeST.setAttribute("child", childName);
-			edgeST.setAttribute("parentText", parentText);
-			edgeST.setAttribute("childText", childText);
+			edgeST.setAttribute("parentText", fixString(parentText));
+			edgeST.setAttribute("childText", fixString(childText));
 			treeST.setAttribute("edges", edgeST);
 			toDOTDefineEdges(child, adaptor, treeST);
 		}
@@ -186,8 +186,8 @@ public class DOTTreeGenerator {
 		StringTemplate nodeST = _nodeST.getInstanceOf();
 		String uniqueName = "n"+getNodeNumber(t);
 		nodeST.setAttribute("name", uniqueName);
-		if (text!=null) text = text.replaceAll("\"", "\\\\\"");
-		nodeST.setAttribute("text", text);
+
+		nodeST.setAttribute("text", fixString(text));
 		return nodeST;
 	}
 
@@ -202,4 +202,23 @@ public class DOTTreeGenerator {
 			return nodeNumber-1;
 		}
 	}
+
+    protected String fixString(String in)
+    {
+        String text = in;
+
+        if (text!=null) {
+
+            text = text.replaceAll("\"", "\\\\\"");
+            text = text.replaceAll("\\t", "    ");
+            text = text.replaceAll("\\n", "\\\\n");
+            text = text.replaceAll("\\r", "\\\\r");
+            if  (text.length() > 20)    {
+                text = text.substring(0, 8) + "..." + text.substring(text.length()-8);
+            }
+
+        }
+
+        return text;
+    }
 }
