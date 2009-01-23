@@ -1121,7 +1121,7 @@ public static class <returnType()> extends <if(TREE_PARSER)>Tree<else>Parser<end
 >>
 
 parameterScope(scope) ::= <<
-<scope.attributes:{<it.decl>}; separator=", ">
+<scope.attributes:{<it.name>:<it.type>}; separator=", ">
 >>
 
 parameterAttributeRef(attr) ::= "<attr.name>"
