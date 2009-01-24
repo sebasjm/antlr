@@ -85,10 +85,12 @@ ruleLabelInitializations() ::= <<
 <super.ruleLabelInitializations()>
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
+<if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{stream_<it>   = antlr3RewriteRule<rewriteElementType>StreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"token <it>"); }; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
     :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"rule <it>");}; separator="\n">
+<if(backtracking)>}<endif>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.tree  = NULL;
 <endif>
@@ -294,6 +296,7 @@ rewriteCodeLabelsDecl() ::= <<
 >>
 
 rewriteCodeLabelsInit() ::= <<
+<if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
 <referencedTokenLabels
     :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>);};
     separator="\n"
@@ -310,8 +313,10 @@ rewriteCodeLabelsInit() ::= <<
     :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>);};
     separator="\n"
 >
+<if(backtracking)>}<endif>
 >>
 rewriteCodeLabelsFree() ::= <<
+<if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
 <referencedTokenLabels
     :{stream_<it>->free(stream_<it>);};
     separator="\n"
@@ -328,6 +333,7 @@ rewriteCodeLabelsFree() ::= <<
     :{stream_<it>->free(stream_<it>);};
     separator="\n"
 >
+<if(backtracking)>}<endif>
 >>
 
 /** Generate code for an optional rewrite block; note it uses the deep ref'd element
