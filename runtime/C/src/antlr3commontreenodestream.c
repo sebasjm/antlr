@@ -222,7 +222,7 @@ antlr3CommonTreeNodeStreamNewStream(pANTLR3_COMMON_TREE_NODE_STREAM inStream)
 	stream->EOF_NODE.token					= inStream->EOF_NODE.token;
 	inStream->EOF_NODE.token->strFactory	= stream->stringFactory;
 	stream->INVALID_NODE.token				= inStream->INVALID_NODE.token;
-	inStream->INVALID_NODE.token->strFactory			= stream->stringFactory;
+	inStream->INVALID_NODE.token->strFactory= stream->stringFactory;
 
 	// Reuse the root tree of the originating stream
 	//

@@ -120,6 +120,7 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
     antlr3SetTokenAPI	  (specialT);
     specialT->setType	  (specialT, ANTLR3_TOKEN_EOF);
     specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
+    specialT->strFactory    = NULL;
 
 	// Initialize the skip token.
 	//
@@ -127,6 +128,7 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
     antlr3SetTokenAPI	  (specialT);
     specialT->setType	  (specialT, ANTLR3_TOKEN_INVALID);
     specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
+    specialT->strFactory    = NULL;
     return  lexer;
 }
 
@@ -462,7 +464,15 @@ static void setCharStream   (pANTLR3_LEXER lexer,  pANTLR3_INPUT_STREAM input)
      */
     if	(lexer->rec->state->tokSource->strFactory == NULL)
     {
-	lexer->rec->state->tokSource->strFactory	= input->strFactory;
+        lexer->rec->state->tokSource->strFactory	= input->strFactory;
+
+        // Set the newly acquired string factory up for our pre-made tokens
+        // for EOF.
+        //
+        if (lexer->rec->state->tokSource->eofToken.strFactory == NULL)
+        {
+            lexer->rec->state->tokSource->eofToken.strFactory = input->strFactory;
+        }
     }
 
     /* This is a lexer, install the appropriate exception creator
