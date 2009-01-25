@@ -85,21 +85,22 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		//
 		recognizer->state->errorRecovery	= ANTLR3_FALSE;
 		recognizer->state->lastErrorIndex	= -1;
-		recognizer->state->failed			= ANTLR3_FALSE;
+		recognizer->state->failed		= ANTLR3_FALSE;
 		recognizer->state->errorCount		= 0;
 		recognizer->state->backtracking		= 0;
 		recognizer->state->following		= NULL;
-		recognizer->state->ruleMemo			= NULL;
+		recognizer->state->ruleMemo		= NULL;
 		recognizer->state->tokenNames		= NULL;
-		recognizer->state->sizeHint			= sizeHint;
+		recognizer->state->sizeHint             = sizeHint;
 		recognizer->state->tokSource		= NULL;
+                recognizer->state->tokFactory           = NULL;
 
 		// Rather than check to see if we must initialize
 		// the stack every time we are asked for an new rewrite stream
 		// we just always create an empty stack and then just
 		// free it when the base recognizer is freed.
 		//
-		recognizer->state->rStreams			= antlr3VectorNew(0);  // We don't know the size.
+		recognizer->state->rStreams		= antlr3VectorNew(0);  // We don't know the size.
 
 		if	(recognizer->state->rStreams == NULL)
 		{
@@ -121,41 +122,41 @@ antlr3BaseRecognizerNew(ANTLR3_UINT32 type, ANTLR3_UINT32 sizeHint, pANTLR3_RECO
 		
     // Install the BR API
     //
-    recognizer->alreadyParsedRule				= alreadyParsedRule;
-    recognizer->beginResync						= beginResync;
-    recognizer->combineFollows					= combineFollows;
-    recognizer->beginBacktrack					= beginBacktrack;
-    recognizer->endBacktrack					= endBacktrack;
-    recognizer->computeCSRuleFollow				= computeCSRuleFollow;
-    recognizer->computeErrorRecoverySet			= computeErrorRecoverySet;
-    recognizer->consumeUntil					= consumeUntil;
-    recognizer->consumeUntilSet					= consumeUntilSet;
-    recognizer->displayRecognitionError			= displayRecognitionError;
-    recognizer->endResync						= endResync;
-    recognizer->exConstruct						= antlr3MTExceptionNew;
-    recognizer->getRuleInvocationStack			= getRuleInvocationStack;
-    recognizer->getRuleInvocationStackNamed		= getRuleInvocationStackNamed;
-    recognizer->getRuleMemoization				= getRuleMemoization;
-    recognizer->match							= match;
-    recognizer->matchAny						= matchAny;
-    recognizer->memoize							= memoize;
-    recognizer->mismatch						= mismatch;
-	recognizer->mismatchIsUnwantedToken			= mismatchIsUnwantedToken;
-	recognizer->mismatchIsMissingToken			= mismatchIsMissingToken;
-    recognizer->recover							= recover;
-    recognizer->recoverFromMismatchedElement	= recoverFromMismatchedElement;
-    recognizer->recoverFromMismatchedSet		= recoverFromMismatchedSet;
-    recognizer->recoverFromMismatchedToken		= recoverFromMismatchedToken;
-	recognizer->getNumberOfSyntaxErrors			= getNumberOfSyntaxErrors;
-    recognizer->reportError						= reportError;
-    recognizer->reset							= reset;
-    recognizer->synpred							= synpred;
-    recognizer->toStrings						= toStrings;
-	recognizer->getCurrentInputSymbol			= getCurrentInputSymbol;
-	recognizer->getMissingSymbol				= getMissingSymbol;
-	recognizer->debugger						= NULL;
+    recognizer->alreadyParsedRule           = alreadyParsedRule;
+    recognizer->beginResync                 = beginResync;
+    recognizer->combineFollows              = combineFollows;
+    recognizer->beginBacktrack              = beginBacktrack;
+    recognizer->endBacktrack                = endBacktrack;
+    recognizer->computeCSRuleFollow         = computeCSRuleFollow;
+    recognizer->computeErrorRecoverySet     = computeErrorRecoverySet;
+    recognizer->consumeUntil                = consumeUntil;
+    recognizer->consumeUntilSet             = consumeUntilSet;
+    recognizer->displayRecognitionError     = displayRecognitionError;
+    recognizer->endResync                   = endResync;
+    recognizer->exConstruct                 = antlr3MTExceptionNew;
+    recognizer->getRuleInvocationStack      = getRuleInvocationStack;
+    recognizer->getRuleInvocationStackNamed = getRuleInvocationStackNamed;
+    recognizer->getRuleMemoization          = getRuleMemoization;
+    recognizer->match                       = match;
+    recognizer->matchAny                    = matchAny;
+    recognizer->memoize                     = memoize;
+    recognizer->mismatch                    = mismatch;
+    recognizer->mismatchIsUnwantedToken     = mismatchIsUnwantedToken;
+    recognizer->mismatchIsMissingToken      = mismatchIsMissingToken;
+    recognizer->recover                     = recover;
+    recognizer->recoverFromMismatchedElement= recoverFromMismatchedElement;
+    recognizer->recoverFromMismatchedSet    = recoverFromMismatchedSet;
+    recognizer->recoverFromMismatchedToken  = recoverFromMismatchedToken;
+    recognizer->getNumberOfSyntaxErrors     = getNumberOfSyntaxErrors;
+    recognizer->reportError                 = reportError;
+    recognizer->reset                       = reset;
+    recognizer->synpred                     = synpred;
+    recognizer->toStrings                   = toStrings;
+    recognizer->getCurrentInputSymbol       = getCurrentInputSymbol;
+    recognizer->getMissingSymbol            = getMissingSymbol;
+    recognizer->debugger                    = NULL;
 
-    recognizer->free							=  freeBR;
+    recognizer->free = freeBR;
 
     /* Initialize variables
      */
@@ -2111,7 +2112,7 @@ reset(pANTLR3_BASE_RECOGNIZER recognizer)
 			recognizer->state->ruleMemo = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */
 		}
 	}
-	recognizer->state->tokenNames		= NULL;
+	
 
     // Install a new following set
     //
