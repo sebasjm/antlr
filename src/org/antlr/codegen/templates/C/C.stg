@@ -1299,7 +1299,7 @@ ANTLR3_API p<name>
 	// functions to.NULL the state so we only free it once.
 	//
 	<grammar.directDelegates:
-         {g| ctx-><g:delegateName()>->pParser->rec->state = NULL;
+         {g| ctx-><g:delegateName()>-><if(TREE_PARSER)>pTreeParser<else>pParser<endif>->rec->state = NULL;
          ctx-><g:delegateName()>->free(ctx-><g:delegateName()>);}; separator="\n">
 <endif>
 <if(memoize)>
