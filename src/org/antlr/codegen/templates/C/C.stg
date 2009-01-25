@@ -38,8 +38,8 @@ group C implements ANTLRCore ;
 cTypeInitMap ::= [
 	"int"		    : "0",              // Integers     start out being 0
 	"long"		    : "0",              // Longs        start out being 0
-	"float"		    : "0.0F",           // Floats       start out being 0
-	"double"	    : "0.0D",           // Doubles      start out being 0
+	"float"		    : "0.0",           // Floats       start out being 0
+	"double"	    : "0.0",           // Doubles      start out being 0
 	"ANTLR3_BOOLEAN"    : "ANTLR3_FALSE",   // Booleans     start out being Antlr C for false
 	"byte"		    : "0",              // Bytes        start out being 0
 	"short"		    : "0",              // Shorts       start out being 0
