@@ -2986,8 +2986,8 @@ tokenLabelPropertyRef_index(scope,attr) ::= "(<scope> != NULL ? <scope>->getToke
 tokenLabelPropertyRef_tree(scope,attr) ::= "(<scope> != NULL ? <scope>->tree : NULL)"
 tokenLabelPropertyRef_int(scope,attr) ::= "(<scope> != NULL ? <scope>->getText(<scope>)->toInt32(<scope>->getText(<scope>)) : 0)"
 
-ruleLabelPropertyRef_start(scope,attr) ::= "((<labelType>)<scope>.start)"
-ruleLabelPropertyRef_stop(scope,attr) ::= "((<labelType>)<scope>.stop)"
+ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>.start)"
+ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
@@ -3010,9 +3010,9 @@ lexerRuleLabelPropertyRef_index(scope,attr) ::= "(<scope> != NULL ? <scope>->get
 lexerRuleLabelPropertyRef_text(scope,attr) ::= "(<scope> != NULL ? <scope>->getText(<scope>) : NULL)"
 
 // Somebody may ref $template or $tree or $stop within a rule:
-rulePropertyRef_start(scope,attr) ::= "((<labelType>)retval).start"
-rulePropertyRef_stop(scope,attr) ::= "((<labelType>)retval).stop"
-rulePropertyRef_tree(scope,attr) ::= "((<labelType>)retval).tree"
+rulePropertyRef_start(scope,attr) ::= "retval.start"
+rulePropertyRef_stop(scope,attr) ::= "retval.stop"
+rulePropertyRef_tree(scope,attr) ::= "retval.tree"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
 INPUT->toStringSS(INPUT, ADAPTOR->getTokenStartIndex(ADAPTOR, retval.start), ADAPTOR->getTokenStopIndex(ADAPTOR, retval.start))
@@ -3034,7 +3034,7 @@ lexerRulePropertyRef_int(scope,attr) ::= "LEXER->getText(LEXER)->toInt32(LEXER->
 
 
 // setting $st and $tree is allowed in local rule. everything else is flagged as error
-ruleSetPropertyRef_tree(scope,attr,expr) ::= "((<labelType>)retval).tree=<expr>;"
+ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree=<expr>;"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st=<expr>;"
 
 
