@@ -165,7 +165,7 @@ antlr3CommonTokenStreamSourceNew(ANTLR3_UINT32 hint, pANTLR3_TOKEN_SOURCE source
     
     stream->channelOverrides	= NULL;
     stream->discardSet		= NULL;
-    stream->discardOffChannel	= ANTLR3_TRUE;
+    stream->discardOffChannel	= ANTLR3_FALSE;
 
     stream->tstream->setTokenSource(stream->tstream, source);
 
@@ -862,71 +862,70 @@ dbgSeek	(pANTLR3_INT_STREAM is, ANTLR3_MARKER index)
 }
 
 static void
-fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
-{
-    ANTLR3_UINT32	    index;
-    pANTLR3_COMMON_TOKEN    tok;
-    ANTLR3_BOOLEAN	    discard;
-    void		  * channelI;
+fillBuffer(pANTLR3_COMMON_TOKEN_STREAM tokenStream) {
+    ANTLR3_UINT32 index;
+    pANTLR3_COMMON_TOKEN tok;
+    ANTLR3_BOOLEAN discard;
+    void * channelI;
 
     /* Start at index 0 of course
      */
-    index   = 0;
+    index = 0;
 
     /* Pick out the next token from the token source
      * Remember we just get a pointer (reference if you like) here
      * and so if we store it anywhere, we don't set any pointers to auto free it.
      */
-    tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
+    tok = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
 
-    while   (tok != NULL && tok->type != ANTLR3_TOKEN_EOF)
+    while (tok != NULL && tok->type != ANTLR3_TOKEN_EOF)
     {
-	discard	    = ANTLR3_FALSE;	/* Assume we are not discarding	*/
+        discard = ANTLR3_FALSE; /* Assume we are not discarding	*/
 
-	/* I employ a bit of a trick, or perhaps hack here. Rather than
-	 * store a pointer to a structure in the override map and discard set
-	 * we store the value + 1 cast to a void *. Hence on systems where NULL = (void *)0
-	 * we can distinguish "not being there" from "being channel or type 0"
-	 */
+        /* I employ a bit of a trick, or perhaps hack here. Rather than
+         * store a pointer to a structure in the override map and discard set
+         * we store the value + 1 cast to a void *. Hence on systems where NULL = (void *)0
+         * we can distinguish "not being there" from "being channel or type 0"
+         */
 
-	if  (	tokenStream->discardSet							    != NULL
-	     && tokenStream->discardSet->get(tokenStream->discardSet, tok->getType(tok))    != NULL)
-	{
-	    discard = ANTLR3_TRUE;
-	}
-	else if (      tokenStream->discardOffChannel	== ANTLR3_TRUE
-		    && tok->getChannel(tok)		!= tokenStream->channel
-		    )
-	{
-	    discard = ANTLR3_TRUE;
-	}
-	else if	(   tokenStream->channelOverrides != NULL)
-	{
-	    /* See if this type is in the override map
-	     */
-	    channelI	= tokenStream->channelOverrides->get(tokenStream->channelOverrides, tok->getType(tok)+1);
+        if (tokenStream->discardSet != NULL
+            && tokenStream->discardSet->get(tokenStream->discardSet, tok->getType(tok)) != NULL)
+        {
+            discard = ANTLR3_TRUE;
+        }
+        else if (   tokenStream->discardOffChannel == ANTLR3_TRUE
+                 && tok->getChannel(tok) != tokenStream->channel
+                 )
+        {
+            discard = ANTLR3_TRUE;
+        }
+        else if (tokenStream->channelOverrides != NULL)
+        {
+            /* See if this type is in the override map
+             */
+            channelI = tokenStream->channelOverrides->get(tokenStream->channelOverrides, tok->getType(tok) + 1);
 
-	    if	(channelI != NULL)
-	    {
-		/* Override found
-		 */
-		tok->setChannel(tok, ANTLR3_UINT32_CAST(channelI) - 1);
-	    }
-	}
-	
-	/* If not discarding it, add it to the list at the current index
-	 */
-	if  (discard == ANTLR3_FALSE)
-	{
-	    /* Add it, indicating that we will delete it and the table should not
-	     */
-	    tok->setTokenIndex(tok, index);
-	    tokenStream->p++;
-	    tokenStream->tokens->add(tokenStream->tokens, (void *)tok, NULL);
-	    index++;
-	}
-	
-	tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
+            if (channelI != NULL)
+            {
+                /* Override found
+                 */
+                tok->setChannel(tok, ANTLR3_UINT32_CAST(channelI) - 1);
+            }
+        }
+
+        /* If not discarding it, add it to the list at the current index
+         */
+        if (discard == ANTLR3_FALSE)
+        {
+            /* Add it, indicating that we will delete it and the table should not
+             */
+            tok->setTokenIndex(tok, index);
+            tokenStream->p++;
+            tokenStream->tokens->add(tokenStream->tokens, (void *) tok, NULL);
+            index++;
+        }
+
+        tok = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
     }
 
     /* Cache the size so we don't keep doing indirect method calls. We do this as
@@ -936,33 +935,33 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 
     /* Set the consume pointer to the first token that is on our channel
      */
-    tokenStream->p  = 0;
-    tokenStream->p  = skipOffTokenChannels(tokenStream, tokenStream->p);
+    tokenStream->p = 0;
+    tokenStream->p = skipOffTokenChannels(tokenStream, tokenStream->p);
 
 }
-/** Given a starting index, return the index of the first on-channel
- *  token.
- */
+
+/// Given a starting index, return the index of the first on-channel
+///  token.
+///
 static ANTLR3_UINT32
-skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 i)
-{
-    ANTLR3_INT32	    n;
-    pANTLR3_COMMON_TOKEN    tok;
+skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 i) {
+    ANTLR3_INT32 n;
+    pANTLR3_COMMON_TOKEN tok;
 
-    n	= tokenStream->tstream->istream->cachedSize;
+    n = tokenStream->tstream->istream->cachedSize;
 
-    while   (	   i < n )
+    while (i < n)
     {
-	tok =	tokenStream->tstream->get(tokenStream->tstream, i);
+        tok = tokenStream->tstream->get(tokenStream->tstream, i);
 
-	if  (tok == NULL || tok->getChannel(tok) != tokenStream->channel)
-	{
-	    i++;
-	}
-	else
-	{
-	    return i;
-	}
+        if (tok == NULL || tok->getChannel(tok) != tokenStream->channel)
+        {
+            i++;
+        }
+        else
+        {
+            return i;
+        }
     }
     return i;
 }

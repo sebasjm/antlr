@@ -303,7 +303,7 @@ nextToken	    (pANTLR3_TOKEN_SOURCE toksource)
 		if  (lexer->rec->state->streams != NULL && lexer->rec->state->streams->size(lexer->rec->state->streams) > 0)
 		{
 			// We have another input stream in the stack so we
-			// need to revert to it, then resume the lop to check
+			// need to revert to it, then resume the loop to check
 			// it wasn't sitting at EOF itself.
 			//
 			lexer->popCharStream(lexer);
