@@ -595,7 +595,46 @@ newStr16_16	(pANTLR3_STRING_FACTORY factory, pANTLR3_UINT8 ptr)
 static    void		    
 destroy	(pANTLR3_STRING_FACTORY factory, pANTLR3_STRING string)
 {
-    factory->strings->del(factory->strings, string->index);
+    // Record which string we are deleting
+    //
+    ANTLR3_UINT32 strIndex = string->index;
+    
+    // Ensure that the string was not factory made, or we would try
+    // to delete memory that wasn't allocated outside the factory
+    // block.
+    // Remove the specific indexed string from the vector
+    //
+    factory->strings->del(factory->strings, strIndex);
+
+    // One less string in the vector, so decrement the factory index
+    // so that the next string allocated is indexed correctly with
+    // respect to the vector.
+    //
+    factory->index--;
+
+    // Now we have to reindex the strings in the vector that followed
+    // the one we just deleted. We only do this if the one we just deleted
+    // was not the last one.
+    //
+    if  (strIndex< factory->index)
+    {
+        // We must reindex the strings after the one we just deleted.
+        // The one that follows the one we just deleted is also out
+        // of whack, so we start there.
+        //
+        ANTLR3_UINT32 i;
+
+        for (i = strIndex; i < factory->index; i++)
+        {
+            // Renumber the entry
+            //
+            ((pANTLR3_STRING)(factory->strings->elements[i].element))->index = i;
+        }
+    }
+
+    // The string has been destroyed and the elements of the factory are reindexed.
+    //
+
 }
 
 static    pANTLR3_STRING    
