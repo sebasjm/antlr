@@ -2977,23 +2977,23 @@ listLabelRef(label) ::= "list_<label>"
 
 // not sure the next are the right approach
 //
-tokenLabelPropertyRef_text(scope,attr) ::= "(<scope> != NULL ? <scope>->getText(<scope>) : NULL)"
-tokenLabelPropertyRef_type(scope,attr) ::= "(<scope> != NULL ? <scope>->getType(<scope>) : 0)"
-tokenLabelPropertyRef_line(scope,attr) ::= "(<scope> != NULL ? <scope>->getLine(<scope>) : 0)"
-tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope> != NULL ? <scope>->getCharPositionInLine(<scope>) : 0)"
-tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope> != NULL ? <scope>->getChannel(<scope>) : 0)"
-tokenLabelPropertyRef_index(scope,attr) ::= "(<scope> != NULL ? <scope>->getTokenIndex(<scope>) : 0)"
-tokenLabelPropertyRef_tree(scope,attr) ::= "(<scope> != NULL ? <scope>->tree : NULL)"
-tokenLabelPropertyRef_int(scope,attr) ::= "(<scope> != NULL ? <scope>->getText(<scope>)->toInt32(<scope>->getText(<scope>)) : 0)"
+tokenLabelPropertyRef_text(scope,attr) ::= "(<scope>->getText(<scope>))"
+tokenLabelPropertyRef_type(scope,attr) ::= "(<scope>->getType(<scope>))"
+tokenLabelPropertyRef_line(scope,attr) ::= "(<scope>->getLine(<scope>))"
+tokenLabelPropertyRef_pos(scope,attr) ::= "(<scope>->getCharPositionInLine(<scope>))"
+tokenLabelPropertyRef_channel(scope,attr) ::= "(<scope>->getChannel(<scope>))"
+tokenLabelPropertyRef_index(scope,attr) ::= "(<scope>->getTokenIndex(<scope>))"
+tokenLabelPropertyRef_tree(scope,attr) ::= "(<scope>->tree)"
+tokenLabelPropertyRef_int(scope,attr) ::= "(<scope>->getText(<scope>)->toInt32(<scope>->getText(<scope>)))"
 
 ruleLabelPropertyRef_start(scope,attr) ::= "(<scope>.start)"
 ruleLabelPropertyRef_stop(scope,attr) ::= "(<scope>.stop)"
 ruleLabelPropertyRef_tree(scope,attr) ::= "(<scope>.tree)"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(<scope>.start != NULL ? STRSTREAM->toStringSS(STRSTREAM, <scope>.start, <scope>.start) : NULL )
+(STRSTREAM->toStringSS(STRSTREAM, <scope>.start, <scope>.start))
 <else>
-(<scope>.start != NULL ? STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop) : NULL )
+(STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop))
 <endif>
 >>
 
@@ -3002,12 +3002,12 @@ ruleLabelPropertyRef_st(scope,attr) ::= "<scope>.st"
 /** Isolated $RULE ref ok in lexer as it's a Token */
 lexerRuleLabel(label) ::= "<label>"
 
-lexerRuleLabelPropertyRef_type(scope,attr) ::= "(<scope> != NULL ? <scope>->getType(<scope>) : 0)"
-lexerRuleLabelPropertyRef_line(scope,attr) ::= "(<scope> != NULL ? <scope>->getLine(<scope>) : 0)"
-lexerRuleLabelPropertyRef_pos(scope,attr) ::= "(<scope> != NULL ? <scope>->getCharPositionInLine(<scope>) : 0)"
-lexerRuleLabelPropertyRef_channel(scope,attr) ::= "(<scope> != NULL ? <scope>->getChannel(<scope>) : 0)"
-lexerRuleLabelPropertyRef_index(scope,attr) ::= "(<scope> != NULL ? <scope>->getTokenIndex(<scope>) : 0)"
-lexerRuleLabelPropertyRef_text(scope,attr) ::= "(<scope> != NULL ? <scope>->getText(<scope>) : NULL)"
+lexerRuleLabelPropertyRef_type(scope,attr) ::= "(<scope>->getType(<scope>))"
+lexerRuleLabelPropertyRef_line(scope,attr) ::= "(<scope>->getLine(<scope>))"
+lexerRuleLabelPropertyRef_pos(scope,attr) ::= "(<scope>->getCharPositionInLine(<scope>))"
+lexerRuleLabelPropertyRef_channel(scope,attr) ::= "(<scope>->getChannel(<scope>))"
+lexerRuleLabelPropertyRef_index(scope,attr) ::= "(<scope>->getTokenIndex(<scope>))"
+lexerRuleLabelPropertyRef_text(scope,attr) ::= "(<scope>->getText(<scope>))"
 
 // Somebody may ref $template or $tree or $stop within a rule:
 rulePropertyRef_start(scope,attr) ::= "retval.start"
