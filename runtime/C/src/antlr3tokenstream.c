@@ -929,14 +929,15 @@ fillBuffer  (pANTLR3_COMMON_TOKEN_STREAM tokenStream)
 	tok	    = tokenStream->tstream->tokenSource->nextToken(tokenStream->tstream->tokenSource);
     }
 
+    /* Cache the size so we don't keep doing indirect method calls. We do this as
+     * early as possible so that anything after this may utilize the cached value.
+     */
+    tokenStream->tstream->istream->cachedSize = tokenStream->tokens->count;
+
     /* Set the consume pointer to the first token that is on our channel
      */
     tokenStream->p  = 0;
     tokenStream->p  = skipOffTokenChannels(tokenStream, tokenStream->p);
-
-    /* Cache the size so we don't keep doing indirect method calls
-     */
-    tokenStream->tstream->istream->cachedSize = tokenStream->tokens->count;
 
 }
 /** Given a starting index, return the index of the first on-channel
