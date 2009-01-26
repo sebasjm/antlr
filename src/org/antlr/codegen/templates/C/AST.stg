@@ -59,7 +59,7 @@ ADAPTOR->free(ADAPTOR);
 
 @returnScope.ruleReturnMembers() ::= <<
 
-<recognizer.ASTLabelType>	tree;
+<super.ASTLabelType()>	tree;
 
 >>
 
