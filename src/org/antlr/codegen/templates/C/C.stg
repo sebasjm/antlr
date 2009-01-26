@@ -1535,7 +1535,7 @@ lexerSynpred(predname) ::= <<
 <synpred(predname)>
 >>
 
-ruleMemoization(name) ::= <<
+ruleMemoization(rname) ::= <<
 <if(memoize)>
 if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 {
@@ -1594,7 +1594,7 @@ static <returnType()>
     <ruleLabelDefs()>
     <ruleInitializations()>
     <ruleDescriptor.actions.init>
-    <ruleMemoization(name=ruleName)>
+    <ruleMemoization(rname=ruleName)>
     <ruleLabelInitializations()>
     <@preamble()>
     {
@@ -1808,13 +1808,13 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
 
 <if(nakedBlock)>
-    <ruleMemoization(name=ruleName)>
+    <ruleMemoization(rname=ruleName)>
     <lexerRuleLabelInit()>
     <ruleDescriptor.actions.init>
         
     <block><\n>
 <else>
-    <ruleMemoization(name=ruleName)>   
+    <ruleMemoization(rname=ruleName)>
     <lexerRuleLabelInit()>
     _type	    = <ruleName>;
        
@@ -2936,6 +2936,8 @@ ruleLabelInitVal(label) ::= <<
 <label.label.text> = <initValue(label.referencedRule.singleValueReturnType)>;
 <endif>
 >>
+
+ASTLabelType() ::= "<if(recognizer.ASTLabelType)><recognizer.ASTLabelType><else>pANTLR3_BASE_TREE<endif>"
 
 /** Define a return struct for a rule if the code needs to access its
  *  start/stop tokens, tree stuff, attributes, ...  Leave a hole for
