@@ -479,47 +479,46 @@ toString    (pANTLR3_TOKEN_STREAM ts)
     return  ts->toStringSS(ts, 0, ts->istream->size(ts->istream));
 }
 
-static pANTLR3_STRING	    
-toStringSS   (pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT32 start, ANTLR3_UINT32 stop)
+static pANTLR3_STRING
+toStringSS(pANTLR3_TOKEN_STREAM ts, ANTLR3_UINT32 start, ANTLR3_UINT32 stop)
 {
-    pANTLR3_STRING		string;
-    pANTLR3_TOKEN_SOURCE	tsource;
-    pANTLR3_COMMON_TOKEN	tok;
-    ANTLR3_UINT32		i;
+    pANTLR3_STRING string;
+    pANTLR3_TOKEN_SOURCE tsource;
+    pANTLR3_COMMON_TOKEN tok;
+    ANTLR3_UINT32 i;
     pANTLR3_COMMON_TOKEN_STREAM cts;
 
-    cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
+    cts = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
 
-    if	(cts->p == -1)
+    if (cts->p == -1)
     {
-	fillBuffer(cts);
+        fillBuffer(cts);
     }
-    if	(stop >= ts->istream->size(ts->istream))
+    if (stop >= ts->istream->size(ts->istream))
     {
-	stop = ts->istream->size(ts->istream)-1;
+        stop = ts->istream->size(ts->istream) - 1;
     }
-    
+
     /* Who is giving us these tokens?
      */
-    tsource  = ts->getTokenSource(ts);
+    tsource = ts->getTokenSource(ts);
 
-    if	(tsource != NULL && cts->tokens != NULL)
+    if (tsource != NULL && cts->tokens != NULL)
     {
-	/* Finally, let's get a string
-	 */
-	string	= tsource->strFactory->newRaw(tsource->strFactory);
+        /* Finally, let's get a string
+         */
+        string = tsource->strFactory->newRaw(tsource->strFactory);
 
-	for (i = start; i <= stop; i++)
-	{
-	    tok	= ts->get(ts, i);
+        for (i = start; i <= stop; i++)
+        {
+            tok = ts->get(ts, i);
+            if (tok != NULL)
+            {
+                string->appendS(string, tok->getText(tok));
+            }
+        }
 
-	    if	(tok != NULL)
-	    {
-		string->appendS(string, tok->getText(tok));
-	    }
-	}
-
-	return	string;
+        return string;
     }
     return NULL;
 

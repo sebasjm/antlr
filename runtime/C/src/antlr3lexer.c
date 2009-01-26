@@ -219,18 +219,20 @@ nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 		lexer->rec->state->error		    = ANTLR3_FALSE;	    // Start out without an exception
 		lexer->rec->state->failed		    = ANTLR3_FALSE;
 
-		// Record the start of the token in our input stream.
-		//
-		lexer->rec->state->channel						= ANTLR3_TOKEN_DEFAULT_CHANNEL;
-		lexer->rec->state->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);  
-		lexer->rec->state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
-		lexer->rec->state->tokenStartLine				= lexer->input->getLine(lexer->input);
-		lexer->rec->state->text							= NULL;
+
 
 		// Now call the matching rules and see if we can generate a new token
 		//
 		for	(;;)
 		{
+            // Record the start of the token in our input stream.
+            //
+            lexer->rec->state->channel						= ANTLR3_TOKEN_DEFAULT_CHANNEL;
+            lexer->rec->state->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);
+            lexer->rec->state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
+        	lexer->rec->state->tokenStartLine				= lexer->input->getLine(lexer->input);
+            lexer->rec->state->text							= NULL;
+
 			if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
 			{
 				// Reached the end of the current stream, nothing more to do if this is
