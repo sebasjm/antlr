@@ -5,8 +5,9 @@ AC_INIT(libantlr3c, 3.1.2.b1, jimi@idle.ws)
 AC_PREREQ(2.60)
 AC_COPYRIGHT([
  (The "BSD licence")
- Copyright (c) 2005-2006 Terence Parr
- ANTLR C templates and runtime Copyright (c) 2005-2006 Jim Idle
+ Copyright (c) 2005-2009 Jim Idle, Temporal Wave LLC
+ http://www.temporal-wave.com
+ http://www.linkedin.com/in/jimidle
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
