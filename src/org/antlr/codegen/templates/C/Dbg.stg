@@ -100,24 +100,11 @@ ctorForProfilingRootGrammar() ::= <<
 
 /** Basically we don't want to set any dbg listeners as root will have it. */
 ctorForDelegateGrammar() ::= <<
-//public <name>(<inputStreamType> input, DebugEventListener dbg, RecognizerSharedState state<grammar.delegators:{g|, <g.recognizerName> <g:delegateName()>}>) {
- //   super(input, dbg, state);
-   //parserCtorBody()
-   // <grammar.directDelegates:
-     {g|<g:delegateName()> = new <g.recognizerName>(input, this, state<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-//}
+
 >>
 
 ctorForPredefinedListener() ::= <<
-//public <name>(<inputStreamType> input, DebugEventListener dbg) {
-//    super(input, dbg, new RecognizerSharedState());
-//<if(profile)>
-//    Profiler p = (Profiler)dbg;
-//    p.setParser(this);
-//<endif>
-//   //parserCtorBody()
-//    <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-//}<\n>
+
 >>
 
 createListenerAndHandshake() ::= <<
