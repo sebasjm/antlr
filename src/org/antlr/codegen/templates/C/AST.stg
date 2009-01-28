@@ -45,7 +45,7 @@ pANTLR3_VECTOR_FACTORY		vectors;
 <if(PARSER)>
 ADAPTOR	= ANTLR3_TREE_ADAPTORNew(instream->tstream->tokenSource->strFactory);<\n>
 <endif>
-ctx->vectors	= antlr3VectorFactoryNew(64);
+ctx->vectors	= antlr3VectorFactoryNew(0);
 >>
 
 @genericParser.cleanup() ::= <<

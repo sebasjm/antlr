@@ -76,7 +76,7 @@ antlr3ArboretumNew(pANTLR3_STRING_FACTORY strFactory)
 	// Install a vector factory to create, track and free() any child
 	// node lists.
 	//
-	factory->vFactory					= antlr3VectorFactoryNew(32);
+	factory->vFactory					= antlr3VectorFactoryNew(0);
 	if	(factory->vFactory == NULL)
 	{
 		free(factory);

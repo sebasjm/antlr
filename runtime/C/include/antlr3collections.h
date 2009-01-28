@@ -220,6 +220,7 @@ typedef struct ANTLR3_VECTOR_ELEMENT_struct
 }
     ANTLR3_VECTOR_ELEMENT, *pANTLR3_VECTOR_ELEMENT;
 
+#define ANTLR3_VECTOR_INTERNAL_SIZE     8
 /* Structure that represents a vector collection. A vector is a simple list
  * that contains a pointer to the element and a pointer to a function that
  * that can free the element if it is removed. It auto resizes but does not
@@ -236,6 +237,15 @@ typedef struct ANTLR3_VECTOR_struct
     /** Number of entries currently in the list;
      */
     ANTLR3_UINT32   count;
+
+    /** Many times, a vector holds just a few nodes in an AST and it
+     * is too much overhead to malloc the space for elements so
+     * at the expense of a few bytes of memory, we hold the first
+     * few elements internally. It means we must copy them when
+     * we grow beyond this initial size, but that is less overhead than
+     * the malloc/free callas we would otherwise require.
+     */
+    ANTLR3_VECTOR_ELEMENT   internal[ANTLR3_VECTOR_INTERNAL_SIZE];
 
     /** Indicates if the structure was made by a factory, in which
      *  case only the factory can free the memory for the actual vector,
@@ -259,22 +269,39 @@ typedef struct ANTLR3_VECTOR_struct
 }
     ANTLR3_VECTOR;
 
+/** Default vector pool size if otherwise unspecified
+ */
+#define ANTLR3_FACTORY_VPOOL_SIZE 4096
+
 /** Structure that tracks vectors in a vector and auto deletes the vectors
  *  in the vector factory when closed.
  */
 typedef struct ANTLR3_VECTOR_FACTORY_struct
 {
-	/** Vector of all the vectors created so far
-	 */
-	pANTLR3_VECTOR  vectors;
 
-	/** Function to close the vector factory
+        /** List of all vector pools allocated so far
+         */
+        pANTLR3_VECTOR      *pools;
+
+        /** Count of the vector pools allocated so far (current active pool)
+         */
+        ANTLR3_INT32         thisPool;
+
+        /** The next vector available in the pool
+         */
+        ANTLR3_UINT32        nextVector;
+
+        /** Trick to quickly initialize a new vector via memcpy and not a function call
+         */
+        ANTLR3_VECTOR        unTruc;
+
+       	/** Function to close the vector factory
 	 */
-	void			(*close)	    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
+	void                (*close)	    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
 
 	/** Function to supply a new vector
 	 */
-	pANTLR3_VECTOR  (*newVector)    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
+	pANTLR3_VECTOR      (*newVector)    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
 
 }
 ANTLR3_VECTOR_FACTORY; 

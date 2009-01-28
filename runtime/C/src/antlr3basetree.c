@@ -161,31 +161,39 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
 			return;
 		}
 
-		// Add all of the children's children to this list
-		//
-		if  (child->children != NULL)
-		{
-			if	(tree->children == NULL)
-			{
-				tree->createChildrenList(tree);
-			}
+        // Add all of the children's children to this list
+        //
+        if (child->children != NULL)
+        {
+            if (tree->children == NULL)
+            {
+                // We are build ing the tree structure here, so we need not
+                // worry about duplication of pointers as the tree node
+                // factory will only clean up each node once. So we just
+                // copy in the child's children pointer as the child is
+                // a nil node (has not root itself).
+                //
+                tree->children = child->children;
+            }
+            else
+            {
+                // Need to copy the children
+                //
+                n = child->children->size(child->children);
 
-			// Need to copy the children 
-			//
-			n = child->children->size(child->children);
+                for (i = 0; i < n; i++)
+                {
+                    pANTLR3_BASE_TREE entry;
+                    entry = child->children->get(child->children, i);
 
-			for (i = 0; i<n; i++)
-			{
-				pANTLR3_BASE_TREE entry;
-				entry	= child->children->get(child->children, i);
-
-				// ANTLR3 lists can be sparse, unlike Array Lists
-				//
-				if  (entry != NULL)
-				{
-					tree->children->add(tree->children, entry, (void (ANTLR3_CDECL *)(void *))child->free);
-				}
-			}
+                    // ANTLR3 lists can be sparse, unlike Array Lists
+                    //
+                    if (entry != NULL)
+                    {
+                        tree->children->add(tree->children, entry, (void (ANTLR3_CDECL *) (void *))child->free);
+                    }
+                }
+            }
 		}
 	}
 	else

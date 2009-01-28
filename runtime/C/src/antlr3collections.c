@@ -94,6 +94,7 @@ static	ANTLR3_UINT32		antlr3VectorAdd		(pANTLR3_VECTOR vector, void * element, v
 static	ANTLR3_UINT32		antlr3VectorSet		(pANTLR3_VECTOR vector, ANTLR3_UINT32 entry, void * element, void (ANTLR3_CDECL *freeptr)(void *), ANTLR3_BOOLEAN freeExisting);
 static	ANTLR3_UINT32		antlr3VectorSize    (pANTLR3_VECTOR vector);
 
+static  void                newPool             (pANTLR3_VECTOR_FACTORY factory);
 static  void				closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory);
 static	pANTLR3_VECTOR		newVector			(pANTLR3_VECTOR_FACTORY factory);
 
@@ -1025,19 +1026,8 @@ antlr3StackPush	(pANTLR3_STACK stack, void * element, void (ANTLR3_CDECL *freept
 ANTLR3_API  pANTLR3_VECTOR
 antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 {
-	ANTLR3_UINT32   initialSize;
 	pANTLR3_VECTOR  vector;
 
-	// Allow vectors to be guessed by ourselves, so input size can be zero
-	//
-	if	(sizeHint > 0)
-	{
-		initialSize = sizeHint;
-	}
-	else
-	{
-		initialSize = 8;
-	}
 
 	// Allocate memory for the vector structure itself
 	//
@@ -1050,12 +1040,42 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 
 	// Now fill in the defaults
 	//
-	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
+    antlr3SetVectorApi(vector, sizeHint);
+
+	// And everything is hunky dory
+	//
+	return  vector;
+}
+
+ANTLR3_API void
+antlr3SetVectorApi  (pANTLR3_VECTOR vector, ANTLR3_UINT32 sizeHint)
+{
+	ANTLR3_UINT32   initialSize;
+
+  	// Allow vectors to be guessed by ourselves, so input size can be zero
+	//
+	if	(sizeHint > ANTLR3_VECTOR_INTERNAL_SIZE)
+	{
+		initialSize = sizeHint;
+	}
+	else
+	{
+		initialSize = ANTLR3_VECTOR_INTERNAL_SIZE;
+	}
+
+    if  (sizeHint > ANTLR3_VECTOR_INTERNAL_SIZE)
+    {
+        vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR_ELEMENT) * initialSize));
+    }
+    else
+    {
+        vector->elements    = vector->internal;
+    }
 
 	if	(vector->elements == NULL)
 	{
 		ANTLR3_FREE(vector);
-		return	(pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return;
 	}
 
 	// Memory allocated successfully
@@ -1077,12 +1097,7 @@ antlr3VectorNew	(ANTLR3_UINT32 sizeHint)
 	// Assume that this is not a factory made vector
 	//
 	vector->factoryMade	= ANTLR3_FALSE;
-
-	// And everything is hunky dory
-	//
-	return  vector;
 }
-
 // Clear the entries in a vector.
 // Clearing the vector leaves its capacity the same but
 // it walks the entries first to see if any of them
@@ -1136,7 +1151,10 @@ void	ANTLR3_CDECL	antlr3VectorFree    (pANTLR3_VECTOR vector)
 	{
 		// The entries are freed, so free the element allocation
 		//
-		ANTLR3_FREE(vector->elements);
+        if  (vector->elementsSize > ANTLR3_VECTOR_INTERNAL_SIZE)
+        {
+            ANTLR3_FREE(vector->elements);
+        }
 		vector->elements = NULL;
 
 		// Finally, free the allocation for the vector itself
@@ -1204,7 +1222,7 @@ static	void *		antrl3VectorRemove  (pANTLR3_VECTOR vector, ANTLR3_UINT32 entry)
 {
 	void * element;
 
-	// Check this is a valid request first (index is 1 based!!)
+	// Check this is a valid request first 
 	//
 	if	(entry >= vector->count)
 	{
@@ -1244,39 +1262,38 @@ antlr3VectorResize  (pANTLR3_VECTOR vector, ANTLR3_UINT32 hint)
 	ANTLR3_UINT32	newSize;
 
 	// Need to resize the element pointers. We double the allocation
-	// unless we have reached 1024 elements, in which case we just
-	// add another 1024. I may tune this or make it tunable later.
-	//
-	if  (vector->elementsSize > 1024)
-	{
-		if (hint == 0 || hint < vector->elementsSize)
-		{
-			newSize = vector->elementsSize + 1024;
-		}
-		else
-		{
-			newSize = vector->elementsSize + hint + 1024;
-		}
-	}
-	else
-	{
-		if (hint == 0 || hint < vector->elementsSize)
-		{
-			newSize = vector->elementsSize * 2;
-		}
-		else
-		{
-			newSize = hint * 2;
-		}
-	}
+	// we already have unless asked for a specific increase.
+    //
+    if (hint == 0 || hint < vector->elementsSize)
+    {
+        newSize = vector->elementsSize * 2;
+    }
+    else
+    {
+        newSize = hint * 2;
+    }
 
-	// Use realloc so that the pointers are copied for us
-	//
-	vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_REALLOC(vector->elements, (sizeof(ANTLR3_VECTOR_ELEMENT)* newSize));
+    // Now we know how many we need, so we see if we have just expanded
+    // past the built in vector elements or were already past that
+    //
+    if  (vector->elementsSize > ANTLR3_VECTOR_INTERNAL_SIZE)
+    {
+        // We were already larger than the internal size, so we just
+        // use realloc so that the pointers are copied for us
+        //
+        vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_REALLOC(vector->elements, (sizeof(ANTLR3_VECTOR_ELEMENT)* newSize));
+    }
+    else
+    {
+        // The current size was less than or equal to the internal array size and as we always start
+        // with a size that is at least the maximum internal size, then we must need to allocate new memory
+        // for external pointers. We don't want to take the time to calculate if a requested element
+        // is part of the internal or external entries, so we copy the internal ones to the new space
+        //
+        vector->elements	= (pANTLR3_VECTOR_ELEMENT)ANTLR3_MALLOC((sizeof(ANTLR3_VECTOR_ELEMENT)* newSize));
+        ANTLR3_MEMCPY(vector->elements, vector->internal, ANTLR3_VECTOR_INTERNAL_SIZE * sizeof(ANTLR3_VECTOR_ELEMENT));
+    }
 
-	// Reset new pointers etc to 0
-	//
-	ANTLR3_MEMSET(vector->elements + vector->elementsSize, 0x00, (newSize - vector->elementsSize) * sizeof(ANTLR3_VECTOR_ELEMENT));
 	vector->elementsSize	= newSize;
 }
 
@@ -1347,7 +1364,8 @@ static	ANTLR3_UINT32   antlr3VectorSize    (pANTLR3_VECTOR vector)
 
 /// Vector factory creation
 ///
-ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 sizeHint)
+ANTLR3_API pANTLR3_VECTOR_FACTORY
+antlr3VectorFactoryNew	    (ANTLR3_UINT32 sizeHint)
 {
 	pANTLR3_VECTOR_FACTORY  factory;
 
@@ -1357,27 +1375,24 @@ ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 si
 
 	if	(factory == NULL)
 	{
-		return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
+		return	NULL;
 	}
 
-	// Factory memory is good, so create a new vector
+	// Factory memory is good, so create a new vector pool
 	//
-	if	(sizeHint == 0)
-	{
-		sizeHint = 64;
-	}
+    factory->pools      = NULL;
+    factory->thisPool   = -1;
 
-	// Create the vector if possible
-	//
-	factory->vectors	= antlr3VectorNew(sizeHint);
+    newPool(factory);
 
-	if	(factory->vectors == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
-	{
-		ANTLR3_FREE(factory);
-		return	(pANTLR3_VECTOR_FACTORY)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM);
-	}
+    // Initialize the API, ignore the hint as this algorithm does
+    // a better job really.
+    //
+    antlr3SetVectorApi(&(factory->unTruc), ANTLR3_VECTOR_INTERNAL_SIZE);
+    
+    factory->unTruc.factoryMade = ANTLR3_TRUE;
 
-	// Install the API
+	// Install the factory API
 	//
 	factory->close		= closeVectorFactory;
 	factory->newVector	= newVector;
@@ -1385,85 +1400,176 @@ ANTLR3_API pANTLR3_VECTOR_FACTORY   antlr3VectorFactoryNew	    (ANTLR3_UINT32 si
 	return  factory;
 }
 
+static void
+newPool(pANTLR3_VECTOR_FACTORY factory)
+{
+    /* Increment factory count
+     */
+    factory->thisPool++;
+
+    /* Ensure we have enough pointers allocated
+     */
+    factory->pools = (pANTLR3_VECTOR *)
+		     ANTLR3_REALLOC(	(void *)factory->pools,	    /* Current pools pointer (starts at NULL)	*/
+					(ANTLR3_UINT32)((factory->thisPool + 1) * sizeof(pANTLR3_VECTOR *))	/* Memory for new pool pointers */
+					);
+
+    /* Allocate a new pool for the factory
+     */
+    factory->pools[factory->thisPool]	=
+			    (pANTLR3_VECTOR)
+				ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_VECTOR) * ANTLR3_FACTORY_VPOOL_SIZE));
+
+
+    /* Reset the counters
+     */
+    factory->nextVector	= 0;
+
+    /* Done
+     */
+    return;
+}
+
 static  void		
 closeVectorFactory  (pANTLR3_VECTOR_FACTORY factory)
 {
-	ANTLR3_UINT32   entry;
-	pANTLR3_VECTOR  vector;
-	pANTLR3_VECTOR  freeVector;
+    pANTLR3_VECTOR      pool;
+    ANTLR3_INT32        poolCount;
+    ANTLR3_UINT32       limit;
+    ANTLR3_UINT32       vector;
+    pANTLR3_VECTOR      check;
 
-	// First we iterate the vectors in the factory and call
-	// free on each of them. Because they are factory made only
-	// any installed free pointers for the entries will be called
-	// and we will be left with just those vectors that were factory made
-	// to delete the memory allocations for. These are the element list
-	// itself.
-	//
-	vector  = factory->vectors;
-
-	// We must traverse every entry in the vector and if it has
-	// a pointer to a free function then we call it with the
-	// the entry pointer
-	//
-	for	(entry = 0; entry < vector->count; entry++)
-	{
-		if  (vector->elements[entry].freeptr != NULL)
-		{
-			vector->elements[entry].freeptr(vector->elements[entry].element);
-		}
-	}
-
-	// Having called free on each of the vectors in the vector factory,
-	// anything that was somewhere buried in the vectors in the factory that
-	// was not factory made, is now de-allocated. So, we now need only
-	// traverse each vector in the factory and free its elements, then free this
-	// factory vector.
-	//
-	for	(entry = 0; entry < vector->count; entry++)
-	{
-		freeVector  = (pANTLR3_VECTOR)(vector->elements[entry].element);
-
-		// Anything in here should be factory made, but we do this just
-		// to triple check.
-		//
-		if  (freeVector->factoryMade == ANTLR3_TRUE)
-		{
-			ANTLR3_FREE(freeVector->elements);
-			ANTLR3_FREE(freeVector);
-		}
-	}
-
-	// Free the memory for the factory vector elements, then the factory vector
-	//
-	ANTLR3_FREE(vector->elements);
-	ANTLR3_FREE(vector);
-
-	// Now free the memory for the factory itself
-	//
-	ANTLR3_FREE(factory);
-}
-
-static	pANTLR3_VECTOR  
-newVector	    (pANTLR3_VECTOR_FACTORY factory)
-{
-    pANTLR3_VECTOR  vector;
-
-    // Attempt to create a new vector of default size
-    //
-    vector  = antlr3VectorNew(0);
-
-    if	(vector == (pANTLR3_VECTOR)ANTLR3_FUNC_PTR(ANTLR3_ERR_NOMEM))
+    /* We iterate the vector pools one at a time
+     */
+    for (poolCount = 0; poolCount <= factory->thisPool; poolCount++)
     {
-		return vector;
+        /* Pointer to current pool
+         */
+        pool = factory->pools[poolCount];
+
+        /* Work out how many tokens we need to check in this pool.
+         */
+        limit = (poolCount == factory->thisPool ? factory->nextVector : ANTLR3_FACTORY_VPOOL_SIZE);
+
+        /* Marginal condition, we might be at the start of a brand new pool
+         * where the nextToken is 0 and nothing has been allocated.
+         */
+        if (limit > 0)
+        {
+            /* We have some vectors allocated from this pool
+             */
+            for (vector = 0; vector < limit; vector++)
+            {
+                /* Next one in the chain
+                 */
+                check = pool + vector;
+
+                // Call the free function on each of the vectors in the pool,
+                // which in turn will cause any elements it holds that also have a free
+                // pointer to be freed. However, because any vector may be in any other
+                // vector, we don't free the element allocations yet. We do that in a
+                // a specific pass, coming up next. The vector free function knows that
+                // this is a factory allocated pool vector and so it won't free things it
+                // should not.
+                //
+                check->free(check);
+            }
+        }
     }
 
-    // Now add this vector to the factory vector, which will
-    // track it and release any entries in it when we close the factory.
-    //
-    vector->factoryMade	= ANTLR3_TRUE;
-    factory->vectors->add(factory->vectors, (void *)vector, (void (ANTLR3_CDECL *)(void *))(vector->free));
+    /* We iterate the vector pools one at a time once again, but this time
+     * we are going to free up any allocated element pointers. Note that we are doing this
+     * so that we do not try to release vectors twice. When building ASTs we just copy
+     * the vectors all over the place and they may be embedded in this vector pool
+     * numerous times.
+     */
+    for (poolCount = 0; poolCount <= factory->thisPool; poolCount++)
+    {
+        /* Pointer to current pool
+         */
+        pool = factory->pools[poolCount];
 
-    return  vector;
+        /* Work out how many tokens we need to check in this pool.
+         */
+        limit = (poolCount == factory->thisPool ? factory->nextVector : ANTLR3_FACTORY_VPOOL_SIZE);
+
+        /* Marginal condition, we might be at the start of a brand new pool
+         * where the nextToken is 0 and nothing has been allocated.
+         */
+        if (limit > 0)
+        {
+            /* We have some vectors allocated from this pool
+             */
+            for (vector = 0; vector < limit; vector++)
+            {
+                /* Next one in the chain
+                 */
+                check = pool + vector;
+
+                // Anything in here should be factory made, but we do this just
+                // to triple check. We just free up the elements if they were
+                // allocated beyond the internal size.
+                //
+                if (check->factoryMade == ANTLR3_TRUE && check->elementsSize > ANTLR3_VECTOR_INTERNAL_SIZE)
+                {
+                    ANTLR3_FREE(check->elements);
+                    check->elements = NULL;
+                }
+            }
+        }
+
+        // We can now free this pool allocation as we have called free on every element in every vector
+        // and freed any memory for pointers the grew beyond the internal size limit.
+        //
+        ANTLR3_FREE(factory->pools[poolCount]);
+        factory->pools[poolCount] = NULL;
+    }
+
+    /* All the pools are deallocated we can free the pointers to the pools
+     * now.
+     */
+    ANTLR3_FREE(factory->pools);
+
+    /* Finally, we can free the space for the factory itself
+     */
+    ANTLR3_FREE(factory);
+
+}
+
+static pANTLR3_VECTOR
+newVector(pANTLR3_VECTOR_FACTORY factory)
+{
+    pANTLR3_VECTOR vector;
+
+    // See if we need a new vector pool before allocating a new
+    // one
+    //
+    if (factory->nextVector >= ANTLR3_FACTORY_VPOOL_SIZE)
+    {
+        // We ran out of vectors in the current pool, so we need a new pool
+        //
+        newPool(factory);
+    }
+
+    // Assuming everything went well (we are trying for performance here so doing minimal
+    // error checking. Then we can work out what the pointer is to the next vector.
+    //
+    vector = factory->pools[factory->thisPool] + factory->nextVector;
+    factory->nextVector++;
+
+    // We have our token pointer now, so we can initialize it to the predefined model.
+    //
+    ANTLR3_MEMCPY((void *) vector, (const void *) & factory->unTruc, sizeof (ANTLR3_VECTOR));
+
+    // We know that the pool vectors are created at the default size, which means they
+    // will start off using their internal entry pointers. We must intialize our pool vector
+    // to point to its own internal entry table and not the pre-made one.
+    //
+    vector->elements = vector->internal;
+
+    // And we are done
+    //
+    return vector;
 }
 
 /** Array of left most significant bit positions for an 8 bit

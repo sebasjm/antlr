@@ -309,6 +309,10 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 
 	cts	    = (pANTLR3_COMMON_TOKEN_STREAM)ts->super;
 
+    if	(k < 0)
+	{
+		return LB(cts, -k);
+	}
 
 	if	(cts->p == -1)
 	{
@@ -317,10 +321,6 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 	if	(k == 0)
 	{
 		return NULL;
-	}
-	if	(k < 0)
-	{
-		return LB(cts, -k);
 	}
 
 	if	((cts->p + k - 1) >= (ANTLR3_INT32)ts->istream->cachedSize)
@@ -401,44 +401,47 @@ dbgTokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 #pragma warning( disable : 4702 )
 #endif
 
-static	pANTLR3_COMMON_TOKEN
-LB  (pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 k)
+static pANTLR3_COMMON_TOKEN
+LB(pANTLR3_COMMON_TOKEN_STREAM cts, ANTLR3_INT32 k)
 {
-    ANTLR3_INT32    i;
-    ANTLR3_INT32    n;
+    ANTLR3_INT32 i;
+    ANTLR3_INT32 n;
 
-    if	(cts->p == -1)
+    if (cts->p == -1)
     {
-	fillBuffer(cts);
+        fillBuffer(cts);
     }
-    if	(k == 0)
+    if (k == 0)
     {
-	return NULL;
+        return NULL;
     }
-    if	((cts->p - k) < 0)
+    if ((cts->p - k) < 0)
     {
-	return NULL;
+        return NULL;
     }
 
-    i	= cts->p;
-    n	= 1;
+    i = cts->p;
+    n = 1;
 
     /* Need to find k good tokens, going backwards, skipping ones that are off channel
      */
-    while   (  n <= (ANTLR3_INT32)k )
+    while (n <= (ANTLR3_INT32) k)
     {
-	/* Skip off-channel tokens 
-	 */
+        /* Skip off-channel tokens
+         */
 
-	i = skipOffTokenChannelsReverse(cts, i-1); /* leave p on valid token    */
-	n++;
+        i = skipOffTokenChannelsReverse(cts, i - 1); /* leave p on valid token    */
+        n++;
     }
-    if	( i <0 )
+    if (i < 0)
     {
-	return	NULL;
+        return NULL;
     }
-
-    return  (pANTLR3_COMMON_TOKEN)cts->tokens->get(cts->tokens, i);
+	// Here the token must be in the input vector. Rather then incut
+	// function call penalty, we jsut return the pointer directly
+	// from the vector
+	//
+	return  (pANTLR3_COMMON_TOKEN)cts->tokens->elements[i].element;
 }
 
 static pANTLR3_COMMON_TOKEN 
@@ -752,7 +755,7 @@ _LA  (pANTLR3_INT_STREAM is, ANTLR3_INT32 i)
 
 	ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
 
-	tok	    = ts->_LT(ts, i);
+	tok	    =  ts->_LT(ts, i);
 
 	if	(tok != NULL)
 	{
@@ -889,7 +892,11 @@ dbgSeek	(pANTLR3_INT_STREAM is, ANTLR3_MARKER index)
 	//
 	seek(is, index);
 }
-
+ANTLR3_API void
+fillBufferExt(pANTLR3_COMMON_TOKEN_STREAM tokenStream)
+{
+    fillBuffer(tokenStream);
+}
 static void
 fillBuffer(pANTLR3_COMMON_TOKEN_STREAM tokenStream) {
     ANTLR3_UINT32 index;
@@ -981,9 +988,9 @@ skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 i) {
 
     while (i < n)
     {
-        tok = tokenStream->tstream->get(tokenStream->tstream, i);
+        tok =  (pANTLR3_COMMON_TOKEN)tokenStream->tokens->elements[i].element;
 
-        if (tok == NULL || tok->getChannel(tok) != tokenStream->channel)
+        if (tok->channel!= tokenStream->channel)
         {
             i++;
         }
@@ -998,20 +1005,20 @@ skipOffTokenChannels(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 i) {
 static ANTLR3_UINT32
 skipOffTokenChannelsReverse(pANTLR3_COMMON_TOKEN_STREAM tokenStream, ANTLR3_INT32 x)
 {
-    pANTLR3_COMMON_TOKEN    tok;
+    pANTLR3_COMMON_TOKEN tok;
 
-    while   ( x >= 0 )
+    while (x >= 0)
     {
-	tok =	tokenStream->tstream->get(tokenStream->tstream, x);
-
-	if  (tok == NULL || (tok->getChannel(tok) != tokenStream->channel))
-	{
-	    x--;
-	}
-	else
-	{
-	    return x;
-	}
+        tok =  (pANTLR3_COMMON_TOKEN)tokenStream->tokens->elements[x].element;
+        
+        if ((tok->channel != tokenStream->channel))
+        {
+            x--;
+        }
+        else
+        {
+            return x;
+        }
     }
     return x;
 }
