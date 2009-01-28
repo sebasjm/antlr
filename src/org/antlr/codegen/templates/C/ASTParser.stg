@@ -197,9 +197,9 @@ if ( <actions.(actionScope).synpredgate> )
 	retval.tree = (<ASTLabelType>)(ADAPTOR->rulePostProcessing(ADAPTOR, root_0));
 	ADAPTOR->setTokenBoundaries(ADAPTOR, retval.tree, retval.start, retval.stop);
     <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>->free(stream_<it>);}; separator="\n">
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);}; separator="\n">
     <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{stream_<it>->free(stream_<it>);}; separator="\n">
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);}; separator="\n">
 <if(backtracking)>
 }<\n>
 <endif>

@@ -84,16 +84,24 @@ ruleLabelDefs() ::= <<
     :{pANTLR3_REWRITE_RULE_SUBTREE_STREAM stream_<it>;}; separator="\n">
 >>
 
+/* Note that we defer the actual creation of any rewrite streams we need here and just initialize
+ * them to NULL. This saves creating huge numbers of rewrite streams that cannot be used as only
+ * one alt will be taken in a rule, but we are declaring all the streams here. So we define
+ * a macro that conatins the create code, then use this macro later to check if the stream
+ * has been created yet. Checking for NULL is almost free in C.
+ */
 ruleLabelInitializations() ::= <<
 <super.ruleLabelInitializations()>
 <ruleDescriptor.tokenLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree   = NULL;}; separator="\n">
-<if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
-    <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>   = antlr3RewriteRule<rewriteElementType>StreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"token <it>"); }; separator="\n">
-    <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"rule <it>");}; separator="\n">
-<if(backtracking)>}<endif>
+
+<ruleDescriptor.allTokenRefsInAltsWithRewrites
+:{stream_<it>   = NULL;
+#define CREATE_stream_<it>  if (stream_<it> == NULL) {stream_<it> = antlr3RewriteRule<rewriteElementType>StreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"token <it>"); } }; separator="\n">
+<ruleDescriptor.allRuleRefsInAltsWithRewrites
+:{stream_<it>   = NULL;
+#define CREATE_stream_<it>  if (stream_<it> == NULL) {stream_<it> = antlr3RewriteRuleSubtreeStreamNewAE(ADAPTOR, RECOGNIZER, (pANTLR3_UINT8)"rule <it>"); }}; separator="\n">
+
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.tree  = NULL;
 <endif>
@@ -133,7 +141,7 @@ root_0 = (<ASTLabelType>)(ADAPTOR->nilNode(ADAPTOR));<\n>
 /** ID but track it for use in a rewrite rule */
 tokenRefTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)> <! Track implies no auto AST construction!>
-<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) { <endif>CREATE_stream_<token>; stream_<token>->add(stream_<token>, <label>, NULL);<if(backtracking)> }<endif><\n>
 >>
 
 /** ids+=ID and track it for use in a rewrite rule; adds to ids *and*
@@ -147,7 +155,7 @@ tokenRefTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 /** ^(ID ...) track for rewrite */
 tokenRefRuleRootTrack(token,label,elementIndex,hetero) ::= <<
 <tokenRefBang(...)>
-<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<token>->add(stream_<token>, <label>, NULL);<\n>
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>CREATE_stream_<token>; stream_<token>->add(stream_<token>, <label>, NULL);<if(backtracking)> }<endif><\n>
 >>
 
 wildcardTrack(label,elementIndex) ::= <<
@@ -157,7 +165,7 @@ wildcardTrack(label,elementIndex) ::= <<
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
-<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) { <endif>CREATE_stream_<rule.name>; stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);<if(backtracking)> }<endif>
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
@@ -169,7 +177,7 @@ ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
 <ruleRefRuleRoot(...)>
-<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) <endif>stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);
+<if(backtracking)>if ( <actions.(actionScope).synpredgate> ) { <endif>CREATE_stream_<rule.name>; stream_<rule.name>->add(stream_<rule.name>, <label>.tree, NULL);<if(backtracking)> }<endif>
 >>
 
 /** ^(x+=rule ...) rewrite */
@@ -361,11 +369,11 @@ rewriteOptionalBlock(
 <<
 // <fileName>:<description>
 {
-	if ( <referencedElementsDeep:{el | stream_<el>->hasNext(stream_<el>)}; separator="||"> ) 
+	if ( <referencedElementsDeep:{el | (stream_<el> != NULL && stream_<el>->hasNext(stream_<el>)) }; separator="||"> )
 	{
 		<alt>
 	}
-	<referencedElementsDeep:{el | stream_<el>->reset(stream_<el>);<\n>}>
+	<referencedElementsDeep:{el | if ( stream_<el> != NULL) stream_<el>->reset(stream_<el>);<\n>}>
 }<\n>
 >>
 
@@ -378,11 +386,11 @@ rewriteClosureBlock(
 <<
 // <fileName>:<description>
 {
-	while ( <referencedElements:{el | stream_<el>->hasNext(stream_<el>)}; separator="||"> ) 
+	while ( (<referencedElements:{el | stream_<el> != NULL && stream_<el>->hasNext(stream_<el>)) }; separator="||"> )
 	{
 		<alt>
 	}
-	<referencedElements:{el | stream_<el>->reset(stream_<el>);<\n>}>
+	<referencedElements:{el | if ( stream_<el> != NULL) stream_<el>->reset(stream_<el>);<\n>}>
 }<\n>
 >>
 RewriteEarlyExitException() ::=
@@ -398,13 +406,13 @@ rewritePositiveClosureBlock(
 	referencedElements,		// elements in immediately block; no nested blocks
 	description) ::=
 <<
-if ( !(<referencedElements:{el | stream_<el>->hasNext(stream_<el>)}; separator="||">) ) 
+if (<referencedElements:{el | (stream_<el> == NULL || !stream_<el>->hasNext(stream_<el>)) }; separator="||"> )
 {
     <RewriteEarlyExitException()>
 }
 else
 {
-	while ( <referencedElements:{el | stream_<el>->hasNext(stream_<el>)}; separator="||"> ) {
+	while ( (<referencedElements:{el | stream_<el>->hasNext(stream_<el>)) }; separator="||"> ) {
 		<alt>
 	}
 	<referencedElements:{el | stream_<el>->reset(stream_<el>);<\n>}>
@@ -453,17 +461,17 @@ ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, <createRewriteNodeFromElement(...)>
 
 /** Gen $label ... where defined via label=ID */
 rewriteTokenLabelRef(label,elementIndex) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextNode(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label> == NULL ? NULL : stream_<label>->nextNode(stream_<label>));<\n>
 >>
 
 /** Gen $label ... where defined via label+=ID */
 rewriteTokenListLabelRef(label,elementIndex) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextNode(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label> == NULL ? NULL : stream_<label>->nextNode(stream_<label>));<\n>
 >>
 
 /** Gen ^($label ...) */
 rewriteTokenLabelRefRoot(label,elementIndex) ::= <<
-root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRootToken(ADAPTOR, stream_<label>->nextToken(stream_<label>), root_<treeLevel>));<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRootToken(ADAPTOR, stream_<label> == NULL ? NULL : stream_<label>->nextToken(stream_<label>), root_<treeLevel>));<\n>
 >>
 
 /** Gen ^($label ...) where label+=... */
@@ -495,11 +503,11 @@ root_0 = <action>;<\n>
 prevRuleRootRef() ::= "retval"
 
 rewriteRuleRef(rule,dup) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<rule>->nextTree(stream_<rule>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<rule> == NULL ? NULL : stream_<rule>->nextTree(stream_<rule>));<\n>
 >>
 
 rewriteRuleRefRoot(rule,dup) ::= <<
-root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, stream_<rule>->nextNode(stream_<rule>), root_<treeLevel>));<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, stream_<rule> == NULL ? NULL : stream_<rule>->nextNode(stream_<rule>), root_<treeLevel>));<\n>
 >>
 
 rewriteNodeAction(action) ::= <<
@@ -512,22 +520,22 @@ root_<treeLevel> = (<ASLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, <action>, root_<
 
 /** Gen $ruleLabel ... where defined via ruleLabel=rule */
 rewriteRuleLabelRef(label) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextTree(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label> == NULL ? NULL : stream_<label>->nextTree(stream_<label>));<\n>
 >>
 
 /** Gen $ruleLabel ... where defined via ruleLabel+=rule */
 rewriteRuleListLabelRef(label) ::= <<
-ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label>->nextTree(stream_<label>));<\n>
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label> == NULL ? NULL : stream_<label>->nextTree(stream_<label>));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel=rule */
 rewriteRuleLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(ADAPTOR, stream_<label> == NULL ? NULL : stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
 >>
 
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
-root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot((<ASTLabelType>)(stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
+root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot((<ASTLabelType>)(stream_<label> == NULL ? NULL : stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<
@@ -562,7 +570,7 @@ ADAPTOR->createTypeToken(ADAPTOR, <token>->getType(<token>, <token>, <args; sepa
 #endif
 
 <else>
-stream_<token>->nextNode(stream_<token>)
+stream_<token> == NULL ? NULL : stream_<token>->nextNode(stream_<token>)
 <endif>
 <endif>
 >>
