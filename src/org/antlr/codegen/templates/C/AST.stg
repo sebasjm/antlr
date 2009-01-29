@@ -337,19 +337,19 @@ if ( BACKTRACKING ==0 )
 {
 <endif>
     <referencedTokenLabels
-    :{stream_<it>->free(stream_<it>);};
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>); };
     separator="\n"
 >
     <referencedTokenListLabels
-    :{stream_<it>->free(stream_<it>);};
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
     separator="\n"
 >
     <referencedRuleLabels
-    :{stream_<it>->free(stream_<it>);};
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
     separator="\n"
 >
     <referencedRuleListLabels
-    :{stream_<it>->free(stream_<it>);};
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
     separator="\n"
 >
 <if(backtracking)>
