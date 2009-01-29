@@ -233,7 +233,7 @@ if (list_<label> == NULL)
 {
     RETURN_TYPE_<label> * tcopy;
 
-    tcopy = ANTLR3_CALLOC(1, sizeof(RETURN_TYPE_<label>)); /* Note no memory allocation checks! */
+    tcopy = ANTLR3_MALLOC(sizeof(RETURN_TYPE_<label>)); /* Note no memory allocation checks! */
     ANTLR3_MEMCPY((void *)(tcopy), (const void *)&<label>, sizeof(RETURN_TYPE_<label>));
     list_<label>->add(list_<label>, tcopy, freeScope);  /* Add whatever the return type is */<\n>
 }
