@@ -129,7 +129,7 @@ newPool(pANTLR3_ARBORETUM factory)
     //
     factory->pools[factory->thisPool]	=
 			    (pANTLR3_COMMON_TREE) 
-				ANTLR3_CALLOC(1, (size_t)(sizeof(ANTLR3_COMMON_TREE) * ANTLR3_FACTORY_POOL_SIZE));
+				ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TREE) * ANTLR3_FACTORY_POOL_SIZE));
 
 
     // Reset the counters
