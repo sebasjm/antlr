@@ -220,7 +220,7 @@ typedef struct ANTLR3_VECTOR_ELEMENT_struct
 }
     ANTLR3_VECTOR_ELEMENT, *pANTLR3_VECTOR_ELEMENT;
 
-#define ANTLR3_VECTOR_INTERNAL_SIZE     8
+#define ANTLR3_VECTOR_INTERNAL_SIZE     16
 /* Structure that represents a vector collection. A vector is a simple list
  * that contains a pointer to the element and a pointer to a function that
  * that can free the element if it is removed. It auto resizes but does not

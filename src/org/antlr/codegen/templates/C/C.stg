@@ -1696,7 +1696,7 @@ ruleLabelInitializations() ::= <<
 >
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!ruleDescriptor.isSynPred)>
-retval.start = LT(1);<\n>
+retval.start = LT(1); retval.stop = retval.start;<\n>
 <endif>
 <endif>
 >>
