@@ -466,9 +466,13 @@ add	    (pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream, void * el, void (ANTLR3_CDE
 	//
 	if	(stream->elements == NULL)
 	{
-		stream->elements		= antlr3VectorNew(0);	// We will let the vector figure things out as it goes
+        pANTLR3_VECTOR_FACTORY factory = ((pANTLR3_COMMON_TREE_ADAPTOR)(stream->adaptor->super))->arboretum->vFactory;
+
+        
+		stream->elements		= factory->newVector(factory);
 		stream->freeElements	= ANTLR3_TRUE;			// We 'ummed it, so we play it son.
 	}
+    
 	stream->elements->add	(stream->elements, stream->singleElement, freePtr);
 	stream->elements->add	(stream->elements, el, freePtr);
 	stream->singleElement	= NULL;
