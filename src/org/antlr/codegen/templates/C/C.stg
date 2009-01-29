@@ -671,6 +671,7 @@ typedef struct <name>_Ctx_struct <name>, * p<name>;
 #pragma warning( disable : 4127 )
 #pragma warning( disable : 4189 )
 #pragma warning( disable : 4505 )
+#pragma warning( disable : 4701 )
 #endif
 <if(backtracking)>
 
@@ -683,10 +684,7 @@ typedef struct <name>_Ctx_struct <name>, * p<name>;
 <rules:{r |<headerReturnScope(ruleDescriptor=r.ruleDescriptor,...)>}>
 
 <scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(scope=it)><endif>}>
-<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeFuncMacro(scope=it)><endif>}>
 <rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
-<rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
-
 <if(recognizer.grammar.delegators)>
 // Include delegator definition header files
 //
@@ -1193,6 +1191,8 @@ pANTLR3_UINT8   <name>TokenNames[<length(tokenNames)>+4]
     <@members>
 
     <@end>
+<rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
+<scopes:{<if(it.isDynamicGlobalScope)><globalAttributeScopeFuncMacro(scope=it)><endif>}>
 
 // Forward declare the locally static matching functions we have generated.
 //
@@ -2660,10 +2660,28 @@ globalAttributeScopeFuncMacro(scope) ::= <<
 <if(scope.attributes)>
 /* globalAttributeScopeFuncMacro(scope)
  */
-/** Macro for popping the top value from a <scopeStack(sname=scope.name)>
+/** Function  for popping the top value from a <scopeStack(sname=scope.name)>
  */
-#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ((<scopeType(sname=scope.name)>)(ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name,...)>)))
+void
+<scopePopName(sname=scope.name,...)>(p<name> ctx)
+{
+    // First see if the user defined a function they want to be called when a
+    // scope is popped/freed.
+    //
+	// If the user supplied the scope entries with a free function,then call it first
+	//
+    if	(SCOPE_TOP(<scope.name>)-\>free != NULL)
+	{
+        SCOPE_TOP(<scope.name>)-\>free(SCOPE_TOP(<scope.name>));
+	}
 
+    // Now we decrement the scope's upper limit bound. We do not actually pop the scope as
+    // we want to reuse scope entries if we do continuous push and pops. Most scopes don't
+    // next too far so we don't want to keep freeing and allocating them
+    //
+    ctx-\><scopeStack(sname=scope.name,...)>_limit--;
+    SCOPE_TOP(<scope.name>) = (<scopeType(sname=scope.name)>)(ctx-\><scopeStack(sname=scope.name,...)>-\>get(ctx-\><scopeStack(sname=scope.name,...)>, ctx-\><scopeStack(sname=scope.name,...)>_limit - 1));
+}
 <endif>
 >>
 
@@ -2685,13 +2703,33 @@ ruleAttributeScopeFuncMacro(scope) ::= <<
 <if(scope.attributes)>
 /* ruleAttributeScopeFuncMacro(scope)
  */
-/** Macro for popping the top value from a <scopeStack(sname=scope.name,...)>
+/** Function for popping the top value from a <scopeStack(sname=scope.name,...)>
  */
-#define <scopePopName(sname=scope.name,...)>()  SCOPE_TOP(<scope.name>) = ((<scopeType(sname=scope.name)>)(ctx-><scopeStack(sname=scope.name,...)>->pop(ctx-><scopeStack(sname=scope.name)>)))
+void
+<scopePopName(sname=scope.name,...)>(p<name> ctx)
+{
+    // First see if the user defined a function they want to be called when a
+    // scope is popped/freed.
+    //
+	// If the user supplied the scope entries with a free function,then call it first
+	//
+    if	(SCOPE_TOP(<scope.name>)\>free != NULL)
+	{
+        SCOPE_TOP(<scope.name>)>-\>free(SCOPE_TOP(<scope.name>));
+	}
+
+    // Now we decrement the scope's upper limit bound. We do not actually pop the scope as
+    // we want to reuse scope entries if we do continuous push and pops. Most scopes don't
+    // next too far so we don't want to keep freeing and allocating them
+    //
+    ctx-\><scopeStack(sname=scope.name,...)>_limit--;
+    SCOPE_TOP(<scope.name>) = (<scopeType(sname=scope.name)>)(ctx-\><scopeStack(sname=scope.name,...)>-\>get(ctx-\><scopeStack(sname=scope.name,...)>, ctx-\><scopeStack(sname=scope.name,...)>_limit - 1));
+}
 
 <endif>
 >>
-globalAttributeScopeDef(scope) ::= 
+
+globalAttributeScopeDef(scope) ::=
 <<
 /* globalAttributeScopeDef(scope)
  */
@@ -2700,6 +2738,7 @@ globalAttributeScopeDef(scope) ::=
  *  and <scopePopName(sname=scope.name,...)>()
  */
 pANTLR3_STACK <scopeStack(sname=scope.name)>;
+ANTLR3_UINT32 <scopeStack(sname=scope.name)>_limit;
 /** Pointer to the top of the stack for the global scope <scopeStack(sname=scope.name)>
  */
 <scopeType(sname=scope.name,...)>    (*<scopePushName(sname=scope.name,...)>)(struct <name>_Ctx_struct * ctx);
@@ -2716,6 +2755,7 @@ ruleAttributeScopeDef(scope) ::= <<
  *  and <scopePopName(sname=scope.name,...)>()
  */
 pANTLR3_STACK <scopeStack(sname=scope.name,...)>;
+ANTLR3_UINT32 <scopeStack(sname=scope.name,...)>_limit;
 <scopeType(sname=scope.name,...)>   (*<scopePushName(sname=scope.name,...)>)(struct <name>_Ctx_struct * ctx);
 <scopeType(sname=scope.name,...)>   <scopeTopDecl(sname=scope.name,...)>;
 
@@ -2740,21 +2780,23 @@ ruleAttributeScopeFuncs(scope) ::= <<
 
 globalAttributeScope(scope) ::= <<
 <if(scope.attributes)>
-/* globalAttributeScope(scope)  
+/* globalAttributeScope(scope)
  */
 ctx-><scopePushName(sname=scope.name,...)>     = <scopePushName(sname=scope.name,...)>;
-ctx-><scopeStack(sname=scope.name,...)>    = antlr3StackNew(ANTLR3_SIZE_HINT);
+ctx-><scopeStack(sname=scope.name,...)>    = antlr3StackNew(0);
+ctx-><scopeStack(sname=scope.name,...)>_limit    = 0;
 <scopeTop(sname=scope.name,...)>      = NULL;
 <endif>
 >>
 
-ruleAttributeScope(scope) ::= 
+ruleAttributeScope(scope) ::=
 <<
 <if(scope.attributes)>
 /* ruleAttributeScope(scope)
  */
 ctx-><scopePushName(sname=scope.name,...)>     = <scopePushName(sname=scope.name,...)>;
-ctx-><scopeStack(sname=scope.name,...)>    = antlr3StackNew(ANTLR3_SIZE_HINT);
+ctx-><scopeStack(sname=scope.name,...)>    = antlr3StackNew(0);
+ctx-><scopeStack(sname=scope.name,...)>_limit    = 0;
 <scopeTop(sname=scope.name,...)>      = NULL;
 <endif>
 >>
@@ -2784,7 +2826,7 @@ ctx-><scopeTopDecl(sname=sname,...)>
 >>
 
 scopePop(sname) ::= <<
-<scopePopName(sname=sname,...)>();
+<scopePopName(sname=sname,...)>(ctx);
 >>
 
 scopePush(sname) ::= <<
@@ -2818,13 +2860,6 @@ attributeFuncs(scope) ::= <<
 
 static void ANTLR3_CDECL <scope.name>Free(<scopeType(sname=scope.name)> scope)
 {
-	
-	// If the user supplied the scope entries with a free function,then call it first
-	//
-	if	(scope->free != NULL)
-	{
-		scope->free(scope);
-	}
     ANTLR3_FREE(scope);
 }
 
@@ -2857,24 +2892,39 @@ static <scopeType(sname=scope.name)>
      */
     <scopeType(sname=scope.name)>      newAttributes;
 
-    /* Allocate the memory for a new structure
+    /* Allocate the memory for a new structure if we need one.
      */
-    newAttributes = (<scopeType(sname=scope.name)>) ANTLR3_MALLOC(sizeof(<scopeStruct(sname=scope.name)>));
-
-    if  (newAttributes != NULL)
+    if (ctx-\><scopeStack(sname=scope.name)>-\>size(ctx-\><scopeStack(sname=scope.name)>) \> ctx-\><scopeStack(sname=scope.name)>_limit)
     {
-	/* Standard ANTLR3 library implementation
-	 */
-     newAttributes->free = NULL;
-	ctx-><scopeStack(sname=scope.name)>->push(ctx-><scopeStack(sname=scope.name)>, newAttributes, (void (*)(void *))<scope.name>Free);
-	
+        // The current limit value was less than the number of scopes available on the stack so
+        // we can just reuse one. Our limit tracks the stack count, so the index of the entry we want
+        // is one less than that, or conveniently, the current value of limit.
+        //
+        newAttributes = ctx-><scopeStack(sname=scope.name)>->get(ctx-><scopeStack(sname=scope.name)>, ctx-\><scopeStack(sname=scope.name)>_limit);
+    }
+    else
+    {
+        // Need a new allocation
+        //
+        newAttributes = (<scopeType(sname=scope.name)>) ANTLR3_MALLOC(sizeof(<scopeStruct(sname=scope.name)>));
+        if  (newAttributes != NULL)
+        {
+            /* Standard ANTLR3 library implementation
+             */
+            ctx-\><scopeStack(sname=scope.name)>-\>push(ctx-\><scopeStack(sname=scope.name)>, newAttributes, (void (*)(void *))<scope.name>Free);
+        }
+    }
+
+    // Blank out any previous free pointer, the user might or might install a new one.
+    //
+    newAttributes->free = NULL;
+
+    // Indicate the position in the available stack that the current level is at
+    //
+    ctx-><scopeStack(sname=scope.name)>_limit++;
+
 	/* Return value is the pointer to the new entry, which may be used locally
 	 * without de-referencing via the context.
-	 */
-    }
- 
-    /* Calling routine will throw an exception if this
-     * fails and this pointer is NULL.
      */
     return  newAttributes;
 }<\n>
