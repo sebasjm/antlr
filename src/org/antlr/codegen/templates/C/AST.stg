@@ -307,54 +307,40 @@ rewriteCodeLabelsDecl() ::= <<
 >>
 
 rewriteCodeLabelsInit() ::= <<
-<if(backtracking)>
-if ( BACKTRACKING ==0 )
-{<\n>
-<endif>
-    <referencedTokenLabels
-    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>);};
-    separator="\n"
+<referencedTokenLabels
+:{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>);};
+separator="\n"
 >
-    <referencedTokenListLabels
-    :{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>); };
-    separator="\n"
+<referencedTokenListLabels
+:{stream_<it>=antlr3RewriteRule<rewriteElementType>StreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>); };
+separator="\n"
 >
-    <referencedRuleLabels
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>.tree != NULL ? <it>.tree : NULL);};
-    separator="\n"
+<referencedRuleLabels
+:{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEE(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", <it>.tree != NULL ? <it>.tree : NULL);};
+separator="\n"
 >
-    <referencedRuleListLabels
-    :{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>);};
-    separator="\n"
+<referencedRuleListLabels
+:{stream_<it>=antlr3RewriteRuleSubtreeStreamNewAEV(ADAPTOR,  RECOGNIZER, (pANTLR3_UINT8)"token <it>", list_<it>);};
+separator="\n"
 >
-<if(backtracking)>
-}
-<endif>
 >>
 rewriteCodeLabelsFree() ::= <<
-<if(backtracking)>
-if ( BACKTRACKING ==0 )
-{
-<endif>
-    <referencedTokenLabels
-    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>); };
-    separator="\n"
+<referencedTokenLabels
+:{if (stream_<it> != NULL) stream_<it>->free(stream_<it>); };
+separator="\n"
 >
-    <referencedTokenListLabels
-    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
-    separator="\n"
+<referencedTokenListLabels
+:{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
+separator="\n"
 >
-    <referencedRuleLabels
-    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
-    separator="\n"
+<referencedRuleLabels
+:{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
+separator="\n"
 >
-    <referencedRuleListLabels
-    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
-    separator="\n"
+<referencedRuleListLabels
+:{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);};
+separator="\n"
 >
-<if(backtracking)>
-}
-<endif>
 >>
 
 /** Generate code for an optional rewrite block; note it uses the deep ref'd element
