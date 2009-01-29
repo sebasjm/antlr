@@ -2859,12 +2859,13 @@ static <scopeType(sname=scope.name)>
 
     /* Allocate the memory for a new structure
      */
-    newAttributes = (<scopeType(sname=scope.name)>) ANTLR3_CALLOC(1, sizeof(<scopeStruct(sname=scope.name)>));
+    newAttributes = (<scopeType(sname=scope.name)>) ANTLR3_MALLOC(sizeof(<scopeStruct(sname=scope.name)>));
 
     if  (newAttributes != NULL)
     {
 	/* Standard ANTLR3 library implementation
 	 */
+     newAttributes->free = NULL;
 	ctx-><scopeStack(sname=scope.name)>->push(ctx-><scopeStack(sname=scope.name)>, newAttributes, (void (*)(void *))<scope.name>Free);
 	
 	/* Return value is the pointer to the new entry, which may be used locally
