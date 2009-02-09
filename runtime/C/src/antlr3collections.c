@@ -155,6 +155,11 @@ antlr3HashTableNew(ANTLR3_UINT32 sizeHint)
 	*/
 	table->allowDups	= ANTLR3_FALSE;
 
+    /* Assume that keys should by strduped before they are
+     * entered in the table.
+     */
+    table->doStrdup     = ANTLR3_TRUE;
+
 	/* Install the interface
 	*/
 
@@ -347,9 +352,12 @@ antlr3HashRemove(pANTLR3_HASH_TABLE table, void * key)
 	     */
 	    (*nextPointer)		= entry->nextEntry;
 
-	    /* Release the key - we allocated that
+	    /* Release the key - if we allocated that
 	     */
-	    ANTLR3_FREE(entry->keybase.key.sKey);
+        if (table->doStrdup == ANTLR3_TRUE)
+        {
+            ANTLR3_FREE(entry->keybase.key.sKey);
+        }
 	    entry->keybase.key.sKey	= NULL;
 
 	    table->count--;
@@ -626,8 +634,15 @@ antlr3HashPut(pANTLR3_HASH_TABLE table, void * key, void * element, void (ANTLR3
 
 	entry->data			= element;					/* Install the data element supplied				*/
 	entry->free			= freeptr;					/* Function that knows how to release the entry	    */
-	entry->keybase.type		= ANTLR3_HASH_TYPE_STR;	/* Indicate the key type stored here for free()	    */
-	entry->keybase.key.sKey	= ANTLR3_STRDUP(key);	/* Record the key value								*/
+	entry->keybase.type	= ANTLR3_HASH_TYPE_STR;     /* Indicate the key type stored here for free()	    */
+    if  (table->doStrdup == ANTLR3_TRUE)
+    {
+        entry->keybase.key.sKey	= ANTLR3_STRDUP(key);	/* Record the key value								*/
+    }
+    else
+    {
+        entry->keybase.key.sKey	= key;                  /* Record the key value								*/
+    }
 	entry->nextEntry		= NULL;					/* Ensure that the forward pointer ends the chain   */
 
 	*newPointer	= entry;    /* Install the next entry in this bucket	*/
@@ -1559,7 +1574,8 @@ newVector(pANTLR3_VECTOR_FACTORY factory)
 
     // We have our token pointer now, so we can initialize it to the predefined model.
     //
-    ANTLR3_MEMCPY((void *) vector, (const void *) & factory->unTruc, sizeof (ANTLR3_VECTOR));
+    antlr3SetVectorApi(vector, ANTLR3_VECTOR_INTERNAL_SIZE);
+    vector->factoryMade = ANTLR3_TRUE;
 
     // We know that the pool vectors are created at the default size, which means they
     // will start off using their internal entry pointers. We must intialize our pool vector

@@ -174,6 +174,9 @@ addChild (pANTLR3_BASE_TREE tree, pANTLR3_BASE_TREE child)
                 // a nil node (has not root itself).
                 //
                 tree->children = child->children;
+                child->children = NULL;
+                freshenPACIndexesAll(tree);
+                
             }
             else
             {

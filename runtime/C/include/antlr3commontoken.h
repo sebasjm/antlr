@@ -44,7 +44,7 @@
 
 /** How many tokens to allocate at once in the token factory
  */
-#define	ANTLR3_FACTORY_POOL_SIZE    4096
+#define	ANTLR3_FACTORY_POOL_SIZE    1024
 
 /* Base token types, which all lexer/parser tokens come after in sequence.
  */

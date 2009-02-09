@@ -129,16 +129,22 @@ typedef	struct ANTLR3_ARBORETUM_struct
     ///
     ANTLR3_COMMON_TREE	    unTruc;
 
-	/// Pointer to a vector factory that is used to create child list vectors
-	/// for any child nodes that need them. This means that we auto track the
-	/// vectors and auto free them when we close the factory. It also means
-	/// that all rewriting trees can use the same tree factory and the same
-	/// vector factory and we do not dup any nodes unless we must do so 
-	/// explicitly because of context such as an empty rewrite stream and
-	/// ->IMAGINARY[ID] so on. This makes memory tracking much simpler and 
-	/// tempts no errors.
-	///
-	pANTLR3_VECTOR_FACTORY   vFactory;
+    /// Pointer to a vector factory that is used to create child list vectors
+    /// for any child nodes that need them. This means that we auto track the
+    /// vectors and auto free them when we close the factory. It also means
+    /// that all rewriting trees can use the same tree factory and the same
+    /// vector factory and we do not dup any nodes unless we must do so
+    /// explicitly because of context such as an empty rewrite stream and
+    /// ->IMAGINARY[ID] so on. This makes memory tracking much simpler and
+    /// tempts no errors.
+    ///
+    pANTLR3_VECTOR_FACTORY   vFactory;
+
+    /// A resuse stack for reclaiming Nil nodes that were used in rewrites
+    /// and are now dead. The nilNode() method will eat one of these before
+    /// creating a new node.
+    ///
+    pANTLR3_STACK           nilStack;
 
     /// Pointer to a function that returns a new tree
     ///

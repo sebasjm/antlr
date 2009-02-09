@@ -512,6 +512,8 @@ dbgAddChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTL
 static	pANTLR3_BASE_TREE	
 becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pANTLR3_BASE_TREE oldRootTree)
 {
+    pANTLR3_BASE_TREE saveRoot;
+
 	/* Protect against tree rewrites if we are in some sort of error
 	 * state, but have tried to recover. In C we can end up with a null pointer
 	 * for a tree that was not produced.
@@ -537,13 +539,19 @@ becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pA
 		{
 			/* TODO: Handle tree exceptions 
 			 */
-			ANTLR3_FPRINTF(stderr, "More than one node as root! TODO: Create tree exception hndling\n");
+			ANTLR3_FPRINTF(stderr, "More than one node as root! TODO: Create tree exception handling\n");
 			return newRootTree;
 		}
 
-		/* The new root is the first child
+		/* The new root is the first child, keep track of the original newRoot
+         * because if it was a Nil Node, then we can reuse it now.
 		 */
+        saveRoot    = newRootTree;
 		newRootTree = newRootTree->getChild(newRootTree, 0);
+
+        // Reclaim the old nilNode()
+        //
+        saveRoot->reuse(saveRoot);
 	}
 
 	/* Add old root into new root. addChild takes care of the case where oldRoot
@@ -552,6 +560,21 @@ becomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree, pA
 	 */
 	newRootTree->addChild(newRootTree, oldRootTree);
 
+    // If the oldroot tree was a nil node, then we know at this point
+    // it has become orphaned by the rewrite logic, so we tell it to do
+    // whatever it needs to do to be reused.
+    //
+    if  (oldRootTree->isNilNode(oldRootTree))
+    {
+        // We have taken an old Root Tree and appended all its children to the new
+        // root. In addition though it was a nil node, which means the generated code
+        // will not reuse it again, so we will reclaim it here. First we want to zero out
+        // any pointers it was carrying around. We are just the baseTree handler so we
+        // don't know necessarilly know how to do this for the real node, we just ask the tree itself
+        // to do it.
+        //
+        oldRootTree->reuse(oldRootTree);
+    }
 	/* Always returns new root structure
 	 */
 	return	newRootTree;
@@ -573,6 +596,13 @@ dbgBecomeRoot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE newRootTree,
 static	pANTLR3_BASE_TREE	
    rulePostProcessing	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root)
 {
+    pANTLR3_BASE_TREE saveRoot;
+
+    // Keep track of the root we are given. If it is a nilNode, then we
+    // can reuse it rather than orphaning it!
+    //
+    saveRoot = root;
+
 	if (root != NULL && root->isNilNode(root))
 	{
 		if	(root->getChildCount(root) == 0)
@@ -584,6 +614,12 @@ static	pANTLR3_BASE_TREE
 			root = root->getChild(root, 0);
 			root->setParent(root, NULL);
 			root->setChildIndex(root, -1);
+
+            // The root we were given was a nil node, wiht one child, which means it has
+            // been abandoned and would be lost in the node factory. However
+            // nodes can be flagged as resuable to prevent this terrible waste
+            //
+            saveRoot->reuse(saveRoot);
 		}
 	}
 

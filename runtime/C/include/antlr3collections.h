@@ -119,6 +119,10 @@ typedef	struct	ANTLR3_HASH_TABLE_struct
      */
     ANTLR3_UINT32		count;
 
+    /** Whether the hash table should strdup the keys it is given or not.
+     */
+    ANTLR3_BOOLEAN              doStrdup;
+
     /** Pointer to function to completely delete this table
      */
     void				(*free)	    (struct ANTLR3_HASH_TABLE_struct * table);
@@ -271,7 +275,7 @@ typedef struct ANTLR3_VECTOR_struct
 
 /** Default vector pool size if otherwise unspecified
  */
-#define ANTLR3_FACTORY_VPOOL_SIZE 4096
+#define ANTLR3_FACTORY_VPOOL_SIZE 256
 
 /** Structure that tracks vectors in a vector and auto deletes the vectors
  *  in the vector factory when closed.

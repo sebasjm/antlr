@@ -96,6 +96,68 @@ freeRS	(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 	stream->rec->state->rStreams->add(stream->rec->state->rStreams, stream, (void(*)(void *))expungeRS);
 }
 
+/** Do special nilNode reuse detection for node streams.
+ */
+static void
+freeNodeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
+{
+    pANTLR3_BASE_TREE tree;
+
+    // Before placing the stream back in the pool, we
+	// need to clear any vector it has. This is so any
+	// free pointers that are associated with the
+	// entires are called. However, if this particular function is called
+    // then we know that the entries in the stream are definately
+    // tree nodes. Hence we check to see if any of them were nilNodes as
+    // if they were, we can reuse them.
+	//
+	if	(stream->elements != NULL)
+	{
+        // We have some elements to traverse
+        //
+        ANTLR3_UINT32 i;
+
+        for (i = 1; i<= stream->elements->count; i++)
+        {
+            tree = (pANTLR3_BASE_TREE)(stream->elements->elements[i-1].element);
+            if  (tree->isNilNode(tree))
+            {
+                 tree->reuse(tree);
+            }
+
+        }
+		// Protext factory generated nodes as we cannot clear them,
+		// the factory is responsible for that.
+		//
+		if	(stream->elements->factoryMade == ANTLR3_TRUE)
+		{
+			stream->elements = NULL;
+		}
+		else
+		{
+			stream->elements->clear(stream->elements);
+			stream->freeElements = ANTLR3_TRUE;
+		}
+	}
+	else
+	{
+        if  (stream->singleElement != NULL)
+        {
+            tree = (pANTLR3_BASE_TREE)(stream->singleElement);
+            if  (tree->isNilNode(tree))
+            {
+                 tree->reuse(tree);
+            }
+        }
+		stream->freeElements = ANTLR3_FALSE; // Just in case
+	}
+
+	// Add the stream into the recognizer stream stack vector
+	// adding the stream memory free routine so that
+	// it is thrown away when the stack vector is destroyed
+	//
+	stream->rec->state->rStreams->add(stream->rec->state->rStreams, stream, (void(*)(void *))expungeRS);
+}
 static void
 expungeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
 {
@@ -313,7 +375,7 @@ antlr3RewriteRuleSubtreeStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_B
 	//
 	stream->dup			= dupTree;
 	stream->nextNode	= nextNode;
-
+    stream->free        = freeNodeRS;
 	return stream;
 
 }
@@ -335,6 +397,7 @@ antlr3RewriteRuleSubtreeStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 	//
 	stream->dup			= dupTree;
 	stream->nextNode	= nextNode;
+    stream->free        = freeNodeRS;
 
 	return stream;
 }
@@ -357,6 +420,7 @@ antlr3RewriteRuleSubtreeStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_
 	//
 	stream->dup			= dupTree;
 	stream->nextNode	= nextNode;
+    stream->free        = freeNodeRS;
 
 	return stream;
 }
@@ -381,6 +445,7 @@ antlr3RewriteRuleNODEStreamNewAE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE
 	stream->dup			= dupTreeNode;
 	stream->toTree		= toTreeNode;
 	stream->nextNode	= nextNodeNode;
+    stream->free        = freeNodeRS;
 
 	return stream;
 }
@@ -399,6 +464,7 @@ antlr3RewriteRuleNODEStreamNewAEE(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BAS
 	stream->dup			= dupTreeNode;
 	stream->toTree		= toTreeNode;
 	stream->nextNode	= nextNodeNode;
+    stream->free        = freeNodeRS;
 
 	return stream;
 }
@@ -417,7 +483,8 @@ antlr3RewriteRuleNODEStreamNewAEV(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BAS
 	stream->dup			= dupTreeNode;
 	stream->toTree		= toTreeNode;
 	stream->nextNode	= nextNodeNode;
-
+    stream->free        = freeNodeRS;
+    
 	return stream;
 }
 

@@ -59,7 +59,6 @@ static  pANTLR3_STRING  toString				(pANTLR3_COMMON_TOKEN token);
 /* Factory API
  */
 static	void			factoryClose	(pANTLR3_TOKEN_FACTORY factory);
-static  void			setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input);
 static	pANTLR3_COMMON_TOKEN	newToken	(void);
 
 /* Internal management functions
@@ -106,12 +105,11 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
      */
     factory->newToken	    =  newPoolToken;
     factory->close			=  factoryClose;
-    factory->setInputStream = setInputStream;
     
     /* Allocate the initial pool
      */
     factory->thisPool	= -1;
-    factory->pools	= NULL;
+    factory->pools      = NULL;
     newPool(factory);
 
     /* Factory space is good, we now want to initialize our cheating token
@@ -122,25 +120,13 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     /* Set some initial variables for future copying
      */
     factory->unTruc.factoryMade	= ANTLR3_TRUE;
-	
-    setInputStream(factory, input);
+
+    // Input stream
+    //
+    factory->input				=  input;
     
     return  factory;
 
-}
-static void
-setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input)
-{
-    factory->input				=  input;
-    factory->unTruc.input		=  input;
-	if	(input != NULL)
-	{
-		factory->unTruc.strFactory	= input->strFactory;
-	}
-	else
-	{
-		factory->unTruc.strFactory = NULL;
-	}
 }
 
 static void
@@ -163,10 +149,6 @@ newPool(pANTLR3_TOKEN_FACTORY factory)
 			    (pANTLR3_COMMON_TOKEN) 
 				ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TOKEN) * ANTLR3_FACTORY_POOL_SIZE));
 
-
-
-
-
     /* Reset the counters
      */
     factory->nextToken	= 0;
@@ -176,34 +158,39 @@ newPool(pANTLR3_TOKEN_FACTORY factory)
     return;
 }
 
-static	pANTLR3_COMMON_TOKEN    
-newPoolToken	    (pANTLR3_TOKEN_FACTORY factory)
+static pANTLR3_COMMON_TOKEN
+newPoolToken(pANTLR3_TOKEN_FACTORY factory)
 {
-    pANTLR3_COMMON_TOKEN    token;
+    pANTLR3_COMMON_TOKEN token;
 
     /* See if we need a new token pool before allocating a new
      * one
      */
-    if	(factory->nextToken >= ANTLR3_FACTORY_POOL_SIZE)
+    if (factory->nextToken >= ANTLR3_FACTORY_POOL_SIZE)
     {
-	/* We ran out of tokens in the current pool, so we need a new pool
-	 */
-	newPool(factory);
+        /* We ran out of tokens in the current pool, so we need a new pool
+         */
+        newPool(factory);
     }
 
     /* Assuming everything went well (we are trying for performance here so doing minimal
      * error checking. Then we can work out what the pointer is to the next token.
      */
-    token   = factory->pools[factory->thisPool] + factory->nextToken;
+    token = factory->pools[factory->thisPool] + factory->nextToken;
     factory->nextToken++;
 
     /* We have our token pointer now, so we can initialize it to the predefined model.
      */
-    ANTLR3_MEMCPY((void *)token, (const void *)&factory->unTruc, (ANTLR3_UINT32)sizeof(ANTLR3_COMMON_TOKEN));
+    antlr3SetTokenAPI(token);
+
+    /* It is factory made, and we need to copy the string factory pointer
+     */
+    token->factoryMade  = ANTLR3_TRUE;
+    token->strFactory   = factory->input == NULL ? NULL : factory->input->strFactory;
 
     /* And we are done
      */
-    return  token;
+    return token;
 }
 
 static	void
