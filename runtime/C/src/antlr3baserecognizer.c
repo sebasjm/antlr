@@ -2203,7 +2203,11 @@ getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istre
 	token->setCharPositionInLine	(token, current->getCharPositionInLine(current));
 	token->setChannel				(token, ANTLR3_TOKEN_DEFAULT_CHANNEL);
 	token->setType					(token, expectedTokenType);
-
+    token->user1                    = current->user1;
+    token->user2                    = current->user2;
+    token->user3                    = current->user3;
+    token->custom                   = current->custom;
+    
 	// Create the token text that shows it has been inserted
 	//
 	token->setText8(token, (pANTLR3_UINT8)"<missing ");
