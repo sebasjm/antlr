@@ -2670,9 +2670,9 @@ void
     //
 	// If the user supplied the scope entries with a free function,then call it first
 	//
-    if	(SCOPE_TOP(<scope.name>)-\>free != NULL)
+    if	(SCOPE_TOP(<scope.name>)->free != NULL)
 	{
-        SCOPE_TOP(<scope.name>)-\>free(SCOPE_TOP(<scope.name>));
+        SCOPE_TOP(<scope.name>)->free(SCOPE_TOP(<scope.name>));
 	}
 
     // Now we decrement the scope's upper limit bound. We do not actually pop the scope as
