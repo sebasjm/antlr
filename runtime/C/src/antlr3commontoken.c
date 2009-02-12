@@ -124,6 +124,7 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
     // Input stream
     //
     factory->input				=  input;
+    factory->unTruc.input       =  input;
     
     return  factory;
 
@@ -187,6 +188,7 @@ newPoolToken(pANTLR3_TOKEN_FACTORY factory)
      */
     token->factoryMade  = ANTLR3_TRUE;
     token->strFactory   = factory->input == NULL ? NULL : factory->input->strFactory;
+    token->input        = factory->input;
 
     /* And we are done
      */

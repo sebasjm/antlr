@@ -306,7 +306,7 @@ if ( <actions.(actionScope).synpredgate> ) {<\n>
 }
 <endif>
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{stream_<it>->free(stream_<it>);}; separator="\n">
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);}; separator="\n">
 <ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{stream_<it>->free(stream_<it>);}; separator="\n">
+    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);}; separator="\n">
 >>

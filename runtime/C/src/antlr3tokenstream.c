@@ -343,7 +343,7 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 		i = skipOffTokenChannels(cts, i+1); /* leave p on valid token    */
 		n++;
 	}
-	if	( (ANTLR3_UINT32) i > ts->istream->cachedSize)
+	if	( (ANTLR3_UINT32) i >= ts->istream->cachedSize)
 	{
 		pANTLR3_COMMON_TOKEN    teof = &(ts->tokenSource->eofToken);
 
