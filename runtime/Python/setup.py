@@ -186,8 +186,8 @@ class functest(Command):
 
         if self.antlr_version == 'HEAD':
             classpath = [
-                os.path.join(rootDir, 'build', 'classes'),
-                os.path.join(rootDir, 'build', 'rtclasses')
+                os.path.join(rootDir, 'target', 'classes'),
+                os.path.join(rootDir, 'runtime', 'Java', 'target', 'classes')
                 ]
         else:
             classpath = [
