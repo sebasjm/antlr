@@ -25,7 +25,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.antlr.morph;
+package org.antlr;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,6 +33,8 @@ import java.util.List;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 import org.antlr.runtime.debug.*;
+import org.antlr.grammar.v3.ANTLRv3Parser;
+import org.antlr.grammar.v3.ANTLRv3Lexer;
 
 /** This is an individual tool of ANTLRMorph which can be used for stripping
  *  off grammar options, actions, scopes, and grammar rule arguments, return
@@ -152,7 +154,7 @@ public class Strip {
 	        CommonTokenStream tokens = new CommonTokenStream(lex);
 	        ParseTreeBuilder builder = new ParseTreeBuilder(grammarFileName);
 	        // TODO: Make a generic grammar parser for this class, no need of MorphEngine
-	        ANTLRv3Parser g = new ANTLRv3Parser(tokens, builder, new MorphEngine());
+	        ANTLRv3Parser g = new ANTLRv3Parser(tokens, builder);
 	        g.grammarDef();
 	        ParseTree pt = builder.getTree();
 	        

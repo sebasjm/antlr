@@ -75,10 +75,6 @@ tokens {
     REWRITE='->';
 }
 
-@members {
-	int gtype;
-}
-
 @parser::header
 {
     package org.antlr.grammar.v3;
@@ -88,6 +84,9 @@ tokens {
     package org.antlr.grammar.v3;
 }
 
+@members {
+	int gtype;
+}
 
 grammarDef
     :   DOC_COMMENT?
@@ -164,7 +163,7 @@ scope {
 		':'	altList	';'
 		exceptionGroup?
 	    -> ^( RULE id {modifier!=null?adaptor.create(modifier):null} ^(ARG $arg)? ^(RET $rt)?
-	    	  optionsSpec? ruleScopeSpec? ruleAction*
+	    	  throwsSpec? optionsSpec? ruleScopeSpec? ruleAction*
 	    	  altList
 	    	  exceptionGroup?
 	    	  EOR["EOR"]
@@ -191,10 +190,12 @@ ruleScopeSpec
 block
     :   lp='('
 		( (opts=optionsSpec)? ':' )?
-		a1=alternative rewrite ( '|' a2=alternative rewrite )*
+		altpair ( '|' altpair )*
         rp=')'
-        -> ^( BLOCK[$lp,"BLOCK"] optionsSpec? alternative+ EOB[$rp,"EOB"] )
+        -> ^( BLOCK[$lp,"BLOCK"] optionsSpec? altpair+ EOB[$rp,"EOB"] )
     ;
+
+altpair : alternative rewrite ;
 
 altList
 @init {
@@ -203,8 +204,7 @@ altList
 	// it's really BLOCK[firstToken,"BLOCK"]; set line/col to previous ( or : token.
     CommonTree blkRoot = (CommonTree)adaptor.create(BLOCK,input.LT(-1),"BLOCK");
 }
-    :   a1=alternative rewrite ( '|' a2=alternative rewrite )*
-		-> ^( {blkRoot} (alternative rewrite?)+ EOB["EOB"] )
+    :   altpair ( '|' altpair )* -> ^( {blkRoot} altpair+ EOB["EOB"] )
     ;
 
 alternative
@@ -243,13 +243,16 @@ elementNoOptionSpec
 		|				-> ^($labelOp id block)
 		)
 	|	atom
-		(	ebnfSuffix	-> ^(BLOCK["BLOCK"] ^(ALT["ALT"] atom EOA["EOA"]) EOB["EOB"])
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] atom EOA["EOA"]) EOB["EOB"]) )
 		|				-> atom
 		)
 	|	ebnf
 	|   ACTION
 	|   SEMPRED ( '=>' -> GATED_SEMPRED | -> SEMPRED )
 	|   treeSpec
+		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] treeSpec EOA["EOA"]) EOB["EOB"]) )
+		|				-> treeSpec
+		)
 	;
 
 atom:   range ( (op='^'|op='!') -> ^($op range) | -> range )
@@ -286,8 +289,6 @@ ebnf
 		(	op='?'	-> ^(OPTIONAL[op] block)
 		|	op='*'	-> ^(CLOSURE[op] block)
 		|	op='+'	-> ^(POSITIVE_CLOSURE[op] block)
-		|   '^'		-> ^('^' block)
-		|   '!'		-> ^('!' block)
 		|   '=>'	// syntactic predicate
 					-> {gtype==COMBINED_GRAMMAR &&
 					    Character.isUpperCase($rule::name.charAt(0))}?
@@ -354,10 +355,6 @@ options {backtrack=true;}
    	|   /* empty rewrite */ -> ^(ALT["ALT"] EPSILON["EPSILON"] EOA["EOA"])
 	;
 	
-rewrite_template_block
-    :   lp='(' rewrite_template ')' -> ^(BLOCK[$lp,"BLOCK"] rewrite_template EOB[$lp,"EOB"])
-    ;
-
 rewrite_tree_block
     :   lp='(' rewrite_tree_alternative ')'
     	-> ^(BLOCK[$lp,"BLOCK"] rewrite_tree_alternative EOB[$lp,"EOB"])
@@ -373,7 +370,7 @@ rewrite_tree_element
 		-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] rewrite_tree_atom EOA["EOA"]) EOB["EOB"]))
 	|   rewrite_tree
 		(	ebnfSuffix
-			-> ^(BLOCK["BLOCK"] ^(ALT["ALT"] rewrite_tree EOA["EOA"]) EOB["EOB"])
+			-> ^(ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] rewrite_tree EOA["EOA"]) EOB["EOB"]))
 		|	-> rewrite_tree
 		)
 	|   rewrite_tree_ebnf
@@ -417,10 +414,9 @@ rewrite_tree
  */
 rewrite_template
 	:   // -> template(a={...},...) "..."    inline template
-		{input.LT(1).getText().equals("template")}?
 		id lp='(' rewrite_template_args	')'
-		st=( DOUBLE_QUOTE_STRING_LITERAL | DOUBLE_ANGLE_STRING_LITERAL )
-		-> ^(TEMPLATE[$lp,"TEMPLATE"] id rewrite_template_args $st)
+		( str=DOUBLE_QUOTE_STRING_LITERAL | str=DOUBLE_ANGLE_STRING_LITERAL )
+		-> ^(TEMPLATE[$lp,"TEMPLATE"] id rewrite_template_args $str)
 
 	|	// -> foo(a={...}, ...)
 		rewrite_template_ref
@@ -488,7 +484,7 @@ LITERAL_CHAR
 	;
 
 DOUBLE_QUOTE_STRING_LITERAL
-	:	'"' LITERAL_CHAR* '"'
+	:	'"' (ESC | ~('\\'|'"'))* '"'
 	;
 
 DOUBLE_ANGLE_STRING_LITERAL
@@ -535,7 +531,7 @@ NESTED_ARG_ACTION :
 	|	.
 	)*
 	']'
-	{setText(getText().substring(1, getText().length()-1));}
+	//{setText(getText().substring(1, getText().length()-1));}
 	;
 
 ACTION
@@ -545,7 +541,7 @@ ACTION
 fragment
 NESTED_ACTION :
 	'{'
-	(	options {greedy=false; k=3;}
+	(	options {greedy=false; k=2;}
 	:	NESTED_ACTION
 	|	SL_COMMENT
 	|	ML_COMMENT
@@ -563,7 +559,7 @@ ACTION_CHAR_LITERAL
 
 fragment
 ACTION_STRING_LITERAL
-	:	'"' (ACTION_ESC|~('\\'|'"'))+ '"'
+	:	'"' (ACTION_ESC|~('\\'|'"'))* '"'
 	;
 
 fragment
