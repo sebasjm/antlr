@@ -146,7 +146,8 @@ public class Strip {
 			System.err.println("you need to provide a grammar file.");
 			System.exit(1);
 		}
-		
+
+        /*
 		for (String grammarFileName: grammarFileNames) {
 			CharStream input = new ANTLRFileStream(grammarFileName);
 			// BUILD AST + PARSE TREES
@@ -163,6 +164,7 @@ public class Strip {
 	        //System.out.println("parse tree: "+pt.toStringTree());
 	        System.out.println(pt.toInputString());
 		}
+		*/
 	}
 	
 	public void walkPT(Tree pt) {
