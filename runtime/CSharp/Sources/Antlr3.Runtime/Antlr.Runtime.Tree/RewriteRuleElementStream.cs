@@ -173,7 +173,7 @@ namespace Antlr.Runtime.Tree
 		/// </remarks>
 		public virtual object NextTree()
 		{
-			int size = Size();
+			int size = Count;
 			if ( dirty || ((cursor >= size) && (size == 1)) )
 			{
 				// if out of elements and size is 1, dup
@@ -194,7 +194,7 @@ namespace Antlr.Runtime.Tree
 		/// </remarks>
 		protected object _Next() 
 		{
-			int size = Size();
+			int size = Count;
 			if ( size == 0 ) 
 			{
 				throw new RewriteEmptyStreamException(elementDescription);
@@ -413,7 +413,7 @@ namespace Antlr.Runtime.Tree {
 		/// empty or we're out of elements and size>1.
 		/// </remarks>
 		protected object _Next() {
-			int size = Size();
+			int size = Count;
 			if (size == 0) {
 				throw new RewriteEmptyStreamException(elementDescription);
 			}
@@ -441,15 +441,21 @@ namespace Antlr.Runtime.Tree {
 			return el;
 		}
 
-#warning Size() should be converted into a property named Count.
+		public int Count {
+			get {
+				if (singleElement != null) {
+					return 1;
+				}
+				if (elements != null) {
+					return elements.Count;
+				}
+				return 0;
+			}
+		}
+		
+		[Obsolete("Please use property Count instead.")]
 		public int Size() {
-			if (singleElement != null) {
-				return 1;
-			}
-			if (elements != null) {
-				return elements.Count;
-			}
-			return 0;
+			return Count;
 		}
 
 		public string Description {

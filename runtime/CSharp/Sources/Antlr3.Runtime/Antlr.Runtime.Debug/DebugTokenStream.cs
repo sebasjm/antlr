@@ -152,9 +152,14 @@ namespace Antlr.Runtime.Debug
 			input.Seek(index);
 		}
 		
+		[Obsolete("Please use property Count instead.")]
 		public virtual int Size()
 		{
-			return input.Size();
+			return Count;
+		}
+		
+		public virtual int Count {
+			get { return input.Count; }
 		}
 
 		public virtual ITokenSource TokenSource

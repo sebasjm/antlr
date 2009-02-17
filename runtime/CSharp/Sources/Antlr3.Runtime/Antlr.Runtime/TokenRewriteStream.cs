@@ -648,7 +648,7 @@ namespace Antlr.Runtime
 		
 		public virtual string ToDebugString()
 		{
-			return ToDebugString(MIN_TOKEN_INDEX, Size()-1);
+			return ToDebugString(MIN_TOKEN_INDEX, Count-1);
 		}
 		
 		public virtual string ToDebugString(int start, int end)

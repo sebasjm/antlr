@@ -159,6 +159,30 @@ namespace Antlr.Runtime.Tree
 			set { stopIndex = value; }
 		}
 
+		/// <summary>
+		/// For every node in this subtree, make sure it's start/stop token's
+	    /// are set.  Walk depth first, visit bottom up.  Only updates nodes
+	    /// with at least one token index < 0.
+		/// </summary>
+	    public void SetUnknownTokenBoundaries() {
+	        if ( children==null ) {
+	            if ( startIndex<0 || stopIndex<0 ) {
+	                startIndex = stopIndex = token.getTokenIndex();
+	            }
+	            return;
+	        }
+	        for (int i=0; i<children.Count; i++) {
+	            ((CommonTree)children[i]).SetUnknownTokenBoundaries();
+	        }
+	        if ( startIndex>=0 && stopIndex>=0 ) return; // already set
+	        if ( children.Count > 0 ) {
+	            CommonTree firstChild = (CommonTree)children[0];
+	            CommonTree lastChild = (CommonTree)children[children.size()-1];
+	            startIndex = firstChild.GetTokenStartIndex();
+	            stopIndex = lastChild.GetTokenStopIndex();
+	        }
+	    }
+
 		override public int ChildIndex
 		{
 			get { return childIndex;  }

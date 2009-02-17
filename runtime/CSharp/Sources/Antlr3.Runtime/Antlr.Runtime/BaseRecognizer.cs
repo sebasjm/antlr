@@ -121,11 +121,11 @@ namespace Antlr.Runtime
 		/// </summary>
 		/// <remarks>
 		/// To turn off single token insertion or deletion error
-		/// recovery, override mismatchRecover() and have it call
-		/// plain mismatch(), which does not recover. Then any error
-		/// in a rule will cause an exception and immediate exit from
-		/// rule. Rule would recover by resynchronizing to the set of
-		/// symbols that can follow rule ref.
+		/// recovery, override recoverFromMismatchedToken() and have it call
+		/// pthrow an exception. See TreeParser.RecoverFromMismatchedToken().
+		/// This way any error in a rule will cause an exception and
+     	/// immediate exit from rule.  Rule would recover by resynchronizing
+     	/// to the set of symbols that can follow rule ref.
 		/// </remarks>
 		public virtual object Match(IIntStream input, int ttype, BitSet follow) {
 			object matchedSymbol = GetCurrentInputSymbol(input);
@@ -139,7 +139,6 @@ namespace Antlr.Runtime
 				state.failed = true;
 				return matchedSymbol;
 			}
-			Mismatch(input, ttype, follow);
 			matchedSymbol = RecoverFromMismatchedToken(input, ttype, follow);
 			return matchedSymbol;
 		}
@@ -301,7 +300,7 @@ namespace Antlr.Runtime
 			}
 			else if (e is NoViableAltException)
 			{
-				NoViableAltException nvae = (NoViableAltException)e;
+				//NoViableAltException nvae = (NoViableAltException)e;
 				// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 				// and "(decision="+nvae.decisionNumber+") and
 				// "state "+nvae.stateNumber
@@ -309,7 +308,7 @@ namespace Antlr.Runtime
 			}
 			else if (e is EarlyExitException)
 			{
-				EarlyExitException eee = (EarlyExitException)e;
+				//EarlyExitException eee = (EarlyExitException)e;
 				// for development, can add "(decision="+eee.decisionNumber+")"
 				msg = "required (...)+ loop did not match anything at input " + GetTokenErrorDisplay(e.Token);
 			}
@@ -454,7 +453,7 @@ namespace Antlr.Runtime
 		/// is in the set of tokens that can follow the ')' token
 		/// reference in rule atom.  It can assume that you forgot the ')'.
 		/// </remarks>
-		protected virtual Object RecoverFromMismatchedToken(IIntStream input, int ttype, BitSet follow) {
+		protected internal virtual Object RecoverFromMismatchedToken(IIntStream input, int ttype, BitSet follow) {
 			RecognitionException e = null;
 			// if next token is what we are looking for then "delete" this token
 			if (MismatchIsUnwantedToken(input, ttype)) {
@@ -723,13 +722,14 @@ namespace Antlr.Runtime
 
 		/// <summary>
 		/// Factor out what to do upon token mismatch so tree parsers can behave
-		/// differently.  Override and call MismatchRecover(input, ttype, follow)
+		/// differently.  Override and call RecoverFromMismatchedToken()
 	 	/// to get single token insertion and deletion. Use this to turn off
 		/// single token insertion and deletion. Override mismatchRecover
 		/// to call this instead.
 	    /// 
 	    /// TODO: fix this comment, mismatchRecover doesn't exist, for example
 		/// </summary>
+		/*
 		protected internal virtual void Mismatch(IIntStream input, int ttype, BitSet follow)
 		{
 			if ( MismatchIsUnwantedToken(input, ttype) ) {
@@ -739,7 +739,7 @@ namespace Antlr.Runtime
 				throw new MissingTokenException(ttype, input, null);
 			}
 			throw new MismatchedTokenException(ttype, input);
-		}
+		}*/
 	
 		/*  Compute the error recovery set for the current rule.  During
 		*  rule invocation, the parser pushes the set of tokens that can

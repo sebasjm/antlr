@@ -96,7 +96,7 @@ namespace Antlr.Runtime.Tree
 			{
 				return null;
 			}
-			return (BaseTree) children[i];
+			return (ITree) children[i];
 		}
 
 		/// <summary>
@@ -206,7 +206,7 @@ namespace Antlr.Runtime.Tree
 			{
 				return null;
 			}
-			BaseTree killed = (BaseTree)children[i];
+			ITree killed = (ITree)children[i];
 			children.RemoveAt(i);
 			// walk rest and decrement their child indexes
 			FreshenParentAndChildIndexes(i);
@@ -274,7 +274,6 @@ namespace Antlr.Runtime.Tree
 				for (int c = indexToDelete; c <= stopChildIndex; c++)
 				{
 					// delete same index, shifting everybody down each time
-					BaseTree killed = (BaseTree)children[indexToDelete];
 					children.RemoveAt(indexToDelete);
 				}
 				FreshenParentAndChildIndexes(startChildIndex);
@@ -409,7 +408,7 @@ namespace Antlr.Runtime.Tree
 			}
 			for (int i = 0; children != null && i < children.Count; i++)
 			{
-				BaseTree t = (BaseTree) children[i];
+				ITree t = (ITree) children[i];
 				if (i > 0)
 				{
 					buf.Append(' ');

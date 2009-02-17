@@ -77,7 +77,7 @@ namespace Antlr.Runtime.Debug
 		/// </remarks>
 		public void AddListener(IDebugEventListener listener)
 		{
-			listeners.Add(listeners);
+			listeners.Add(listener);
 		}
 
 		public void EnterRule(string grammarFileName, string ruleName)

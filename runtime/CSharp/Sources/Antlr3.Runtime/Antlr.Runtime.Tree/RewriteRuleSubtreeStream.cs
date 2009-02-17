@@ -80,7 +80,7 @@ namespace Antlr.Runtime.Tree
 		/// </remarks>
 		public object NextNode()
 		{
-			int size = Size();
+			int size = Count;
 			if (dirty || ((cursor >= size) && (size == 1)))
 			{
 				// if out of elements and size is 1, dup (at most a single node
@@ -190,7 +190,7 @@ namespace Antlr.Runtime.Tree {
 		/// </summary>
 		/// <returns><code>true</code>, if positive, <code>false</code>, if negative.</returns>
 		private bool RequiresDuplication() {
-			int size = Size();
+			int size = Count;
 			// if dirty or if out of elements and size is 1
 			return dirty || ((cursor >= size) && (size == 1));
 		}

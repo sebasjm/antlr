@@ -144,9 +144,14 @@ namespace Antlr.Runtime.Debug
 			input.Seek(index);
 		}
 
+		[Obsolete("Please use property Count instead.")]
 		public int Size()
 		{
-			return input.Size();
+			return Count;
+		}
+		
+		public int Count {
+			get { return input.Count; }
 		}
 
 		public object TreeSource

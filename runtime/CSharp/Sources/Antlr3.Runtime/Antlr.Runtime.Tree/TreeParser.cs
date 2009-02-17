@@ -102,80 +102,6 @@ namespace Antlr.Runtime.Tree
 			}
 		}
 
-	    /// <summary>
-	    /// Check if current node in input has a context. Context means sequence
-	    /// of nodes towards root of tree.  For example, you might say context
-	    /// is "MULT" which means my parent must be MULT. "CLASS VARDEF" says
-	    /// current node must be child of a VARDEF and whose parent is a CLASS node.
-	    /// You can use "..." to mean zero-or-more nodes. "METHOD ... VARDEF"
-	    /// means my parent is VARDEF and somewhere above that is a METHOD node.
-	    /// The first node in the context is not necessarily the root. The context
-	    /// matcher stops matching and returns true when it runs out of context.
-	    /// There is no way to force the first node to be the root.
-	    /// </summary>
-	    public bool InContext(string context) {
-	        return InContext(input.TreeAdaptor, TokenNames, input.LT(1), context);
-	    }
-	
-	    /// <summary>
-	    /// The worker for InContext.  It's static and full of parameters for
-	    /// testing purposes.
-	    /// </summary>
-	    public static bool InContext(
-	    	ITreeAdaptor adaptor,
-	        string[] tokenNames,
-	        object t,
-	        string context
-	        ) {
-	        
-	        if (dotdotPattern.IsMatch(context)) { // don't allow "..", must be "..."
-	            throw new ArgumentException("invalid syntax: ..");
-	        }
-	        if (doubleEtcPattern.IsMatch(context)) { // don't allow double "..."
-	            throw new ArgumentException("invalid syntax: ... ...");
-	        }
-	        
-	        context = context.Replace("...", " ... ").Trim(); // ensure spaces around ...
-	        string[] nodes = spacesPattern.Split(context);
-	        int ni = nodes.Length - 1;
-	        t = adaptor.GetParent(t);
-	        while (ni >= 0 && t != null) {
-	            if (nodes[ni] == "...") {
-	                // walk upwards until we see nodes[ni-1] then continue walking
-	                if (ni == 0) return true; // ... at start is no-op
-	                string goal = nodes[ni - 1];
-	                object ancestor = GetAncestor(adaptor, tokenNames, t, goal);
-	                if (ancestor == null) return false;
-	                t = ancestor;
-	                ni--;
-	            }
-	            
-	            string name = tokenNames[adaptor.GetNodeType(t)];
-	            if (name != nodes[ni]) {
-	                //System.err.println("not matched: "+nodes[ni]+" at "+t);
-	                return false;
-	            }
-	            // advance to parent and to previous element in context node list
-	            ni--;
-	            t = adaptor.GetParent(t);
-	        }
-	
-	        if (t == null && ni >= 0) return false; // at root but more nodes to match
-	        return true;
-	    }
-	
-	    /// <summary>
-	    /// Helper for static InContext
-	    /// </summary>
-	    protected static object GetAncestor(ITreeAdaptor adaptor, string[] tokenNames, object t, string goal) {
-	        while (t != null) {
-	            string name = tokenNames[adaptor.GetNodeType(t)];
-	            if (name == goal) return t;
-	            t = adaptor.GetParent(t);
-	        }
-	        return null;
-	    }
-
 		/// <summary>
 		/// Match '.' in tree parser.
 		/// </summary>
@@ -226,7 +152,7 @@ namespace Antlr.Runtime.Tree
 		/// plus we want to alter the exception type. Don't try to recover
 		/// from tree parser errors inline...
 		/// </summary>
-		protected internal override void Mismatch(IIntStream input, int ttype, BitSet follow) {
+		protected internal override object RecoverFromMismatchedToken(IIntStream input, int ttype, BitSet follow) {
 			throw new MismatchedTreeNodeException(ttype, (ITreeNodeStream)input);
 		}
 

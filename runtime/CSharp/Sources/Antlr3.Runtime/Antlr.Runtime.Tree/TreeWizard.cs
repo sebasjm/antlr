@@ -499,7 +499,6 @@ namespace Antlr.Runtime.Tree
 		/// Compare type, structure, and text of two trees, assuming adaptor in
 		/// this instance of a TreeWizard.
 		/// </summary>
-#warning Added "new" modifier to suppress warning (override impossible). Check correctness!
 		public new bool Equals(object t1, object t2)
 		{
 			return _Equals(t1, t2, adaptor);
