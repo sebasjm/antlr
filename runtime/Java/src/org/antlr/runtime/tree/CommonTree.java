@@ -131,6 +131,29 @@ public class CommonTree extends BaseTree {
 		stopIndex = index;
 	}
 
+    /** For every node in this subtree, make sure it's start/stop token's
+     *  are set.  Walk depth first, visit bottom up.  Only updates nodes
+     *  with at least one token index < 0.
+     */
+    public void setUnknownTokenBoundaries() {
+        if ( children==null ) {
+            if ( startIndex<0 || stopIndex<0 ) {
+                startIndex = stopIndex = token.getTokenIndex();
+            }
+            return;
+        }
+        for (int i=0; i<children.size(); i++) {
+            ((CommonTree)children.get(i)).setUnknownTokenBoundaries();
+        }
+        if ( startIndex>=0 && stopIndex>=0 ) return; // already set
+        if ( children.size() > 0 ) {
+            CommonTree firstChild = (CommonTree)children.get(0);
+            CommonTree lastChild = (CommonTree)children.get(children.size()-1);
+            startIndex = firstChild.getTokenStartIndex();
+            stopIndex = lastChild.getTokenStopIndex();
+        }
+    }
+
 	public int getChildIndex() {
 		return childIndex;
 	}

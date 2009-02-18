@@ -12,6 +12,29 @@ February 18, 2008
 * Added org.antlr.tool.Strip (reads from file arg or stdin, emits to stdout)
   to strip actions from a grammar.
 
+February 4, 2009
+
+* Added CommonTree.setUnknownTokenBoundaries().  Sometimes we build trees
+  in a grammar and some of the token boundaries are not set properly.
+  This only matters if you want to print out the original text associated
+  with a subtree.  Check this out rule:
+
+	postfixExpression
+	    :   primary ('.'^ ID)*
+	    ;
+
+  For a.b.c, we get a '.' that does not have the token boundaries set.
+  ANTLR only sets token boundaries for subtrees returned from a rule.
+  SO, the overall '.' operator has the token boundaries set from 'a'
+  to 'c' tokens, but the lower '.' subtree does not get the boundaries
+  set (they are -1,-1).  Calling setUnknownTokenBoundaries() on
+  the returned tree sets the boundaries appropriately according to the
+  children's token boundaries.
+
+January 22, 2009
+
+* fixed to be listeners.add(listener); in addListener() of DebugEventHub.java
+
 January 20, 2009
 
 * Removed runtime method: mismatch in BaseRecognizer and TreeParser.  Seems

@@ -55,7 +55,7 @@ public class DebugEventHub implements DebugEventListener {
 	 *  Don't add events in one thread while parser fires events in another.
 	 */
 	public void addListener(DebugEventListener listener) {
-		listeners.add(listeners);
+		listeners.add(listener);
 	}
 	
 	/* To avoid a mess like this:
