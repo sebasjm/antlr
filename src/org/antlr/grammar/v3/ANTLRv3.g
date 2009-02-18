@@ -54,12 +54,11 @@ tokens {
     ID;
     ARG;
     ARGLIST;
-    RET;
+    RET='returns';
     LEXER_GRAMMAR;
     PARSER_GRAMMAR;
     TREE_GRAMMAR;
     COMBINED_GRAMMAR;
-    INITACTION;
     LABEL; // $x used in rewrite rules
     TEMPLATE;
     SCOPE='scope';
@@ -73,6 +72,9 @@ tokens {
     BANG='!';
     RANGE='..';
     REWRITE='->';
+    AT='@';
+    LABEL_ASSIGN='=';
+    LIST_LABEL_ASSIGN='+=';
 }
 
 @parser::header
@@ -162,7 +164,7 @@ scope {
 		throwsSpec? optionsSpec? ruleScopeSpec? ruleAction*
 		':'	altList	';'
 		exceptionGroup?
-	    -> ^( RULE id {modifier!=null?adaptor.create(modifier):null} ^(ARG $arg)? ^(RET $rt)?
+	    -> ^( RULE id {modifier!=null?adaptor.create(modifier):null} ^(ARG[$arg] $arg)? ^('returns' $rt)?
 	    	  throwsSpec? optionsSpec? ruleScopeSpec? ruleAction*
 	    	  altList
 	    	  exceptionGroup?
@@ -248,7 +250,7 @@ elementNoOptionSpec
 		)
 	|	ebnf
 	|   ACTION
-	|   SEMPRED ( '=>' -> GATED_SEMPRED | -> SEMPRED )
+	|   SEMPRED ( g='=>' -> GATED_SEMPRED[$g] | -> SEMPRED )
 	|   treeSpec
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] treeSpec EOA["EOA"]) EOB["EOB"]) )
 		|				-> treeSpec
