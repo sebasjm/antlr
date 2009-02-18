@@ -28,7 +28,7 @@ public class Strip {
         ANTLRv3Parser g = new ANTLRv3Parser(tokens);
         ANTLRv3Parser.grammarDef_return r = g.grammarDef();
         CommonTree t = (CommonTree)r.getTree();
-        System.out.println(t.toStringTree());
+        //System.out.println(t.toStringTree());
 
         final TreeAdaptor adaptor = g.getTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, g.getTokenNames());
@@ -165,11 +165,11 @@ public class Strip {
         {
             return;
         }
-        System.out.println("ACTION: "+t.getText());
+        //System.out.println("ACTION: "+t.getText());
         CommonTree root = (CommonTree)t.getAncestor(ANTLRv3Parser.RULE);
         if ( root!=null ) {
             CommonTree rule = (CommonTree)root.getChild(0);
-            System.out.println("rule: "+rule);
+            //System.out.println("rule: "+rule);
             if ( !Character.isUpperCase(rule.getText().charAt(0)) ) {
                 tokens.delete(t.getTokenStartIndex(),t.getTokenStopIndex());
                 killTrailingNewline(tokens, t.token.getTokenIndex());
@@ -182,7 +182,7 @@ public class Strip {
         Token after = (Token)all.get(index+1);
         String ws = after.getText();
         if ( ws.startsWith("\n") ) {
-            System.out.println("killing WS after action");
+            //System.out.println("killing WS after action");
             if ( ws.length()>1 ) {
                 tokens.replace(after.getTokenIndex(), ws.substring(1));
             }

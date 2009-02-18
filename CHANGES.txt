@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+February 18, 2008
+
+* Added org.antlr.tool.Strip (reads from file arg or stdin, emits to stdout)
+  to strip actions from a grammar.
+
 November 24, 2008
 
 * null-ptr protected getParent and a few others.
