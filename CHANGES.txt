@@ -12,6 +12,11 @@ February 18, 2008
 * Added org.antlr.tool.Strip (reads from file arg or stdin, emits to stdout)
   to strip actions from a grammar.
 
+December 16, 2008
+
+* Added -verbose cmd-line option and turned off standard header
+  and list of read files.  Silent now without -verbose.
+
 November 24, 2008
 
 * null-ptr protected getParent and a few others.

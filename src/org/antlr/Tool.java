@@ -37,7 +37,7 @@ import java.util.*;
 
 /** The main ANTLR entry point.  Read a grammar and generate a parser. */
 public class Tool {
-    public static final String REV = "-2008-10-21";
+    public static final String REV = "-2009-02-18";
     public static final String VERSION = "3.1.2"+REV;
 
 	public static final String UNINITIALIZED_DIR = "<unset-dir>";
@@ -56,7 +56,9 @@ public class Tool {
 	protected boolean printGrammar = false;
 	protected boolean depend = false;
 	protected boolean forceAllFilesToOutputDir = false;
-	protected boolean deleteTempLexer = true;
+    protected boolean deleteTempLexer = true;
+    protected boolean verbose = false;
+
 
 	// the internal options are for my use on the command line during dev
 
@@ -65,10 +67,11 @@ public class Tool {
 	public static boolean internalOption_ShowNFAConfigsInDFA = false;
 	public static boolean internalOption_watchNFAConversion = false;
 
-	public static void main(String[] args) {
-		ErrorManager.info("ANTLR Parser Generator  Version " +
-						  VERSION); // + " (August 12, 2008)  1989-2008");
+    public static void main(String[] args) {
 		Tool antlr = new Tool(args);
+        if ( antlr.verbose ) {
+            ErrorManager.info("ANTLR Parser Generator  Version " +VERSION);
+        }
 		antlr.process();
 		if ( ErrorManager.getNumErrors() > 0 ) {
 			System.exit(1);
@@ -153,9 +156,12 @@ public class Tool {
 			else if (args[i].equals("-print")) {
 				printGrammar = true;
 			}
-			else if (args[i].equals("-depend")) {
-				depend=true;
-			}
+            else if (args[i].equals("-depend")) {
+                depend=true;
+            }
+            else if (args[i].equals("-verbose")) {
+                verbose=true;
+            }
 			else if (args[i].equals("-message-format")) {
 				if (i + 1 >= args.length) {
 					System.err.println("missing output format with -message-format option; using default");
@@ -263,7 +269,7 @@ public class Tool {
 		String lexerGrammarFileName = null;		// necessary at this scope to have access in the catch below
 		for (int i = 0; i < numFiles; i++) {
 			String grammarFileName = (String) grammarFileNames.get(i);
-			if ( numFiles > 1 && !depend ) {
+			if ( verbose && !depend ) {
 				System.out.println(grammarFileName);
 			}
 			try {
@@ -498,6 +504,7 @@ public class Tool {
 		System.err.println("  -nfa                  generate an NFA for each rule");
 		System.err.println("  -dfa                  generate a DFA for each decision point");
 		System.err.println("  -message-format name  specify output style for messages");
+        System.err.println("  -verbose              generate ANTLR version and other information");
 		System.err.println("  -X                    display extended argument list");
 	}
 
