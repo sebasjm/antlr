@@ -91,11 +91,11 @@ public abstract class BaseRecognizer {
 	 *  that fails, throw MismatchedTokenException.
 	 *
 	 *  To turn off single token insertion or deletion error
-	 *  recovery, override mismatchRecover() and have it call
-	 *  plain mismatch(), which does not recover.  Then any error
-	 *  in a rule will cause an exception and immediate exit from
-	 *  rule.  Rule would recover by resynchronizing to the set of
-	 *  symbols that can follow rule ref.
+	 *  recovery, override recoverFromMismatchedToken() and have it
+     *  throw an exception. See TreeParser.recoverFromMismatchedToken().
+     *  This way any error in a rule will cause an exception and
+     *  immediate exit from rule.  Rule would recover by resynchronizing
+     *  to the set of symbols that can follow rule ref.
 	 */
 	public Object match(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
@@ -159,13 +159,12 @@ public abstract class BaseRecognizer {
 	}
 
 	/** Factor out what to do upon token mismatch so tree parsers can behave
-	 *  differently.  Override and call mismatchRecover(input, ttype, follow)
+	 *  differently.  Override and call recoverFromMismatchedToken()
 	 *  to get single token insertion and deletion.  Use this to turn of
 	 *  single token insertion and deletion. Override mismatchRecover
 	 *  to call this instead.
      *
      * TODO: fix this comment, mismatchRecover doesn't exist, for example
-	 */
 	protected void mismatch(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException
 	{
@@ -177,6 +176,7 @@ public abstract class BaseRecognizer {
 		}
 		throw new MismatchedTokenException(ttype, input);
 	}
+     */
 
 	/** Report a recognition problem.
 	 *
@@ -286,14 +286,14 @@ public abstract class BaseRecognizer {
 				" expecting "+tokenName;
 		}
 		else if ( e instanceof NoViableAltException ) {
-			NoViableAltException nvae = (NoViableAltException)e;
+			//NoViableAltException nvae = (NoViableAltException)e;
 			// for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
 			// and "(decision="+nvae.decisionNumber+") and
 			// "state "+nvae.stateNumber
 			msg = "no viable alternative at input "+getTokenErrorDisplay(e.token);
 		}
 		else if ( e instanceof EarlyExitException ) {
-			EarlyExitException eee = (EarlyExitException)e;
+			//EarlyExitException eee = (EarlyExitException)e;
 			// for development, can add "(decision="+eee.decisionNumber+")"
 			msg = "required (...)+ loop did not match anything at input "+
 				getTokenErrorDisplay(e.token);

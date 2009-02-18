@@ -53,7 +53,7 @@ public abstract class BaseTree implements Tree {
 		if ( children==null || i>=children.size() ) {
 			return null;
 		}
-		return (BaseTree)children.get(i);
+		return (Tree)children.get(i);
 	}
 
 	/** Get the children internal List; note that if you directly mess with
@@ -155,7 +155,7 @@ public abstract class BaseTree implements Tree {
 		if ( children==null ) {
 			return null;
 		}
-		BaseTree killed = (BaseTree)children.remove(i);
+		Tree killed = (Tree)children.remove(i);
 		// walk rest and decrement their child indexes
 		this.freshenParentAndChildIndexes(i);
 		return killed;
@@ -209,7 +209,7 @@ public abstract class BaseTree implements Tree {
 			int indexToDelete = startChildIndex+numNewChildren;
 			for (int c=indexToDelete; c<=stopChildIndex; c++) {
 				// delete same index, shifting everybody down each time
-				BaseTree killed = (BaseTree)children.remove(indexToDelete);
+				children.remove(indexToDelete);
 			}
 			freshenParentAndChildIndexes(startChildIndex);
 		}
@@ -324,7 +324,7 @@ public abstract class BaseTree implements Tree {
 			buf.append(' ');
 		}
 		for (int i = 0; children!=null && i < children.size(); i++) {
-			BaseTree t = (BaseTree) children.get(i);
+			Tree t = (Tree)children.get(i);
 			if ( i>0 ) {
 				buf.append(' ');
 			}
