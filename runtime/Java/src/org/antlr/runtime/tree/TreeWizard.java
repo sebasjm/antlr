@@ -151,6 +151,7 @@ public class TreeWizard {
 
 	/** Using the map of token names to token types, return the type. */
 	public int getTokenType(String tokenName) {
+        System.out.println("getTokenType: "+tokenName);
 	 	if ( tokenNameToTypeMap==null ) {
 			 return Token.INVALID_TOKEN_TYPE;
 		 }
@@ -326,33 +327,32 @@ public class TreeWizard {
 	 *  text arguments on nodes.  Fill labels map with pointers to nodes
 	 *  in tree matched against nodes in pattern with labels.
 	 */
-	protected boolean _parse(Object t1, TreePattern t2, Map labels) {
+	protected boolean _parse(Object t1, TreePattern tpattern, Map labels) {
 		// make sure both are non-null
-		if ( t1==null || t2==null ) {
+		if ( t1==null || tpattern==null ) {
 			return false;
 		}
 		// check roots (wildcard matches anything)
-		if ( t2.getClass() != WildcardTreePattern.class ) {
-			if ( adaptor.getType(t1) != t2.getType() ) {
-				return false;
-			}
-			if ( t2.hasTextArg && !adaptor.getText(t1).equals(t2.getText()) ) {
+		if ( tpattern.getClass() != WildcardTreePattern.class ) {
+			if ( adaptor.getType(t1) != tpattern.getType() ) return false;
+            // if pattern has text, check node text
+			if ( tpattern.hasTextArg && !adaptor.getText(t1).equals(tpattern.getText()) ) {
 				return false;
 			}
 		}
-		if ( t2.label!=null && labels!=null ) {
+		if ( tpattern.label!=null && labels!=null ) {
 			// map label in pattern to node in t1
-			labels.put(t2.label, t1);
+			labels.put(tpattern.label, t1);
 		}
 		// check children
 		int n1 = adaptor.getChildCount(t1);
-		int n2 = t2.getChildCount();
+		int n2 = tpattern.getChildCount();
 		if ( n1 != n2 ) {
 			return false;
 		}
 		for (int i=0; i<n1; i++) {
 			Object child1 = adaptor.getChild(t1, i);
-			TreePattern child2 = (TreePattern)t2.getChild(i);
+			TreePattern child2 = (TreePattern)tpattern.getChild(i);
 			if ( !_parse(child1, child2, labels) ) {
 				return false;
 			}
