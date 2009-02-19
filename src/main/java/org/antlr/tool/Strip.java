@@ -32,7 +32,6 @@ public class Strip {
 
         final TreeAdaptor adaptor = g.getTreeAdaptor();
         TreeWizard wiz = new TreeWizard(adaptor, g.getTokenNames());
-        //CommonTree t = (CommonTree)wiz.create("(A B C (A[foo] B[bar]) (D (A[big] B[dog])))");
 
         // ACTIONS STUFF
         wiz.visit(t, ANTLRv3Parser.ACTION,
@@ -44,18 +43,18 @@ public class Strip {
             new TreeWizard.Visitor() {
               public void visit(Object t) {
                   CommonTree a = (CommonTree)t;
-                  if ( a.getChildCount()>=2 ) {
-                      CommonTree action = (CommonTree)a.getChild(1);
-                      if ( action.getType()==ANTLRv3Parser.ACTION ) {
-                          tokens.delete(a.getTokenStartIndex(),
-                                        a.getTokenStopIndex());
-                          killTrailingNewline(tokens, a.getTokenStopIndex());
-                      }
+                  CommonTree action = null;
+                  if ( a.getChildCount()==2 ) action = (CommonTree)a.getChild(1);
+                  else if ( a.getChildCount()==3 ) action = (CommonTree)a.getChild(2);
+                  if ( action.getType()==ANTLRv3Parser.ACTION ) {
+                      tokens.delete(a.getTokenStartIndex(),
+                                    a.getTokenStopIndex());
+                      killTrailingNewline(tokens, action.getTokenStopIndex());
                   }
               }
             });
         wiz.visit(t, ANTLRv3Parser.ARG, // wipe rule arguments
-            new TreeWizard.Visitor() {
+                  new TreeWizard.Visitor() {
               public void visit(Object t) {
                   CommonTree a = (CommonTree)t;
                   a = (CommonTree)a.getChild(0);
@@ -179,12 +178,22 @@ public class Strip {
 
     private static void killTrailingNewline(TokenRewriteStream tokens, int index) {
         List all = tokens.getTokens();
+        Token tok = (Token)all.get(index);
         Token after = (Token)all.get(index+1);
         String ws = after.getText();
         if ( ws.startsWith("\n") ) {
             //System.out.println("killing WS after action");
             if ( ws.length()>1 ) {
-                tokens.replace(after.getTokenIndex(), ws.substring(1));
+                int space = ws.indexOf(' ');
+                int tab = ws.indexOf('\t');
+                if ( ws.startsWith("\n") &&
+                     space>=0 || tab>=0 )
+                {
+                    return; // do nothing if \n + indent
+                }
+                // otherwise kill all \n
+                ws = ws.replaceAll("\n", "");
+                tokens.replace(after.getTokenIndex(), ws);
             }
             else {
                 tokens.delete(after.getTokenIndex());
