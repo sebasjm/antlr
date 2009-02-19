@@ -1,5 +1,5 @@
-ANTLR v3.1.1
-October 1, 2008
+ANTLR v3.1.2
+February 22, 2009
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -28,6 +28,8 @@ The book will also help you a great deal (printed May 15, 2007); you
 can also buy the PDF:
 
     http://www.pragmaticprogrammer.com/titles/tpantlr/index.html
+
+(New book coming out in beta Summer 2009: "Language Design Patterns")
 
 See the getting started document:
 
@@ -106,13 +108,13 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.1.1/README.txt (this file)
-antlr-3.1.1/LICENSE.txt
-antlr-3.1.1/src/org/antlr/...
-antlr-3.1.1/lib/stringtemplate-3.2.jar
-antlr-3.1.1/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
-antlr-3.1.1/lib/antlr-3.1.1.jar (all jars combined, runtime and tools)
-antlr-3.1.1/lib/antlr-3.1.1.-runime.jar (only what is needed to use ANTLR parsers)
+antlr-3.1.2/README.txt (this file)
+antlr-3.1.2/LICENSE.txt
+antlr-3.1.2/src/org/antlr/...
+antlr-3.1.2/lib/stringtemplate-3.2.jar
+antlr-3.1.2/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
+antlr-3.1.2/lib/antlr-3.1.2.jar (all jars combined, runtime and tools)
+antlr-3.1.2/lib/antlr-runtime-3.1.2.jar (only what is needed to use ANTLR parsers)
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
