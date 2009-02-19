@@ -121,7 +121,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		/// <remarks>
 		/// To turn off single token insertion or deletion error
-		/// recovery, override recoverFromMismatchedToken() and have it call
+		/// recovery, override RecoverFromMismatchedToken() and have it call
 		/// pthrow an exception. See TreeParser.RecoverFromMismatchedToken().
 		/// This way any error in a rule will cause an exception and
      	/// immediate exit from rule.  Rule would recover by resynchronizing
