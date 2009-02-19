@@ -108,29 +108,7 @@
     </dependencies>
     
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        
-        <resources>
-            <resource>
-                <directory>src</directory>
-                <includes>
-                    <include>**/*.st</include>
-                    <include>**/*.stg</include>
-                    <include>**/*.sti</include>
-               </includes>
-           </resource>
-        </resources>
-        
-        <testSourceDirectory>test</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>src</directory>
-            </testResource>
-            <testResource>
-                <directory>test</directory>
-            </testResource>
-        </testResources>
-        
+      
          <defaultGoal>install</defaultGoal>
          
         <plugins>
@@ -155,7 +133,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>antlr-maven-plugin</artifactId>
                 <configuration>
-                    <sourceDirectory>src/org/antlr/grammar/v2</sourceDirectory>
+                    <sourceDirectory>src/main/antlr2/org/antlr/grammar/v2</sourceDirectory>
                     <grammars>antlr.g codegen.g, antlr.print.g, assign.types.g, buildnfa.g, define.g</grammars>
                 </configuration>
                 <executions>
