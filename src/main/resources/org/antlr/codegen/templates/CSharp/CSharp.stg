@@ -57,6 +57,8 @@ outputFile(LEXER,PARSER,TREE_PARSER, actionScope, actions,
 	   scopes, superClass, literals) ::=
 <<
 // $ANTLR <ANTLRVersion> <fileName> <generatedTimestamp>
+
+<@debugPreprocessor()>
 <if(actions.(actionScope).namespace)>
 namespace <actions.(actionScope).namespace>
 {
@@ -663,10 +665,10 @@ do
 		default:
 		    if ( cnt<decisionNumber> >= 1 ) goto loop<decisionNumber>;
 		    <ruleBacktrackFailure()>
-	            EarlyExitException eee =
+	            EarlyExitException eee<decisionNumber> =
 	                new EarlyExitException(<decisionNumber>, input);
 	            <@earlyExitException()>
-	            throw eee;
+	            throw eee<decisionNumber>;
     }
     cnt<decisionNumber>++;
 } while (true);
@@ -1141,10 +1143,10 @@ protected internal int DFA<dfa.decisionNumber>_SpecialStateTransition(DFA dfa, i
 <if(backtracking)>
     if (state.backtracking > 0) {state.failed = true; return -1;}<\n>
 <endif>
-    NoViableAltException nvae =
+    NoViableAltException nvae<dfa.decisionNumber> =
         new NoViableAltException(dfa.Description, <dfa.decisionNumber>, _s, input);
-    dfa.Error(nvae);
-    throw nvae;
+    dfa.Error(nvae<dfa.decisionNumber>);
+    throw nvae<dfa.decisionNumber>;
 }<\n>
 <endif>
 >>

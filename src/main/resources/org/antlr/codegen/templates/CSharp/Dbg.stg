@@ -32,6 +32,8 @@
  */
 group Dbg;
 
+@outputFile.debugPreprocessor() ::= "#define ANTLR_DEBUG"
+
 @outputFile.imports() ::= <<
 <@super.imports()>
 using Antlr.Runtime.Debug;
