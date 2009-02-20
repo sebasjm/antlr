@@ -158,26 +158,6 @@ public abstract class BaseRecognizer {
 		return false;
 	}
 
-	/** Factor out what to do upon token mismatch so tree parsers can behave
-	 *  differently.  Override and call recoverFromMismatchedToken()
-	 *  to get single token insertion and deletion.  Use this to turn of
-	 *  single token insertion and deletion. Override mismatchRecover
-	 *  to call this instead.
-     *
-     * TODO: fix this comment, mismatchRecover doesn't exist, for example
-	protected void mismatch(IntStream input, int ttype, BitSet follow)
-		throws RecognitionException
-	{
-		if ( mismatchIsUnwantedToken(input, ttype) ) {
-			throw new UnwantedTokenException(ttype, input);
-		}
-		else if ( mismatchIsMissingToken(input, follow) ) {
-			throw new MissingTokenException(ttype, input, null);
-		}
-		throw new MismatchedTokenException(ttype, input);
-	}
-     */
-
 	/** Report a recognition problem.
 	 *
 	 *  This method sets errorRecovery to indicate the parser is recovering
