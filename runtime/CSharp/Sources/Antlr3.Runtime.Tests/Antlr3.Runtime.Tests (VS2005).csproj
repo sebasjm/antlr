@@ -63,11 +63,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <GtkDesignInfo />
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
 </Project>

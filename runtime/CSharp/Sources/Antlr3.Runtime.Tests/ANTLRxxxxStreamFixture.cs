@@ -76,7 +76,7 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(new byte[] { });
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, Encoding.Unicode);
-			Assert.AreEqual(0, inputStream.Size());
+			Assert.AreEqual(0, inputStream.Count);
 		}
 
 		[Test]
@@ -87,7 +87,7 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(grammarStrBuffer);
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, Encoding.Unicode);
-			Assert.AreEqual(grammarStr.Length, inputStream.Size());
+			Assert.AreEqual(grammarStr.Length, inputStream.Count);
 		}
 
 		[Test]
@@ -106,11 +106,11 @@ namespace Antlr.Runtime.Tests
 			inputStream.Consume();
 			Assert.AreEqual(2, inputStream.Index());
 
-			while (inputStream.Index() < inputStream.Size())
+			while (inputStream.Index() < inputStream.Count)
 			{
 				inputStream.Consume();
 			}
-			Assert.AreEqual(inputStream.Index(), inputStream.Size());
+			Assert.AreEqual(inputStream.Index(), inputStream.Count);
 		}
 
 		[Test]
@@ -121,12 +121,12 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(grammarStrBuffer);
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, Encoding.Unicode);
-			while (inputStream.Index() < inputStream.Size())
+			while (inputStream.Index() < inputStream.Count)
 			{
 				Console.Out.Write((char)inputStream.LA(1));
 				inputStream.Consume();
 			}
-			Assert.AreEqual(inputStream.Index(), inputStream.Size());
+			Assert.AreEqual(inputStream.Index(), inputStream.Count);
 		}
 
 		[Test]
@@ -292,7 +292,7 @@ namespace Antlr.Runtime.Tests
 		public void TestSizeOnEmptyANTLRStringStream()
 		{
 			ANTLRStringStream s1 = new ANTLRStringStream("");
-			Assert.AreEqual(0, s1.Size());
+			Assert.AreEqual(0, s1.Count);
 			Assert.AreEqual(0, s1.Index());
 		}
 
@@ -300,13 +300,13 @@ namespace Antlr.Runtime.Tests
 		public void TestSizeOnANTLRStringStream()
 		{
 			ANTLRStringStream s1 = new ANTLRStringStream("lexer\r\n");
-			Assert.AreEqual(7, s1.Size());
+			Assert.AreEqual(7, s1.Count);
 
 			ANTLRStringStream s2 = new ANTLRStringStream(grammarStr);
-			Assert.AreEqual(grammarStr.Length, s2.Size());
+			Assert.AreEqual(grammarStr.Length, s2.Count);
 
 			ANTLRStringStream s3 = new ANTLRStringStream("grammar P;");
-			Assert.AreEqual(10, s3.Size());
+			Assert.AreEqual(10, s3.Count);
 		}
 
 		[Test]

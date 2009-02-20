@@ -200,10 +200,10 @@ namespace Antlr.Runtime.Tree {
 		/// Return the next element in the stream.
 		/// </summary>
 		/// <remarks>
-		/// If out of elements, throw an exception unless Size()==1.
-		/// If Size() is 1, then return elements[0].
+		/// If out of elements, throw an exception unless Count==1.
+		/// If Count is 1, then return elements[0].
 		/// Return a duplicate node/subtree if stream is out of 
-		/// elements and Size()==1.
+		/// elements and Count==1.
 		/// If we've already used the element, dup (dirty bit set).
 		/// </remarks>
 		public override object NextTree() {

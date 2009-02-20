@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -19,9 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <OutputType>Library</OutputType>
-    <AssemblyName>Antlr3.Utility</AssemblyName>
     <RootNamespace>Antlr.Utility</RootNamespace>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,10 +32,8 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\net-2.0\Antlr3.Utility.XML</DocumentationFile>
     <OutputType>Library</OutputType>
-    <AssemblyName>Antlr3.Utility</AssemblyName>
     <DebugSymbols>true</DebugSymbols>
     <RootNamespace>Antlr.Utility</RootNamespace>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <ItemGroup>
@@ -44,9 +41,9 @@
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Antlr3.Runtime\Antlr3.Runtime %2528VS2005%2529.csproj">
+    <ProjectReference Include="..\Antlr3.Runtime\Antlr3.Runtime (VS2005).csproj">
       <Project>{CF15D0D5-BE72-4F98-B70F-229ABA1DF0E8}</Project>
-      <Name>Antlr3.Runtime %28VS2005%29</Name>
+      <Name>Antlr3.Runtime (VS2005)</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -56,7 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <Folder Include="Properties/" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

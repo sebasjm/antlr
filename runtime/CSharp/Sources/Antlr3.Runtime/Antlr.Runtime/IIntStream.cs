@@ -70,7 +70,7 @@ namespace Antlr.Runtime
 		/// read not the most recently read symbol.
 		/// </summary>
 		int Index();
-
+		
         /// <summary>
 		/// Resets the stream so that the next call to 
         /// <see cref="IIntStream.Index"/> would  return marker.
@@ -84,7 +84,7 @@ namespace Antlr.Runtime
         /// this routine must unroll them like a stack.  Assumes the state the 
         /// stream was in when this marker was created.
         /// </remarks>
-		void  Rewind(int marker);
+		void Rewind(int marker);
 		
 		/// <summary>
 		/// Rewind to the input position of the last marker.
@@ -146,7 +146,16 @@ namespace Antlr.Runtime
         /// but might be useful to display the entire stream or for testing.
 		/// This value includes a single EOF.
         /// </remarks>
+        [Obsolete("Please use property Count instead.")]
 		int Size();
+		
+		/// <summary>Returns the size of the entire stream.</summary>
+        /// <remarks>
+        /// Only makes sense for streams that buffer everything up probably, 
+        /// but might be useful to display the entire stream or for testing.
+		/// This value includes a single EOF.
+        /// </remarks>
+        int Count { get; }
 
 		/// <summary>
 		/// Where are you getting symbols from?  Normally, implementations will

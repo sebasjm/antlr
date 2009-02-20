@@ -197,24 +197,27 @@ namespace Antlr.Runtime
             return s;
         }
 
-        public virtual int Size()
+        public virtual int Count
         {
-            int deg = 0;
-            for (int i = bits.Length - 1; i >= 0; i--)
-            {
-                ulong word = bits[i];
-                if (word != 0L)
-                {
-                    for (int bit = BITS - 1; bit >= 0; bit--)
-                    {
-                        if ((word & (1UL << bit)) != 0)
-                        {
-                            deg++;
-                        }
-                    }
-                }
-            }
-            return deg;
+	    get
+	    {
+		int deg = 0;
+		for (int i = bits.Length - 1; i >= 0; i--)
+		{
+		    ulong word = bits[i];
+		    if (word != 0L)
+		    {
+			for (int bit = BITS - 1; bit >= 0; bit--)
+			{
+			    if ((word & (1UL << bit)) != 0)
+			    {
+				deg++;
+			    }
+			}
+		    }
+		}
+		return deg;
+		}
         }
 
         public virtual bool Member(int el)
@@ -254,7 +257,7 @@ namespace Antlr.Runtime
 
         public virtual int[] ToArray()
         {
-            int[] elems = new int[Size()];
+            int[] elems = new int[Count];
             int en = 0;
             for (int i = 0; i < (bits.Length << LOG_BITS); i++)
             {

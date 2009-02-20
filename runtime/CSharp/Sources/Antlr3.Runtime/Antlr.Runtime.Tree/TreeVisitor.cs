@@ -26,9 +26,9 @@ namespace Antlr.Runtime.Tree {
 	    /// Return result of applying post action to this node.
 		/// </summary>
 	    public object Visit(object t, ITreeVisitorAction action) {
-	        boolean isNil = adaptor.IsNil(t);
+	        bool isNil = adaptor.IsNil(t);
 	        if ( action!=null && !isNil ) {
-	            t = action.pre(t); // if rewritten, walk children of new t
+	            t = action.Pre(t); // if rewritten, walk children of new t
 	        }
 	        int n = adaptor.GetChildCount(t);
 	        for (int i=0; i<n; i++) {
@@ -39,7 +39,7 @@ namespace Antlr.Runtime.Tree {
 	                adaptor.SetChild(t, i, visitResult);
 	            }
 	        }
-	        if ( action!=null && !isNil ) t = action.post(t);
+	        if ( action!=null && !isNil ) t = action.Post(t);
 	        return t;
 	    }
 	}

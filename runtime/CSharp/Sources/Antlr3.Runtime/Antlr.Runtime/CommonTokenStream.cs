@@ -267,9 +267,15 @@ namespace Antlr.Runtime
 			p = index;
 		}
 
+		[Obsolete("Please use the property Count instead.")]
 		public virtual int Size()
 		{
-			return tokens.Count;
+			return Count;
+		}
+		
+		public virtual int Count
+		{
+			get { return tokens.Count; }
 		}
 		
 		#endregion

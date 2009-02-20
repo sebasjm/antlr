@@ -642,7 +642,7 @@ namespace Antlr.Runtime.Tests
 		public string GetStringOfEntireStreamContentsWithNodeTypesOnly(ITreeNodeStream nodes)
 		{
 			StringBuilder buf = new StringBuilder();
-			for (int i = 0; i < nodes.Size(); i++)
+			for (int i = 0; i < nodes.Count; i++)
 			{
 				object t = nodes.LT(i + 1);
 				int type = nodes.TreeAdaptor.GetNodeType(t);

@@ -175,9 +175,18 @@ namespace Antlr.Runtime
 		/// <summary>
 		/// Returns the size of the stream
 		/// </summary>
+		[Obsolete("Please use property Count instead.")]
 		public virtual int Size()
         {
-			return n;
+			return Count;
+        }
+
+		/// <summary>
+		/// Returns the size of the stream
+		/// </summary>
+		public virtual int Count
+        {
+			get { return n; }
         }
 
         public virtual int Mark()

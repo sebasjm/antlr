@@ -528,15 +528,29 @@ namespace Antlr.Runtime.Tree
 		/// This method only returns how much input has been seen so far.  So
 		/// after parsing it returns true size.
 		/// </summary>
+		[Obsolete("Please use property Count instead.")]
 		public virtual int Size()
 		{
-			if ( p == -1 ) 
-			{
-				FillBuffer();
-			}
-			return nodes.Count;
+			return Count;
 		}
 
+		/// <summary>
+		/// Expensive to compute so I won't bother doing the right thing.
+		/// This method only returns how much input has been seen so far.  So
+		/// after parsing it returns true size.
+		/// </summary>
+		public virtual int Count
+		{
+			get
+			{
+				if ( p == -1 ) 
+				{
+					FillBuffer();
+				}
+				return nodes.Count;
+			}
+		}
+		
 		#endregion
 
 		/// <summary>
@@ -605,7 +619,7 @@ namespace Antlr.Runtime.Tree
 				}
 				else if ( adaptor.GetNodeType(stop) == Token.EOF ) 
 				{
-					endTokenIndex = Size()-2; // don't use EOF
+					endTokenIndex = Count-2; // don't use EOF
 				}
 				return tokens.ToString(beginTokenIndex, endTokenIndex);
 			}

@@ -414,7 +414,7 @@ namespace Antlr.Runtime
 		
 		public virtual string ToOriginalString()
 		{
-			return ToOriginalString(MIN_TOKEN_INDEX, Size() - 1);
+			return ToOriginalString(MIN_TOKEN_INDEX, Count - 1);
 		}
 		
 		public virtual string ToOriginalString(int start, int end)
@@ -429,12 +429,12 @@ namespace Antlr.Runtime
 		
 		public override string ToString()
 		{
-			return ToString(MIN_TOKEN_INDEX, Size()-1);
+			return ToString(MIN_TOKEN_INDEX, Count-1);
 		}
 		
 		public virtual string ToString(string programName)
 		{
-			return ToString(programName, MIN_TOKEN_INDEX, Size()-1);
+			return ToString(programName, MIN_TOKEN_INDEX, Count-1);
 		}
 		
 		public override string ToString(int start, int end)

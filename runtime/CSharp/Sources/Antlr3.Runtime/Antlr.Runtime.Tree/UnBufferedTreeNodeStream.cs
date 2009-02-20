@@ -464,11 +464,26 @@ namespace Antlr.Runtime.Tree
 		/// in CommonTreeNodeStream as we only really use this
 		/// for testing.
 		/// </summary>
+		[Obsolete("Please use property Count instead.")]
 		public virtual int Size()
 		{
-			CommonTreeNodeStream s = new CommonTreeNodeStream(root);
-			return s.Size();
+			return Count;
 
+		}
+		
+		/// <summary>
+		/// Expensive to compute; recursively walk tree to find size;
+		/// include navigation nodes and EOF.  Reuse functionality
+		/// in CommonTreeNodeStream as we only really use this
+		/// for testing.
+		/// </summary>
+		public virtual int Count
+		{
+			get
+			{
+				CommonTreeNodeStream s = new CommonTreeNodeStream(root);
+				return s.Count;
+			}
 		}
 		
 		// Satisfy Java's Iterator interface
@@ -635,7 +650,7 @@ namespace Antlr.Runtime.Tree
 				}
 				else 
 				{
-					endTokenIndex = Size()-1;
+					endTokenIndex = Count-1;
 				}
 				return tokens.ToString(beginTokenIndex, endTokenIndex);
 			}

@@ -167,7 +167,7 @@ namespace Antlr.Runtime.Tree
 	    public void SetUnknownTokenBoundaries() {
 	        if ( children==null ) {
 	            if ( startIndex<0 || stopIndex<0 ) {
-	                startIndex = stopIndex = token.getTokenIndex();
+	                startIndex = stopIndex = token.TokenIndex;
 	            }
 	            return;
 	        }
@@ -177,9 +177,9 @@ namespace Antlr.Runtime.Tree
 	        if ( startIndex>=0 && stopIndex>=0 ) return; // already set
 	        if ( children.Count > 0 ) {
 	            CommonTree firstChild = (CommonTree)children[0];
-	            CommonTree lastChild = (CommonTree)children[children.size()-1];
-	            startIndex = firstChild.GetTokenStartIndex();
-	            stopIndex = lastChild.GetTokenStopIndex();
+	            CommonTree lastChild = (CommonTree)children[children.Count-1];
+	            startIndex = firstChild.TokenStartIndex;
+	            stopIndex = lastChild.TokenStopIndex;
 	        }
 	    }
 
