@@ -301,7 +301,7 @@ if ( <actions.(actionScope).synpredgate> ) {<\n>
 <if(!ruleDescriptor.isSynPred)>
 	retval.stop = LT(-1);<\n>
 <endif>
-	retval.tree = ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
+	retval.tree = (<ASTLabelType>)ADAPTOR->rulePostProcessing(ADAPTOR, root_0);
 <if(backtracking)>
 }
 <endif>
