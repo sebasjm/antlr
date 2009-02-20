@@ -87,9 +87,9 @@ typedef	struct ANTLR3_BASE_TREE_ADAPTOR_struct
 
     void *	   			 	(*rulePostProcessing)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, void * root);
 
-    void *	   			 	(*becomeRootToken)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_COMMON_TOKEN newRoot, void * oldRoot);
+    void *	   			 	(*becomeRootToken)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, void * newRoot, void * oldRoot);
 
-    void *	   		 		(*create)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adpator, pANTLR3_COMMON_TOKEN payload);
+    void *	   		 		(*create)				(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, pANTLR3_COMMON_TOKEN payload);
     void *	   		 		(*createTypeToken)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken);
     void *	   				(*createTypeTokenText)	(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text);
     void *	    			(*createTypeText)		(struct ANTLR3_BASE_TREE_ADAPTOR_struct * adaptor, ANTLR3_UINT32 tokenType, pANTLR3_UINT8 text);

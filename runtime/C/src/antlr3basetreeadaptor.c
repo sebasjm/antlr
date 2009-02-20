@@ -53,8 +53,8 @@ static	pANTLR3_BASE_TREE	dbgBecomeRoot			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pAN
 static	pANTLR3_BASE_TREE	rulePostProcessing		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE root);
 static	void				addChildToken			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child);
 static	void				dbgAddChildToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t, pANTLR3_COMMON_TOKEN child);
-static	pANTLR3_BASE_TREE	becomeRootToken			(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot);
-static	pANTLR3_BASE_TREE	dbgBecomeRootToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot);
+static	pANTLR3_BASE_TREE	becomeRootToken			(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * newRoot, pANTLR3_BASE_TREE oldRoot);
+static	pANTLR3_BASE_TREE	dbgBecomeRootToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * newRoot, pANTLR3_BASE_TREE oldRoot);
 static	pANTLR3_BASE_TREE	createTypeToken			(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken);
 static	pANTLR3_BASE_TREE	dbgCreateTypeToken		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken);
 static	pANTLR3_BASE_TREE	createTypeTokenText		(pANTLR3_BASE_TREE_ADAPTOR adaptor, ANTLR3_UINT32 tokenType, pANTLR3_COMMON_TOKEN fromToken, pANTLR3_UINT8 text);
@@ -91,7 +91,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 																				becomeRoot;
 		adaptor->addChildToken			= (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN))	
 																				addChildToken;
-		adaptor->becomeRootToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN, void *))	
+		adaptor->becomeRootToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))
 																				becomeRootToken;
 		adaptor->createTypeToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_COMMON_TOKEN))
 																				createTypeToken;
@@ -112,7 +112,7 @@ antlr3BaseTreeAdaptorInit(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_DEBUG_EVENT
 																				dbgBecomeRoot;
 		adaptor->addChildToken			= (void   (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, pANTLR3_COMMON_TOKEN))
                                                                                 dbgAddChildToken;
-		adaptor->becomeRootToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, pANTLR3_COMMON_TOKEN, void *))
+		adaptor->becomeRootToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, void *, void *))
                                                                                 dbgBecomeRootToken;
 		adaptor->createTypeToken		= (void * (*)(pANTLR3_BASE_TREE_ADAPTOR, ANTLR3_UINT32, pANTLR3_COMMON_TOKEN))
                                                                                 dbgCreateTypeToken;
@@ -630,12 +630,12 @@ static	pANTLR3_BASE_TREE
  *  to the root of the tree.
  */
 static	pANTLR3_BASE_TREE	
-   becomeRootToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot)
+   becomeRootToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * newRoot, pANTLR3_BASE_TREE oldRoot)
 {
 	return	adaptor->becomeRoot(adaptor, adaptor->create(adaptor, newRoot), oldRoot);
 }
 static	pANTLR3_BASE_TREE	
-dbgBecomeRootToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_COMMON_TOKEN newRoot, pANTLR3_BASE_TREE oldRoot)
+dbgBecomeRootToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * newRoot, pANTLR3_BASE_TREE oldRoot)
 {
 	pANTLR3_BASE_TREE	t;
 

@@ -435,12 +435,6 @@ getType		(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
     return  t->getType(t);
 }
 
-static	pANTLR3_COMMON_TOKEN    
-getToken	(pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE t)
-{
-	return t->getToken(t);
-}
-
 static	void					
 replaceChildren
 (pANTLR3_BASE_TREE_ADAPTOR adaptor, pANTLR3_BASE_TREE parent, ANTLR3_INT32 startChildIndex, ANTLR3_INT32 stopChildIndex, pANTLR3_BASE_TREE t)
