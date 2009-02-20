@@ -4,7 +4,7 @@
     <groupId>org.antlr</groupId>
     <artifactId>antlr</artifactId>
     <packaging>jar</packaging>
-    <version>3.1.2-SNAPSHOT</version>
+    <version>3.1.2</version>
     <name>antlr</name>
     <url>http://maven.apache.org</url>
 
@@ -94,14 +94,14 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr-runtime</artifactId>
-            <version>3.1.2-SNAPSHOT</version>
+            <version>3.1.2</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>gunit</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <version>1.0.5</version>
             <scope>compile</scope>
         </dependency>
         
