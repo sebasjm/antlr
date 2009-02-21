@@ -489,6 +489,72 @@ class T(testbase.ANTLRTest):
 
         self.failUnlessEqual("(begin<V> 2)", found)
 
+    def testRewriteRuleResults(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {
+                language=Python;
+                output=AST;
+            }
+            tokens {LIST;}
+            @header {
+            class V(CommonTree):
+                def toString(self):
+                    return self.token.text + "<V>"
+                __str__ = toString
+
+            class W(CommonTree):
+                def __init__(self, tokenType, txt):
+                    super(W, self).__init__(
+                        CommonToken(type=tokenType, text=txt))
+
+                def toString(self):
+                    return self.token.text + "<W>"
+                __str__ = toString
+
+            }
+            a : id (',' id)* -> ^(LIST<W>["LIST"] id+);
+            id : ID -> ID<V>;
+            ID : 'a'..'z'+ ;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        found = self.execParser(
+            grammar, 'a',
+            input="a,b,c")
+
+        self.failUnlessEqual("(LIST<W> a<V> b<V> c<V>)", found)
+
+    def testCopySemanticsWithHetero(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {
+                language=Python;
+                output=AST;
+            }
+            @header {
+            class V(CommonTree):
+                def dupNode(self):
+                    return V(self)
+
+                def toString(self):
+                    return self.token.text + "<V>"
+                __str__ = toString
+
+            }
+            a : type ID (',' ID)* ';' -> ^(type ID)+;
+            type : 'int'<V> ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\\n') {$channel=HIDDEN;} ;
+            ''')
+
+        found = self.execParser(
+            grammar, 'a',
+            input="int a, b, c;")
+        self.failUnlessEqual("(int<V> a) (int<V> b) (int<V> c)", found)
 
     # TREE PARSERS -- REWRITE AST
         

@@ -38,6 +38,8 @@ This module contains all support classes for AST construction and tree parsers.
 # lot's of docstrings are missing, don't complain for now...
 # pylint: disable-msg=C0111
 
+import re
+
 from antlr3.constants import UP, DOWN, EOF, INVALID_TOKEN_TYPE
 from antlr3.recognizers import BaseRecognizer, RuleReturnScope
 from antlr3.streams import IntStream
@@ -127,6 +129,26 @@ class Tree(object):
 
         raise NotImplementedError
     
+
+    def hasAncestor(self, ttype):
+        """Walk upwards looking for ancestor with this token type."""
+
+        raise NotImplementedError
+
+    def getAncestor(self, ttype):
+        """Walk upwards and get first ancestor with this token type."""
+
+        raise NotImplementedError
+
+    def getAncestors(self):
+        """Return a list of all ancestors of this node.
+
+        The first node of list is the root and the last is the parent of
+        this node.
+        """
+
+        raise NotImplementedError
+
 
     def getChildIndex(self):
         """This node is what child index? 0..n-1"""
@@ -864,6 +886,38 @@ class BaseTree(Tree):
         pass
 
 
+    def hasAncestor(self, ttype):
+        """Walk upwards looking for ancestor with this token type."""
+        return self.getAncestor(ttype) is not None
+
+    def getAncestor(self, ttype):
+        """Walk upwards and get first ancestor with this token type."""
+        t = self.getParent()
+        while t is not None:
+            if t.getType() == ttype:
+                return t
+            t = t.getParent()
+
+        return None
+
+    def getAncestors(self):
+        """Return a list of all ancestors of this node.
+
+        The first node of list is the root and the last is the parent of
+        this node.
+        """
+        if selfgetParent() is None:
+            return None
+
+        ancestors = []
+        t = self.getParent()
+        while t is not None:
+            ancestors.insert(0, t) # insert at start
+            t = t.getParent()
+
+        return ancestors
+
+
     def toStringTree(self):
         """Print out a whole tree not just a node"""
 
@@ -924,6 +978,9 @@ class BaseTreeAdaptor(TreeAdaptor):
         override this method. CommonTree returns Token.INVALID_TOKEN_TYPE
         if no token payload but you might have to set token type for diff
         node type.
+
+        You don't have to subclass CommonErrorNode; you will likely need to
+        subclass your own tree node class to avoid class cast exception.
         """
         
         return CommonErrorNode(input, start, stop, exc)
@@ -1257,6 +1314,32 @@ class CommonTree(BaseTree):
     tokenStopIndex = property(getTokenStopIndex, setTokenStopIndex)
 
 
+    def setUnknownTokenBoundaries(self):
+        """For every node in this subtree, make sure it's start/stop token's
+        are set.  Walk depth first, visit bottom up.  Only updates nodes
+        with at least one token index < 0.
+        """
+
+        if self.children is None:
+            if self.startIndex < 0 or self.stopIndex < 0:
+                self.startIndex = self.stopIndex = self.token.getTokenIndex()
+
+            return
+ 
+        for child in self.children:
+            child.setUnknownTokenBoundaries()
+
+        if self.startIndex >= 0 and self.stopIndex >= 0:
+            # already set
+            return
+
+        if self.children:
+            firstChild = self.children[0]
+            lastChild = self.children[-1]
+            self.startIndex = firstChild.getTokenStartIndex()
+            self.stopIndex = lastChild.getTokenStopIndex()
+
+
     def getChildIndex(self):
         #FIXME: mark as deprecated
         return self.childIndex
@@ -1395,7 +1478,8 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
     use your subclass.
 
     To get your parser to build nodes of a different type, override
-    create(Token).
+    create(Token), errorNode(), and to be safe, YourTreeClass.dupNode().
+    dupNode is called to duplicate nodes during rewrite operations.
     """
     
     def dupNode(self, treeNode):
@@ -1517,6 +1601,8 @@ class CommonTreeAdaptor(BaseTreeAdaptor):
 
 
     def getChildIndex(self, t):
+        if t is None:
+            return 0
         return t.getChildIndex()
 
 
@@ -1678,18 +1764,52 @@ class CommonTreeNodeStream(TreeNodeStream):
             adaptor = CommonTreeAdaptor()
             tree = args[0]
 
+            nodes = None
+            down = None
+            up = None
+            eof = None
+
         elif len(args) == 2:
             adaptor = args[0]
             tree = args[1]
+
+            nodes = None
+            down = None
+            up = None
+            eof = None
+
+        elif len(args) == 3:
+            parent = args[0]
+            start = args[1]
+            stop = args[2]
+
+            adaptor = parent.adaptor
+            tree = parent.root
+
+            nodes = parent.nodes[start:stop]
+            down = parent.down
+            up = parent.up
+            eof = parent.eof
 
         else:
             raise TypeError("Invalid arguments")
         
         # all these navigation nodes are shared and hence they
         # cannot contain any line/column info
-        self.down = adaptor.createFromType(DOWN, "DOWN")
-        self.up = adaptor.createFromType(UP, "UP")
-        self.eof = adaptor.createFromType(EOF, "EOF")
+        if down is not None:
+            self.down = down
+        else:
+            self.down = adaptor.createFromType(DOWN, "DOWN")
+
+        if up is not None:
+            self.up = up
+        else:
+            self.up = adaptor.createFromType(UP, "UP")
+
+        if eof is not None:
+            self.eof = eof
+        else:
+            self.eof = adaptor.createFromType(EOF, "EOF")
 
         # The complete mapping from stream index to tree node.
         # This buffer includes pointers to DOWN, UP, and EOF nodes.
@@ -1699,7 +1819,10 @@ class CommonTreeNodeStream(TreeNodeStream):
         # Load upon first need of the buffer so we can set token types
         # of interest for reverseIndexing.  Slows us down a wee bit to
         # do all of the if p==-1 testing everywhere though.
-        self.nodes = []
+        if nodes is not None:
+            self.nodes = nodes
+        else:
+            self.nodes = []
 
         # Pull nodes from which tree?
         self.root = tree
@@ -1811,7 +1934,6 @@ class CommonTreeNodeStream(TreeNodeStream):
         if k < 0:
             return self.LB(-k)
 
-        #System.out.print("LT(p="+p+","+k+")=");
         if self.p + k - 1 >= len(self.nodes):
             return self.eof
 
@@ -2079,6 +2201,91 @@ class TreeParser(BaseRecognizer):
         return CommonTree(CommonToken(type=expectedTokenType, text=tokenText))
 
 
+    # precompiled regex used by inContext
+    dotdot = ".*[^.]\\.\\.[^.].*"
+    doubleEtc = ".*\\.\\.\\.\\s+\\.\\.\\..*"
+    dotdotPattern = re.compile(dotdot)
+    doubleEtcPattern = re.compile(doubleEtc)
+
+    def inContext(self, context, adaptor=None, tokenName=None, t=None):
+        """Check if current node in input has a context.
+
+        Context means sequence of nodes towards root of tree.  For example,
+        you might say context is "MULT" which means my parent must be MULT.
+        "CLASS VARDEF" says current node must be child of a VARDEF and whose
+        parent is a CLASS node.  You can use "..." to mean zero-or-more nodes.
+        "METHOD ... VARDEF" means my parent is VARDEF and somewhere above
+        that is a METHOD node.  The first node in the context is not
+        necessarily the root.  The context matcher stops matching and returns
+        true when it runs out of context.  There is no way to force the first
+        node to be the root. 
+        """
+
+        return _inContext(
+            self.input.getTreeAdaptor(), self.getTokenNames(), 
+            self.input.LT(1), context)
+
+    @classmethod
+    def _inContext(cls, adaptor, tokenNames, t, context):
+        """The worker for inContext.
+
+        It's static and full of parameters for testing purposes.
+        """
+
+        if cls.dotdotPattern.match(context):
+            # don't allow "..", must be "..."
+            raise ValueError("invalid syntax: ..")
+
+        if cls.doubleEtcPattern.match(context):
+            # don't allow double "..."
+            raise ValueError("invalid syntax: ... ...")
+
+        # ensure spaces around ...
+        context = context.replace("...", " ... ")
+        context = context.strip()
+        nodes = context.split()
+
+        ni = len(nodes) - 1
+        t = adaptor.getParent(t)
+        while ni >= 0 and t is not None:
+            if nodes[ni] == "...":
+                # walk upwards until we see nodes[ni-1] then continue walking
+                if ni == 0:
+                    # ... at start is no-op
+                    return True
+                goal = nodes[ni-1]
+                ancestor = cls._getAncestor(adaptor, tokenNames, t, goal)
+                if ancestor is None:
+                    return False
+                t = ancestor
+                ni -= 1
+
+            name = tokenNames[adaptor.getType(t)]
+            if name != nodes[ni]:
+                return False
+
+            # advance to parent and to previous element in context node list
+            ni -= 1
+            t = adaptor.getParent(t)
+
+        # at root but more nodes to match
+        if t is None and ni >= 0:
+            return False
+
+        return True
+
+    @staticmethod
+    def _getAncestor(adaptor, tokenNames, t, goal):
+        """Helper for static inContext."""
+        while t is not None:
+            name = tokenNames[adaptor.getType(t)]
+            if name == goal:
+                return t
+            t = adaptor.getParent(t)
+
+        return None
+
+
     def matchAny(self, ignore): # ignore stream, copy of this.input
         """
         Match '.' in tree parser has special meaning.  Skip node or
@@ -2159,6 +2366,53 @@ class TreeParser(BaseRecognizer):
 
     def traceOut(self, ruleName, ruleIndex):
         BaseRecognizer.traceOut(self, ruleName, ruleIndex, self.input.LT(1))
+
+
+#############################################################################
+#
+# tree visitor
+#
+#############################################################################
+
+class TreeVisitor(object):
+    """Do a depth first walk of a tree, applying pre() and post() actions
+    we go.
+    """
+
+    def __init__(self, adaptor=None):
+        if adaptor is not None:
+            self.adaptor = adaptor
+        else:
+            self.adaptor = CommonTreeAdaptor()
+    
+    def visit(self, t, pre_action=None, post_action=None):
+        """Visit every node in tree t and trigger an action for each node
+        before/after having visited all of its children.  Bottom up walk.
+        Execute both actions even if t has no children.  Ignore return
+        results from transforming children since they will have altered
+        the child list of this node (their parent).  Return result of
+        applying post action to this node.
+
+        The Python version differs from the Java version by taking two
+        callables 'pre_action' and 'post_action' instead of a class instance
+        that wraps those methods. Those callables must accept a TreeNode as
+        their single argument and return the (potentially transformed or
+        replaced) TreeNode.
+        """
+
+        isNil = self.adaptor.isNil(t)
+        if pre_action is not None and not isNil:
+            # if rewritten, walk children of new t
+            t = pre_action(t)
+
+        for idx in xrange(self.adaptor.getChildCount(t)):
+            child = self.adaptor.getChild(t, idx)
+            self.visit(child, pre_action, post_action)
+
+        if post_action is not None and not isNil:
+            t = post_action(t)
+
+        return t
 
 
 #############################################################################

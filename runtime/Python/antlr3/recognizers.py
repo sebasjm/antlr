@@ -215,11 +215,11 @@ class BaseRecognizer(object):
         that fails, throw MismatchedTokenException.
 
         To turn off single token insertion or deletion error
-        recovery, override mismatchRecover() and have it call
-        plain mismatch(), which does not recover.  Then any error
-        in a rule will cause an exception and immediate exit from
-        rule.  Rule would recover by resynchronizing to the set of
-        symbols that can follow rule ref.
+        recovery, override recoverFromMismatchedToken() and have it
+        throw an exception. See TreeParser.recoverFromMismatchedToken().
+        This way any error in a rule will cause an exception and
+        immediate exit from rule.  Rule would recover by resynchronizing
+        to the set of symbols that can follow rule ref.
         """
         
         matchedSymbol = self.getCurrentInputSymbol(input)
@@ -255,12 +255,12 @@ class BaseRecognizer(object):
         
         # compute what can follow this grammar element reference
         if EOR_TOKEN_TYPE in follow:
+            viableTokensFollowingThisRule = self.computeContextSensitiveRuleFOLLOW()
+            follow = follow | viableTokensFollowingThisRule
+
             if len(self._state.following) > 0:
                 # remove EOR if we're not the start symbol
                 follow = follow - set([EOR_TOKEN_TYPE])
-
-            viableTokensFollowingThisRule = self.computeContextSensitiveRuleFOLLOW()
-            follow = follow | viableTokensFollowingThisRule
 
         # if current token is consistent with what could come after set
         # then we know we're missing a token; error recovery is free to
@@ -269,37 +269,6 @@ class BaseRecognizer(object):
             return True
 
         return False
-
-
-    def mismatch(self, input, ttype, follow):
-        """
-        Factor out what to do upon token mismatch so tree parsers can behave
-        differently.  Override and call mismatchRecover(input, ttype, follow)
-        to get single token insertion and deletion. Use this to turn of
-        single token insertion and deletion. Override mismatchRecover
-        to call this instead.
-        """
-
-        if self.mismatchIsUnwantedToken(input, ttype):
-            raise UnwantedTokenException(ttype, input)
-
-        elif self.mismatchIsMissingToken(input, follow):
-            raise MissingTokenException(ttype, input, None)
-
-        raise MismatchedTokenException(ttype, input)
-
-
-##     def mismatchRecover(self, input, ttype, follow):
-##         if self.mismatchIsUnwantedToken(input, ttype):
-##             mte = UnwantedTokenException(ttype, input)
-
-##         elif self.mismatchIsMissingToken(input, follow):
-##             mte = MissingTokenException(ttype, input)
-
-##         else:
-##             mte = MismatchedTokenException(ttype, input)
-
-##         self.recoverFromMismatchedToken(input, mte, ttype, follow)
 
 
     def reportError(self, e):
@@ -741,7 +710,7 @@ class BaseRecognizer(object):
         e = None
 
         # if next token is what we are looking for then "delete" this token
-        if self. mismatchIsUnwantedToken(input, ttype):
+        if self.mismatchIsUnwantedToken(input, ttype):
             e = UnwantedTokenException(ttype, input)
 
             self.beginResync()
@@ -921,6 +890,15 @@ class BaseRecognizer(object):
     def getBacktrackingLevel(self):
         return self._state.backtracking
 
+    def setBacktrackingLevel(self, n):
+        self._state.backtracking = n
+
+
+    def failed(self):
+        """Return whether or not a backtracking attempt failed."""
+
+        return self._state.failed
+
 
     def getGrammarFileName(self):
         """For debugging and other purposes, might want the grammar name.
@@ -1007,9 +985,6 @@ class BaseRecognizer(object):
     def traceIn(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("enter %s %s" % (ruleName, inputSymbol))
         
-##         if self._state.failed:
-##             sys.stdout.write(" failed=%s" % self._state.failed)
-
         if self._state.backtracking > 0:
             sys.stdout.write(" backtracking=%s" % self._state.backtracking)
 
@@ -1019,14 +994,15 @@ class BaseRecognizer(object):
     def traceOut(self, ruleName, ruleIndex, inputSymbol):
         sys.stdout.write("exit %s %s" % (ruleName, inputSymbol))
         
-##         if self._state.failed:
-##             sys.stdout.write(" failed=%s" % self._state.failed)
-
         if self._state.backtracking > 0:
             sys.stdout.write(" backtracking=%s" % self._state.backtracking)
 
-        sys.stdout.write('\n')
+        if self._state.failed:
+            sys.stdout.write(" failed")
+        else:
+            sys.stdout.write(" succeeded")
 
+        sys.stdout.write('\n')
 
 
 class TokenSource(object):

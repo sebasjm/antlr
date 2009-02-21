@@ -169,6 +169,23 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
+/** Match . wildcard and auto dup the node/subtree */
+wildcard(token,label,elementIndex,hetero) ::= <<
+_last = self.input.LT(1)
+<super.wildcard(...)>
+<if(!rewriteMode)>
+<finishedBacktracking({
+<label>_tree = self._adaptor.dupTree(<label>)
+self._adaptor.addChild(root_<treeLevel>, <label>_tree)
+})>
+<else> <! rewrite mode !>
+<finishedBacktracking({
+if _first_<treeLevel> is None:
+    _first_<treeLevel> = <label>
+})>
+<endif>
+>>
+
 // SET AST
 matchSet(s,label,hetero,elementIndex,postmatchCode) ::= <<
 _last = self.input.LT(1)

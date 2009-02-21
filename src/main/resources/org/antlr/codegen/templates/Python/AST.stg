@@ -77,7 +77,9 @@ root_0 = None<\n>
 
 ruleLabelDefs() ::= <<
 <super.ruleLabelDefs()>
-<ruleDescriptor.tokenLabels:{<it.label.text>_tree = None}; separator="\n">
+<[ruleDescriptor.tokenLabels,ruleDescriptor.wildcardTreeLabels,
+  ruleDescriptor.wildcardTreeListLabels]
+    :{<it.label.text>_tree = None}; separator="\n">
 <ruleDescriptor.tokenListLabels:{<it.label.text>_tree = None}; separator="\n">
 <ruleDescriptor.allTokenRefsInAltsWithRewrites
     :{stream_<it> = RewriteRule<rewriteElementType>Stream(self._adaptor, "token <it>")}; separator="\n">
@@ -129,10 +131,6 @@ tokenRefRuleRootTrackAndListLabel(token,label,elementIndex,hetero) ::= <<
 <listLabel(elem=label,...)>
 >>
 
-wildcardTrack(label,elementIndex) ::= <<
-<super.wildcard(...)>
->>
-
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
 <super.ruleRef(...)>
@@ -160,15 +158,15 @@ ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 // R e w r i t e
 
 rewriteCode(
-	alts, description,
-	referencedElementsDeep, // ALL referenced elements to right of ->
-	referencedTokenLabels,
-	referencedTokenListLabels,
-	referencedRuleLabels,
-	referencedRuleListLabels,
-    referencedWildcardLabels,
-    referencedWildcardListLabels,
-	rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
+        alts, description,
+        referencedElementsDeep, // ALL referenced elements to right of ->
+        referencedTokenLabels,
+        referencedTokenListLabels,
+        referencedRuleLabels,
+        referencedRuleListLabels,
+        referencedWildcardLabels,
+        referencedWildcardListLabels,
+        rewriteBlockLevel, enclosingTreeLevel, treeLevel) ::=
 <<
 # AST Rewrite
 # elements: <referencedElementsDeep; separator=", ">
@@ -176,6 +174,7 @@ rewriteCode(
 # rule labels: <referencedRuleLabels; separator=", ">
 # token list labels: <referencedTokenListLabels; separator=", ">
 # rule list labels: <referencedRuleListLabels; separator=", ">
+# wildcard labels: <[referencedWildcardLabels,referencedWildcardListLabels]; separator=", ">
 <finishedBacktracking({
 <prevRuleRootRef()>.tree = root_0
 <rewriteCodeLabels()>
@@ -217,10 +216,18 @@ rewriteCodeLabels() ::= <<
     :{stream_<it> = RewriteRule<rewriteElementType>Stream(self._adaptor, "token <it>", list_<it>)};
     separator="\n"
 >
+<referencedWildcardLabels
+    :{stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "wildcard <it>", <it>)};
+    separator="\n"
+>
+<referencedWildcardListLabels
+    :{stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "wildcard <it>", list_<it>)};
+    separator="\n"
+>
 <referencedRuleLabels
     :{
 if <it> is not None:
-    stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "token <it>", <it>.tree)
+    stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "rule <it>", <it>.tree)
 else:
     stream_<it> = RewriteRuleSubtreeStream(self._adaptor, "token <it>", None)
 };
@@ -236,10 +243,10 @@ else:
   *  list rather shallow like other blocks.
   */
 rewriteOptionalBlock(
-	alt,rewriteBlockLevel,
-	referencedElementsDeep, // all nested refs
-	referencedElements, // elements in immediately block; no nested blocks
-	description) ::=
+        alt,rewriteBlockLevel,
+        referencedElementsDeep, // all nested refs
+        referencedElements, // elements in immediately block; no nested blocks
+        description) ::=
 <<
 # <fileName>:<description>
 if <referencedElementsDeep:{el | stream_<el>.hasNext()}; separator=" or ">:
@@ -249,10 +256,10 @@ if <referencedElementsDeep:{el | stream_<el>.hasNext()}; separator=" or ">:
 >>
 
 rewriteClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedElementsDeep, // all nested refs
-	referencedElements, // elements in immediately block; no nested blocks
-	description) ::=
+        alt,rewriteBlockLevel,
+        referencedElementsDeep, // all nested refs
+        referencedElements, // elements in immediately block; no nested blocks
+        description) ::=
 <<
 # <fileName>:<description>
 while <referencedElements:{el | stream_<el>.hasNext()}; separator=" or ">:
@@ -262,10 +269,10 @@ while <referencedElements:{el | stream_<el>.hasNext()}; separator=" or ">:
 >>
 
 rewritePositiveClosureBlock(
-	alt,rewriteBlockLevel,
-	referencedElementsDeep, // all nested refs
-	referencedElements, // elements in immediately block; no nested blocks
-	description) ::=
+        alt,rewriteBlockLevel,
+        referencedElementsDeep, // all nested refs
+        referencedElements, // elements in immediately block; no nested blocks
+        description) ::=
 <<
 # <fileName>:<description>
 if not (<referencedElements:{el | stream_<el>.hasNext()}; separator=" or ">):
@@ -401,6 +408,10 @@ root_<treeLevel> = self._adaptor.becomeRoot(stream_<label>.nextNode(), root_<tre
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = self._adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>)<\n>
+>>
+
+rewriteWildcardLabelRef(label) ::= <<
+self._adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree())<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<

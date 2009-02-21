@@ -532,39 +532,41 @@ class TreeWizard(object):
         return self._parse(t, tpattern, labels)
 
 
-    def _parse(self, t1, t2, labels):
+    def _parse(self, t1, tpattern, labels):
         """
-        Do the work for parse. Check to see if the t2 pattern fits the
+        Do the work for parse. Check to see if the tpattern fits the
         structure and token types in t1.  Check text if the pattern has
         text arguments on nodes.  Fill labels map with pointers to nodes
         in tree matched against nodes in pattern with labels.
 	"""
         
         # make sure both are non-null
-        if t1 is None or t2 is None:
+        if t1 is None or tpattern is None:
             return False
 
         # check roots (wildcard matches anything)
-        if not isinstance(t2, WildcardTreePattern):
-            if self.adaptor.getType(t1) != t2.getType():
+        if not isinstance(tpattern, WildcardTreePattern):
+            if self.adaptor.getType(t1) != tpattern.getType():
                 return False
 
-            if t2.hasTextArg and self.adaptor.getText(t1) != t2.getText():
+            # if pattern has text, check node text
+            if (tpattern.hasTextArg
+                and self.adaptor.getText(t1) != tpattern.getText()):
                 return False
 
-        if t2.label is not None and labels is not None:
+        if tpattern.label is not None and labels is not None:
             # map label in pattern to node in t1
-            labels[t2.label] = t1
+            labels[tpattern.label] = t1
 
         # check children
         n1 = self.adaptor.getChildCount(t1)
-        n2 = t2.getChildCount()
+        n2 = tpattern.getChildCount()
         if n1 != n2:
             return False
 
         for i in range(n1):
             child1 = self.adaptor.getChild(t1, i)
-            child2 = t2.getChild(i)
+            child2 = tpattern.getChild(i)
             if not self._parse(child1, child2, labels):
                 return False
 

@@ -303,6 +303,138 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("a 1", found)
 
 
+    def testAutoWildcard(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python;output=AST;}
+            a : ID INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python;output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            a : ID . 
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "abc 34")
+        self.assertEquals("abc 34", found)
+
+
+#     def testNoWildcardAsRootError(self):
+#         ErrorQueue equeue = new ErrorQueue();
+#         ErrorManager.setErrorListener(equeue);
+# > 
+#         String treeGrammar =
+#             "tree grammar TP;\n"+
+#             "options {language=Python;output=AST;}
+#             "a : ^(. INT) 
+#             "  ;\n";
+# > 
+#         Grammar g = new Grammar(treeGrammar);
+#         Tool antlr = newTool();
+#         antlr.setOutputDirectory(null); // write to /dev/null
+#         CodeGenerator generator = new CodeGenerator(antlr, g, "Java");
+#         g.setCodeGenerator(generator);
+#         generator.genRecognizer();
+# > 
+#         assertEquals("unexpected errors: "+equeue, 1, equeue.errors.size());
+# > 
+#         int expectedMsgID = ErrorManager.MSG_WILDCARD_AS_ROOT;
+#         Object expectedArg = null;
+#         antlr.RecognitionException expectedExc = null;
+#         GrammarSyntaxMessage expectedMessage =
+#             new GrammarSyntaxMessage(expectedMsgID, g, null, expectedArg, expectedExc);
+# > 
+#         checkError(equeue, expectedMessage);        
+#     }
+
+    def testAutoWildcard2(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python;output=AST;}
+            a : ID INT -> ^(ID INT);
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python;output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            a : ^(ID .) 
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "abc 34")
+        self.assertEquals("(abc 34)", found)
+
+
+    def testAutoWildcardWithLabel(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python;output=AST;}
+            a : ID INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+ 
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python;output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            a : ID c=. 
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "abc 34")
+        self.assertEquals("abc 34", found)
+
+
+    def testAutoWildcardWithListLabel(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python;output=AST;}
+            a : ID INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python;output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            a : ID c+=. 
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "abc 34")
+        self.assertEquals("abc 34", found)
+
+
     def testAutoDupMultiple(self):
         grammar = textwrap.dedent(
         r'''
@@ -1256,7 +1388,7 @@ class T(testbase.ANTLRTest):
         self.failUnlessEqual("(root (ick 34))", found)
 
 
-    def testWildcard(self):
+    def testWildcardSingleNode(self):
         grammar = textwrap.dedent(
             r'''
             grammar T;
@@ -1290,6 +1422,135 @@ class T(testbase.ANTLRTest):
             )
 
         self.failUnlessEqual("34", found)
+
+    def testWildcardUnlabeledSingleNode(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID INT -> ^(ID INT);
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            s : ^(ID .) -> ID
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 34")
+        self.assertEquals("abc", found)
+
+
+    def testWildcardGrabsSubtree(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID x=INT y=INT z=INT -> ^(ID[\"root\"] ^($x $y $z));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            s : ^(ID c=.) -> $c
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 1 2 3")
+        self.assertEquals("(1 2 3)", found)
+
+
+    def testWildcardGrabsSubtree2(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID x=INT y=INT z=INT -> ID ^($x $y $z);
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            s : ID c=. -> $c
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "abc 1 2 3")
+        self.assertEquals("(1 2 3)", found)
+
+
+    def testWildcardListLabel(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : INT INT INT ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T;}
+            s : (c+=.)+ -> $c+
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "1 2 3")
+        self.assertEquals("1 2 3", found)
+
+
+    def testWildcardListLabel2(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST; ASTLabelType=CommonTree;}
+            a  : x=INT y=INT z=INT -> ^($x ^($y $z) ^($y $z));
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; output=AST; ASTLabelType=CommonTree; tokenVocab=T; rewrite=true;}
+            s : ^(INT (c+=.)+) -> $c+
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 's',
+            "1 2 3")
+        self.assertEquals("(2 3) (2 3)", found)
 
 
 if __name__ == '__main__':

@@ -274,6 +274,21 @@ class TestAutoAST(testbase.ANTLRTest):
         self.assertEquals("(foo void ;)", found)
 
 
+    def testWildcardBangWithListLabel(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python;output=AST;}
+            a : v='void' x=.! ';' ;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        found = self.execParser(grammar, "a", "void foo;")
+        self.assertEquals("void ;", found)
+
+
     def testRootRoot(self):
         grammar = textwrap.dedent(
             r'''
@@ -902,8 +917,8 @@ class TestAutoAST(testbase.ANTLRTest):
             ''')
     
         found, errors = self.execParser(grammar, "a", "abc", expectErrors=True)
-        self.assertEquals(["line 0:-1 missing INT at '<EOF>'"], errors)
-        self.assertEquals("abc <missing INT>", found)
+        self.assertEquals(["line 0:-1 mismatched input '<EOF>' expecting INT"], errors)
+        self.assertEquals("<mismatched token: <EOF>, resync=abc>", found)
 
 
     def testExtraTokenGivesErrorNode(self):

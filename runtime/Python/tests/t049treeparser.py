@@ -373,7 +373,127 @@ class T(testbase.ANTLRTest):
             )
         self.failUnless("abc, 2\n", found)
 
-        
+
+    def testWildcardLookahead(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID '+'^ INT;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            SEMI : ';' ;
+            PERIOD : '.' ;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP; 
+            options {language=Python; tokenVocab=T; ASTLabelType=CommonTree;}
+            a : ^('+' . INT) { self.capture("alt 1") }
+              ;
+            ''')
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "a + 2")
+        self.assertEquals("alt 1", found)
+
+
+    def testWildcardLookahead2(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID '+'^ INT;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            SEMI : ';' ;
+            PERIOD : '.' ;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; tokenVocab=T; ASTLabelType=CommonTree;}
+            a : ^('+' . INT) { self.capture("alt 1") }
+              | ^('+' . .)   { self.capture("alt 2") }
+              ;
+            ''')
+
+        # AMBIG upon '+' DOWN INT UP etc.. but so what.
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "a + 2")
+        self.assertEquals("alt 1", found)
+
+
+    def testWildcardLookahead3(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID '+'^ INT;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            SEMI : ';' ;
+            PERIOD : '.' ;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; tokenVocab=T; ASTLabelType=CommonTree;}
+            a : ^('+' ID INT) { self.capture("alt 1") }
+              | ^('+' . .)   { self.capture("alt 2") }
+              ;
+            ''')
+
+        # AMBIG upon '+' DOWN INT UP etc.. but so what.
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "a + 2")
+        self.assertEquals("alt 1", found)
+
+
+    def testWildcardPlusLookahead(self):
+        grammar = textwrap.dedent(
+            r'''
+            grammar T;
+            options {language=Python; output=AST;}
+            a : ID '+'^ INT;
+            ID : 'a'..'z'+ ;
+            INT : '0'..'9'+;
+            SEMI : ';' ;
+            PERIOD : '.' ;
+            WS : (' '|'\n') {$channel=HIDDEN;} ;
+            ''')
+
+        treeGrammar = textwrap.dedent(
+            r'''
+            tree grammar TP;
+            options {language=Python; tokenVocab=T; ASTLabelType=CommonTree;}
+            a : ^('+' INT INT ) { self.capture("alt 1") }
+              | ^('+' .+)   { self.capture("alt 2") }
+              ;
+            ''')
+
+        # AMBIG upon '+' DOWN INT UP etc.. but so what.
+
+        found = self.execTreeParser(
+            grammar, 'a',
+            treeGrammar, 'a',
+            "a + 2")
+        self.assertEquals("alt 2", found)
+
 
 if __name__ == '__main__':
     unittest.main()

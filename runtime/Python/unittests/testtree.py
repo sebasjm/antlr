@@ -4,9 +4,10 @@ import os
 import unittest
 from StringIO import StringIO
 
-from antlr3.tree import CommonTreeNodeStream, CommonTree, CommonTreeAdaptor
+from antlr3.tree import (CommonTreeNodeStream, CommonTree, CommonTreeAdaptor,
+                         TreeParser, TreeVisitor)
 from antlr3 import CommonToken, UP, DOWN, EOF
-
+from antlr3.treewizard import TreeWizard
 
 class TestTreeNodeStream(unittest.TestCase):
     """Test case for the TreeNodeStream class."""
@@ -862,6 +863,360 @@ class TestCommonTree(unittest.TestCase):
         t.sanityCheckParentAndChildIndexes()
 
 
+class TestTreeContext(unittest.TestCase):
+    """Test the TreeParser.inContext() method"""
+
+    tokenNames = [
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "VEC", "ASSIGN", "PRINT",
+        "PLUS", "MULT", "DOT", "ID", "INT", "WS", "'['", "','", "']'"
+        ]
+
+    def testSimpleParent(self):
+        tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID (VEC INT %x:INT INT))))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "VEC")
+        self.assertEquals(expecting, found)
+
+
+    def testNoParent(self):
+        tree = "(PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(%x:PRINT (MULT ID (VEC INT INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = False
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "VEC")
+        self.assertEquals(expecting, found)
+
+
+    def testParentWithWildcard(self):
+        tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID (VEC INT %x:INT INT))))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "VEC ...")
+        self.assertEquals(expecting, found)
+
+
+    def testWildcardAtStartIgnored(self):
+        tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID (VEC INT %x:INT INT))))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "...VEC")
+        self.assertEquals(expecting, found)
+
+
+    def testWildcardInBetween(self):
+        tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID (VEC INT %x:INT INT))))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT...VEC")
+        self.assertEquals(expecting, found)
+
+
+    def testLotsOfWildcards(self):
+        tree = "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID[x] (VEC INT[1] INT[2] INT[3]))))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(nil (ASSIGN ID[x] INT[3]) (PRINT (MULT ID (VEC INT %x:INT INT))))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "... PRINT ... VEC ...")
+        self.assertEquals(expecting, found)
+
+
+    def testDeep(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "VEC ...")
+        self.assertEquals(expecting, found)
+
+
+    def testDeepAndFindRoot(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT ...")
+        self.assertEquals(expecting, found)
+
+
+    def testDeepAndFindRoot2(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT ... VEC ...")
+        self.assertEquals(expecting, found)
+
+
+    def testChain(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = True
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT MULT VEC MULT")
+        self.assertEquals(expecting, found)
+
+
+    ## TEST INVALID CONTEXTS
+
+    def testNotParent(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = False
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "VEC")
+        self.assertEquals(expecting, found)
+
+
+    def testMismatch(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = False
+        ## missing MULT
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT VEC MULT")
+        self.assertEquals(expecting, found)
+
+
+    def testMismatch2(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = False
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT VEC ...")
+        self.assertEquals(expecting, found)
+
+
+    def testMismatch3(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        expecting = False
+        found = TreeParser._inContext(adaptor, self.tokenNames, node, "VEC ... VEC MULT")
+        self.assertEquals(expecting, found)
+
+
+    def testDoubleEtc(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        try:
+            TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT ... ... VEC")
+            self.fail()
+        except ValueError, exc: 
+            expecting = "invalid syntax: ... ..."
+            found = str(exc)
+            self.assertEquals(expecting, found)
+
+
+    def testDotDot(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        labels = {}
+        valid = wiz.parse(
+            t,
+            "(PRINT (MULT ID (VEC (MULT INT %x:INT) INT INT)))",
+            labels)
+        self.assertTrue(valid)
+        node = labels.get("x")
+
+        try:
+            TreeParser._inContext(adaptor, self.tokenNames, node, "PRINT .. VEC")
+            self.fail()
+        except ValueError, exc:
+            expecting = "invalid syntax: .."
+            found = str(exc)
+            self.assertEquals(expecting, found)
+
+
+class TestTreeVisitor(unittest.TestCase):
+    """Test of the TreeVisitor class."""
+
+    tokenNames = [
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "VEC", "ASSIGN", "PRINT",
+        "PLUS", "MULT", "DOT", "ID", "INT", "WS", "'['", "','", "']'"
+        ]
+
+    def testTreeVisitor(self):
+        tree = "(PRINT (MULT ID[x] (VEC (MULT INT[9] INT[1]) INT[2] INT[3])))"
+        adaptor = CommonTreeAdaptor()
+        wiz = TreeWizard(adaptor, self.tokenNames)
+        t = wiz.create(tree)
+
+        found = []
+        def pre(t):
+            found.append("pre(%s)" % t)
+            return t
+        def post(t):
+            found.append("post(%s)" % t)
+            return t
+
+        visitor = TreeVisitor(adaptor)
+        visitor.visit(t, pre, post)
+
+        expecting = [ "pre(PRINT)", "pre(MULT)", "pre(x)", "post(x)",
+                      "pre(VEC)", "pre(MULT)", "pre(9)", "post(9)", "pre(1)",
+                      "post(1)", "post(MULT)", "pre(2)", "post(2)", "pre(3)",
+                      "post(3)", "post(VEC)", "post(MULT)", "post(PRINT)" ]
+
+        self.assertEquals(expecting, found)
 
 if __name__ == "__main__":
     unittest.main(testRunner=unittest.TextTestRunner(verbosity=2))
