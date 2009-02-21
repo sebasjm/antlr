@@ -110,7 +110,7 @@ Just untar and you'll get:
 
 antlr-3.1.2/README.txt (this file)
 antlr-3.1.2/LICENSE.txt
-antlr-3.1.2/src/org/antlr/...
+antlr-3.1.2/src/main/java/org/antlr/...
 antlr-3.1.2/lib/stringtemplate-3.2.jar
 antlr-3.1.2/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
 antlr-3.1.2/lib/antlr-3.1.2.jar (all jars combined, runtime and tools)
