@@ -715,27 +715,26 @@ public class NFAToDFAConverter {
 				);
 			}
 			else if ( transition0!=null && transition0.isSemanticPredicate() ) {
-				if ( computingStartState ) {
-					if ( collectPredicates ) {
-						// only indicate we can see a predicate if we're collecting preds;
-						// Could be computing start state & seen an action before this.
-						dfa.predicateVisible = true;
-					}
-					else {
-						// this state has a pred, but we can't see it.
-						dfa.hasPredicateBlockedByAction = true;
-						// System.out.println("found pred during prediction but blocked by action found previously");
-					}
-				}
-				// continue closure here too, but add the sem pred to ctx
-				SemanticContext newSemanticContext = semanticContext;
-				if ( collectPredicates ) {
-					// AND the previous semantic context with new pred
-					SemanticContext labelContext =
-						transition0.label.getSemanticContext();
-					// do not hoist syn preds from other rules; only get if in
-					// starting state's rule (i.e., context is empty)
-					int walkAlt =
+                SemanticContext labelContext = transition0.label.getSemanticContext();
+                if ( computingStartState ) {
+                    if ( collectPredicates ) {
+                        // only indicate we can see a predicate if we're collecting preds
+                        // Could be computing start state & seen an action before this.
+                        dfa.predicateVisible = true;
+                    }
+                    else {
+                        // this state has a pred, but we can't see it.
+                        dfa.hasPredicateBlockedByAction = true;
+                        // System.out.println("found pred during prediction but blocked by action found previously");
+                    }
+                }
+                // continue closure here too, but add the sem pred to ctx
+                SemanticContext newSemanticContext = semanticContext;
+                if ( collectPredicates ) {
+                    // AND the previous semantic context with new pred
+                    // do not hoist syn preds from other rules; only get if in
+                    // starting state's rule (i.e., context is empty)
+                    int walkAlt =
 						dfa.decisionNFAStartState.translateDisplayAltToWalkAlt(alt);
 					NFAState altLeftEdge =
 						dfa.nfa.grammar.getNFAStateForAltOfDecision(dfa.decisionNFAStartState,walkAlt);
