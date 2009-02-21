@@ -827,6 +827,18 @@ public abstract class BaseTest {
 		return n;
 	}
 
+    public String sortLinesInString(String s) {
+        String lines[] = s.split("\n");
+        Arrays.sort(lines);
+        List<String> linesL = Arrays.asList(lines);
+        StringBuffer buf = new StringBuffer();
+        for (String l : linesL) {
+            buf.append(l);
+            buf.append('\n');
+        }
+        return buf.toString();
+    }
+    
     /**
      * When looking at a result set that consists of a Map/HashTable
      * we cannot rely on the output order, as the hashing algorithm or other aspects

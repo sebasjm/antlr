@@ -645,9 +645,9 @@ public class TestDFAConversion extends BaseTest {
 			"  ;\n");
 		String expecting =
 			".s0-C->:s4=>3\n" +
-			".s0-X->.s1\n" +
-			".s1-A->:s3=>1\n" +
-			".s1-B->:s2=>2\n";
+            ".s0-X->.s1\n" +
+            ".s1-A->:s2=>1\n" +
+            ".s1-B->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 	}
 
@@ -664,16 +664,16 @@ public class TestDFAConversion extends BaseTest {
 			"c : C ;\n");
 		String expecting =
 			".s0-C->.s1\n" +
-			".s1-B->.s4\n" +
-			".s1-X->:s2=>1\n" +
-			".s1-Y->:s3=>2\n" +
-			".s4-X->:s2=>1\n" +
-			".s4-Y->:s3=>2\n";
+            ".s1-B->.s2\n" +
+            ".s1-X->:s4=>1\n" +
+            ".s1-Y->:s3=>2\n" +
+            ".s2-X->:s4=>1\n" +
+            ".s2-Y->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, 0);
 		expecting =
 			".s0-C->.s1\n" +
-			".s1-B->:s3=>1\n" +
-			".s1-X..Y->:s2=>2\n";
+            ".s1-B->:s2=>1\n" +
+            ".s1-X..Y->:s3=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, 0);
 	}
 
@@ -733,8 +733,8 @@ public class TestDFAConversion extends BaseTest {
 			"a : A a | A ;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-A->:s3=>1\n" +
-			".s1-EOF->:s2=>2\n";
+            ".s1-A->:s2=>1\n" +
+            ".s1-EOF->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -915,11 +915,11 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B->:s3=>1\n" +
-			".s0-C->:s2=>2\n" +
-			".s1-A->.s1\n" +
-			".s1-B->:s3=>1\n" +
-			".s1-C->:s2=>2\n";
+            ".s0-B->:s2=>1\n" +
+            ".s0-C->:s3=>2\n" +
+            ".s1-A->.s1\n" +
+            ".s1-B->:s2=>1\n" +
+            ".s1-C->:s3=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
@@ -938,10 +938,10 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B->:s3=>1\n" +
-			".s1-A->.s1\n" +
-			".s1-B->:s3=>1\n" +
-			".s1-C->:s2=>2\n";
+            ".s0-B->:s2=>1\n" +
+            ".s1-A->.s1\n" +
+            ".s1-B->:s2=>1\n" +
+            ".s1-C->:s3=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule block
 	}
 
@@ -961,10 +961,10 @@ public class TestDFAConversion extends BaseTest {
 		checkDecision(g, 2, expecting, null, null, null, null, 0); // loopback (A)+
 		expecting =
 			".s0-A->.s1\n" +
-			".s0-B..X->:s3=>1\n" +
-			".s1-A->.s1\n" +
-			".s1-B..X->:s3=>1\n" +
-			".s1-Y->:s2=>2\n";
+            ".s0-B..X->:s2=>1\n" +
+            ".s1-A->.s1\n" +
+            ".s1-B..X->:s2=>1\n" +
+            ".s1-Y->:s3=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, 0); // rule
 	}
 
@@ -1485,8 +1485,9 @@ As a result, alternative(s) 2 were disabled for that input
             ".s1-DOWN->.s2\n" +
             ".s2-X->.s3\n" +
             ".s2-{A, Y}->:s6=>2\n" +
-            ".s3-A..X->:s6=>2\n" +
             ".s3-Y->.s4\n" +
+            ".s3-{DOWN, A..X}->:s6=>2\n" +
+            ".s4-DOWN->:s6=>2\n" +
             ".s4-UP->:s5=>1\n";
         int[] unreachableAlts = null;
         int[] nonDetAlts = new int[] {1,2};

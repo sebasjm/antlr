@@ -33,9 +33,7 @@ import org.antlr.codegen.CodeGenerator;
 import org.antlr.misc.BitSet;
 import org.antlr.tool.*;
 
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -136,8 +134,8 @@ public class TestSemanticPredicates extends BaseTest {
 			"b : {p1}? A | {p1a}? A ;");
 		String expecting =
 			".s0-A->.s1\n" +
-			".s1-{(p1||p1a)}?->:s2=>1\n" +
-			".s1-{p2}?->:s3=>2\n";
+            ".s1-{(p1a||p1)}?->:s2=>1\n" +
+            ".s1-{p2}?->:s3=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
@@ -446,12 +444,12 @@ public class TestSemanticPredicates extends BaseTest {
 			"B : {p}? => 'a' ;\n" +
 			"C : {q}? => ('a'|'b')+ ;");
 		String expecting =
-			".s0-'a'&&{(p||q)}?->.s1\n" +
-			".s0-'b'&&{q}?->:s4=>2\n" +
-			".s1-'a'..'b'&&{q}?->:s4=>2\n" +
-			".s1-<EOT>&&{(p||q)}?->.s2\n" +
-			".s2-{p}?->:s3=>1\n" +
-			".s2-{q}?->:s4=>2\n";
+			".s0-'a'&&{(q||p)}?->.s1\n" +
+            ".s0-'b'&&{q}?->:s4=>2\n" +
+            ".s1-'a'..'b'&&{q}?->:s4=>2\n" +
+            ".s1-<EOT>&&{(q||p)}?->.s2\n" +
+            ".s2-{p}?->:s3=>1\n" +
+            ".s2-{q}?->:s4=>2\n";
 		checkDecision(g, 2, expecting, null, null, null, null, null, 0, false);
 	}
 
@@ -476,14 +474,14 @@ public class TestSemanticPredicates extends BaseTest {
 			"A : {p}?=> ('a')+ 'x' ;\n" +
 			"B : {q}?=> ('a'|'b')+ 'x' ;");
 		String expecting =
-			".s0-'a'&&{(p||q)}?->.s1\n" +
-			".s0-'b'&&{q}?->:s5=>2\n" +
-			".s1-'a'&&{(p||q)}?->.s1\n" +
-			".s1-'b'&&{q}?->:s5=>2\n" +
-			".s1-'x'&&{(p||q)}?->.s2\n" +
-			".s2-<EOT>&&{(p||q)}?->.s3\n" +
-			".s3-{p}?->:s4=>1\n" +
-			".s3-{q}?->:s5=>2\n";
+			".s0-'a'&&{(q||p)}?->.s1\n" +
+            ".s0-'b'&&{q}?->:s5=>2\n" +
+            ".s1-'a'&&{(q||p)}?->.s1\n" +
+            ".s1-'b'&&{q}?->:s5=>2\n" +
+            ".s1-'x'&&{(q||p)}?->.s2\n" +
+            ".s2-<EOT>&&{(q||p)}?->.s3\n" +
+            ".s3-{p}?->:s4=>1\n" +
+            ".s3-{q}?->:s5=>2\n";
 		checkDecision(g, 3, expecting, null, null, null, null, null, 0, false);
 	}
 
@@ -735,8 +733,8 @@ public class TestSemanticPredicates extends BaseTest {
 			"  ;\n");
 		String expecting =
 			".s0-X->.s1\n" +
-			".s1-{((b&&c)||(a&&c))}?->:s2=>1\n" +
-			".s1-{c}?->:s3=>2\n";
+            ".s1-{((a&&c)||(b&&c))}?->:s2=>1\n" +
+            ".s1-{c}?->:s3=>2\n";
 		int[] unreachableAlts = null;
 		int[] nonDetAlts = null;
 		String ambigInput = null;
@@ -761,9 +759,9 @@ public class TestSemanticPredicates extends BaseTest {
 			"    ;");
 		String expecting =
 			".s0-ID->.s1\n" +
-			".s1-SEMI->.s2\n" +
-			".s2-{(do||while||for)}?->:s3=>1\n" +
-			".s2-{true}?->:s4=>2\n";
+            ".s1-SEMI->.s2\n" +
+            ".s2-{(for||do||while)}?->:s3=>1\n" +
+            ".s2-{true}?->:s4=>2\n";
 		checkDecision(g, 1, expecting, null, null, null, null, null, 0, false);
 	}
 
