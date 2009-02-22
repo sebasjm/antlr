@@ -12,7 +12,7 @@
     will be deployed to the ANTLR snapshot repository at antlr.org with the word
     SNAPSHOT replaced with the the data, time and unique number.
     -->
-  <version>3.1.2-SNAPSHOT</version>
+  <version>3.1.3-SNAPSHOT</version>
   <name>Antlr 3 Runtime</name>
   <description>A framework for constructing recognizers, compilers, and translators from grammatical descriptions containing Java, C#, C++, or Python actions.</description>
   <url>http://www.antlr.org</url>
