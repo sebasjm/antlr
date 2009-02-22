@@ -108,7 +108,8 @@ class <grammar.recognizerName>(<@superClassName><superClass><@end>):
     def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input=None, state=None):
         if state is None:
             state = RecognizerSharedState()
-        <@superClassName><superClass><@end>.__init__(self, input, state)
+        super(<grammar.recognizerName>, self).__init__(input, state)
+
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
         self._state.ruleMemo = {}
@@ -226,28 +227,24 @@ from <grammar.composite.rootGrammar.recognizerName> import tokenNames<\n>
 
 <rules:{<ruleAttributeScopeClass(scope=it.ruleDescriptor.ruleScope)>}>
 
-class <grammar.recognizerName>(<superClass>):
+class <grammar.recognizerName>(<@superClassName><superClass><@end>):
     grammarFileName = "<fileName>"
     antlr_version = version_str_to_tuple("<ANTLRVersion>")
     antlr_version_str = "<ANTLRVersion>"
     tokenNames = tokenNames
 
-    def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state=None):
+    def __init__(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state=None, *args, **kwargs):
         if state is None:
             state = RecognizerSharedState()
 
-        <superClass>.__init__(self, input, state)
+        <@args()>
+        super(<grammar.recognizerName>, self).__init__(input, state, *args, **kwargs)
 
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
         self._state.ruleMemo = {}
 <endif>
 <endif>
-
-        <grammar.delegators:
-         {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
-        <last(grammar.delegators):
-    	 {g|self.gParent = self.<g:delegateName()>}; separator="\n">
 
         <cyclicDFAs:{dfa | <cyclicDFAInit(dfa)>}; separator="\n">
 
@@ -256,10 +253,14 @@ class <grammar.recognizerName>(<superClass>):
 
         <init>
 
+        <grammar.delegators:
+         {g|self.<g:delegateName()> = <g:delegateName()>}; separator="\n">
         <grammar.directDelegates:
          {g|self.<g:delegateName()> = <g.recognizerName>(<trunc(g.delegators):{p|<p:delegateName()>, }>self, input, state)}; separator="\n">
         <!grammar.directDelegates:
          {g|self.<g:delegateName()> = <g.recognizerName>(self<grammar.delegators:{g|, <g:delegateName()>}>, input, state)}; separator="\n"!>
+        <last(grammar.delegators):
+    	 {g|self.gParent = self.<g:delegateName()>}; separator="\n">
 
         <@init>
         <@end>
@@ -390,55 +391,58 @@ def <ruleName>(self, <ruleDescriptor.parameterScope:parameterScope(scope=it)>):
     <ruleLabelDefs()>
     <ruleDescriptor.actions.init>
     <@preamble()>
-<if(memoize)>
-<if(backtracking)>
-    success = False<\n>
-<endif>
-<endif>
-    try:
-        try:
-            <ruleMemoization(name=ruleName)>
-            <block>
-            <ruleCleanUp()>
-            <(ruleDescriptor.actions.after):execAction()>
-
-<if(memoize)>
-<if(backtracking)>
-            success = True<\n>
-<endif>
-<endif>
-<if(exceptions)>
-        <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
-<else>
-<if(!emptyRule)>
-<if(actions.(actionScope).rulecatch)>
-        <actions.(actionScope).rulecatch>
-<else>
-        except RecognitionException, re:
-            self.reportError(re)
-            self.recover(self.input, re)
-            <@setErrorReturnValue()>
-
-<endif>
-<else>
-        finally:
-            pass
-
-<endif>
-<endif>
-    finally:
-<if(trace)>
-        self.traceOut("<ruleName>", <ruleDescriptor.index>)<\n>
-<endif>
-        <memoize()>
-        <ruleScopeCleanUp()>
-        <finally>
-        pass
-
+    <@body><ruleBody()><@end>
     <@postamble()>
     return <ruleReturnValue()>
 
 # $ANTLR end "<ruleName>"
+>>
+
+ruleBody() ::= <<
+<if(memoize)>
+<if(backtracking)>
+success = False<\n>
+<endif>
+<endif>
+try:
+    try:
+        <ruleMemoization(name=ruleName)>
+        <block>
+        <ruleCleanUp()>
+        <(ruleDescriptor.actions.after):execAction()>
+
+<if(memoize)>
+<if(backtracking)>
+        success = True<\n>
+<endif>
+<endif>
+<if(exceptions)>
+    <exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
+<else>
+<if(!emptyRule)>
+<if(actions.(actionScope).rulecatch)>
+    <actions.(actionScope).rulecatch>
+<else>
+    except RecognitionException, re:
+        self.reportError(re)
+        self.recover(self.input, re)
+        <@setErrorReturnValue()>
+
+<endif>
+<else>
+    finally:
+        pass
+
+<endif>
+<endif>
+finally:
+<if(trace)>
+    self.traceOut("<ruleName>", <ruleDescriptor.index>)<\n>
+<endif>
+    <memoize()>
+    <ruleScopeCleanUp()>
+    <finally>
+    pass
 >>
 
 catch(decl,action) ::= <<
@@ -600,8 +604,12 @@ block(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK,max
 # <fileName>:<description>
 alt<decisionNumber> = <maxAlt>
 <decls>
+<@body><blockBody()><@end>
+>>
+
+blockBody() ::= <<
 <@predecision()>
-<decision>
+<@decision><decision><@end>
 <@postdecision()>
 <@prebranch()>
 <alts:altSwitchCase(); separator="\nel">
@@ -614,7 +622,7 @@ ruleBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,maxK
 alt<decisionNumber> = <maxAlt>
 <decls>
 <@predecision()>
-<decision>
+<@decision><decision><@end>
 <@postdecision()>
 <alts:altSwitchCase(); separator="\nel">
 >>
@@ -642,10 +650,17 @@ positiveClosureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decision
 cnt<decisionNumber> = 0
 <decls>
 <@preloop()>
+<@loopBody>
+<positiveClosureBlockLoop()>
+<@end>
+<@postloop()>
+>>
+
+positiveClosureBlockLoop() ::= <<
 while True: #loop<decisionNumber>
     alt<decisionNumber> = <maxAlt>
     <@predecision()>
-    <decision>
+    <@decisionBody><decision><@end>
     <@postdecision()>
     <alts:altSwitchCase(); separator="\nel">
     else:
@@ -658,8 +673,6 @@ while True: #loop<decisionNumber>
         raise eee
 
     cnt<decisionNumber> += 1
-
-<@postloop()>
 >>
 
 positiveClosureBlockSingleAlt ::= positiveClosureBlock
@@ -669,16 +682,21 @@ closureBlock(alts,decls,decision,enclosingBlockLevel,blockLevel,decisionNumber,m
 # <fileName>:<description>
 <decls>
 <@preloop()>
+<@loopBody>
+<closureBlockLoop()>
+<@end>
+<@postloop()>
+>>
+
+closureBlockLoop() ::= <<
 while True: #loop<decisionNumber>
     alt<decisionNumber> = <maxAlt>
     <@predecision()>
-    <decision>
+    <@decisionBody><decision><@end>
     <@postdecision()>
     <alts:altSwitchCase(); separator="\nel">
     else:
         break #loop<decisionNumber>
-
-<@postloop()>
 >>
 
 closureBlockSingleAlt ::= closureBlock
@@ -1068,8 +1086,12 @@ DFA<dfa.decisionNumber>_transition = [
 
 # class definition for DFA #<dfa.decisionNumber>
 
-<if(dfa.specialStateSTs)>
 class DFA<dfa.decisionNumber>(DFA):
+    pass
+
+    <@errorMethod()>
+
+<if(dfa.specialStateSTs)>
     def specialStateTransition(self_, s, input):
         # convince pylint that my self_ magic is ok ;)
         # pylint: disable-msg=E0213
@@ -1092,8 +1114,6 @@ if s == <i0>: <! compressed special state numbers 0..n-1 !>
         nvae = NoViableAltException(self_.getDescription(), <dfa.decisionNumber>, _s, input)
         self_.error(nvae)
         raise nvae<\n>
-<else>
-DFA<dfa.decisionNumber> = DFA<\n>
 <endif>
 
 >>
@@ -1224,11 +1244,7 @@ returnScope(scope) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
 class <ruleDescriptor:returnStructName()>(<if(TREE_PARSER)>Tree<else>Parser<endif>RuleReturnScope):
     def __init__(self):
-        <if(TREE_PARSER)>
-        TreeRuleReturnScope.__init__(self)
-        <else>
-        ParserRuleReturnScope.__init__(self)
-        <endif>
+        super(<grammar.recognizerName>.<ruleDescriptor:returnStructName()>, self).__init__()
 
         <scope.attributes:{self.<it.decl> = None}; separator="\n">
         <@ruleReturnInit()>

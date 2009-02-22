@@ -78,6 +78,18 @@ class _Main(object):
             action="store_true",
             dest="hotshot"
             )
+        optParser.add_option(
+            "--port",
+            type="int",
+            dest="port",
+            default=None
+            )
+        optParser.add_option(
+            "--debug-socket",
+            action='store_true',
+            dest="debug_socket",
+            default=None
+            )
 
         self.setupOptions(optParser)
         
@@ -212,9 +224,15 @@ class ParserMain(_Main):
 
         
     def parseStream(self, options, inStream):
+        kwargs = {}
+        if options.port is not None:
+            kwargs['port'] = options.port
+        if options.debug_socket is not None:
+            kwargs['debug_socket'] = sys.stderr
+
         lexer = self.lexerClass(inStream)
         tokenStream = antlr3.CommonTokenStream(lexer)
-        parser = self.parserClass(tokenStream)
+        parser = self.parserClass(tokenStream, **kwargs)
         result = getattr(parser, options.parserRule)()
         if result is not None:
             if hasattr(result, 'tree'):

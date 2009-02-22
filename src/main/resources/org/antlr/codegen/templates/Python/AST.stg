@@ -48,12 +48,17 @@ from antlr3.tree import *<\n>
 
 /** Add an adaptor property that knows how to build trees */
 @genericParser.init() ::= <<
+self._adaptor = None
+self.adaptor = CommonTreeAdaptor()
 <@super.init()>
-self._adaptor = CommonTreeAdaptor()
 >>
 
 @genericParser.members() ::= <<
 <@super.members()>
+<astAccessor()>
+>>
+
+astAccessor() ::= <<
 def getTreeAdaptor(self):
     return self._adaptor
 

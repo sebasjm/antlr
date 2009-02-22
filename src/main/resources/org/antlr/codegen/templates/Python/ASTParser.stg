@@ -48,7 +48,7 @@ if <actions.(actionScope).synpredgate>:
 <endif>
 >>
 
-@rule.setErrorReturnValue() ::= <<
+@ruleBody.setErrorReturnValue() ::= <<
 retval.tree = self._adaptor.errorNode(self.input, retval.start, self.input.LT(-1), re)
 >>
 
