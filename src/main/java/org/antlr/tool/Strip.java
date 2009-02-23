@@ -3,35 +3,45 @@ package org.antlr.tool;
 import org.antlr.grammar.v3.ANTLRv3Lexer;
 import org.antlr.grammar.v3.ANTLRv3Parser;
 import org.antlr.runtime.*;
+import org.antlr.runtime.DFA;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeWizard;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.analysis.*;
+import org.antlr.codegen.CodeGenerator;
 
 import java.util.List;
+import java.io.File;
 
 /** A basic action stripper. */
 public class Strip {
-    public static void main(String args[]) throws Exception {
-        CharStream input = null;
-        String inputName = "<stdin>";
-        if ( args.length==1 ) {
-            input = new ANTLRFileStream(args[0]);
-            inputName = args[0];
-        }
-        else {
-            input = new ANTLRInputStream(System.in);
-        }
+    String filename;
+    TokenRewriteStream tokens;
+    public boolean tree = false;
 
+    public static void main(String args[]) throws Exception {
+        Strip s = new Strip();
+        s.processArgs(args);
+        s.parseAndRewrite();
+        System.out.println(s.tokens);
+    }
+
+    public void parseAndRewrite() throws Exception {
+        CharStream input = new ANTLRInputStream(System.in);
+        if ( filename!=null ) input = new ANTLRFileStream(filename);
         // BUILD AST
         ANTLRv3Lexer lex = new ANTLRv3Lexer(input);
-        final TokenRewriteStream tokens = new TokenRewriteStream(lex);
+        tokens = new TokenRewriteStream(lex);
         ANTLRv3Parser g = new ANTLRv3Parser(tokens);
         ANTLRv3Parser.grammarDef_return r = g.grammarDef();
         CommonTree t = (CommonTree)r.getTree();
-        //System.out.println(t.toStringTree());
+        if ( tree ) System.out.println(t.toStringTree());
+        rewrite(g.getTreeAdaptor(),t,g.getTokenNames());
+    }
 
-        final TreeAdaptor adaptor = g.getTreeAdaptor();
-        TreeWizard wiz = new TreeWizard(adaptor, g.getTokenNames());
+    public void rewrite(TreeAdaptor adaptor, CommonTree t, String[] tokenNames) throws Exception {
+        TreeWizard wiz = new TreeWizard(adaptor, tokenNames);
 
         // ACTIONS STUFF
         wiz.visit(t, ANTLRv3Parser.ACTION,
@@ -147,13 +157,16 @@ public class Strip {
             });
         wiz.visit(t, ANTLRv3Parser.ROOT,
            new TreeWizard.Visitor() {
-               public void visit(Object t) { AST_SUFFIX(tokens, (CommonTree)t); }
+               public void visit(Object t) {
+                   tokens.delete(((CommonTree)t).token.getTokenIndex());
+               }
            });
         wiz.visit(t, ANTLRv3Parser.BANG,
            new TreeWizard.Visitor() {
-               public void visit(Object t) { AST_SUFFIX(tokens, (CommonTree)t); }
+               public void visit(Object t) {
+                   tokens.delete(((CommonTree)t).token.getTokenIndex());
+               }
            });
-        System.out.print(tokens);
     }
 
     public static void ACTION(TokenRewriteStream tokens, CommonTree t) {
@@ -201,7 +214,25 @@ public class Strip {
         }
     }
 
-    public static void AST_SUFFIX(TokenRewriteStream tokens, CommonTree t) {
-        tokens.delete(t.token.getTokenIndex());
+    public void processArgs(String[] args) {
+		if ( args==null || args.length==0 ) {
+			help();
+			return;
+		}
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals("-tree")) tree = true;
+			else {
+				if (args[i].charAt(0) != '-') {
+					// Must be the grammar file
+                    filename = args[0];
+				}
+			}
+		}
+	}
+
+    private static void help() {
+        System.err.println("usage: java org.antlr.tool.Strip [args] file.g");
+        System.err.println("  -o outputDir          specify output directory where all output is generated");
     }
+
 }
