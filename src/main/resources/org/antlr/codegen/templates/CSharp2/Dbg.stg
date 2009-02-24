@@ -97,11 +97,15 @@ public <name>(<inputStreamType> input)
 
 public <name>(<inputStreamType> input, int port, RecognizerSharedState state)
     : base(input, state) {
-    <parserCtorBody()>
     <createListenerAndHandshake()>
+    <parserCtorBody()>
     <grammar.directDelegates:{g|<g:delegateName()> = new <g.recognizerName>(input, dbg, this.state, this<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
     <@finally()>
 }<\n>
+>>
+
+@parserCtorBody.initializeCyclicDFAs() ::= <<
+InitializeCyclicDFAs(dbg);
 >>
 
 ctorForProfilingRootGrammar() ::= <<
@@ -148,14 +152,14 @@ public <name>(<inputStreamType> input, IDebugEventListener dbg)
 
 createListenerAndHandshake() ::= <<
 <if(TREE_PARSER)>
-DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, input.TreeAdaptor);
+DebugEventSocketProxy dbg = new DebugEventSocketProxy(this, port, input.TreeAdaptor);
 <else>
-DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, null);
+DebugEventSocketProxy dbg = new DebugEventSocketProxy(this, port, null);
 <endif>
-DebugListener = proxy;
+DebugListener = dbg;
 try
 {
-    proxy.Handshake();
+    dbg.Handshake();
 }
 catch (IOException ioe)
 {
@@ -172,6 +176,8 @@ try {
 	IncRuleLevel();
 	dbg.Location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 >>
+
+@lexer.debugInitializeCyclicDFAs() ::= "IDebugEventListener dbg"
 
 @lexer.debugAddition() ::= ", dbg"
 
@@ -230,7 +236,7 @@ enterAlt(n) ::= "dbg.EnterAlt(<n>);<\n>"
 @positiveClosureBlock.postdecision() ::= "<exitDecision()>"
 
 @positiveClosureBlock.earlyExitException() ::=
-    "dbg.RecognitionException(eee);<\n>"
+    "dbg.RecognitionException(eee<decisionNumber>);<\n>"
 
 @closureBlock.preloop() ::= "<enterSubRule()>"
 

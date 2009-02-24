@@ -54,20 +54,20 @@ parserCtorBody() ::= <<
 >>
 
 createListenerAndHandshake() ::= <<
-DebugEventSocketProxy proxy = new DebugEventSocketProxy(this, port, adaptor);
-DebugListener = proxy;
+DebugEventSocketProxy dbg = new DebugEventSocketProxy(this, port, adaptor);
+DebugListener = dbg;
 <!
 Original line follows, replaced by the next two ifs:
-set<inputStreamType>(new Debug<inputStreamType>(input,proxy));
+set<inputStreamType>(new Debug<inputStreamType>(input,dbg));
  !>
 <if(PARSER)>
-TokenStream = new DebugTokenStream(input,proxy);<\n>
+TokenStream = new DebugTokenStream(input,dbg);<\n>
 <endif>
 <if(TREE_PARSER)>
-TokenStream = new DebugTreeNodeStream(input,proxy);<\n>
+TokenStream = new DebugTreeNodeStream(input,dbg);<\n>
 <endif>
 try {
-    proxy.Handshake();
+    dbg.Handshake();
 } catch (IOException ioe) {
     ReportError(ioe);
 }
@@ -76,13 +76,13 @@ try {
 @ctorForRootGrammar.finally() ::= <<
 ITreeAdaptor adap = new CommonTreeAdaptor();
 TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
+dbg.TreeAdaptor = adap;
 >>
 
 @ctorForProfilingRootGrammar.finally() ::=<<
 ITreeAdaptor adap = new CommonTreeAdaptor();
 TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
+dbg.TreeAdaptor = adap;
 >>
 
 @ctorForPredefinedListener.superClassRef() ::= "base(input, dbg)"

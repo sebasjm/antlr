@@ -129,7 +129,7 @@ public partial class <grammar.recognizerName> : <@superClassName><superClass><@e
    	<synpreds:{p | <lexerSynpred(p)>}>
 
     <cyclicDFAs:{dfa | protected DFA<dfa.decisionNumber> dfa<dfa.decisionNumber>;}; separator="\n">
-	private void InitializeCyclicDFAs()
+	private void InitializeCyclicDFAs(<@debugInitializeCyclicDFAs()>)
 	{
 	    <cyclicDFAs:{dfa | this.dfa<dfa.decisionNumber> = new DFA<dfa.decisionNumber>(this<@debugAddition()>);}; separator="\n">
 	    <cyclicDFAs:{dfa | <if(dfa.specialStateSTs)>this.dfa<dfa.decisionNumber>.specialStateTransitionHandler = new DFA.SpecialStateTransitionHandler(DFA<dfa.decisionNumber>_SpecialStateTransition);<endif>}; separator="\n">
@@ -295,7 +295,7 @@ public partial class <grammar.recognizerName> : <@superClassName><superClass><@e
 >>
 
 parserCtorBody() ::= <<
-InitializeCyclicDFAs();
+<@initializeCyclicDFAs>InitializeCyclicDFAs();<@end>
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
 this.state.ruleMemo = new Hashtable[<length(grammar.allImportedRules)>+1];<\n> <! index from 1..n !>

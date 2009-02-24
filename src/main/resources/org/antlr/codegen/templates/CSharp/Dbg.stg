@@ -230,7 +230,7 @@ enterAlt(n) ::= "dbg.EnterAlt(<n>);<\n>"
 @positiveClosureBlock.postdecision() ::= "<exitDecision()>"
 
 @positiveClosureBlock.earlyExitException() ::=
-    "dbg.RecognitionException(eee);<\n>"
+    "dbg.RecognitionException(eee<decisionNumber>);<\n>"
 
 @closureBlock.preloop() ::= "<enterSubRule()>"
 
