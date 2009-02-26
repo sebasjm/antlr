@@ -3,31 +3,31 @@ package org.antlr.tool;
 import org.antlr.grammar.v3.ANTLRv3Lexer;
 import org.antlr.grammar.v3.ANTLRv3Parser;
 import org.antlr.runtime.*;
-import org.antlr.runtime.DFA;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeWizard;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.analysis.*;
-import org.antlr.codegen.CodeGenerator;
 
 import java.util.List;
-import java.io.File;
 
 /** A basic action stripper. */
 public class Strip {
-    String filename;
-    TokenRewriteStream tokens;
-    public boolean tree = false;
+    protected String filename;
+    protected TokenRewriteStream tokens;
+    protected boolean tree_option = false;
+    protected String args[];
 
     public static void main(String args[]) throws Exception {
-        Strip s = new Strip();
-        s.processArgs(args);
+        Strip s = new Strip(args);
         s.parseAndRewrite();
         System.out.println(s.tokens);
     }
 
+    public Strip(String[] args) { this.args = args; }
+
+    public TokenRewriteStream getTokenStream() { return tokens; }
+
     public void parseAndRewrite() throws Exception {
+        processArgs(args);
         CharStream input = new ANTLRInputStream(System.in);
         if ( filename!=null ) input = new ANTLRFileStream(filename);
         // BUILD AST
@@ -36,7 +36,7 @@ public class Strip {
         ANTLRv3Parser g = new ANTLRv3Parser(tokens);
         ANTLRv3Parser.grammarDef_return r = g.grammarDef();
         CommonTree t = (CommonTree)r.getTree();
-        if ( tree ) System.out.println(t.toStringTree());
+        if (tree_option) System.out.println(t.toStringTree());
         rewrite(g.getTreeAdaptor(),t,g.getTokenNames());
     }
 
@@ -220,7 +220,7 @@ public class Strip {
 			return;
 		}
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-tree")) tree = true;
+			if (args[i].equals("-tree")) tree_option = true;
 			else {
 				if (args[i].charAt(0) != '-') {
 					// Must be the grammar file
@@ -232,7 +232,7 @@ public class Strip {
 
     private static void help() {
         System.err.println("usage: java org.antlr.tool.Strip [args] file.g");
-        System.err.println("  -o outputDir          specify output directory where all output is generated");
+        System.err.println("  -tree      print out ANTLR grammar AST");
     }
 
 }
