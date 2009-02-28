@@ -68,11 +68,13 @@ class unittest(Command):
     description = "run unit tests for package"
 
     user_options = [
+        ('xml-output=', None,
+         "Directory for JUnit compatible XML files."),
         ]
     boolean_options = []
 
     def initialize_options(self):
-        pass
+        self.xml_output = None
     
     def finalize_options(self):
         pass
@@ -122,9 +124,13 @@ class unittest(Command):
                 loadFailures.append(
                     (os.path.basename(testPath), buf.getvalue())
                     )              
-                
-            
-        runner = unittest.TextTestRunner(verbosity=2)
+         
+        if self.xml_output:
+            import xmlrunner
+            runner = xmlrunner.XMLTestRunner(
+                stream=open(os.path.join(self.xml_output, 'unittest.xml'), 'w'))
+        else:
+            runner = unittest.TextTestRunner(verbosity=2)
         result = runner.run(suite)
 
         for testName, error in loadFailures:
@@ -151,6 +157,10 @@ class functest(Command):
          "testcase to run [default: run all]"),
         ('antlr-version=', None,
          "ANTLR version to use [default: HEAD (in ../../build)]"),
+        ('antlr-jar=', None,
+         "Explicit path to an antlr jar (overrides --antlr-version)"),
+        ('xml-output=', None,
+         "Directory for JUnit compatible XML files."),
         ]
     
     boolean_options = []
@@ -158,7 +168,8 @@ class functest(Command):
     def initialize_options(self):
         self.testcase = None
         self.antlr_version = 'HEAD'
-
+        self.antlr_jar = None
+        self.xml_output = None
     
     def finalize_options(self):
         pass
@@ -184,7 +195,9 @@ class functest(Command):
         rootDir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), '..', '..'))
 
-        if self.antlr_version == 'HEAD':
+        if self.antlr_jar is not None:
+            classpath = [self.antlr_jar]
+        elif self.antlr_version == 'HEAD':
             classpath = [
                 os.path.join(rootDir, 'target', 'classes'),
                 os.path.join(rootDir, 'runtime', 'Java', 'target', 'classes')
@@ -249,7 +262,13 @@ class functest(Command):
                     )              
                 
             
-        runner = unittest.TextTestRunner(verbosity=2)
+        if self.xml_output:
+            import xmlrunner
+            runner = xmlrunner.XMLTestRunner(
+                stream=open(os.path.join(self.xml_output, 'functest.xml'), 'w'))
+        else:
+            runner = unittest.TextTestRunner(verbosity=2)
+
         result = runner.run(suite)
 
         for testName, error in loadFailures:
