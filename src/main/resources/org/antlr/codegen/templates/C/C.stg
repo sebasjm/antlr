@@ -2900,7 +2900,7 @@ static <scopeType(sname=scope.name)>
         // we can just reuse one. Our limit tracks the stack count, so the index of the entry we want
         // is one less than that, or conveniently, the current value of limit.
         //
-        newAttributes = ctx-><scopeStack(sname=scope.name)>->get(ctx-><scopeStack(sname=scope.name)>, ctx-\><scopeStack(sname=scope.name)>_limit);
+        newAttributes = (<scopeType(sname=scope.name)>)ctx-><scopeStack(sname=scope.name)>->get(ctx-><scopeStack(sname=scope.name)>, ctx-\><scopeStack(sname=scope.name)>_limit);
     }
     else
     {
