@@ -355,7 +355,7 @@ rewriteOptionalBlock(
 <<
 // <fileName>:<description>
 {
-	if ( <referencedElementsDeep:{el | (stream_<el> != NULL && stream_<el>->hasNext(stream_<el>)) }; separator="||"> )
+	if ( <referencedElementsDeep:{el | (stream_<el> != NULL && stream_<el>->hasNext(stream_<el>)) }; separator="|| "> )
 	{
 		<alt>
 	}
@@ -372,11 +372,11 @@ rewriteClosureBlock(
 <<
 // <fileName>:<description>
 {
-	while ( (<referencedElements:{el | stream_<el> != NULL && stream_<el>->hasNext(stream_<el>)) }; separator="||"> )
+	while ( <referencedElements:{el | (stream_<el> != NULL && stream_<el>->hasNext(stream_<el>)) }; separator="|| "> )
 	{
 		<alt>
 	}
-	<referencedElements:{el | if ( stream_<el> != NULL) stream_<el>->reset(stream_<el>);<\n>}>
+	<referencedElements:{el | if (stream_<el> != NULL) stream_<el>->reset(stream_<el>);<\n>}>
 }<\n>
 >>
 RewriteEarlyExitException() ::=
@@ -392,13 +392,13 @@ rewritePositiveClosureBlock(
 	referencedElements,		// elements in immediately block; no nested blocks
 	description) ::=
 <<
-if (<referencedElements:{el | (stream_<el> == NULL || !stream_<el>->hasNext(stream_<el>)) }; separator="||"> )
+if (<referencedElements:{el | (stream_<el> == NULL || !stream_<el>->hasNext(stream_<el>)) }; separator="|| "> )
 {
     <RewriteEarlyExitException()>
 }
 else
 {
-	while ( (<referencedElements:{el | stream_<el>->hasNext(stream_<el>)) }; separator="||"> ) {
+	while ( <referencedElements:{el | (stream_<el>->hasNext(stream_<el>)) }; separator="|| "> ) {
 		<alt>
 	}
 	<referencedElements:{el | stream_<el>->reset(stream_<el>);<\n>}>
