@@ -151,7 +151,6 @@ public class TreeWizard {
 
 	/** Using the map of token names to token types, return the type. */
 	public int getTokenType(String tokenName) {
-        System.out.println("getTokenType: "+tokenName);
 	 	if ( tokenNameToTypeMap==null ) {
 			 return Token.INVALID_TOKEN_TYPE;
 		 }

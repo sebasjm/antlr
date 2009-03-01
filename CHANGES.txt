@@ -39,7 +39,7 @@ This feature will be announced in 3.2, but I am integrating from my development 
   A linked list is fast at dequeue but slow at get(i).  An array is
   the reverse.  This is O(1) for both operations.
 
-* Added tree.TreeIterator, an generator that walks a doubly linked tree.
+* Added tree.TreeIterator, a generator that walks a doubly linked tree.
   The nodes must know what index they are. It's an Iterator but
   remove() is not supported. Returns navigation nodes always:
   UP, DOWN, EOF.
@@ -48,12 +48,6 @@ This feature will be announced in 3.2, but I am integrating from my development 
   to mark/release locations in the buffer for backtracking purposes.
   I hope to use for both tree nodes and tokens.  Just implement
   nextElement() to say how to get next node or token.
-
-* Added tree.UnBufferedTreeNodeStream to make tree parsing of subtrees
-  faster.  It only walks tree as required by LT/consume operations.
-
-* Backed out change: from 24th: removed new ctor to CommonTreeNodeStream
-  for walking subtrees.
 
 END CHANGES FOR TREE FILTER MODE
 
