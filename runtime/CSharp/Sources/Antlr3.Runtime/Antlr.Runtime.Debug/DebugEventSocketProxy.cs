@@ -59,7 +59,7 @@ namespace Antlr.Runtime.Debug
 	/// </remarks>
 	public class DebugEventSocketProxy : BlankDebugEventListener
 	{
-		public const int DEFAULT_DEBUGGER_PORT = 0xC001;
+		public const int DEFAULT_DEBUGGER_PORT = 0xBFCC;
 		protected int port = DEFAULT_DEBUGGER_PORT;
 		protected TcpListener serverSocket;
 		protected TcpClient socket;
