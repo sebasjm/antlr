@@ -7,7 +7,12 @@ University of San Francisco
 
 CHANGES
 
-February 18, 2008
+March 1, 2009
+
+* Changed ANTLRWorks debug port from 49153 to 49100.  Apparently we change the port in
+  ANTLRWorks to 49100 in 1.2 but forgot to do so in the ANTLR targets.
+
+February 18, 2009
 
 * Added org.antlr.tool.Strip (reads from file arg or stdin, emits to stdout)
   to strip actions from a grammar.
