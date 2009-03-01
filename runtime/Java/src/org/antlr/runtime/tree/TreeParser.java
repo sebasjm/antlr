@@ -92,75 +92,6 @@ public class TreeParser extends BaseRecognizer {
 		return new CommonTree(new CommonToken(expectedTokenType, tokenText));
 	}
 
-    /** Check if current node in input has a context.  Context means sequence
-     *  of nodes towards root of tree.  For example, you might say context
-     *  is "MULT" which means my parent must be MULT.  "CLASS VARDEF" says
-     *  current node must be child of a VARDEF and whose parent is a CLASS node.
-     *  You can use "..." to mean zero-or-more nodes.  "METHOD ... VARDEF"
-     *  means my parent is VARDEF and somewhere above that is a METHOD node.
-     *  The first node in the context is not necessarily the root.  The context
-     *  matcher stops matching and returns true when it runs out of context.
-     *  There is no way to force the first node to be the root. 
-     */
-    public boolean inContext(String context) {
-        return inContext(input.getTreeAdaptor(), getTokenNames(), input.LT(1), context);
-    }
-
-    /** The worker for inContext.  It's static and full of parameters for
-     *  testing purposes.
-     */
-    public static boolean inContext(TreeAdaptor adaptor,
-                                    String[] tokenNames,
-                                    Object t,
-                                    String context)
-    {
-        Matcher dotdotMatcher = dotdotPattern.matcher(context);
-        Matcher doubleEtcMatcher = doubleEtcPattern.matcher(context);
-        if ( dotdotMatcher.find() ) { // don't allow "..", must be "..."
-            throw new IllegalArgumentException("invalid syntax: ..");
-        }
-        if ( doubleEtcMatcher.find() ) { // don't allow double "..."
-            throw new IllegalArgumentException("invalid syntax: ... ...");
-        }
-        context = context.replaceAll("\\.\\.\\.", " ... "); // ensure spaces around ...
-        context = context.trim();
-        String[] nodes = context.split("\\s+");
-        int ni = nodes.length-1;
-        t = adaptor.getParent(t);
-        while ( ni>=0 && t!=null ) {
-            if ( nodes[ni].equals("...") ) {
-                // walk upwards until we see nodes[ni-1] then continue walking
-                if ( ni==0 ) return true; // ... at start is no-op
-                String goal = nodes[ni-1];
-                Object ancestor = getAncestor(adaptor, tokenNames, t, goal);
-                if ( ancestor==null ) return false;
-                t = ancestor;
-                ni--;
-            }
-            String name = tokenNames[adaptor.getType(t)];
-            if ( !name.equals(nodes[ni]) ) {
-                //System.err.println("not matched: "+nodes[ni]+" at "+t);
-                return false;
-            }
-            // advance to parent and to previous element in context node list
-            ni--;
-            t = adaptor.getParent(t);
-        }
-
-        if ( t==null && ni>=0 ) return false; // at root but more nodes to match
-        return true;
-    }
-
-    /** Helper for static inContext */
-    protected static Object getAncestor(TreeAdaptor adaptor, String[] tokenNames, Object t, String goal) {
-        while ( t!=null ) {
-            String name = tokenNames[adaptor.getType(t)];
-            if ( name.equals(goal) ) return t;
-            t = adaptor.getParent(t);
-        }
-        return null;
-    }
-
     /** Match '.' in tree parser has special meaning.  Skip node or
 	 *  entire tree if node has children.  If children, scan until
 	 *  corresponding UP node.
@@ -191,17 +122,19 @@ public class TreeParser extends BaseRecognizer {
 		input.consume(); // consume UP
 	}
 
-	/** We have DOWN/UP nodes in the stream that have no line info; override.
+    /** We have DOWN/UP nodes in the stream that have no line info; override.
 	 *  plus we want to alter the exception type.  Don't try to recover
 	 *  from tree parser errors inline...
-	 */
-	protected void mismatch(IntStream input, int ttype, BitSet follow)
-		throws RecognitionException
-	{
-		throw new MismatchedTreeNodeException(ttype, (TreeNodeStream)input);
-	}
+     */
+    protected Object recoverFromMismatchedToken(IntStream input,
+                                                int ttype,
+                                                BitSet follow)
+        throws RecognitionException
+    {
+        throw new MismatchedTreeNodeException(ttype, (TreeNodeStream)input);
+    }
 
-	/** Prefix error message with the grammar name because message is
+    /** Prefix error message with the grammar name because message is
 	 *  always intended for the programmer because the parser built
 	 *  the input tree not the user.
 	 */
