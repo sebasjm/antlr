@@ -43,7 +43,7 @@ import java.net.Socket;
  *  be kept in sync.  New events must be handled on both sides of socket.
  */
 public class DebugEventSocketProxy extends BlankDebugEventListener {
-	public static final int DEFAULT_DEBUGGER_PORT = 0xC001;
+	public static final int DEFAULT_DEBUGGER_PORT = 49100; // was 49153
 	protected int port = DEFAULT_DEBUGGER_PORT;
 	protected ServerSocket serverSocket;
 	protected Socket socket;
