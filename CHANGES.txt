@@ -7,6 +7,61 @@ University of San Francisco
 
 CHANGES
 
+March 1, 2009
+
+* Changed ANTLRWorks debug port from 49153 to 49100.  Apparently we change the port in
+  ANTLRWorks to 49100 in 1.2 but forgot to do so in the ANTLR targets.
+
+START CHANGES FOR TREE FILTER MODE (pulled from dev branch)
+
+This feature will be announced in 3.2, but I am integrating from my development branch now into the mainline so target developers have a chance to implement. We might release 3.1.3 bug fix release before 3.2.
+
+* CommonTreeNodeStream -> BufferedTreeNodeStream.  Now,
+  CommonTreeNodeStream is completely unbuffered unless you are
+  backtracking.  No longer making a list of all nodes before tree parsing.
+
+* Added tree grammar filter=true mode.  
+
+  Altered templates:
+	Java.stg: added filterMode to genericParser and treeParser.
+	This required a change to ANTLRCore.sti
+	Defined a default parameter in treeParser to set the superclass
+	to TreeFilter for tree grammar with filter=true. It sets
+	superclass to TreeRewriter if filter=true and output=AST.
+  Other them that, I only had to change ANTLR itself a little bit.
+  Made filter mode valid for tree grammars and have it automatically set
+  the necessary elements: @synpredgate, backtrack=true, rewrite=true
+  (if output=AST).  Added error message for detecting conflicting
+  options.
+
+* Added misc.FastQueue and TestFastQueue:
+  A queue that can dequeue and get(i) in O(1) and grow arbitrarily large.
+  A linked list is fast at dequeue but slow at get(i).  An array is
+  the reverse.  This is O(1) for both operations.
+
+* Added tree.TreeIterator, an generator that walks a doubly linked tree.
+  The nodes must know what index they are. It's an Iterator but
+  remove() is not supported. Returns navigation nodes always:
+  UP, DOWN, EOF.
+
+* Added misc.LookaheadStream: A lookahead queue that knows how
+  to mark/release locations in the buffer for backtracking purposes.
+  I hope to use for both tree nodes and tokens.  Just implement
+  nextElement() to say how to get next node or token.
+
+* Added tree.UnBufferedTreeNodeStream to make tree parsing of subtrees
+  faster.  It only walks tree as required by LT/consume operations.
+
+* Backed out change: from 24th: removed new ctor to CommonTreeNodeStream
+  for walking subtrees.
+
+END CHANGES FOR TREE FILTER MODE
+
+February 18, 2009
+
+* Added org.antlr.tool.Strip (reads from file arg or stdin, emits to stdout)
+  to strip actions from a grammar.
+
 February 4, 2009
 
 * Added CommonTree.setUnknownTokenBoundaries().  Sometimes we build trees
@@ -47,47 +102,6 @@ December 16, 2008
 
 * Added -verbose cmd-line option and turned off standard header
   and list of read files.  Silent now without -verbose.
-
-November 28, 2008
-
-* CommonTreeNodeStream -> BufferedTreeNodeStream.  Now,
-  CommonTreeNodeStream is completely unbuffered unless you are
-  backtracking.  No longer making a list of all nodes before tree parsing.
-
-* Added tree grammar filter=true mode.  
-
-  Altered templates:
-	Java.stg: added filterMode to genericParser and treeParser.
-	This required a change to ANTLRCore.sti
-	Defined a default parameter in treeParser to set the superclass
-	to TreeFilter for tree grammar with filter=true. It sets
-	superclass to TreeRewriter if filter=true and output=AST.
-  Other them that, I only had to change ANTLR itself a little bit.
-  Made filter mode valid for tree grammars and have it automatically set
-  the necessary elements: @synpredgate, backtrack=true, rewrite=true
-  (if output=AST).  Added error message for detecting conflicting
-  options.
-
-* Added misc.FastQueue and TestFastQueue:
-  A queue that can dequeue and get(i) in O(1) and grow arbitrarily large.
-  A linked list is fast at dequeue but slow at get(i).  An array is
-  the reverse.  This is O(1) for both operations.
-
-* Added tree.TreeIterator, an generator that walks a doubly linked tree.
-  The nodes must know what index they are. It's an Iterator but
-  remove() is not supported. Returns navigation nodes always:
-  UP, DOWN, EOF.
-
-* Added misc.LookaheadStream: A lookahead queue that knows how
-  to mark/release locations in the buffer for backtracking purposes.
-  I hope to use for both tree nodes and tokens.  Just implement
-  nextElement() to say how to get next node or token.
-
-* Added tree.UnBufferedTreeNodeStream to make tree parsing of subtrees
-  faster.  It only walks tree as required by LT/consume operations.
-
-* Backed out change: from 24th: removed new ctor to CommonTreeNodeStream
-  for walking subtrees.
 
 November 24, 2008
 
