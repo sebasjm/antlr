@@ -7,16 +7,6 @@ University of San Francisco
 
 CHANGES
 
-March 1, 2009
-
-* Changed ANTLRWorks debug port from 49153 to 49100.  Apparently we change the port in
-  ANTLRWorks to 49100 in 1.2 but forgot to do so in the ANTLR targets.
-
-February 18, 2009
-
-* Added org.antlr.tool.Strip (reads from file arg or stdin, emits to stdout)
-  to strip actions from a grammar.
-
 February 4, 2009
 
 * Added CommonTree.setUnknownTokenBoundaries().  Sometimes we build trees
@@ -57,6 +47,47 @@ December 16, 2008
 
 * Added -verbose cmd-line option and turned off standard header
   and list of read files.  Silent now without -verbose.
+
+November 28, 2008
+
+* CommonTreeNodeStream -> BufferedTreeNodeStream.  Now,
+  CommonTreeNodeStream is completely unbuffered unless you are
+  backtracking.  No longer making a list of all nodes before tree parsing.
+
+* Added tree grammar filter=true mode.  
+
+  Altered templates:
+	Java.stg: added filterMode to genericParser and treeParser.
+	This required a change to ANTLRCore.sti
+	Defined a default parameter in treeParser to set the superclass
+	to TreeFilter for tree grammar with filter=true. It sets
+	superclass to TreeRewriter if filter=true and output=AST.
+  Other them that, I only had to change ANTLR itself a little bit.
+  Made filter mode valid for tree grammars and have it automatically set
+  the necessary elements: @synpredgate, backtrack=true, rewrite=true
+  (if output=AST).  Added error message for detecting conflicting
+  options.
+
+* Added misc.FastQueue and TestFastQueue:
+  A queue that can dequeue and get(i) in O(1) and grow arbitrarily large.
+  A linked list is fast at dequeue but slow at get(i).  An array is
+  the reverse.  This is O(1) for both operations.
+
+* Added tree.TreeIterator, an generator that walks a doubly linked tree.
+  The nodes must know what index they are. It's an Iterator but
+  remove() is not supported. Returns navigation nodes always:
+  UP, DOWN, EOF.
+
+* Added misc.LookaheadStream: A lookahead queue that knows how
+  to mark/release locations in the buffer for backtracking purposes.
+  I hope to use for both tree nodes and tokens.  Just implement
+  nextElement() to say how to get next node or token.
+
+* Added tree.UnBufferedTreeNodeStream to make tree parsing of subtrees
+  faster.  It only walks tree as required by LT/consume operations.
+
+* Backed out change: from 24th: removed new ctor to CommonTreeNodeStream
+  for walking subtrees.
 
 November 24, 2008
 
@@ -137,8 +168,8 @@ October 21, 2008
 * Made . in tree grammar look like ^(. .*) to analysis, though ^(. foo)
   is illegal (can't have . at root). Wildcard is subtree or node.
   Fixed bugs:
-    http://www.antlr.org:8888/browse/ANTLR-248
-    http://www.antlr.org:8888/browse/ANTLR-344
+    http://www.antlr.org/browse/ANTLR-248
+    http://www.antlr.org/browse/ANTLR-344
 
 October 1, 2008 -- ANTLR v3.1.1
 
@@ -1376,18 +1407,18 @@ April 22, 2007
 April 21, 2007
 
 * Pushing a huge update that fixes:
-	http://www.antlr.org:8888/browse/ANTLR-112
-	http://www.antlr.org:8888/browse/ANTLR-110
-	http://www.antlr.org:8888/browse/ANTLR-109
-	http://www.antlr.org:8888/browse/ANTLR-103
-	http://www.antlr.org:8888/browse/ANTLR-97
-	http://www.antlr.org:8888/browse/ANTLR-113
-	http://www.antlr.org:8888/browse/ANTLR-66
-	http://www.antlr.org:8888/browse/ANTLR-98
-	http://www.antlr.org:8888/browse/ANTLR-24
-	http://www.antlr.org:8888/browse/ANTLR-114
-	http://www.antlr.org:8888/browse/ANTLR-5
-	http://www.antlr.org:8888/browse/ANTLR-6
+	http://www.antlr.org/browse/ANTLR-112
+	http://www.antlr.org/browse/ANTLR-110
+	http://www.antlr.org/browse/ANTLR-109
+	http://www.antlr.org/browse/ANTLR-103
+	http://www.antlr.org/browse/ANTLR-97
+	http://www.antlr.org/browse/ANTLR-113
+	http://www.antlr.org/browse/ANTLR-66
+	http://www.antlr.org/browse/ANTLR-98
+	http://www.antlr.org/browse/ANTLR-24
+	http://www.antlr.org/browse/ANTLR-114
+	http://www.antlr.org/browse/ANTLR-5
+	http://www.antlr.org/browse/ANTLR-6
 
   Basically, I gutted the way AST rewrites work.  MUCH better.
 
@@ -1504,10 +1535,10 @@ March 14, 2007
 
 * Added -Xnoinlinedfa make all DFA with tables; no inline prediction with IFs
 
-* Fixed http://www.antlr.org:8888/browse/ANTLR-80.
+* Fixed http://www.antlr.org/browse/ANTLR-80.
   Sem pred states didn't define lookahead vars.
 
-* Fixed http://www.antlr.org:8888/browse/ANTLR-91.  
+* Fixed http://www.antlr.org/browse/ANTLR-91.
   When forcing some acyclic DFA to be state tables, they broke.
   Forcing all DFA to be state tables should give same results.
 
@@ -1675,7 +1706,7 @@ December 27, 2006
   $slist.text will get only first stat.  I need to add a warning about
   this...
 
-* Fixed http://www.antlr.org:8888/browse/ANTLR-76 for Java.
+* Fixed http://www.antlr.org/browse/ANTLR-76 for Java.
   Enhanced TokenRewriteStream so it accepts any object; converts
   to string at last second.  Allows you to rewrite with StringTemplate
   templates now :)
