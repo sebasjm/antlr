@@ -838,7 +838,7 @@ class DebugEventSocketProxy(DebugEventListener):
     be kept in sync.  New events must be handled on both sides of socket.
     """
 
-    DEFAULT_DEBUGGER_PORT = 0xC001
+    DEFAULT_DEBUGGER_PORT = 49100
 
     def __init__(self, recognizer, adaptor=None, port=None,
                  debug=None):
