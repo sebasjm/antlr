@@ -304,7 +304,7 @@ filteringActionGate() ::= "(State.Backtracking = 1)"
 
 /** How to generate a parser */
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
-              bitsets, inputStreamType, superClass,
+              bitsets, inputStreamType, superClass, filterMode,
               ASTLabelType="ANTLRInterface", labelType, members, rewriteElementType) ::= <<
 type
   <rules: {r | <genericParserRuleReturnType(rule=r, ruleDescriptor=r.ruleDescriptor)>}>
@@ -489,7 +489,7 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTL
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="object", superClass="TreeParser", members={<actions.treeparser.members>}, filterMode) ::= <<
 <genericParser(inputStreamType="ITreeNodeStream", rewriteElementType="Node", ...)>
 >>
 

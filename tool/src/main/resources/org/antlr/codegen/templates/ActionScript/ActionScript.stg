@@ -168,7 +168,7 @@ filteringActionGate() ::= "this.state.backtracking==1"
 
 /** How to generate a parser */
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
-              bitsets, inputStreamType, superClass,
+              bitsets, inputStreamType, superClass, filterMode,
               ASTLabelType="Object", labelType, members, rewriteElementType) ::= <<
 public class <grammar.recognizerName> extends <if(actions.(actionScope).superClass)><actions.(actionScope).superClass><else><@superClassName><superClass><@end><endif> {
 <if(grammar.grammarIsRoot)>
@@ -239,7 +239,7 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTL
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}, filterMode) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", rewriteElementType="Node", ...)>
 >>
 

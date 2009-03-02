@@ -228,6 +228,7 @@ IMPORT_NAME_CLASH(arg,arg2) ::=
 AST_OP_IN_ALT_WITH_REWRITE(arg,arg2) ::=
   "rule <arg> alt <arg2> uses rewrite syntax and also an AST operator"
 WILDCARD_AS_ROOT(arg) ::= "Wildcard invalid as root; wildcard can itself be a tree"
+CONFLICTING_OPTION_IN_TREE_FILTER(arg,arg2) ::= "option <arg>=<arg2> conflicts with tree grammar filter mode"
 
 // GRAMMAR WARNINGS
 

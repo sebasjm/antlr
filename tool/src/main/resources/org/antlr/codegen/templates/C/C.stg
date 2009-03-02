@@ -1170,7 +1170,7 @@ genericParser(  grammar,
                 ASTLabelType="pANTLR3_BASE_TREE",
                 labelType,
 				members,
-				rewriteElementType
+				rewriteElementType, filterMode
               ) ::= <<
 
 
@@ -1480,7 +1480,7 @@ treeParser(	grammar,
 			labelType={<ASTLabelType>}, 
 			ASTLabelType="pANTLR3_BASE_TREE", 
 			superClass="TreeParser", 
-			members={<actions.treeparser.members>}
+			members={<actions.treeparser.members>}, filterMode
 			) ::= <<
 <genericParser(inputStreamType="pANTLR3_COMMON_TREE_NODE_STREAM", rewriteElementType="NODE", ...)>
 >>

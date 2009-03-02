@@ -269,7 +269,7 @@ filteringActionGate() ::= "backtracking == 1"
 genericParser(
 	grammar, name, scopes, tokens, tokenNames, rules, numRules, cyclicDFAs, 
 	bitsets, inputStreamType, superClass, ASTLabelType="Object",
-	labelType, members
+	labelType, members, filterMode
 	) ::= <<
 // genericParser	
 class <name> : public <@superClassName><superClass><@end> {
@@ -321,7 +321,7 @@ treeParser(grammar, name, scopes, tokens, tokenNames, globalAction,
 	rules, numRules, 
 	bitsets,
 	labelType={<ASTLabelType>}, ASTLabelType="Object", 
-	superClass="TreeParser", members={<actions.treeparser.members>}
+	superClass="TreeParser", members={<actions.treeparser.members>}, filterMode
 	) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", ...)>
 >>
