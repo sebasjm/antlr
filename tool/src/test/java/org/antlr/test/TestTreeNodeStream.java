@@ -31,10 +31,7 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.*;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /** Test the tree node stream. */
 public class TestTreeNodeStream extends BaseTest {
@@ -43,6 +40,10 @@ public class TestTreeNodeStream extends BaseTest {
 	public TreeNodeStream newStream(Object t) {
 		return new CommonTreeNodeStream(t);
 	}
+
+    public String toTokenTypeString(TreeNodeStream stream) {
+        return ((CommonTreeNodeStream)stream).toTokenTypeString();
+    }
 
 	@Test public void testSingleNode() throws Exception {
 		Tree t = new CommonTree(new CommonToken(101));
@@ -53,7 +54,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 
 		expecting = " 101";
-		found = stream.toString();
+		found = toTokenTypeString(stream);
 		assertEquals(expecting, found);
 	}
 
@@ -70,7 +71,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 
 		expecting = " 101 2 102 2 103 3 104 3";
-		found = stream.toString();
+		found = toTokenTypeString(stream);
 		assertEquals(expecting, found);
 	}
 
@@ -87,13 +88,13 @@ public class TestTreeNodeStream extends BaseTest {
 		root.addChild(t);
 		root.addChild(u);
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+		TreeNodeStream stream = newStream(root);
 		String expecting = " 101 102 103 104 105";
 		String found = toNodesOnlyString(stream);
 		assertEquals(expecting, found);
 
 		expecting = " 101 2 102 2 103 3 104 3 105";
-		found = stream.toString();
+		found = toTokenTypeString(stream);
 		assertEquals(expecting, found);
 	}
 
@@ -104,13 +105,13 @@ public class TestTreeNodeStream extends BaseTest {
 		root.addChild(new CommonTree(new CommonToken(102)));
 		root.addChild(new CommonTree(new CommonToken(103)));
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+		TreeNodeStream stream = newStream(root);
 		String expecting = " 101 102 103";
 		String found = toNodesOnlyString(stream);
 		assertEquals(expecting, found);
 
 		expecting = " 101 102 103";
-		found = stream.toString();
+		found = toTokenTypeString(stream);
 		assertEquals(expecting, found);
 	}
 
@@ -119,13 +120,13 @@ public class TestTreeNodeStream extends BaseTest {
 
 		root.addChild(new CommonTree(new CommonToken(101)));
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+		TreeNodeStream stream = newStream(root);
 		String expecting = " 101";
 		String found = toNodesOnlyString(stream);
 		assertEquals(expecting, found);
 
 		expecting = " 101";
-		found = stream.toString();
+		found = toTokenTypeString(stream);
 		assertEquals(expecting, found);
 	}
 
@@ -139,7 +140,7 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(expecting, found);
 
 		expecting = " 101 2 102 3";
-		found = stream.toString();
+		found = toTokenTypeString(stream);
 		assertEquals(expecting, found);
 	}
 
@@ -178,7 +179,7 @@ public class TestTreeNodeStream extends BaseTest {
 		r0.addChild(new CommonTree(new CommonToken(104)));
 		r0.addChild(new CommonTree(new CommonToken(105)));
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		TreeNodeStream stream = newStream(r0);
 		int m = stream.mark(); // MARK
 		for (int k=1; k<=13; k++) { // consume til end
 			stream.LT(1);
@@ -211,18 +212,19 @@ public class TestTreeNodeStream extends BaseTest {
 		r0.addChild(new CommonTree(new CommonToken(104)));
 		r0.addChild(new CommonTree(new CommonToken(105)));
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		TreeNodeStream stream = newStream(r0);
 		for (int k=1; k<=7; k++) { // consume til middle
 			//System.out.println(((Tree)stream.LT(1)).getType());
 			stream.consume();
 		}
 		assertEquals(107, ((Tree)stream.LT(1)).getType());
-		int m = stream.mark(); // MARK
+		stream.mark(); // MARK
 		stream.consume(); // consume 107
 		stream.consume(); // consume UP
 		stream.consume(); // consume UP
 		stream.consume(); // consume 104
-		stream.rewind(m);      // REWIND
+		stream.rewind(); // REWIND
+        stream.mark();   // keep saving nodes though
 
 		assertEquals(107, ((Tree)stream.LT(1)).getType());
 		stream.consume();
@@ -255,7 +257,7 @@ public class TestTreeNodeStream extends BaseTest {
 		r0.addChild(new CommonTree(new CommonToken(104)));
 		r0.addChild(new CommonTree(new CommonToken(105)));
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		TreeNodeStream stream = newStream(r0);
 		int m = stream.mark(); // MARK at start
 		stream.consume(); // consume 101
 		stream.consume(); // consume DN
@@ -280,32 +282,6 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(Token.DOWN, ((Tree)stream.LT(1)).getType());
 	}
 
-	@Test public void testSeek() throws Exception {
-		// ^(101 ^(102 103 ^(106 107) ) 104 105)
-		// stream has 7 real + 6 nav nodes
-		// Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
-		Tree r0 = new CommonTree(new CommonToken(101));
-		Tree r1 = new CommonTree(new CommonToken(102));
-		r0.addChild(r1);
-		r1.addChild(new CommonTree(new CommonToken(103)));
-		Tree r2 = new CommonTree(new CommonToken(106));
-		r2.addChild(new CommonTree(new CommonToken(107)));
-		r1.addChild(r2);
-		r0.addChild(new CommonTree(new CommonToken(104)));
-		r0.addChild(new CommonTree(new CommonToken(105)));
-
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
-		stream.consume(); // consume 101
-		stream.consume(); // consume DN
-		stream.consume(); // consume 102
-		stream.seek(7);   // seek to 107
-		assertEquals(107, ((Tree)stream.LT(1)).getType());
-		stream.consume(); // consume 107
-		stream.consume(); // consume UP
-		stream.consume(); // consume UP
-		assertEquals(104, ((Tree)stream.LT(1)).getType());
-	}
-
 	@Test public void testSeekFromStart() throws Exception {
 		// ^(101 ^(102 103 ^(106 107) ) 104 105)
 		// stream has 7 real + 6 nav nodes
@@ -320,7 +296,7 @@ public class TestTreeNodeStream extends BaseTest {
 		r0.addChild(new CommonTree(new CommonToken(104)));
 		r0.addChild(new CommonTree(new CommonToken(105)));
 
-		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+		TreeNodeStream stream = newStream(r0);
 		stream.seek(7);   // seek to 107
 		assertEquals(107, ((Tree)stream.LT(1)).getType());
 		stream.consume(); // consume 107
@@ -330,18 +306,18 @@ public class TestTreeNodeStream extends BaseTest {
 	}
 
 	public String toNodesOnlyString(TreeNodeStream nodes) {
+        TreeAdaptor adaptor = nodes.getTreeAdaptor();
 		StringBuffer buf = new StringBuffer();
-        CommonTree node = (CommonTree)nodes.LT(1);
-        int i = 2;
-        while ( node.getType()!=Token.EOF ) {
-		//for (int i=0; i<nodes.size(); i++) {
-			int type = node.getType();
+        Object o = nodes.LT(1);
+        int type = adaptor.getType(o);
+        while ( o!=null && type!=Token.EOF ) {
 			if ( !(type==Token.DOWN||type==Token.UP) ) {
 				buf.append(" ");
 				buf.append(type);
 			}
-            i++;
-            node = (CommonTree)nodes.LT(i);
+            nodes.consume();
+            o = nodes.LT(1);
+            type = adaptor.getType(o);
 		}
 		return buf.toString();
 	}
