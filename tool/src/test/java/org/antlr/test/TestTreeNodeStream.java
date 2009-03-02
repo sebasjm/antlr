@@ -331,13 +331,17 @@ public class TestTreeNodeStream extends BaseTest {
 
 	public String toNodesOnlyString(TreeNodeStream nodes) {
 		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<nodes.size(); i++) {
-			Object t = nodes.LT(i+1);
-			int type = nodes.getTreeAdaptor().getType(t);
+        CommonTree node = (CommonTree)nodes.LT(1);
+        int i = 2;
+        while ( node.getType()!=Token.EOF ) {
+		//for (int i=0; i<nodes.size(); i++) {
+			int type = node.getType();
 			if ( !(type==Token.DOWN||type==Token.UP) ) {
 				buf.append(" ");
 				buf.append(type);
 			}
+            i++;
+            node = (CommonTree)nodes.LT(i);
 		}
 		return buf.toString();
 	}

@@ -59,7 +59,7 @@ public class TestCommonTreeNodeStream extends TestTreeNodeStream {
 
 		CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
 		String expecting = " 101 2 102 2 103 3 104 2 105 3 106 2 107 3 108 109 3";
-		String found = stream.toString();
+		String found = stream.toTokenTypeString();
 		assertEquals(expecting, found);
 
 		// Assume we want to hit node 107 and then "call 102" then return
