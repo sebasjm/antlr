@@ -61,7 +61,7 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
  */
 treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
            numRules, bitsets, labelType, ASTLabelType,
-           superClass, members);
+           superClass, members, filterMode);
 
 /** A simpler version of a rule template that is specific to the imaginary
  *  rules created for syntactic predicates.  As they never have return values

@@ -181,7 +181,8 @@ filteringActionGate() ::= "state.backtracking==1"
 /** How to generate a parser */
 genericParser(grammar, name, scopes, tokens, tokenNames, rules, numRules,
               bitsets, inputStreamType, superClass,
-              ASTLabelType="Object", labelType, members, rewriteElementType) ::= <<
+              ASTLabelType="Object", labelType, members, rewriteElementType,
+              filterMode) ::= <<
 public class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
 <if(grammar.grammarIsRoot)>
     public static final String[] tokenNames = new String[] {
@@ -247,14 +248,20 @@ this.state.ruleMemo = new HashMap[<length(grammar.allImportedRules)>+1];<\n> <! 
  {g|this.<g:delegateName()> = <g:delegateName()>;}; separator="\n">
 >>
 
-parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTLabelType="Object", superClass="Parser", labelType="Token", members={<actions.parser.members>}) ::= <<
+parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets,
+       ASTLabelType="Object", superClass="Parser", labelType="Token",
+       members={<actions.parser.members>}) ::= <<
 <genericParser(inputStreamType="TokenStream", rewriteElementType="Token", ...)>
 >>
 
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object", superClass="TreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules,
+           numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="Object",
+           superClass={<if(filterMode)><if(buildAST)>TreeRewriter<else>TreeFilter<endif><else>TreeParser<endif>},
+           members={<actions.treeparser.members>},
+           filterMode) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", rewriteElementType="Node", ...)>
 >>
 
