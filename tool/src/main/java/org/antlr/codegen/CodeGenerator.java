@@ -340,26 +340,15 @@ public class CodeGenerator {
 		verifyActionScopesOkForTarget(actions);
 		// translate $x::y references
 		translateActionAttributeReferences(actions);
-		Map actionsForGrammarScope =
-			(Map)actions.get(grammar.getDefaultActionScope(grammar.type));
-        // if no synpredgate action set by user then set
-        if ( (actionsForGrammarScope==null ||
-			 !actionsForGrammarScope.containsKey(Grammar.SYNPREDGATE_ACTION_NAME)) )
-		{
-            StringTemplate gateST = templates.getInstanceOf("actionGate");
-            if ( filterMode ) {
-                // if filtering, we need to set actions to execute at backtracking
-                // level 1 not 0.
-                gateST = templates.getInstanceOf("filteringActionGate");
-            }
-            if ( actionsForGrammarScope==null ) {
-                actionsForGrammarScope=new HashMap();
-                actions.put(grammar.getDefaultActionScope(grammar.type),
-                            actionsForGrammarScope);
-            }
-            actionsForGrammarScope.put(Grammar.SYNPREDGATE_ACTION_NAME,
-                                       gateST);
+
+        StringTemplate gateST = templates.getInstanceOf("actionGate");
+        if ( filterMode ) {
+            // if filtering, we need to set actions to execute at backtracking
+            // level 1 not 0.
+            gateST = templates.getInstanceOf("filteringActionGate");
         }
+        grammar.setSynPredGateIfNotAlready(gateST);
+
         headerFileST.setAttribute("actions", actions);
 		outputFileST.setAttribute("actions", actions);
 
@@ -412,6 +401,8 @@ public class CodeGenerator {
 			recognizerST = templates.getInstanceOf("treeParser");
 			outputFileST.setAttribute("TREE_PARSER", Boolean.valueOf(true));
 			headerFileST.setAttribute("TREE_PARSER", Boolean.valueOf(true));
+            recognizerST.setAttribute("filterMode",
+                                      Boolean.valueOf(filterMode));
 		}
 		outputFileST.setAttribute("recognizer", recognizerST);
 		headerFileST.setAttribute("recognizer", recognizerST);

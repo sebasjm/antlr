@@ -224,19 +224,19 @@ public class Grammar {
 				}
 			};
 
-	public static final Set legalTreeParserOptions =
-			new HashSet() {
-				{
-				add("language"); add("tokenVocab");
-				add("output"); add("rewrite"); add("ASTLabelType");
-				add("TokenLabelType");
-				add("superClass");
-				add("filter");
-				add("k");
-				add("backtrack");
-				add("memoize");
-				}
-			};
+    public static final Set legalTreeParserOptions =
+        new HashSet() {
+            {
+                add("language"); add("tokenVocab");
+                add("output"); add("rewrite"); add("ASTLabelType");
+                add("TokenLabelType");
+                add("superClass");
+                add("k");
+                add("backtrack");
+                add("memoize");
+                add("filter");
+            }
+        };
 
 	public static final Set doNotCopyOptionsToLexer =
 		new HashSet() {
@@ -622,7 +622,9 @@ public class Grammar {
 			ErrorManager.internalError("unexpected parser recognition error from "+fileName, re);
 		}
 
-		if ( lexer.hasASTOperator && !buildAST() ) {
+        dealWithTreeFilterMode(); // tree grammar and filter=true?
+
+        if ( lexer.hasASTOperator && !buildAST() ) {
 			Object value = getOption("output");
 			if ( value == null ) {
 				ErrorManager.grammarWarning(ErrorManager.MSG_REWRITE_OR_OP_WITH_NO_OUTPUT_OPTION,
@@ -651,6 +653,40 @@ public class Grammar {
 			grammarTree.addChild(rAST);
 		}
 	}
+
+    protected void dealWithTreeFilterMode() {
+        Object filterMode = (String)getOption("filter");
+        if ( type==TREE_PARSER && filterMode!=null && filterMode.toString().equals("true") ) {
+            // check for conflicting options
+            // filter => backtrack=true
+            // filter&&output=AST => rewrite=true
+            // filter&&output!=AST => error
+            // any deviation from valid option set is an error
+            Object backtrack = (String)getOption("backtrack");
+            Object output = getOption("output");
+            Object rewrite = getOption("rewrite");
+            if ( backtrack!=null && !backtrack.toString().equals("true") ) {
+                ErrorManager.error(ErrorManager.MSG_CONFLICTING_OPTION_IN_TREE_FILTER,
+                                   "backtrack", backtrack);
+            }
+            if ( output!=null && !output.toString().equals("AST") ) {
+                ErrorManager.error(ErrorManager.MSG_CONFLICTING_OPTION_IN_TREE_FILTER,
+                                   "output", output);
+                setOption("output", "", null);
+            }
+            if ( rewrite!=null && !rewrite.toString().equals("true") ) {
+                ErrorManager.error(ErrorManager.MSG_CONFLICTING_OPTION_IN_TREE_FILTER,
+                                   "rewrite", rewrite);
+            }
+            // set options properly
+            setOption("backtrack", true, null);
+            if ( output!=null && output.toString().equals("AST") ) {
+                setOption("rewrite", true, null);
+            }
+            // @synpredgate set to state.backtracking==1 by code gen when filter=true
+            // superClass set in template target::treeParser
+        }
+    }
 
 	public void defineGrammarSymbols() {
 		if ( Tool.internalOption_PrintGrammarTree ) {
@@ -1433,6 +1469,22 @@ outer:
             for (Grammar g : allgrammars) {
                 g.defineNamedAction(ampersandAST, scope, nameAST, actionAST);
             }
+        }
+    }
+
+    public void setSynPredGateIfNotAlready(StringTemplate gateST) {
+        String scope = getDefaultActionScope(type);
+        Map actionsForGrammarScope = (Map)actions.get(scope);
+        // if no synpredgate action set by user then set
+        if ( (actionsForGrammarScope==null ||
+             !actionsForGrammarScope.containsKey(Grammar.SYNPREDGATE_ACTION_NAME)) )
+        {
+            if ( actionsForGrammarScope==null ) {
+                actionsForGrammarScope=new HashMap();
+                actions.put(scope, actionsForGrammarScope);
+            }
+            actionsForGrammarScope.put(Grammar.SYNPREDGATE_ACTION_NAME,
+                                       gateST);
         }
     }
 
@@ -2484,15 +2536,15 @@ outer:
 	public boolean buildAST() {
 		String outputType = (String)getOption("output");
 		if ( outputType!=null ) {
-			return outputType.equals("AST");
+			return outputType.toString().equals("AST");
 		}
 		return false;
 	}
 
 	public boolean rewriteMode() {
-		String outputType = (String)getOption("rewrite");
+		Object outputType = getOption("rewrite");
 		if ( outputType!=null ) {
-			return outputType.equals("true");
+			return outputType.toString().equals("true");
 		}
 		return false;
 	}
@@ -2504,7 +2556,7 @@ outer:
 	public boolean buildTemplate() {
 		String outputType = (String)getOption("output");
 		if ( outputType!=null ) {
-			return outputType.equals("template");
+			return outputType.toString().equals("template");
 		}
 		return false;
 	}

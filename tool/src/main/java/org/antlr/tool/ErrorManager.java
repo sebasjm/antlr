@@ -181,12 +181,13 @@ public class ErrorManager {
 	public static final int MSG_AST_OP_WITH_NON_AST_OUTPUT_OPTION = 164;
 	public static final int MSG_AST_OP_IN_ALT_WITH_REWRITE = 165;
     public static final int MSG_WILDCARD_AS_ROOT = 166;
+    public static final int MSG_CONFLICTING_OPTION_IN_TREE_FILTER = 167;
 
 
 	// GRAMMAR WARNINGS
 	public static final int MSG_GRAMMAR_NONDETERMINISM = 200; // A predicts alts 1,2
 	public static final int MSG_UNREACHABLE_ALTS = 201;       // nothing predicts alt i
-	public static final int MSG_DANGLING_STATE = 202;        // no edges out of state
+	public static final int MSG_DANGLING_STATE = 202;         // no edges out of state
 	public static final int MSG_INSUFFICIENT_PREDICATES = 203;
 	public static final int MSG_DUPLICATE_SET_ENTRY = 204;    // (A|A)
 	public static final int MSG_ANALYSIS_ABORTED = 205;

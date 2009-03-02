@@ -390,7 +390,17 @@ public class GrammarAST extends BaseAST {
 		return null;
 	}
 
-	/** Make nodes unique based upon Token so we can add them to a Set; if
+    public int getNumberOfChildrenWithType(int ttype) {
+        AST p = this.getFirstChild();
+        int n = 0;
+        while ( p!=null ) {
+            if ( p.getType()==ttype ) n++;
+            p = p.getNextSibling();
+        }
+        return n;
+    }
+
+    /** Make nodes unique based upon Token so we can add them to a Set; if
 	 *  not a GrammarAST, check type.
 	 */
 	public boolean equals(Object ast) {
