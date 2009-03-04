@@ -152,7 +152,7 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     }
 
 	public void rewind() {
-        rewind(lastMarker);
+        rewind(lastMarker); // rewind but do not release marker
     }
 
     /** Seek to a 0-indexed position within data buffer.  Can't handle
