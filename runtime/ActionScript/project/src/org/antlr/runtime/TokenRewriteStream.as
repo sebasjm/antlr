@@ -204,7 +204,7 @@ package org.antlr.runtime {
 	
 		public function toOriginalStringWithRange(start:int, end:int):String {
 			var buf:String = new String();
-			for (var i:int=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.size; i++) {
+			for (var i:int=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.length; i++) {
 				buf += getToken(i).text;
 			}
 			return buf.toString();
