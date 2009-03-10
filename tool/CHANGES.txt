@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+March 10, 2009
+
+* Added associativity token option to support upcoming special expression
+  parsing. Added rule option strategy=precedence also
+
 March 1, 2009
 
 * Changed ANTLRWorks debug port from 49153 to 49100.  Apparently we change the port in

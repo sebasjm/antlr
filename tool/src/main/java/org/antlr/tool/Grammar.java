@@ -270,6 +270,7 @@ public class Grammar {
 			new HashSet() {
 				{
 				add(defaultTokenOption);
+                add("associativity");
 				}
 			};
 	
