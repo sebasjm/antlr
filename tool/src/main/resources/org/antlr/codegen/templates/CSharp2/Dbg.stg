@@ -181,6 +181,10 @@ try {
 
 @lexer.debugAddition() ::= ", dbg"
 
+@genericParser.debugInitializeCyclicDFAs() ::= "IDebugEventListener dbg"
+
+@genericParser.debugAddition() ::= ", dbg"
+
 @rule.postamble() ::= <<
 dbg.Location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
 }

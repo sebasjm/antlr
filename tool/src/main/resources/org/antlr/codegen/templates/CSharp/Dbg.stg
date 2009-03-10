@@ -104,6 +104,10 @@ public <name>(<inputStreamType> input, int port, RecognizerSharedState state)
 }<\n>
 >>
 
+@parserCtorBody.initializeCyclicDFAs() ::= <<
+InitializeCyclicDFAs(dbg);
+>>
+
 ctorForProfilingRootGrammar() ::= <<
 <! bug: can't use <@super.members()> cut-n-paste instead !>
 public <name>(<inputStreamType> input) {
@@ -173,7 +177,13 @@ try {
 	dbg.Location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.column>);<\n>
 >>
 
+@lexer.debugInitializeCyclicDFAs() ::= "IDebugEventListener dbg"
+
 @lexer.debugAddition() ::= ", dbg"
+
+@genericParser.debugInitializeCyclicDFAs() ::= "IDebugEventListener dbg"
+
+@genericParser.debugAddition() ::= ", dbg"
 
 @rule.postamble() ::= <<
 dbg.Location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.column>);<\n>
