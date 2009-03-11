@@ -46,6 +46,7 @@
     <RootNamespace>Antlr.Runtime</RootNamespace>
     <Optimize>true</Optimize>
     <StartupObject />
+    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\net-2.0\</OutputPath>

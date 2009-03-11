@@ -22,6 +22,10 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Antlr.Utility</RootNamespace>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <EnvironmentVariables>
+      <EnvironmentVariables />
+    </EnvironmentVariables>
+    <GenerateDocumentation>true</GenerateDocumentation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
