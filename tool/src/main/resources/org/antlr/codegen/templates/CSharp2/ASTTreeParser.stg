@@ -77,7 +77,7 @@ _last = (<ASTLabelType>)input.LT(1);
 <if(rewriteMode)>
 <if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
 <if(root.el.rule)>
-if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = <root.el.label>.Tree;
+if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = (<ASTLabelType>) <root.el.label>.Tree;
 <else>
 if ( _first_<enclosingTreeLevel>==null ) _first_<enclosingTreeLevel> = <root.el.label>;
 <endif>
@@ -240,7 +240,7 @@ _last = (<ASTLabelType>)input.LT(1);
 <if(!rewriteMode)>
 adaptor.AddChild(root_<treeLevel>, <label>.Tree);
 <else> <! rewrite mode !>
-if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>.Tree;
+if ( _first_<treeLevel>==null ) _first_<treeLevel> = (<ASTLabelType>) <label>.Tree;
 <endif>
 >>
 
