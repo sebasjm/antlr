@@ -75,6 +75,8 @@
       -->
     <url>http://antlr.org</url>
 
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     <description>
 
 This is the brand new, re-written from scratch plugin for ANTLR v3.
