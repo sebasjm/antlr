@@ -75,7 +75,9 @@
       -->
     <url>http://antlr.org</url>
 
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <description>
 
@@ -302,6 +304,7 @@ Jim Idle - March 2009
     </dependencies>
     
     <build>
+
         <defaultGoal>install</defaultGoal>
         <extensions>
             <extension>
