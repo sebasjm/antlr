@@ -415,8 +415,8 @@ public class CodeGenerator {
 			target.getTargetStringLiteralFromString(grammar.getFileName());
 		outputFileST.setAttribute("fileName", targetAppropriateFileNameString);
 		headerFileST.setAttribute("fileName", targetAppropriateFileNameString);
-		outputFileST.setAttribute("ANTLRVersion", Tool.VERSION);
-		headerFileST.setAttribute("ANTLRVersion", Tool.VERSION);
+		outputFileST.setAttribute("ANTLRVersion", tool.VERSION);
+		headerFileST.setAttribute("ANTLRVersion", tool.VERSION);
 		outputFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
 		headerFileST.setAttribute("generatedTimestamp", Tool.getCurrentTimeStamp());
 

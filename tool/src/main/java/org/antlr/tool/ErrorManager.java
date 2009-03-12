@@ -199,7 +199,11 @@ public class ErrorManager {
 	public static final int MSG_NONREGULAR_DECISION = 211;
 
 
-	public static final int MAX_MESSAGE_NUMBER = 211;
+    // Dependency sorting errors
+    //
+    public static final int MSG_CIRCULAR_DEPENDENCY = 212; // t1.g -> t2.g -> t3.g ->t1.g
+
+	public static final int MAX_MESSAGE_NUMBER = 212;
 
 	/** Do not do perform analysis if one of these happens */
 	public static final BitSet ERRORS_FORCING_NO_ANALYSIS = new BitSet() {
@@ -213,6 +217,7 @@ public class ErrorManager {
 			add(MSG_NO_SUCH_RULE_IN_SCOPE);
 			add(MSG_LEXER_RULES_NOT_ALLOWED);
             add(MSG_WILDCARD_AS_ROOT);
+            add(MSG_CIRCULAR_DEPENDENCY);
             // TODO: ...
 		}
 	};
@@ -226,6 +231,7 @@ public class ErrorManager {
 			add(MSG_FILE_AND_GRAMMAR_NAME_DIFFER);
 			add(MSG_INVALID_IMPORT);
 			add(MSG_AST_OP_WITH_NON_AST_OUTPUT_OPTION);
+            add(MSG_CIRCULAR_DEPENDENCY);
 			// TODO: ...
 		}
 	};
