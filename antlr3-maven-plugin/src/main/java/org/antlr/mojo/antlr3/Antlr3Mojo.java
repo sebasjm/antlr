@@ -45,8 +45,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import org.antlr.Tool;
 import org.apache.maven.plugin.logging.Log;
@@ -138,7 +136,7 @@ public class Antlr3Mojo
      * If this parameter is set to true, then ANTLR will report all sorts of things
      * about what it is doing such as the names of files and the version of ANTLR and so on.
      *
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     protected boolean verbose;
     /**
@@ -282,6 +280,7 @@ public class Antlr3Mojo
             log.debug("ANTLR: trace: " + trace);
             log.debug("ANTLR: messageFormat: " + messageFormat);
             log.debug("ANTLR: conversionTimeout: " + conversionTimeout);
+            log.debug("ANTLR: verbose: " + verbose);
         }
 
         // Ensure that the output directory path is all in tact so that
@@ -321,7 +320,10 @@ public class Antlr3Mojo
 
         // Where do we want ANTLR to produce its output? (Base directory)
         //
-        log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
+        if (log.isDebugEnabled())
+        {
+            log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
+        }
         tool.setOutputDirectory(outputDirectory.getAbsolutePath());
 
         // Tell ANTLR that we always want the output files to be produced in the output directory
@@ -334,8 +336,10 @@ public class Antlr3Mojo
         tool.setLibDirectory(libDirectory.getAbsolutePath());
 
         if (!sourceDirectory.exists()) {
-            log.error("Source directory " + sourceDirectory.getAbsolutePath() + " does not exist");
-            throw new MojoExecutionException("Source directory " + sourceDirectory.getAbsolutePath() + " does not exist");
+            if (log.isInfoEnabled()) {
+                log.info("No ANTLR grammars to compile in " + sourceDirectory.getAbsolutePath());
+            }
+            return;
         } else {
             if (log.isInfoEnabled()) {
                 log.info("ANTLR: Processing source directory " + sourceDirectory.getAbsolutePath());
@@ -347,28 +351,23 @@ public class Antlr3Mojo
         tool.setInputDirectory(sourceDirectory.getAbsolutePath());
 
         try {
+
             // Now pick up all the files and process them with the Tool
             //
             processGrammarFiles(sourceDirectory, outputDirectory);
+
         } catch (InclusionScanException ie) {
 
             log.error(ie);
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze");
+
         } catch (Exception e) {
+
             getLog().error(e);
             throw new MojoExecutionException(e.getMessage());
         }
 
-        // Grammar files are added, now sort and generate them
-        //
-        try {
-            tool.sortGrammarFiles();
-        } catch (Tool.CircularDependencyException e) {
 
-            // Circular dependencies are not allowed
-            //
-            throw new MojoExecutionException(e.getMessage());
-        }
 
         tool.process();
 
@@ -391,6 +390,16 @@ public class Antlr3Mojo
 
     }
 
+
+    /**
+     *
+     * @param sourceDirectory
+     * @param outputDirectory
+     * @throws antlr.TokenStreamException
+     * @throws antlr.RecognitionException
+     * @throws java.io.IOException
+     * @throws org.codehaus.plexus.compiler.util.scan.InclusionScanException
+     */
     private void processGrammarFiles(File sourceDirectory, File outputDirectory)
             throws TokenStreamException, RecognitionException, IOException, InclusionScanException {
         // Which files under the source set should we be looking for as grammar files
@@ -417,6 +426,11 @@ public class Antlr3Mojo
                 getLog().info("No grammars to process");
             }
         } else {
+
+            // Tell the ANTLR tool that we want sorted build mode
+            //
+            tool.setSort(true);
+            
             // Iterate each grammar file we were given and add it into the tool's list of
             // grammars to process.
             //

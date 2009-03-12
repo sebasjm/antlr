@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <body>
+    <links>
+      <item name="Antlr" href="http://www.antlr.org/"/>
+    </links>
+
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="Usage" href="usage.html"/>
+    </menu>
+
+    <menu name="Examples">
+      <item name="Simple configurations" href="examples/simple.html"/>
+      <item name="Using library directories" href="examples/libraries.html"/>
+      <item name="Using imported grammars" href="examples/import.html"/>
+    </menu>
+  </body>
+</project>
