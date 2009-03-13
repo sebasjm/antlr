@@ -192,6 +192,11 @@ Jim Idle - March 2009
             <url>scpexe://antlr.org/home/mavensync/antlr-snapshot</url>
         </snapshotRepository>
 
+        <site>
+            <id>antlr-repo</id>
+            <name>ANTLR Maven Plugin Web Site</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-maven-webs/antlr3-maven-plugin</url>
+        </site>
     </distributionManagement>
 
     <!--
