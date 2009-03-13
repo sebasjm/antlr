@@ -103,6 +103,19 @@ http://www.sonatype.com/books/maven-book/reference/public-book.html
 
 The instructions here assume that Maven is installed and working correctly.
 
+If this is the first time you have built the ANTLR toolset, you will possibly
+need to install the master pom in your local repository (however the build
+may be able to locate this in the ANLR snapshot or release repository). If you try
+to build sub-modules on their own (as in run the mvn command in the sub directory
+for that tool, such as runtime/Java), and you receive a message that
+maven cannot find the master pom, then execute this in the main (or release) 
+directory:
+
+ mvn -N install
+
+This command will install the master build pom in your local repository and
+individual builds of sub modules will now work correctly.
+
 To build then, simply cd into the master build directory (e.g. $P4ROOT//code/antlr/main)
 and type:
 
