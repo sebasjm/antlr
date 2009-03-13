@@ -1,3 +1,5 @@
+ [The "BSD licence"]
+ Copyright (c) 2005-2008 Terence Parr
  Maven Plugin - Copyright (c) 2009      Jim Idle
 
  All rights reserved.
@@ -63,12 +65,12 @@ release branches are stored in Perforce like so:
 In this top level directory, you will find a master build file for Maven called pom.xml and
 you will also note that there are a number of subdirectories:
 
- tool                         - The ANTLR tool itself
- runtime/Java            - The ANTLR Java runtime
- runtime/X                - The runtime for language target X
- gunit                        - The grammar test tool
- antlr3-maven-plugin - The plugin tool for Maven that allows Maven projects to process
-                                   ANTLR grammars.
+ tool                  - The ANTLR tool itself
+ runtime/Java          - The ANTLR Java runtime
+ runtime/X             - The runtime for language target X
+ gunit                 - The grammar test tool
+ antlr3-maven-plugin   - The plugin tool for Maven that allows Maven projects to process
+                         ANTLR grammars.
 
 Each of these sub-directories also contains a file pom.xml that controls the build of each
 sub-component (or module in Maven parlance).
@@ -328,6 +330,7 @@ to 3.1.4-SNAPSHOT.
 8) Deploy the new snapshot as a placeholder for the next release. It
    will go to the snapshot repository of course:
 
+	  mvn -N deploy
           mvn -Dmaven.test.skip=true deploy
 
 9) You are now finished with the main development branch and change
@@ -368,6 +371,7 @@ to 3.1.4-SNAPSHOT.
 
 16)  Deploy the new release (this is it guys, make sure you are happy):
 
+	  mvn -N deploy
           mvn -Dmaven.test.skip=true deploy
 
         Note that we must skip the tests as Maven will not let you deploy releases
