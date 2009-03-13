@@ -65,6 +65,7 @@ public class Tool {
     private boolean verbose = false;
     private boolean sort = false;
     private boolean showBanner = true;
+    private static boolean exitNow = false;
 
     // The internal options are for my use on the command line during dev
     //
@@ -76,11 +77,13 @@ public class Tool {
     public static void main(String[] args) {
         Tool antlr = new Tool(args);
 
-        antlr.process();
-        if (ErrorManager.getNumErrors() > 0) {
-            System.exit(1);
+        if (!exitNow) {
+            antlr.process();
+            if (ErrorManager.getNumErrors() > 0) {
+                System.exit(1);
+            }
+            System.exit(0);
         }
-        System.exit(0);
     }
 
     /**
@@ -192,6 +195,9 @@ public class Tool {
                 setDepend(true);
             } else if (args[i].equals("-verbose")) {
                 setVerbose(true);
+            } else if (args[i].equals("-version")) {
+                version();
+                exitNow = true;
             } else if (args[i].equals("-sort")) {
                 setSort(true);
             } else if (args[i].equals("-message-format")) {
@@ -610,7 +616,12 @@ public class Tool {
         fw.close();
     }
 
+    private static void version() {
+        ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
+    }
+
     private static void help() {
+        ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("usage: java org.antlr.Tool [args] file.g [file2.g file3.g ...]");
         System.err.println("  -o outputDir          specify output directory where all output is generated");
         System.err.println("  -fo outputDir         same as -o but force even files with relative paths to dir");
@@ -625,10 +636,12 @@ public class Tool {
         System.err.println("  -message-format name  specify output style for messages");
         System.err.println("  -verbose              generate ANTLR version and other information");
         System.err.println("  -sort                 be smart about building dependent grammars after their dependencies");
+        System.err.println("  -version              print the version of ANTLR and exit.");
         System.err.println("  -X                    display extended argument list");
     }
 
     private static void Xhelp() {
+        ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
         System.err.println("  -Xgrtree               print the grammar AST");
         System.err.println("  -Xdfa                  print DFA as text ");
         System.err.println("  -Xnoprune              test lookahead against EBNF block exit branches");
@@ -708,8 +721,19 @@ public class Tool {
         }
         // output directory is a function of where the grammar file lives
         // for subdir/T.g, you get subdir here.  Well, depends on -o etc...
+        // But, if this is a .tokens file, then we force the output to
+        // be the base output directory (or current directory if there is not a -o)
         //
-        File outputDir = getOutputDirectory(g.getFileName());
+        File outputDir;
+        if (fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION)) {
+            if (haveOutputDir) {
+                outputDir = new File(getOutputDirectory());
+            } else {
+                outputDir = new File(".");
+            }
+        } else {
+            outputDir = getOutputDirectory(g.getFileName());
+        }
         File outputFile = new File(outputDir, fileName);
 
         if (!outputDir.exists()) {
@@ -751,7 +775,6 @@ public class Tool {
         } else {
             fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
         }
-
         if (haveOutputDir) {
             // -o /tmp /var/lib/t.g => /tmp/T.java
             // -o subdir/output /usr/lib/t.g => subdir/output/T.java
@@ -830,7 +853,6 @@ public class Tool {
         } else {
             f = new File(fileName);
         }
-
         // And ask Java what the base directory of this location is
         //
         return f.getParent();
@@ -838,9 +860,12 @@ public class Tool {
 
     /** Return a File descriptor for vocab file.  Look in library or
      *  in -o output path.  antlr -o foo T.g U.g where U needs T.tokens
-     *  won't work unless we look in foo too. Additionally we need to
-     *  make sure that we look in relative subdirectories of -o foo otherwise
-     *  -o foo a/y/g1.g a/y/g2.g 
+     *  won't work unless we look in foo too. If we do not find the
+     *  file in the lib directory then must assume that the .tokens file
+     *  is going to be generated as part of this build and we have defined
+     *  .tokens files so that they ALWAYS are generated in the base output
+     *  directory, which means the current directory for the command line tool if there
+     *  was no output directory specified.
      */
     public File getImportedVocabFile(String vocabName) {
 
@@ -853,19 +878,14 @@ public class Tool {
         }
 
         // We did not find the vocab file in the lib directory, so we need
-        // to look for it relative to the output directory, then finally
-        // in the base output directory. If we do -o fred my/path/*.g then
-        // unless we look in fred/my/path we will not find the
-        // .tokens file we want.
+        // to look for it in the output directory which is where .tokens
+        // files are generated (in the base, not relative to the input
+        // location.)
         //
-        String relPath = "";
-        if (grammarOutputDirectory.compareTo(".") != 0) {
-            relPath = grammarOutputDirectory + File.separator;
-        }
         if (haveOutputDir) {
-            f = new File(getOutputDirectory(), relPath + vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+            f = new File(getOutputDirectory(), vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
         } else {
-            f = new File(relPath + vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
+            f = new File(vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
         }
         return f;
     }
@@ -1516,7 +1536,6 @@ public class Tool {
 
             BuildDependencyGenerator dep1 = buildDependencyGenerators.get(o1);
             BuildDependencyGenerator dep2 = buildDependencyGenerators.get(o2);
-
             List<File> dependencies = dep1.getNonImportDependenciesFileList();
             if (dependencies == null) {
                 return false;

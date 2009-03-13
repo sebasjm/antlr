@@ -110,8 +110,10 @@ public class BuildDependencyGenerator {
         String recognizer =
                 generator.getRecognizerFileName(grammar.name, grammar.type);
         files.add(new File(outputDir, recognizer));
-        // add output vocab file; e.g., T.tokens
-        files.add(new File(outputDir, generator.getVocabFileName()));
+        // add output vocab file; e.g., T.tokens. This is always generated to
+        // the base output directory, which will be just . if there is no -o option
+        //
+        files.add(new File(tool.getOutputDirectory(), generator.getVocabFileName()));
         // are we generating a .h file?
         StringTemplate headerExtST = null;
         StringTemplate extST = generator.getTemplates().getInstanceOf("codeFileExtension");
