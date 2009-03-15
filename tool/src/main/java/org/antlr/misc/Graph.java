@@ -22,7 +22,7 @@ public class Graph {
     protected Map<Object,Node> nodes = new HashMap<Object,Node>();
 
     public void addEdge(Object a, Object b) {
-        System.out.println("add edge "+a+" to "+b);
+        //System.out.println("add edge "+a+" to "+b);
         Node a_node = getNode(a);
         Node b_node = getNode(b);
         a_node.addEdge(b_node);
