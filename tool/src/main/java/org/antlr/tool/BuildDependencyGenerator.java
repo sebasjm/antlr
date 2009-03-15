@@ -75,8 +75,8 @@ import java.io.*;
  *  and had to escape spaces in filenames :(
  */
 public class BuildDependencyGenerator {
-
     protected String grammarFileName;
+    protected String tokenVocab;
     protected Tool tool;
     protected Grammar grammar;
     protected CodeGenerator generator;
@@ -192,10 +192,10 @@ public class BuildDependencyGenerator {
         List<File> files = new ArrayList<File>();
 
         // handle token vocabulary loads
-        String vocabName = (String) grammar.getOption("tokenVocab");
-        if (vocabName != null) {
+        tokenVocab = (String) grammar.getOption("tokenVocab");
+        if (tokenVocab != null) {
 
-            File vocabFile = tool.getImportedVocabFile(vocabName);
+            File vocabFile = tool.getImportedVocabFile(tokenVocab);
             files.add(vocabFile);
         }
 
@@ -244,6 +244,14 @@ public class BuildDependencyGenerator {
             }
         }
     }
+
+    public String getTokenVocab() {
+        return tokenVocab;
+    }
+
+    public CodeGenerator getGenerator() {
+        return generator;
+    }    
 
     public String groomQualifiedFileName(String outputDir, String fileName) {
         if (outputDir.equals(".")) {
