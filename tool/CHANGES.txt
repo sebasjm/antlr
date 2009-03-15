@@ -11,7 +11,9 @@ March 15, 2009
 
 * ANTLR always sorts incoming grammar list by dependency.  For example,
   If W.g depends on tokens from P.g then P.g is done first even if
-  W.g mentioned first on command line.
+  W.g mentioned first on command line.  It does not ignore any files you
+  specify the commandline.  If you do *.g and that includes some
+  imported grammars, it will run antlr on them.
 
 * -make option prevents ANTLR from running on P.g if P older than
   generated files.
@@ -19,6 +21,10 @@ March 15, 2009
 * Added org.antlr.tool.GrammarSpelunker to build a faster dependency
   checker (what grammars depend on etc...).  Totally independent of any
   ANTLR code; easy to pull into other tools.
+
+* Added org.antlr.misc.Graph, a general graph with nodes
+  containing an Object payload. It knows how to do a topological sort
+  on the nodes.
 
 March 10, 2009
 
