@@ -680,9 +680,9 @@ public class Grammar {
                                    "rewrite", rewrite);
             }
             // set options properly
-            setOption("backtrack", true, null);
+            setOption("backtrack", "true", null);
             if ( output!=null && output.toString().equals("AST") ) {
-                setOption("rewrite", true, null);
+                setOption("rewrite", "true", null);
             }
             // @synpredgate set to state.backtracking==1 by code gen when filter=true
             // superClass set in template target::treeParser
