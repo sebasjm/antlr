@@ -22,7 +22,7 @@ public class Graph {
     protected Map<Object,Node> nodes = new HashMap<Object,Node>();
 
     public void addEdge(Object a, Object b) {
-        //System.out.println("add edge "+a+" to "+b);
+        System.out.println("add edge "+a+" to "+b);
         Node a_node = getNode(a);
         Node b_node = getNode(b);
         a_node.addEdge(b_node);
@@ -47,9 +47,9 @@ public class Graph {
      *  So if this gives nonreversed postorder traversal, I get the order
      *  I want.
      */
-    public List<Node> sort() {
+    public List<Object> sort() {
         Set<Node> visited = new HashSet<Node>();
-        ArrayList<Node> sorted = new ArrayList<Node>();
+        ArrayList<Object> sorted = new ArrayList<Object>();
         while ( visited.size() < nodes.size() ) {
             // pick any unvisited node, n
             Node n = null;
@@ -62,7 +62,7 @@ public class Graph {
         return sorted;
     }
 
-    public void DFS(Node n, Set<Node> visited, ArrayList<Node> sorted) {
+    public void DFS(Node n, Set<Node> visited, ArrayList<Object> sorted) {
         if ( visited.contains(n) ) return;
         visited.add(n);
         if ( n.edges!=null ) {
@@ -71,6 +71,6 @@ public class Graph {
                 DFS(target, visited, sorted);
             }
         }
-        sorted.add(n);
+        sorted.add(n.payload);
     }
 }

@@ -7,6 +7,19 @@ University of San Francisco
 
 CHANGES
 
+March 15, 2009
+
+* ANTLR always sorts incoming grammar list by dependency.  For example,
+  If W.g depends on tokens from P.g then P.g is done first even if
+  W.g mentioned first on command line.
+
+* -make option prevents ANTLR from running on P.g if P older than
+  generated files.
+
+* Added org.antlr.tool.GrammarSpelunker to build a faster dependency
+  checker (what grammars depend on etc...).  Totally independent of any
+  ANTLR code; easy to pull into other tools.
+
 March 10, 2009
 
 * Added associativity token option to support upcoming special expression

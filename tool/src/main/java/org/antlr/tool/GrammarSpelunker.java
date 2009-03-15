@@ -45,7 +45,7 @@ public class GrammarSpelunker {
                              "' not expected '"+expecting+"'");
     }
 
-    protected void parse() throws IOException {
+    public void parse() throws IOException {
         Reader r = new FileReader(grammarFileName);
         BufferedReader br = new BufferedReader(r);
         try {

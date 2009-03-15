@@ -28,10 +28,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.antlr;
 
 import antlr.TokenStreamException;
+import antlr.RecognitionException;
+import antlr.ANTLRException;
 import org.antlr.analysis.*;
 import org.antlr.codegen.CodeGenerator;
 import org.antlr.runtime.misc.Stats;
 import org.antlr.tool.*;
+import org.antlr.misc.Graph;
 
 import java.io.*;
 import java.util.*;
@@ -43,7 +46,7 @@ public class Tool {
     public String VERSION = "!Unknown version!";
     //public static final String VERSION = "${project.version}";
     public static final String UNINITIALIZED_DIR = "<unset-dir>";
-    private List grammarFileNames = new ArrayList();
+    private Set<String> grammarFileNames = new HashSet<String>();
     private boolean generate_NFA_dot = false;
     private boolean generate_DFA_dot = false;
     private String outputDirectory = ".";
@@ -63,7 +66,8 @@ public class Tool {
     private boolean forceRelativeOutput = false;
     protected boolean deleteTempLexer = true;
     private boolean verbose = false;
-    private boolean sort = false;
+    /** Don't process grammar file if generated files are newer than grammar */
+    private boolean make = false;
     private boolean showBanner = true;
     private static boolean exitNow = false;
 
@@ -73,6 +77,12 @@ public class Tool {
     public static boolean internalOption_PrintDFA = false;
     public static boolean internalOption_ShowNFAConfigsInDFA = false;
     public static boolean internalOption_watchNFAConversion = false;
+
+    /**
+     * A list of dependency generators that are accumulated aaaas (and if) the
+     * tool is required to sort the provided grammars into build dependency order.
+    protected Map<String, BuildDependencyGenerator> buildDependencyGenerators;
+     */
 
     public static void main(String[] args) {
         Tool antlr = new Tool(args);
@@ -143,16 +153,17 @@ public class Tool {
             if (args[i].equals("-o") || args[i].equals("-fo")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing output directory with -fo/-o option; ignoring");
-                } else {
+                }
+                else {
                     if (args[i].equals("-fo")) { // force output into dir
                         setForceAllFilesToOutputDir(true);
                     }
                     i++;
                     outputDirectory = args[i];
                     if (outputDirectory.endsWith("/") ||
-                            outputDirectory.endsWith("\\")) {
+                        outputDirectory.endsWith("\\")) {
                         outputDirectory =
-                                outputDirectory.substring(0, getOutputDirectory().length() - 1);
+                            outputDirectory.substring(0, getOutputDirectory().length() - 1);
                     }
                     File outDir = new File(outputDirectory);
                     haveOutputDir = true;
@@ -161,14 +172,16 @@ public class Tool {
                         setLibDirectory(".");
                     }
                 }
-            } else if (args[i].equals("-lib")) {
+            }
+            else if (args[i].equals("-lib")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing library directory with -lib option; ignoring");
-                } else {
+                }
+                else {
                     i++;
                     setLibDirectory(args[i]);
                     if (getLibraryDirectory().endsWith("/") ||
-                            getLibraryDirectory().endsWith("\\")) {
+                        getLibraryDirectory().endsWith("\\")) {
                         setLibDirectory(getLibraryDirectory().substring(0, getLibraryDirectory().length() - 1));
                     }
                     File outDir = new File(getLibraryDirectory());
@@ -177,105 +190,126 @@ public class Tool {
                         setLibDirectory(".");
                     }
                 }
-            } else if (args[i].equals("-nfa")) {
+            }
+            else if (args[i].equals("-nfa")) {
                 setGenerate_NFA_dot(true);
-            } else if (args[i].equals("-dfa")) {
+            }
+            else if (args[i].equals("-dfa")) {
                 setGenerate_DFA_dot(true);
-            } else if (args[i].equals("-debug")) {
+            }
+            else if (args[i].equals("-debug")) {
                 setDebug(true);
-            } else if (args[i].equals("-trace")) {
+            }
+            else if (args[i].equals("-trace")) {
                 setTrace(true);
-            } else if (args[i].equals("-report")) {
+            }
+            else if (args[i].equals("-report")) {
                 setReport(true);
-            } else if (args[i].equals("-profile")) {
+            }
+            else if (args[i].equals("-profile")) {
                 setProfile(true);
-            } else if (args[i].equals("-print")) {
+            }
+            else if (args[i].equals("-print")) {
                 setPrintGrammar(true);
-            } else if (args[i].equals("-depend")) {
+            }
+            else if (args[i].equals("-depend")) {
                 setDepend(true);
-            } else if (args[i].equals("-verbose")) {
+            }
+            else if (args[i].equals("-verbose")) {
                 setVerbose(true);
-            } else if (args[i].equals("-version")) {
+            }
+            else if (args[i].equals("-version")) {
                 version();
                 exitNow = true;
-            } else if (args[i].equals("-sort")) {
-                setSort(true);
-            } else if (args[i].equals("-message-format")) {
+            }
+            else if (args[i].equals("-make")) {
+                setMake(true);
+            }
+            else if (args[i].equals("-message-format")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing output format with -message-format option; using default");
-                } else {
+                }
+                else {
                     i++;
                     ErrorManager.setFormat(args[i]);
                 }
-            } else if (args[i].equals("-Xgrtree")) {
+            }
+            else if (args[i].equals("-Xgrtree")) {
                 internalOption_PrintGrammarTree = true; // print grammar tree
-            } else if (args[i].equals("-Xdfa")) {
+            }
+            else if (args[i].equals("-Xdfa")) {
                 internalOption_PrintDFA = true;
-            } else if (args[i].equals("-Xnoprune")) {
+            }
+            else if (args[i].equals("-Xnoprune")) {
                 DFAOptimizer.PRUNE_EBNF_EXIT_BRANCHES = false;
-            } else if (args[i].equals("-Xnocollapse")) {
+            }
+            else if (args[i].equals("-Xnocollapse")) {
                 DFAOptimizer.COLLAPSE_ALL_PARALLEL_EDGES = false;
-            } else if (args[i].equals("-Xdbgconversion")) {
+            }
+            else if (args[i].equals("-Xdbgconversion")) {
                 NFAToDFAConverter.debug = true;
-            } else if (args[i].equals("-Xmultithreaded")) {
+            }
+            else if (args[i].equals("-Xmultithreaded")) {
                 NFAToDFAConverter.SINGLE_THREADED_NFA_CONVERSION = false;
-            } else if (args[i].equals("-Xnomergestopstates")) {
+            }
+            else if (args[i].equals("-Xnomergestopstates")) {
                 DFAOptimizer.MERGE_STOP_STATES = false;
-            } else if (args[i].equals("-Xdfaverbose")) {
+            }
+            else if (args[i].equals("-Xdfaverbose")) {
                 internalOption_ShowNFAConfigsInDFA = true;
-            } else if (args[i].equals("-Xwatchconversion")) {
+            }
+            else if (args[i].equals("-Xwatchconversion")) {
                 internalOption_watchNFAConversion = true;
-            } else if (args[i].equals("-XdbgST")) {
+            }
+            else if (args[i].equals("-XdbgST")) {
                 CodeGenerator.EMIT_TEMPLATE_DELIMITERS = true;
-            } else if (args[i].equals("-Xmaxinlinedfastates")) {
+            }
+            else if (args[i].equals("-Xmaxinlinedfastates")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing max inline dfa states -Xmaxinlinedfastates option; ignoring");
-                } else {
+                }
+                else {
                     i++;
                     CodeGenerator.MAX_ACYCLIC_DFA_STATES_INLINE = Integer.parseInt(args[i]);
                 }
-            } else if (args[i].equals("-Xm")) {
+            }
+            else if (args[i].equals("-Xm")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing max recursion with -Xm option; ignoring");
-                } else {
+                }
+                else {
                     i++;
                     NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK = Integer.parseInt(args[i]);
                 }
-            } else if (args[i].equals("-Xmaxdfaedges")) {
+            }
+            else if (args[i].equals("-Xmaxdfaedges")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing max number of edges with -Xmaxdfaedges option; ignoring");
-                } else {
+                }
+                else {
                     i++;
                     DFA.MAX_STATE_TRANSITIONS_FOR_TABLE = Integer.parseInt(args[i]);
                 }
-            } else if (args[i].equals("-Xconversiontimeout")) {
+            }
+            else if (args[i].equals("-Xconversiontimeout")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing max time in ms -Xconversiontimeout option; ignoring");
-                } else {
+                }
+                else {
                     i++;
                     DFA.MAX_TIME_PER_DFA_CREATION = Integer.parseInt(args[i]);
                 }
-            } else if (args[i].equals("-Xnfastates")) {
+            }
+            else if (args[i].equals("-Xnfastates")) {
                 DecisionProbe.verbose = true;
-            } else if (args[i].equals("-X")) {
+            }
+            else if (args[i].equals("-X")) {
                 Xhelp();
-            } else {
+            }
+            else {
                 if (args[i].charAt(0) != '-') {
                     // Must be the grammar file
-                    // If the sort option is set, then we add teh grammar file in a special way
-                    // so that it creates a build dependency object. This causes each file to be analyzed
-                    // wtwice - once to find out what all the output files are and a second time to
-                    // do the actual code generation. That is why the sort option is not the default
-                    //
-                    if (sort && !isDepend()) {
-                        try {
-                            addGrammarFile(args[i]);
-                        } catch (Exception e) {
-                            ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, args[i], e);
-                        }
-                    } else {
-                        getGrammarFileNames().add(args[i]);
-                    }
+                    addGrammarFile(args[i]);
                 }
             }
         }
@@ -291,6 +325,7 @@ public class Tool {
     }
     }
      */
+    
     /**
      * Checks to see if the list of outputFiles all exist, and have
      * last-modified timestamps which are later than the last-modified
@@ -299,34 +334,29 @@ public class Tool {
      * returns false, otherwise, it returns true.
      *
      * @param grammarFileName The grammar file we are checking
-     * @param outputFiles
-     * @return
      */
-    public boolean buildRequired(String grammarFileName) {
-        BuildDependencyGenerator bd = buildDependencyGenerators.get(grammarFileName);
+    public boolean buildRequired(String grammarFileName)
+        throws IOException, ANTLRException
+    {
+        BuildDependencyGenerator bd =
+            new BuildDependencyGenerator(this, grammarFileName);
+
         List<File> outputFiles = bd.getGeneratedFileList();
         List<File> inputFiles = bd.getDependenciesFileList();
         File grammarFile = new File(grammarFileName);
         long grammarLastModified = grammarFile.lastModified();
         for (File outputFile : outputFiles) {
-
             if (!outputFile.exists() || grammarLastModified > outputFile.lastModified()) {
-
                 // One of the output files does not exist or is out of date, so we must build it
-                //
                 return true;
             }
 
             // Check all of the imported grammars and see if any of these are younger
             // than any of the output files.
-            //
             if (inputFiles != null) {
                 for (File inputFile : inputFiles) {
-
                     if (inputFile.lastModified() > outputFile.lastModified()) {
-
                         // One of the imported grammar files has been updated so we must build
-                        //
                         return true;
                     }
                 }
@@ -338,43 +368,39 @@ public class Tool {
         return false;
     }
 
-    /**
-     *
-     */
     public void process() {
-        int numFiles = getGrammarFileNames().size();
         boolean exceptionWhenWritingLexerFile = false;
         String lexerGrammarFileName = null;		// necessary at this scope to have access in the catch below
 
         // Have to be tricky here when Maven or build tools call in and must new Tool()
         // before setting options. The banner won't display that way!
-        //
         if (isVerbose() && showBanner) {
             ErrorManager.info("ANTLR Parser Generator  Version " + VERSION);
             showBanner = false;
         }
 
-        if (sort) {
-            // If the sort option is set, then we will have accumulated build dependencies for all
-            // the grammars and can now sort them into dependent build order
-            //
-            try {
-                sortGrammarFiles();
-            } catch (CircularDependencyException ce) {
-                ErrorManager.error(ErrorManager.MSG_CIRCULAR_DEPENDENCY);
-            }
+        try {
+            sortGrammarFiles(); // update grammarFileNames
+        }
+        catch (Exception e) {
+            ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR,e);
+        }
+        catch (Error e) {
+            ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, e);
         }
 
-        for (int i = 0; i < numFiles; i++) {
-            String grammarFileName = (String) getGrammarFileNames().get(i);
-
-            // If we are in sort mode (to support build tools like Maven) and the
+        Iterator it = grammarFileNames.iterator();
+        while (it.hasNext()) {
+            String grammarFileName = (String)it.next();
+            // If we are in make mode (to support build tools like Maven) and the
             // file is already up to date, then we do not build it (and in verbose mode
             // we will say so).
-            //
-            if (sort) {
-                if (!buildRequired(grammarFileName)) {
-                    continue;
+            if (make) {
+                try {
+                    if ( !buildRequired(grammarFileName) ) continue;
+                }
+                catch (Exception e) {
+                    ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR,e);
                 }
             }
 
@@ -384,15 +410,16 @@ public class Tool {
             try {
                 if (isDepend()) {
                     BuildDependencyGenerator dep =
-                            new BuildDependencyGenerator(this, grammarFileName);
+                        new BuildDependencyGenerator(this, grammarFileName);
+                    /*
                     List outputFiles = dep.getGeneratedFileList();
                     List dependents = dep.getDependenciesFileList();
-                    //System.out.println("output: "+outputFiles);
-                    //System.out.println("dependents: "+dependents);
+                    System.out.println("output: "+outputFiles);
+                    System.out.println("dependents: "+dependents);
+                     */
                     System.out.println(dep.getDependencies());
                     continue;
                 }
-
 
                 Grammar grammar = getRootGrammar(grammarFileName);
                 // we now have all grammars read in as ASTs
@@ -418,7 +445,7 @@ public class Tool {
                 if (isProfile()) {
                     GrammarReport greport = new GrammarReport(grammar);
                     Stats.writeReport(GrammarReport.GRAMMAR_STATS_FILENAME,
-                            greport.toNotifyString());
+                                      greport.toNotifyString());
                 }
 
                 // now handle the lexer if one was created for a merged spec
@@ -430,7 +457,8 @@ public class Tool {
                         Writer w = getOutputFile(grammar, lexerGrammarFileName);
                         w.write(lexerGrammarStr);
                         w.close();
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         // emit different error message when creating the implicit lexer fails
                         // due to write permission error
                         exceptionWhenWritingLexerFile = true;
@@ -443,7 +471,7 @@ public class Tool {
                         lexerGrammar.implicitLexer = true;
                         lexerGrammar.setTool(this);
                         File lexerGrammarFullFile =
-                                new File(getFileDirectory(lexerGrammarFileName), lexerGrammarFileName);
+                            new File(getFileDirectory(lexerGrammarFileName), lexerGrammarFileName);
                         lexerGrammar.setFileName(lexerGrammarFullFile.toString());
 
                         lexerGrammar.importTokenVocabulary(grammar);
@@ -456,7 +484,8 @@ public class Tool {
                         lexerGrammar.composite.createNFAs();
 
                         generateRecognizer(lexerGrammar);
-                    } finally {
+                    }
+                    finally {
                         // make sure we clean up
                         if (deleteTempLexer) {
                             File outputDir = getOutputDirectory(lexerGrammarFileName);
@@ -465,37 +494,62 @@ public class Tool {
                         }
                     }
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 if (exceptionWhenWritingLexerFile) {
                     ErrorManager.error(ErrorManager.MSG_CANNOT_WRITE_FILE,
-                            lexerGrammarFileName, e);
-                } else {
-                    ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
-                            grammarFileName);
+                                       lexerGrammarFileName, e);
                 }
-            } catch (Exception e) {
+                else {
+                    ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE,
+                                       grammarFileName);
+                }
+            }
+            catch (Exception e) {
                 ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, grammarFileName, e);
             }
-        /*
-        finally {
-        System.out.println("creates="+ Interval.creates);
-        System.out.println("hits="+ Interval.hits);
-        System.out.println("misses="+ Interval.misses);
-        System.out.println("outOfRange="+ Interval.outOfRange);
+            /*
+           finally {
+           System.out.println("creates="+ Interval.creates);
+           System.out.println("hits="+ Interval.hits);
+           System.out.println("misses="+ Interval.misses);
+           System.out.println("outOfRange="+ Interval.outOfRange);
+           }
+            */
         }
-         */
+    }
+
+    public void sortGrammarFiles() throws IOException {
+        //System.out.println("Grammar names "+getGrammarFileNames());
+        Graph g = new Graph();
+        for (String gfile : getGrammarFileNames()) {
+            GrammarSpelunker grammar = new GrammarSpelunker(gfile);
+            grammar.parse();
+            String vocabName = grammar.getTokenVocab();
+            String grammarName = grammar.getGrammarName();
+            // Make all grammars depend on any tokenVocab options
+            if ( vocabName!=null ) g.addEdge(gfile, vocabName+CodeGenerator.VOCAB_FILE_EXTENSION);
+            // Make all generated tokens files depend on their grammars
+            g.addEdge(grammarName+CodeGenerator.VOCAB_FILE_EXTENSION, gfile);
         }
+        List<Object> sorted = g.sort();
+        //System.out.println("sorted="+sorted);
+        grammarFileNames.clear(); // wipe so we can give new ordered list
+        for (int i = 0; i < sorted.size(); i++) {
+            String f = (String)sorted.get(i);
+            if ( f.endsWith(".g") ) grammarFileNames.add(f);
+        }
+        //System.out.println("new grammars="+grammarFileNames);
     }
 
     /** Get a grammar mentioned on the command-line and any delegates */
     public Grammar getRootGrammar(String grammarFileName)
-            throws IOException {
-
+        throws IOException
+    {
         //StringTemplate.setLintMode(true);
         // grammars mentioned on command line are either roots or single grammars.
         // create the necessary composite in case it's got delegates; even
         // single grammar needs it to get token types.
-        //
         CompositeGrammar composite = new CompositeGrammar();
         Grammar grammar = new Grammar(this, grammarFileName, composite);
         composite.setDelegationRoot(grammar);
@@ -504,7 +558,8 @@ public class Tool {
 
         if (haveInputDir) {
             f = new File(inputDirectory, grammarFileName);
-        } else {
+        }
+        else {
             f = new File(grammarFileName);
         }
 
@@ -516,7 +571,8 @@ public class Tool {
 
         if (grammarFileName.lastIndexOf(File.separatorChar) == -1) {
             grammarOutputDirectory = ".";
-        } else {
+        }
+        else {
             grammarOutputDirectory = grammarFileName.substring(0, grammarFileName.lastIndexOf(File.separatorChar));
         }
         fr = new FileReader(f);
@@ -582,8 +638,8 @@ public class Tool {
                 writeDOTFile(g, dotFileName, dot);
             } catch (IOException ioe) {
                 ErrorManager.error(ErrorManager.MSG_CANNOT_GEN_DOT_FILE,
-                        dotFileName,
-                        ioe);
+                                   dotFileName,
+                                   ioe);
             }
         }
     }
@@ -635,7 +691,7 @@ public class Tool {
         System.err.println("  -dfa                  generate a DFA for each decision point");
         System.err.println("  -message-format name  specify output style for messages");
         System.err.println("  -verbose              generate ANTLR version and other information");
-        System.err.println("  -sort                 be smart about building dependent grammars after their dependencies");
+        System.err.println("  -make                 only build if generated files older than grammar");
         System.err.println("  -version              print the version of ANTLR and exit.");
         System.err.println("  -X                    display extended argument list");
     }
@@ -728,10 +784,12 @@ public class Tool {
         if (fileName.endsWith(CodeGenerator.VOCAB_FILE_EXTENSION)) {
             if (haveOutputDir) {
                 outputDir = new File(getOutputDirectory());
-            } else {
+            }
+            else {
                 outputDir = new File(".");
             }
-        } else {
+        }
+        else {
             outputDir = getOutputDirectory(g.getFileName());
         }
         File outputFile = new File(outputDir, fileName);
@@ -772,7 +830,8 @@ public class Tool {
             //
             fileDirectory = grammarOutputDirectory;
 
-        } else {
+        }
+        else {
             fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
         }
         if (haveOutputDir) {
@@ -780,20 +839,23 @@ public class Tool {
             // -o subdir/output /usr/lib/t.g => subdir/output/T.java
             // -o . /usr/lib/t.g => ./T.java
             if ((fileDirectory != null && !forceRelativeOutput) &&
-                    (new File(fileDirectory).isAbsolute() ||
-                    fileDirectory.startsWith("~")) || // isAbsolute doesn't count this :(
-                    isForceAllFilesToOutputDir()) {
+                (new File(fileDirectory).isAbsolute() ||
+                 fileDirectory.startsWith("~")) || // isAbsolute doesn't count this :(
+                isForceAllFilesToOutputDir()) {
                 // somebody set the dir, it takes precendence; write new file there
                 outputDir = new File(getOutputDirectory());
-            } else {
+            }
+            else {
                 // -o /tmp subdir/t.g => /tmp/subdir/t.g
                 if (fileDirectory != null) {
                     outputDir = new File(getOutputDirectory(), fileDirectory);
-                } else {
+                }
+                else {
                     outputDir = new File(getOutputDirectory());
                 }
             }
-        } else {
+        }
+        else {
             // they didn't specify a -o dir so just write to location
             // where grammar is, absolute or relative, this will only happen
             // with command line invocation as build tools will always
@@ -850,7 +912,8 @@ public class Tool {
         File f;
         if (haveInputDir && !fileName.startsWith(File.separator)) {
             f = new File(inputDirectory, fileName);
-        } else {
+        }
+        else {
             f = new File(fileName);
         }
         // And ask Java what the base directory of this location is
@@ -870,9 +933,9 @@ public class Tool {
     public File getImportedVocabFile(String vocabName) {
 
         File f = new File(getLibraryDirectory(),
-                File.separator +
-                vocabName +
-                CodeGenerator.VOCAB_FILE_EXTENSION);
+                          File.separator +
+                          vocabName +
+                          CodeGenerator.VOCAB_FILE_EXTENSION);
         if (f.exists()) {
             return f;
         }
@@ -884,7 +947,8 @@ public class Tool {
         //
         if (haveOutputDir) {
             f = new File(getOutputDirectory(), vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
-        } else {
+        }
+        else {
             f = new File(vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
         }
         return f;
@@ -921,7 +985,7 @@ public class Tool {
      *
      * @return the grammarFileNames
      */
-    public List getGrammarFileNames() {
+    public Set<String> getGrammarFileNames() {
         return grammarFileNames;
     }
 
@@ -949,7 +1013,7 @@ public class Tool {
      * Return the Path to the base output directory, where ANTLR
      * will generate all the output files for the current language target as
      * well as any ancillary files such as .tokens vocab files.
-     * 
+     *
      * @return the output Directory
      */
     public String getOutputDirectory() {
@@ -1023,7 +1087,7 @@ public class Tool {
     /**
      * Indicates whether ANTLR has supplied, or will supply, a list of all the things
      * that the input grammar depends upon and all the things that will be generated
-     * when that gramamr is successfully analyzed.
+     * when that grammar is successfully analyzed.
      *
      * @return the depend flag
      */
@@ -1082,7 +1146,7 @@ public class Tool {
      * after any of the other gramamrs in the list that they are dependent on. Setting
      * this option also has the side effect that any grammars that are includes for other
      * grammars in the list are excluded from individual analysis, which allows the caller
-     * to invoke the tool via org.antlr.tool -sort *.g and not worry about the inclusion
+     * to invoke the tool via org.antlr.tool -make *.g and not worry about the inclusion
      * of grammars that are just includes for other grammars or what order the grammars
      * appear on the command line.
      *
@@ -1091,8 +1155,8 @@ public class Tool {
      *
      * @return true if the tool is currently configured to analyze and sort grammar files.
      */
-    public boolean getSort() {
-        return sort;
+    public boolean getMake() {
+        return make;
     }
 
     /**
@@ -1113,30 +1177,15 @@ public class Tool {
         DFA.MAX_TIME_PER_DFA_CREATION = timeout;
     }
 
-    /**
-     *  Provide the List of all grammar file names that the ANTLR tool shuold process.
+    /** Provide the List of all grammar file names that the ANTLR tool should process.
      *
      * @param grammarFileNames The list of grammar files to process
      */
-    public void setGrammarFileNames(List grammarFileNames) {
+    public void setGrammarFileNames(Set<String> grammarFileNames) {
         this.grammarFileNames = grammarFileNames;
     }
 
-    public void addGrammarFile(String grammarFileName)
-            throws TokenStreamException, antlr.RecognitionException, IOException {
-
-        // Create the build dependency map if it is not yet formed
-        //
-        if (buildDependencyGenerators == null) {
-            buildDependencyGenerators = new HashMap<String, BuildDependencyGenerator>();
-        }
-
-        // Create a build dependency analyzer for this particular grammar and track
-        // it in our list of dependencies so that we do not re-calculate them every time
-        // (which involves analyzing the grammar as we must ask the target language code generator
-        //  which files it will produce).
-        //
-        buildDependencyGenerators.put(grammarFileName, new BuildDependencyGenerator(this, grammarFileName));
+    public void addGrammarFile(String grammarFileName) {
         grammarFileNames.add(grammarFileName);
     }
 
@@ -1238,7 +1287,7 @@ public class Tool {
     /**
      * Indicates whether ANTLR will force all files to the output directory, even
      * if the input files have relative paths from the input directory.
-     * 
+     *
      * @param forceAllFilesToOutputDir true to force files to output directory
      */
     public void setForceAllFilesToOutputDir(boolean forceAllFilesToOutputDir) {
@@ -1261,290 +1310,17 @@ public class Tool {
      * after any of the other gramamrs in the list that they are dependent on. Setting
      * this option also has the side effect that any grammars that are includes for other
      * grammars in the list are excluded from individual analysis, which allows the caller
-     * to invoke the tool via org.antlr.tool -sort *.g and not worry about the inclusion
+     * to invoke the tool via org.antlr.tool -make *.g and not worry about the inclusion
      * of grammars that are just includes for other grammars or what order the grammars
      * appear on the command line.
      *
      * This option was coded to make life easier for tool integration (such as Maven) but
      * may also be useful at the command line.
      *
-     * @param sort
+     * @param make
      */
-    public void setSort(boolean sort) {
-        this.sort = sort;
+    public void setMake(boolean make) {
+        this.make = make;
     }
 
-    /**
-     * Dependency sorting is not as simple as providing a comparison function
-     * and using the Collection sort() method. This is because a standard sort
-     * will infer some orders and not compare every node with every other node.
-     * This kind of sort will only work with 2 members.
-     *
-     * We need a topological sort here because in the case you have:
-     *
-     *   t1walker.g -> t1.g -> t1lexer.g
-     *
-     * It is quite likely that the walker will sort after t1.g but that
-     * t1lexer will end up being sorter after t1wlaker, which is obviously
-     * incorrect.
-     *
-     * Rather than work it all out again from first principles, I stole this
-     * topological sort code from java2s.com.
-     *
-     * Jim Idle
-     *
-     * @see <a href="http://www.java2s.com/Code/Java/Collections-Data-Structure/Topologicalsorting.htm">Topoligical sort code</a>
-     *
-     */
-    public void sortGrammarFiles()
-            throws CircularDependencyException {
-
-        // Create our topological sorting object
-        //
-        GraphTS sorted = new GraphTS();
-
-        // Node index tracking vars
-        //
-        int parent;         // Vertex we are determining dependencies for
-        int dependency;     // Vertex we are asking if parent is dependent on
-
-
-        // The array of topologically sorted grammar files
-        //
-        String sortedArray[];
-
-        // Create a vertex for each file in the list
-        //
-        for (Object p : getGrammarFileNames()) {
-            sorted.addVertex((String) p);
-        }
-
-        // We need a dependency checking object that can tell us if
-        // one grammar depends on another or not.
-        //
-        DependencyComparator dependsWorker = new DependencyComparator(this);
-
-        // Next we need to determine, for each file in the collection,
-        // which other files in the collection, it depends on. We use
-        // an extension to the ANTLR tool stuff to determine this.
-        //
-        parent = 0;
-
-        for (Object p : getGrammarFileNames()) {
-
-            // See if this file is dependent on any others
-            //
-            dependency = 0;
-
-            for (Object d : getGrammarFileNames()) {
-
-                // Don't check a file against itself
-                //
-                if (parent != dependency) {
-
-                    // Is the parent dependent on the tentative dependency
-                    //
-                    if (dependsWorker.dependsOn((String) p, (String) d)) {
-
-                        // Yes it does, so we need to add an edge from the dependency to
-                        // the parent
-                        //
-                        sorted.addEdge(dependency, parent);
-                    }
-                }
-
-                // Next vertex in possible dependency chain
-                //
-                dependency++;
-            }
-
-            // Next vertex in potential dependent files
-            //
-            parent++;
-
-        }
-
-        // We now have a graph of all vertices and edges and can
-        // sort it topologically...
-        //
-        try {
-
-            // Sort
-            //
-            sortedArray = sorted.topo();
-
-            // Rebuild the collection from the sorted order
-            //
-            getGrammarFileNames().clear();
-
-            for (int j = 0; j < parent; j++) {
-                getGrammarFileNames().add(sortedArray[j]);
-            }
-        } catch (Exception e) {
-
-            // If we got an exception, then we leave the grammar list unsorted as
-            // it usually means that there is a cyclic dependency that cannot be solved.
-            //
-            throw new CircularDependencyException();
-        }
-    }
-
-    /**
-     * Thrown by any method that can detect cyclic dependencies,
-     * 
-     * and the user has created something that cannot be done. Such as:
-     * t1.g depends on t2.g
-     * t2.g depends on t3.g
-     * t3.g depends on t1.g
-     */
-    public class CircularDependencyException extends Exception {
-
-        private static final long serialVersionUID = -1365073529607379463L;
-    }
-
-    private class Vertex {
-
-        public String label;
-
-        public Vertex(String lab) {
-            label = lab;
-        }
-    }
-
-    private class GraphTS {
-
-        private final int MAX_VERTS = 200;
-        private Vertex vertexList[]; // list of vertices
-        private int matrix[][]; // adjacency matrix
-        private int numVerts; // current number of vertices
-        private String sortedArray[];
-
-        public GraphTS() {
-            vertexList = new Vertex[MAX_VERTS];
-            matrix = new int[MAX_VERTS][MAX_VERTS];
-            numVerts = 0;
-            for (int i = 0; i < MAX_VERTS; i++) {
-                for (int k = 0; k < MAX_VERTS; k++) {
-                    matrix[i][k] = 0;
-                }
-            }
-            sortedArray = new String[MAX_VERTS]; // sorted vert labels
-        }
-
-        public void addVertex(String lab) {
-            vertexList[numVerts++] = new Vertex(lab);
-        }
-
-        public void addEdge(int start, int end) {
-            matrix[start][end] = 1;
-        }
-
-        public void displayVertex(int v) {
-            System.out.print(vertexList[v].label);
-        }
-
-        public String[] topo() // toplogical sort
-
-                throws CircularDependencyException {
-            int orig_nVerts = numVerts;
-
-            while (numVerts > 0) // while vertices remain,
-            {
-                // get a vertex with no successors, or -1
-                int currentVertex = noSuccessors();
-                if (currentVertex == -1) // must be a cycle
-                {
-                    throw new CircularDependencyException();
-                }
-                // insert vertex label in sorted array (start at end)
-                sortedArray[numVerts - 1] = vertexList[currentVertex].label;
-
-                deleteVertex(currentVertex); // delete vertex
-            }
-
-            return sortedArray;
-
-
-        }
-
-        public int noSuccessors() // returns vert with no successors (or -1 if no such verts)
-        {
-            boolean isEdge; // edge from row to column in adjMat
-
-            for (int row = 0; row < numVerts; row++) {
-                isEdge = false; // check edges
-                for (int col = 0; col < numVerts; col++) {
-                    if (matrix[row][col] > 0) // if edge to another,
-                    {
-                        isEdge = true;
-                        break; // this vertex has a successor try another
-                    }
-                }
-                if (!isEdge) // if no edges, has no successors
-                {
-                    return row;
-                }
-            }
-            return -1; // no
-        }
-
-        public void deleteVertex(int delVert) {
-            if (delVert != numVerts - 1) // if not last vertex, delete from vertexList
-            {
-                for (int j = delVert; j < numVerts - 1; j++) {
-                    vertexList[j] = vertexList[j + 1];
-                }
-
-                for (int row = delVert; row < numVerts - 1; row++) {
-                    moveRowUp(row, numVerts);
-                }
-
-                for (int col = delVert; col < numVerts - 1; col++) {
-                    moveColLeft(col, numVerts - 1);
-                }
-            }
-            numVerts--; // one less vertex
-        }
-
-        private void moveRowUp(int row, int length) {
-            for (int col = 0; col < length; col++) {
-                matrix[row][col] = matrix[row + 1][col];
-            }
-        }
-
-        private void moveColLeft(int col, int length) {
-            for (int row = 0; row < length; row++) {
-                matrix[row][col] = matrix[row][col + 1];
-            }
-        }
-    }
-    /**
-     * A list of dependency generators that are accumulated aaaas (and if) the
-     * tool is required to sort the provided grammars into build dependency order.
-     */
-    private Map<String, BuildDependencyGenerator> buildDependencyGenerators;
-
-    private class DependencyComparator {
-
-        private Tool tool;
-
-        public DependencyComparator(Tool tool) {
-            this.tool = tool;
-        }
-
-        protected boolean dependsOn(String o1, String o2) {
-
-            BuildDependencyGenerator dep1 = buildDependencyGenerators.get(o1);
-            BuildDependencyGenerator dep2 = buildDependencyGenerators.get(o2);
-            List<File> dependencies = dep1.getNonImportDependenciesFileList();
-            if (dependencies == null) {
-                return false;
-            }
-            List<File> generatedFiles = dep2.getGeneratedFileList();
-
-            Boolean does = !Collections.disjoint(dependencies, generatedFiles);
-
-            return does;
-        }
-    }
 }

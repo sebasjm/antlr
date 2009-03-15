@@ -95,7 +95,7 @@ public class BuildDependencyGenerator {
     /** From T.g return a list of File objects that
      *  name files ANTLR will emit from T.g.
      */
-    public List getGeneratedFileList() {
+    public List<File> getGeneratedFileList() {
         List<File> files = new ArrayList<File>();
         File outputDir = tool.getOutputDirectory(grammarFileName);
         if (outputDir.getName().equals(".")) {
@@ -159,14 +159,11 @@ public class BuildDependencyGenerator {
      * to process T.g; This can be .tokens files if the grammar uses the tokenVocab option
      * as well as any imported grammar files.
      */
-    public List getDependenciesFileList() {
-
+    public List<File> getDependenciesFileList() {
         // Find all the things other than imported grammars
-        //
-        List files = getNonImportDependenciesFileList();
+        List<File> files = getNonImportDependenciesFileList();
 
         // Handle imported grammars
-        //
         List<Grammar> imports =
                 grammar.composite.getDelegates(grammar.composite.getRootGrammar());
         for (Grammar g : imports) {
@@ -188,7 +185,7 @@ public class BuildDependencyGenerator {
      *
      * @return List of dependencies other than imported grammars
      */
-    public List getNonImportDependenciesFileList() {
+    public List<File> getNonImportDependenciesFileList() {
         List<File> files = new ArrayList<File>();
 
         // handle token vocabulary loads

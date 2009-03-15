@@ -29,6 +29,34 @@ public class TestTopologicalSort extends BaseTest {
     }
 
     @Test
+    public void testCyclicGraph() throws Exception {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.addEdge("B", "C");
+        g.addEdge("C", "A");
+        g.addEdge("C", "D");
+
+        String expecting = "[D, C, B, A]";
+        List nodes = g.sort();
+        String result = nodes.toString();
+        assertEquals(expecting, result);
+    }
+
+    @Test
+    public void testRepeatedEdges() throws Exception {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.addEdge("B", "C");
+        g.addEdge("A", "B"); // dup
+        g.addEdge("C", "D");
+
+        String expecting = "[D, C, B, A]";
+        List nodes = g.sort();
+        String result = nodes.toString();
+        assertEquals(expecting, result);
+    }
+
+    @Test
     public void testSimpleTokenDependence() throws Exception {
         Graph g = new Graph();
         g.addEdge("Java.g", "MyJava.tokens"); // Java feeds off manual token file
