@@ -536,7 +536,6 @@ public class Tool {
         for (int i = 0; i < sorted.size(); i++) {
             String f = (String)sorted.get(i);
             if ( f.endsWith(".g") ) grammarFileNames.add(f);
-            if ( f.endsWith(".g") ) System.out.println("Sorted: " + f);
         }
         //System.out.println("new grammars="+grammarFileNames);
     }
