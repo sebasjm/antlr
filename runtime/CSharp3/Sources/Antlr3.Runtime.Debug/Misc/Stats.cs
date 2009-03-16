@@ -102,19 +102,19 @@ namespace Antlr.Runtime.Misc
         [System.Obsolete]
         public static double avg( int[] X )
         {
-            return X.Average();
+            return X.DefaultIfEmpty( 0 ).Average();
         }
 
         [System.Obsolete]
         public static int min( int[] X )
         {
-            return X.Min();
+            return X.DefaultIfEmpty( int.MaxValue ).Min();
         }
 
         [System.Obsolete]
         public static int max( int[] X )
         {
-            return X.Max();
+            return X.DefaultIfEmpty( int.MinValue ).Max();
         }
 
         [System.Obsolete]
@@ -128,8 +128,8 @@ namespace Antlr.Runtime.Misc
         {
             string absoluteFilename = GetAbsoluteFileName( filename );
 
-            System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( filename ) );
-            System.IO.File.AppendAllText( filename, data );
+            System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( absoluteFilename ) );
+            System.IO.File.AppendAllText( absoluteFilename, data );
         }
 
         public static string GetAbsoluteFileName( string filename )
