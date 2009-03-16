@@ -1184,7 +1184,9 @@ public class Tool {
     }
 
     public void addGrammarFile(String grammarFileName) {
-        grammarFileNames.add(grammarFileName);
+        if (!grammarFileNames.contains(grammarFileName)) {
+            grammarFileNames.add(grammarFileName);
+        }
     }
 
     /**
