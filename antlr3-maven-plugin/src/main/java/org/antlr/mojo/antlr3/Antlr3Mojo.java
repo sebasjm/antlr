@@ -429,7 +429,7 @@ public class Antlr3Mojo
 
             // Tell the ANTLR tool that we want sorted build mode
             //
-            tool.setSort(true);
+            tool.setMake(true);
             
             // Iterate each grammar file we were given and add it into the tool's list of
             // grammars to process.
