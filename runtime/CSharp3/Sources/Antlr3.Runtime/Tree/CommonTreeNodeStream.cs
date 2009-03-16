@@ -223,7 +223,7 @@ namespace Antlr.Runtime.Tree
         /** <summary>For debugging; destructive: moves tree iterator to end.</summary> */
         public virtual string ToTokenTypeString()
         {
-            Clear();
+            Reset();
             StringBuilder buf = new StringBuilder();
             object o = LT( 1 );
             int type = _adaptor.GetType( o );
