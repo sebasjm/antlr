@@ -4,6 +4,7 @@ import java.io.Reader;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
+import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -30,9 +31,11 @@ public class GrammarSpelunker {
     protected String grammarName;
     protected String tokenVocab;
     protected String language = "Java"; // default
+    protected String inputDirectory;
     protected List<String> importedGrammars;
 
-    public GrammarSpelunker(String grammarFileName) {
+    public GrammarSpelunker(String inputDirectory, String grammarFileName) {
+        this.inputDirectory = inputDirectory;
         this.grammarFileName = grammarFileName;
     }
 
@@ -46,7 +49,7 @@ public class GrammarSpelunker {
     }
 
     public void parse() throws IOException {
-        Reader r = new FileReader(grammarFileName);
+        Reader r = new FileReader((inputDirectory != null ? inputDirectory + File.separator : "") + grammarFileName);
         BufferedReader br = new BufferedReader(r);
         try {
             scanner = new Scanner(br);
@@ -190,7 +193,7 @@ public class GrammarSpelunker {
 
     /** Tester; Give grammar filename as arg */
     public static void main(String[] args) throws IOException {
-        GrammarSpelunker g = new GrammarSpelunker(args[0]);
+        GrammarSpelunker g = new GrammarSpelunker(".", args[0]);
         g.parse();
         System.out.println(g.grammarModifier+" grammar "+g.grammarName);
         System.out.println("language="+g.language);

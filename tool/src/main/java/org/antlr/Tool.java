@@ -46,12 +46,12 @@ public class Tool {
     public String VERSION = "!Unknown version!";
     //public static final String VERSION = "${project.version}";
     public static final String UNINITIALIZED_DIR = "<unset-dir>";
-    private Set<String> grammarFileNames = new HashSet<String>();
+    private List<String> grammarFileNames = new ArrayList<String>();
     private boolean generate_NFA_dot = false;
     private boolean generate_DFA_dot = false;
     private String outputDirectory = ".";
     private boolean haveOutputDir = false;
-    private String inputDirectory = "";
+    private String inputDirectory = null;
     private String parentGrammarDirectory;
     private String grammarOutputDirectory;
     private boolean haveInputDir = false;
@@ -389,9 +389,10 @@ public class Tool {
             ErrorManager.error(ErrorManager.MSG_INTERNAL_ERROR, e);
         }
 
-        Iterator it = grammarFileNames.iterator();
-        while (it.hasNext()) {
-            String grammarFileName = (String)it.next();
+        for (String grammarFileName : grammarFileNames) {
+           
+            
+            System.out.println("Jim: next grammar is " + grammarFileName);
             // If we are in make mode (to support build tools like Maven) and the
             // file is already up to date, then we do not build it (and in verbose mode
             // we will say so).
@@ -523,7 +524,7 @@ public class Tool {
         //System.out.println("Grammar names "+getGrammarFileNames());
         Graph g = new Graph();
         for (String gfile : getGrammarFileNames()) {
-            GrammarSpelunker grammar = new GrammarSpelunker((haveInputDir ? inputDirectory + File.separator : "") + gfile);
+            GrammarSpelunker grammar = new GrammarSpelunker(inputDirectory, gfile);
             grammar.parse();
             String vocabName = grammar.getTokenVocab();
             String grammarName = grammar.getGrammarName();
@@ -538,6 +539,7 @@ public class Tool {
         for (int i = 0; i < sorted.size(); i++) {
             String f = (String)sorted.get(i);
             if ( f.endsWith(".g") ) grammarFileNames.add(f);
+            if ( f.endsWith(".g") ) System.out.println("Sorted: " + f);
         }
         //System.out.println("new grammars="+grammarFileNames);
     }
@@ -985,7 +987,7 @@ public class Tool {
      *
      * @return the grammarFileNames
      */
-    public Set<String> getGrammarFileNames() {
+    public List<String> getGrammarFileNames() {
         return grammarFileNames;
     }
 
@@ -1181,7 +1183,7 @@ public class Tool {
      *
      * @param grammarFileNames The list of grammar files to process
      */
-    public void setGrammarFileNames(Set<String> grammarFileNames) {
+    public void setGrammarFileNames(List<String> grammarFileNames) {
         this.grammarFileNames = grammarFileNames;
     }
 
