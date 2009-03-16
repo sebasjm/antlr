@@ -390,9 +390,6 @@ public class Tool {
         }
 
         for (String grammarFileName : grammarFileNames) {
-           
-            
-            System.out.println("Jim: next grammar is " + grammarFileName);
             // If we are in make mode (to support build tools like Maven) and the
             // file is already up to date, then we do not build it (and in verbose mode
             // we will say so).
