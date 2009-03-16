@@ -30,68 +30,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Template overrides to add debugging to AST stuff.  Dynamic inheritance
- *  hierarchy is set up as ASTDbg : AST : Dbg : Java by code generator.
- */
-group ASTDbg;
+using System.Collections.Generic;
+using Antlr.Runtime.Tree;
 
-parserMembers() ::= <<
-protected DebugTreeAdaptor adaptor;
-public ITreeAdaptor TreeAdaptor
+partial class DebugGrammarParser
 {
-	get
-	{
-		return adaptor;
-	}
-	set
-	{
-<if(grammar.grammarIsRoot)>
-		this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
-<else>
-		this.adaptor = (DebugTreeAdaptor)adaptor; // delegator sends dbg adaptor
-<endif><\n>
-		<grammar.directDelegates:{g|<g:delegateName()>.TreeAdaptor = this.adaptor;}>
-	}
-}<\n>
->>
-
-parserCtorBody() ::= <<
-<super.parserCtorBody()>
->>
-
-createListenerAndHandshake() ::= <<
-DebugEventSocketProxy proxy = new DebugEventSocketProxy( this, port, <if(TREE_PARSER)>input.TreeAdaptor<else>adaptor<endif> );
-DebugListener = proxy;
-<inputStreamType> = new Debug<inputStreamType>( input, proxy );
-try
-{
-	proxy.Handshake();
+    /** List of function definitions. Must point at the FUNC nodes. */
+    List<CommonTree> functionDefinitions = new List<CommonTree>();
 }
-catch ( IOException ioe )
-{
-	ReportError( ioe );
-}
->>
-
-@ctorForRootGrammar.finally() ::= <<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
-
-@ctorForProfilingRootGrammar.finally() ::=<<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
-
-@ctorForPredefinedListener.superClassRef() ::= ": base( input, dbg )"
-
-@ctorForPredefinedListener.finally() ::=<<
-<if(grammar.grammarIsRoot)><! don't create new adaptor for delegates !>
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;<\n>
-<endif>
->>
-
-@rewriteElement.pregen() ::= "dbg.Location( <e.line>, <e.pos> );"

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -30,68 +30,39 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Template overrides to add debugging to AST stuff.  Dynamic inheritance
- *  hierarchy is set up as ASTDbg : AST : Dbg : Java by code generator.
- */
-group ASTDbg;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
-parserMembers() ::= <<
-protected DebugTreeAdaptor adaptor;
-public ITreeAdaptor TreeAdaptor
-{
-	get
-	{
-		return adaptor;
-	}
-	set
-	{
-<if(grammar.grammarIsRoot)>
-		this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
-<else>
-		this.adaptor = (DebugTreeAdaptor)adaptor; // delegator sends dbg adaptor
-<endif><\n>
-		<grammar.directDelegates:{g|<g:delegateName()>.TreeAdaptor = this.adaptor;}>
-	}
-}<\n>
->>
+// General Information about an assembly is controlled through the following 
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+[assembly: AssemblyTitle( "Antlr3.Runtime.JavaExtensions" )]
+[assembly: AssemblyDescription( "" )]
+[assembly: AssemblyConfiguration( "" )]
+[assembly: AssemblyCompany( "Pixel Mine, Inc." )]
+[assembly: AssemblyProduct( "Antlr3.Runtime.JavaExtensions" )]
+[assembly: AssemblyCopyright( "Copyright © Pixel Mine 2009" )]
+[assembly: AssemblyTrademark( "" )]
+[assembly: AssemblyCulture( "" )]
 
-parserCtorBody() ::= <<
-<super.parserCtorBody()>
->>
+// Setting ComVisible to false makes the types in this assembly not visible 
+// to COM components.  If you need to access a type in this assembly from 
+// COM, set the ComVisible attribute to true on that type.
+[assembly: ComVisible( false )]
 
-createListenerAndHandshake() ::= <<
-DebugEventSocketProxy proxy = new DebugEventSocketProxy( this, port, <if(TREE_PARSER)>input.TreeAdaptor<else>adaptor<endif> );
-DebugListener = proxy;
-<inputStreamType> = new Debug<inputStreamType>( input, proxy );
-try
-{
-	proxy.Handshake();
-}
-catch ( IOException ioe )
-{
-	ReportError( ioe );
-}
->>
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid( "ad48c7f7-0b1d-4b1e-9602-83425cb5699f" )]
 
-@ctorForRootGrammar.finally() ::= <<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
-
-@ctorForProfilingRootGrammar.finally() ::=<<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
-
-@ctorForPredefinedListener.superClassRef() ::= ": base( input, dbg )"
-
-@ctorForPredefinedListener.finally() ::=<<
-<if(grammar.grammarIsRoot)><! don't create new adaptor for delegates !>
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;<\n>
-<endif>
->>
-
-@rewriteElement.pregen() ::= "dbg.Location( <e.line>, <e.pos> );"
+// Version information for an assembly consists of the following four values:
+//
+//      Major Version
+//      Minor Version 
+//      Build Number
+//      Revision
+//
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion( "1.0.0.0" )]
+[assembly: AssemblyFileVersion( "1.0.0.0" )]

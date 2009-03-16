@@ -4,7 +4,7 @@
  * All rights reserved.
  *
  * Conversion to C#:
- * Copyright (c) 2008-2009 Sam Harwell, Pixel Mine, Inc.
+ * Copyright (c) 2008 Sam Harwell, Pixel Mine, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,65 +30,60 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if DEBUG
-
-using System;
-
-using TextReader = System.IO.TextReader;
-using TextWriter = System.IO.TextWriter;
-
+#if !DEBUG
 namespace Antlr.Runtime.JavaExtensions
 {
-    public static class IOExtensions
+    using System;
+    using System.IO;
+
+    public static class JSystem
     {
         [Obsolete]
-        public static void close( this TextReader reader )
+        public static TextWriter err
         {
-            reader.Close();
+            get
+            {
+                return Console.Error;
+            }
         }
 
         [Obsolete]
-        public static void close( this TextWriter writer )
+        public static TextWriter @out
         {
-            writer.Close();
+            get
+            {
+                return Console.Out;
+            }
         }
 
         [Obsolete]
-        public static void print<T>( this TextWriter writer, T value )
+        public static void arraycopy<T>( T[] sourceArray, int sourceIndex, T[] destinationArray, int destinationIndex, int length )
         {
-            writer.Write( value );
+            Array.Copy( sourceArray, sourceIndex, destinationArray, destinationIndex, length );
         }
 
         [Obsolete]
-        public static void println( this TextWriter writer )
+        public static string getProperty( string name )
         {
-            writer.WriteLine();
+            switch ( name )
+            {
+            case "file.encoding":
+                return System.Text.Encoding.Default.WebName;
+
+            case "line.separator":
+                return Environment.NewLine;
+
+            case "java.io.tmpdir":
+                return System.IO.Path.GetTempPath();
+
+            case "user.home":
+                return Environment.GetFolderPath( Environment.SpecialFolder.Personal );
+
+            default:
+                throw new ArgumentException( string.Format( "Unknown system property: '{0}'", name ) );
+            }
         }
 
-        [Obsolete]
-        public static void println<T>( this TextWriter writer, T value )
-        {
-            writer.WriteLine( value );
-        }
-
-        [Obsolete]
-        public static void write<T>( this TextWriter writer, T value )
-        {
-            writer.Write( value );
-        }
-
-        [Obsolete]
-        public static int read( this TextReader reader, char[] buffer, int index, int count )
-        {
-            return reader.Read( buffer, index, count );
-        }
-
-        [Obsolete]
-        public static string readLine( this TextReader reader )
-        {
-            return reader.ReadLine();
-        }
     }
 }
-
 #endif

@@ -30,63 +30,71 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if DEBUG
+#if !DEBUG
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-using TextReader = System.IO.TextReader;
-using TextWriter = System.IO.TextWriter;
+using IDictionary = System.Collections.IDictionary;
 
 namespace Antlr.Runtime.JavaExtensions
 {
-    public static class IOExtensions
+    public static class DictionaryExtensions2
     {
         [Obsolete]
-        public static void close( this TextReader reader )
+        public static bool containsKey( this IDictionary map, object key )
         {
-            reader.Close();
+            return map.Contains( key );
         }
 
         [Obsolete]
-        public static void close( this TextWriter writer )
+        public static object get( this IDictionary map, object key )
         {
-            writer.Close();
+            return map[key];
         }
 
         [Obsolete]
-        public static void print<T>( this TextWriter writer, T value )
+        public static void put( this IDictionary map, object key, object value )
         {
-            writer.Write( value );
+            map[key] = value;
         }
 
         [Obsolete]
-        public static void println( this TextWriter writer )
+        public static void put<TKey, TValue>( this IDictionary<TKey, TValue> map, TKey key, TValue value )
         {
-            writer.WriteLine();
+            map[key] = value;
         }
 
         [Obsolete]
-        public static void println<T>( this TextWriter writer, T value )
+        public static void put<TKey, TValue>( this Dictionary<TKey, TValue> map, TKey key, TValue value )
         {
-            writer.WriteLine( value );
+            map[key] = value;
         }
 
         [Obsolete]
-        public static void write<T>( this TextWriter writer, T value )
+        public static HashSet<object> keySet( this IDictionary map )
         {
-            writer.Write( value );
+            return new HashSet<object>( map.Keys.Cast<object>() );
         }
 
         [Obsolete]
-        public static int read( this TextReader reader, char[] buffer, int index, int count )
+        public static HashSet<TKey> keySet<TKey, TValue>( this IDictionary<TKey, TValue> map )
         {
-            return reader.Read( buffer, index, count );
+            return new HashSet<TKey>( map.Keys );
+        }
+
+        // disambiguates for Dictionary, which implements both IDictionary<T,K> and IDictionary
+        [Obsolete]
+        public static HashSet<TKey> keySet<TKey, TValue>( this Dictionary<TKey, TValue> map )
+        {
+            return new HashSet<TKey>( map.Keys );
         }
 
         [Obsolete]
-        public static string readLine( this TextReader reader )
+        public static HashSet<object> keySet<TKey, TValue>( this SortedList<TKey, TValue> map )
         {
-            return reader.ReadLine();
+            return new HashSet<object>( map.Keys.Cast<object>() );
         }
     }
 }

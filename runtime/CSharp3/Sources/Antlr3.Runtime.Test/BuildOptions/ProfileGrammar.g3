@@ -30,68 +30,71 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Template overrides to add debugging to AST stuff.  Dynamic inheritance
- *  hierarchy is set up as ASTDbg : AST : Dbg : Java by code generator.
- */
-group ASTDbg;
+grammar ProfileGrammar;
 
-parserMembers() ::= <<
-protected DebugTreeAdaptor adaptor;
-public ITreeAdaptor TreeAdaptor
+options
 {
-	get
-	{
-		return adaptor;
-	}
-	set
-	{
-<if(grammar.grammarIsRoot)>
-		this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
-<else>
-		this.adaptor = (DebugTreeAdaptor)adaptor; // delegator sends dbg adaptor
-<endif><\n>
-		<grammar.directDelegates:{g|<g:delegateName()>.TreeAdaptor = this.adaptor;}>
-	}
-}<\n>
->>
-
-parserCtorBody() ::= <<
-<super.parserCtorBody()>
->>
-
-createListenerAndHandshake() ::= <<
-DebugEventSocketProxy proxy = new DebugEventSocketProxy( this, port, <if(TREE_PARSER)>input.TreeAdaptor<else>adaptor<endif> );
-DebugListener = proxy;
-<inputStreamType> = new Debug<inputStreamType>( input, proxy );
-try
-{
-	proxy.Handshake();
+	language=CSharp3;
+	output=AST;
+	ASTLabelType=CommonTree;
 }
-catch ( IOException ioe )
+
+tokens
 {
-	ReportError( ioe );
+	// define pseudo-operations
+	FUNC;
+	CALL;
 }
->>
 
-@ctorForRootGrammar.finally() ::= <<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
+// START:stat
+prog: ( stat )*
+    ;
 
-@ctorForProfilingRootGrammar.finally() ::=<<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
+stat:   expr NEWLINE                    -> expr
+    |   ID '=' expr NEWLINE             -> ^('=' ID expr)
+    |   func NEWLINE                    -> func
+    |   NEWLINE                         -> // ignore
+    ;
 
-@ctorForPredefinedListener.superClassRef() ::= ": base( input, dbg )"
+func:   ID  '(' formalPar ')' '=' expr  -> ^(FUNC ID formalPar expr)
+    ;
+	finally {
+	  functionDefinitions.Add($func.tree);
+	}
 
-@ctorForPredefinedListener.finally() ::=<<
-<if(grammar.grammarIsRoot)><! don't create new adaptor for delegates !>
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;<\n>
-<endif>
->>
+formalPar
+    :   ID
+	|   INT
+	;
 
-@rewriteElement.pregen() ::= "dbg.Location( <e.line>, <e.pos> );"
+// END:stat
+
+// START:expr
+expr:   multExpr (('+'^|'-'^) multExpr)*
+    ;
+
+multExpr
+    :   atom (('*'|'/'|'%')^ atom)*
+    ;
+
+atom:   INT
+    |   ID
+    |   '(' expr ')'    -> expr
+    |   ID '(' expr ')' -> ^(CALL ID expr)
+    ;
+// END:expr
+
+// START:tokens
+ID  :   ('a'..'z'|'A'..'Z')+
+	;
+
+INT :   '0'..'9'+
+    ;
+
+NEWLINE
+    :	'\r'? '\n'
+    ;
+
+WS  :   (' '|'\t')+ { Skip(); }
+    ;
+// END:tokens

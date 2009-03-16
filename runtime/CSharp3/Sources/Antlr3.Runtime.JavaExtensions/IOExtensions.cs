@@ -1,4 +1,4 @@
-/*
+﻿/*
  * [The "BSD licence"]
  * Copyright (c) 2005-2008 Terence Parr
  * All rights reserved.
@@ -30,68 +30,65 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Template overrides to add debugging to AST stuff.  Dynamic inheritance
- *  hierarchy is set up as ASTDbg : AST : Dbg : Java by code generator.
- */
-group ASTDbg;
+#if !DEBUG
 
-parserMembers() ::= <<
-protected DebugTreeAdaptor adaptor;
-public ITreeAdaptor TreeAdaptor
+using System;
+
+using TextReader = System.IO.TextReader;
+using TextWriter = System.IO.TextWriter;
+
+namespace Antlr.Runtime.JavaExtensions
 {
-	get
-	{
-		return adaptor;
-	}
-	set
-	{
-<if(grammar.grammarIsRoot)>
-		this.adaptor = new DebugTreeAdaptor(dbg,adaptor);
-<else>
-		this.adaptor = (DebugTreeAdaptor)adaptor; // delegator sends dbg adaptor
-<endif><\n>
-		<grammar.directDelegates:{g|<g:delegateName()>.TreeAdaptor = this.adaptor;}>
-	}
-}<\n>
->>
+    public static class IOExtensions
+    {
+        [Obsolete]
+        public static void close( this TextReader reader )
+        {
+            reader.Close();
+        }
 
-parserCtorBody() ::= <<
-<super.parserCtorBody()>
->>
+        [Obsolete]
+        public static void close( this TextWriter writer )
+        {
+            writer.Close();
+        }
 
-createListenerAndHandshake() ::= <<
-DebugEventSocketProxy proxy = new DebugEventSocketProxy( this, port, <if(TREE_PARSER)>input.TreeAdaptor<else>adaptor<endif> );
-DebugListener = proxy;
-<inputStreamType> = new Debug<inputStreamType>( input, proxy );
-try
-{
-	proxy.Handshake();
+        [Obsolete]
+        public static void print<T>( this TextWriter writer, T value )
+        {
+            writer.Write( value );
+        }
+
+        [Obsolete]
+        public static void println( this TextWriter writer )
+        {
+            writer.WriteLine();
+        }
+
+        [Obsolete]
+        public static void println<T>( this TextWriter writer, T value )
+        {
+            writer.WriteLine( value );
+        }
+
+        [Obsolete]
+        public static void write<T>( this TextWriter writer, T value )
+        {
+            writer.Write( value );
+        }
+
+        [Obsolete]
+        public static int read( this TextReader reader, char[] buffer, int index, int count )
+        {
+            return reader.Read( buffer, index, count );
+        }
+
+        [Obsolete]
+        public static string readLine( this TextReader reader )
+        {
+            return reader.ReadLine();
+        }
+    }
 }
-catch ( IOException ioe )
-{
-	ReportError( ioe );
-}
->>
 
-@ctorForRootGrammar.finally() ::= <<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
-
-@ctorForProfilingRootGrammar.finally() ::=<<
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;
-proxy.TreeAdaptor = adap;
->>
-
-@ctorForPredefinedListener.superClassRef() ::= ": base( input, dbg )"
-
-@ctorForPredefinedListener.finally() ::=<<
-<if(grammar.grammarIsRoot)><! don't create new adaptor for delegates !>
-ITreeAdaptor adap = new CommonTreeAdaptor();
-TreeAdaptor = adap;<\n>
-<endif>
->>
-
-@rewriteElement.pregen() ::= "dbg.Location( <e.line>, <e.pos> );"
+#endif

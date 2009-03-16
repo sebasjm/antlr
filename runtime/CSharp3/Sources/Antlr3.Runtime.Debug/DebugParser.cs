@@ -40,7 +40,7 @@ namespace Antlr.Runtime.Debug
     public class DebugParser : Parser
     {
         /** <summary>Who to notify when events in the parser occur.</summary> */
-        protected IDebugEventListener dbg = null;
+        public IDebugEventListener dbg = null;
 
         /** <summary>
          *  Used to differentiate between fixed lookahead and cyclic DFA decisions
@@ -75,11 +75,11 @@ namespace Antlr.Runtime.Debug
          *  input stream too that it should send events to this listener.
          *  </summary>
          */
-        public override IDebugEventListener DebugListener
+        public virtual IDebugEventListener DebugListener
         {
             get
             {
-                return base.DebugListener;
+                return dbg;
             }
             set
             {
@@ -87,7 +87,7 @@ namespace Antlr.Runtime.Debug
                 if ( debugTokenStream != null )
                     debugTokenStream.DebugListener = value;
 
-                base.DebugListener = value;
+                dbg = value;
             }
         }
 

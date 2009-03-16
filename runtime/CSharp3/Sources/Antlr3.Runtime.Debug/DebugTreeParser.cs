@@ -42,7 +42,7 @@ namespace Antlr.Runtime.Debug
     public class DebugTreeParser : TreeParser
     {
         /** <summary>Who to notify when events in the parser occur.</summary> */
-        protected IDebugEventListener dbg = null;
+        public IDebugEventListener dbg = null;
 
         /** <summary>
          *  Used to differentiate between fixed lookahead and cyclic DFA decisions
@@ -77,7 +77,7 @@ namespace Antlr.Runtime.Debug
          *  input stream too that it should send events to this listener.
          *  </summary>
          */
-        public override IDebugEventListener DebugListener
+        public virtual IDebugEventListener DebugListener
         {
             get
             {
@@ -90,18 +90,6 @@ namespace Antlr.Runtime.Debug
 
                 this.dbg = value;
             }
-        }
-
-        [System.Obsolete]
-        public void SetDebugListener( IDebugEventListener dbg )
-        {
-            DebugListener = dbg;
-        }
-
-        [System.Obsolete]
-        public IDebugEventListener GetDebugListener()
-        {
-            return DebugListener;
         }
 
         public virtual void ReportError( IOException e )

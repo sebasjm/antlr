@@ -1075,6 +1075,7 @@ namespace Antlr.Runtime
             Console.Out.WriteLine();
         }
 
+#if NEW_DEBUGGER
         #region Debugging support
         public virtual IDebugEventListener DebugListener
         {
@@ -1142,5 +1143,6 @@ namespace Antlr.Runtime
                 dbg.SemanticPredicate( result, predicate );
         }
         #endregion
+#endif
     }
 }
