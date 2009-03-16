@@ -523,7 +523,7 @@ public class Tool {
         //System.out.println("Grammar names "+getGrammarFileNames());
         Graph g = new Graph();
         for (String gfile : getGrammarFileNames()) {
-            GrammarSpelunker grammar = new GrammarSpelunker(gfile);
+            GrammarSpelunker grammar = new GrammarSpelunker((haveInputDir ? inputDirectory + File.separator : "") + gfile);
             grammar.parse();
             String vocabName = grammar.getTokenVocab();
             String grammarName = grammar.getGrammarName();
