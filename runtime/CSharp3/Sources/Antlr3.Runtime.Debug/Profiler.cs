@@ -325,7 +325,7 @@ namespace Antlr.Runtime.Debug
             catch ( IOException ioe )
             {
                 Console.Error.WriteLine( ioe );
-                ioe.printStackTrace( Console.Error );
+                ioe.PrintStackTrace( Console.Error );
             }
             Console.Out.WriteLine( ToString( stats ) );
         }

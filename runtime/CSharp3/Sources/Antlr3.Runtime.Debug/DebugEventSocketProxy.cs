@@ -142,7 +142,7 @@ namespace Antlr.Runtime.Debug
             }
             catch ( IOException ioe )
             {
-                ioe.printStackTrace( Console.Error );
+                ioe.PrintStackTrace( Console.Error );
             }
         }
 
@@ -155,7 +155,7 @@ namespace Antlr.Runtime.Debug
             }
             catch ( IOException ioe )
             {
-                ioe.printStackTrace( Console.Error );
+                ioe.PrintStackTrace( Console.Error );
             }
         }
 

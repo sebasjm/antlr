@@ -74,11 +74,11 @@ namespace Antlr.Runtime.JavaExtensions
         }
 #endif
 
-        public static void printStackTrace( this Exception e )
+        public static void PrintStackTrace( this Exception e )
         {
-            e.printStackTrace( Console.Out );
+            e.PrintStackTrace( Console.Out );
         }
-        public static void printStackTrace( this Exception e, System.IO.TextWriter writer )
+        public static void PrintStackTrace( this Exception e, System.IO.TextWriter writer )
         {
             writer.WriteLine( e.ToString() );
             foreach ( string line in e.StackTrace.Split( '\n', '\r' ) )

@@ -294,7 +294,7 @@ namespace Antlr.Runtime.Debug
             catch ( Exception e )
             {
                 Console.Error.WriteLine( e );
-                e.printStackTrace( Console.Error );
+                e.PrintStackTrace( Console.Error );
             }
             finally
             {
@@ -339,7 +339,7 @@ namespace Antlr.Runtime.Debug
             catch ( Exception e )
             {
                 Console.Error.WriteLine( e );
-                e.printStackTrace( Console.Error );
+                e.PrintStackTrace( Console.Error );
             }
             finally
             {
@@ -702,7 +702,7 @@ namespace Antlr.Runtime.Debug
             }
             catch ( Exception e )
             {
-                e.printStackTrace( Console.Error );
+                e.PrintStackTrace( Console.Error );
             }
             return elements;
         }
