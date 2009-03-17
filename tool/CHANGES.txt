@@ -9,6 +9,11 @@ CHANGES
 
 March 15, 2009
 
+* Fixed ANTLR-389. Strip didn't ignore options in subrules; also seemed
+  to demand stdin.
+
+March 15, 2009
+
 * ANTLR always sorts incoming grammar list by dependency.  For example,
   If W.g depends on tokens from P.g then P.g is done first even if
   W.g mentioned first on command line.  It does not ignore any files you

@@ -28,8 +28,9 @@ public class Strip {
 
     public void parseAndRewrite() throws Exception {
         processArgs(args);
-        CharStream input = new ANTLRInputStream(System.in);
+        CharStream input = null;
         if ( filename!=null ) input = new ANTLRFileStream(filename);
+        else input = new ANTLRInputStream(System.in);
         // BUILD AST
         ANTLRv3Lexer lex = new ANTLRv3Lexer(input);
         tokens = new TokenRewriteStream(lex);
@@ -122,7 +123,7 @@ public class Strip {
             new TreeWizard.Visitor() {
                 public void visit(Object t) {
                     CommonTree a = (CommonTree)t;
-                    if ( a.hasAncestor(ANTLRv3Parser.ALT) ) { // avoid options
+                    if ( !a.hasAncestor(ANTLRv3Parser.OPTIONS) ) { // avoid options
                         CommonTree child = (CommonTree)a.getChild(0);
                         tokens.delete(a.token.getTokenIndex());     // kill "id="
                         tokens.delete(child.token.getTokenIndex());
@@ -224,7 +225,7 @@ public class Strip {
 			else {
 				if (args[i].charAt(0) != '-') {
 					// Must be the grammar file
-                    filename = args[0];
+                    filename = args[i];
 				}
 			}
 		}
