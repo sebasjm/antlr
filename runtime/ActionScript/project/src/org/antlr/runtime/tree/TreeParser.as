@@ -138,6 +138,15 @@ package org.antlr.runtime.tree {
 			return super.getErrorMessage(e, tokenNames);
 		}
 	
+	   public function set treeAdaptor(adaptor:TreeAdaptor):void {
+            // do nothing, implemented in generated code
+        }
+        
+        public function get treeAdaptor():TreeAdaptor {
+            // implementation provided in generated code
+            return null;
+        }
+        
 		public function traceIn(ruleName:String, ruleIndex:int):void  {
 			super.traceInSymbol(ruleName, ruleIndex, input.LT(1));
 		}
