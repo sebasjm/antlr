@@ -199,7 +199,7 @@ class functest(Command):
             classpath = [self.antlr_jar]
         elif self.antlr_version == 'HEAD':
             classpath = [
-                os.path.join(rootDir, 'target', 'classes'),
+                os.path.join(rootDir, 'tool', 'target', 'classes'),
                 os.path.join(rootDir, 'runtime', 'Java', 'target', 'classes')
                 ]
         else:
@@ -286,7 +286,7 @@ class functest(Command):
             
 
 setup(name='antlr_python_runtime',
-      version='3.1.2',
+      version='3.1.3',
       packages=['antlr3'],
 
       author="Benjamin Niemann",
