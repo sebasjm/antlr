@@ -69,7 +69,7 @@ public class GrammarSpelunker {
     void consume() throws IOException { token = scanner.nextToken(); }
 
     protected void match(String expecting) throws IOException {
-        //System.out.println("match "+expecting+"; is "+token);
+        System.out.println("match "+expecting+"; is "+token);
         if ( token.equals(expecting) ) consume();
         else throw new Error("Error parsing "+grammarFileName+": '"+token+
                              "' not expected '"+expecting+"'");
@@ -123,7 +123,7 @@ public class GrammarSpelunker {
             consume();
             String value = token;
             consume();
-            consume(); // kill ';'
+            match(";");
             if ( name.equals("tokenVocab") ) tokenVocab = value;
             if ( name.equals("language") ) language = value;
         }
