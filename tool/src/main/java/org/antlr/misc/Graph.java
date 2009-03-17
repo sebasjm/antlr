@@ -37,7 +37,7 @@ public class Graph {
 
     public static class Node {
         Object payload;
-        List<Node> edges; // depends on which nodes?
+        List<Node> edges; // points at which nodes?
 
         public Node(Object payload) { this.payload = payload; }
 
