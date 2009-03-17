@@ -82,6 +82,21 @@ namespace Antlr.Runtime.Tree
             public abstract void Visit( object t );
         }
 
+        class ActionVisitor : Visitor
+        {
+            System.Action<object> _action;
+
+            public ActionVisitor( System.Action<object> action )
+            {
+                _action = action;
+            }
+
+            public override void Visit( object t )
+            {
+                _action( t );
+            }
+        }
+
         /** <summary>
          *  When using %label:TOKENNAME in a tree for parse(), we must
          *  track the label.
@@ -336,6 +351,11 @@ namespace Antlr.Runtime.Tree
         public virtual void Visit( object t, int ttype, IContextVisitor visitor )
         {
             _Visit( t, null, 0, ttype, visitor );
+        }
+
+        public virtual void Visit( object t, int ttype, System.Action<object> action )
+        {
+            Visit( t, ttype, new ActionVisitor( action ) );
         }
 
         /** <summary>Do the recursive work for visit</summary> */
