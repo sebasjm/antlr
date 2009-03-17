@@ -3,7 +3,7 @@ class T {
 	int y;
 
 	void foo() {
-		int y = x;
+		int y = 3;
 	}
 }
 
