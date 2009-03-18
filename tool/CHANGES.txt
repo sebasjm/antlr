@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+March 17, 2009
+
+* improved ANTLRv3.g to handle <...> element options
+
 March 15, 2009
 
 * Fixed ANTLR-389. Strip didn't ignore options in subrules; also seemed
