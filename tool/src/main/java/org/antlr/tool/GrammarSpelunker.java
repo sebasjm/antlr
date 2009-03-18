@@ -69,7 +69,7 @@ public class GrammarSpelunker {
     void consume() throws IOException { token = scanner.nextToken(); }
 
     protected void match(String expecting) throws IOException {
-        System.out.println("match "+expecting+"; is "+token);
+        //System.out.println("match "+expecting+"; is "+token);
         if ( token.equals(expecting) ) consume();
         else throw new Error("Error parsing "+grammarFileName+": '"+token+
                              "' not expected '"+expecting+"'");
@@ -165,6 +165,7 @@ public class GrammarSpelunker {
             consume();
         }
 
+        boolean isDIGIT() { return c>='0'&&c<='9'; }
         boolean isID_START() { return c>='a'&&c<='z' || c>='A'&&c<='Z'; }
         boolean isID_LETTER() { return isID_START() || c>='0'&&c<='9' || c=='_'; }
         
@@ -180,8 +181,10 @@ public class GrammarSpelunker {
                     case ':' : consume(); return ":";
                     case '@' : consume(); return "@";
                     case '/' : COMMENT(); break;
+                    case '\'': return STRING();
                     default:
                         if ( isID_START() ) return ID();
+                        else if ( isDIGIT() ) return INT();
                         consume(); // ignore anything else
                 }
             }
@@ -191,7 +194,28 @@ public class GrammarSpelunker {
         /** NAME : LETTER+ ; // NAME is sequence of >=1 letter */
         String ID() throws IOException {
             StringBuffer buf = new StringBuffer();
-            while ( isID_LETTER() ) { buf.append((char)c); consume(); }
+            while ( c!=EOF && isID_LETTER() ) { buf.append((char)c); consume(); }
+            return buf.toString();
+        }
+
+        String INT() throws IOException {
+            StringBuffer buf = new StringBuffer();
+            while ( c!=EOF && isDIGIT() ) { buf.append((char)c); consume(); }
+            return buf.toString();
+        }
+
+        String STRING() throws IOException {
+            StringBuffer buf = new StringBuffer();
+            consume();
+            while ( c!=EOF && c!='\'' ) {
+                if ( c=='\\' ) {
+                    buf.append((char)c);
+                    consume();
+                }
+                buf.append((char)c);
+                consume();
+            }
+            consume(); // scan past '
             return buf.toString();
         }
 
@@ -207,12 +231,12 @@ public class GrammarSpelunker {
                             if ( c=='/' ) { consume(); break scarf; }
                         }
                         else {
-                            while ( c!='*' ) consume();
+                            while ( c!=EOF && c!='*' ) consume();
                         }
                     }
                 }
                 else if ( c=='/' ) {
-                    while ( c!='\n' ) consume();
+                    while ( c!=EOF && c!='\n' ) consume();
                 }
             }
         }
