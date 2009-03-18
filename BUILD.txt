@@ -353,13 +353,16 @@ to 3.1.4-SNAPSHOT.
 
         You should see:
 
-         [INFO] [versions:update-child-modules]
-         [INFO] Module: gunit
-         [INFO]   Parent is org.antlr:antlr-master:3.1.3
-         [INFO] Module: runtime/Java
-         [INFO]   Parent is org.antlr:antlr-master:3.1.3
-         [INFO] Module: tool
-         [INFO]   Parent is org.antlr:antlr-master:3.1.3
+	[INFO] [versions:update-child-modules]
+	[INFO] Module: gunit
+	[INFO]   Parent was org.antlr:antlr-master:3.1.3-SNAPSHOT,
+	       now org.antlr:antlr-master:3.1.3
+	[INFO] Module: runtime/Java
+	[INFO]   Parent was org.antlr:antlr-master:3.1.3-SNAPSHOT,
+	       now org.antlr:antlr-master:3.1.3
+	[INFO] Module: tool
+	[INFO]   Parent was org.antlr:antlr-master:3.1.3-SNAPSHOT,
+	       now org.antlr:antlr-master:3.1.3
 
 14)  Run a build of the release-3.1.3 branch:
 
