@@ -107,16 +107,16 @@ The instructions here assume that Maven is installed and working correctly.
 
 If this is the first time you have built the ANTLR toolset, you will possibly
 need to install the master pom in your local repository (however the build
-may be able to locate this in the ANLR snapshot or release repository). If you try
+may be able to locate this in the ANTLR snapshot or release repository). If you try
 to build sub-modules on their own (as in run the mvn command in the sub directory
 for that tool, such as runtime/Java), and you receive a message that
 maven cannot find the master pom, then execute this in the main (or release) 
 directory:
 
- mvn -N install
+mvn -N install
 
-This command will install the master build pom in your local repository and
-individual builds of sub modules will now work correctly.
+This command will install the master build pom in your local maven repository
+(it's ~/.m2 on UNIX) and individual builds of sub-modules will now work correctly.
 
 To build then, simply cd into the master build directory (e.g. $P4ROOT//code/antlr/main)
 and type:
@@ -152,7 +152,7 @@ runtime, you need only the runtime components you use, such as the Java
 runtime and say stringtemplate).
 
 Because the Uber jar is not something we want to deploy to Maven repositories
-it is build with a special invocation of Maven:
+it is built with a special invocation of Maven:
 
 mvn -Dmaven.test.skip=true package assembly:assembly
 
@@ -164,8 +164,8 @@ Somewhere in the build output (towards the end), you will find a line like this:
 
 [INFO] Building jar: /home/jimi/antlrsrc/code/antlr/main/target/antlr-master-3.1.3-SNAPSHOT-completejar.jar
 
-This is the executable jar that you need and you can either copy it somewhere, or
-like me you can create this script (assuming UNIX) somewhere in your PATH:
+This is the executable jar that you need and you can either copy it somewhere or,
+like me, you can create this script (assuming UNIX) somewhere in your PATH:
 
 #! /bin/bash
 java -jar ~/antlrsrc/code/antlr/main/target/antlr-master-3.1.3-SNAPSHOT-completejar.jar $*
@@ -181,11 +181,11 @@ as you like, but only one release version. However, release versions may be upda
 with a patch level: 3.1.3-1, 3.1.3-2 and so on.
 
 Fortunately, Maven helps us with the version numbering in a number of ways. Firstly,
-the pom.xml files for the various modules do not specify a version a version of the
+the pom.xml files for the various modules do not specify a version of the
 artifacts themselves. They pick up their version number from the master build pom.
 However, there is a catch, because they need to know what version of the parent pom
 they inherit from and so they DO mention the version number. However, this does
-prevent accidentally releasing different versions of sub modules than the master pom
+prevent accidentally releasing different versions of sub-modules than the master pom
 describes.
 
 Fortunately once again, Maven has a neat way of helping us with change the version.
@@ -194,7 +194,7 @@ All you need do is check out all the pom.xml files from perforce, then modify th
 is correct in the master pom, you make sure your working directory is the location
 of the master pom and type:
 
-  mvn versions:update-child-modules
+mvn versions:update-child-modules
 
 This command will then update the child pom.xml files to reflect the version number
 defined in the master pom.xml.
@@ -259,7 +259,7 @@ Which should look like this:
 When this configuration is in place, you will be able to deploy the components,
 either individually or from the master directory:
 
-    mvn -Dmaven.test.skip=true deploy
+mvn -Dmaven.test.skip=true deploy
 
 You will then see lots of information about checking existing version information
 and so on, and the components will be deployed.
@@ -303,7 +303,7 @@ to 3.1.4-SNAPSHOT.
    3.1.3-SNAPSHOT to 3.1.4-SNAPSHOT.
 
 4) Edit the pom.xml file for antlr3-maven-plugin under the main directory and
-   change the version from 3.1.3-SNAPSHOT to 3.1.3-SNAPSHOT.
+   change the version from 3.1.3-SNAPSHOT to 3.1.4-SNAPSHOT.
 
 5) Now (from the main directory), run the command:
 
