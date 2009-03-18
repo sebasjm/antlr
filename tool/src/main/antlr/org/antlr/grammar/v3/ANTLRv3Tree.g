@@ -73,7 +73,8 @@ optionsSpec
 	;
 
 option
-    :   ^('=' ID optionValue)
+    :   qid // only allowed in element options
+    |	^('=' ID optionValue)
  	;
  	
 optionValue
@@ -137,10 +138,6 @@ finallyClause
     ;
 
 element
-	:	elementNoOptionSpec
-	;
-
-elementNoOptionSpec
 	:	^(('='|'+=') ID block)
 	|	^(('='|'+=') ID atom)
 	|	atom
@@ -148,44 +145,35 @@ elementNoOptionSpec
 	|   ACTION
 	|   SEMPRED
 	|	GATED_SEMPRED
-	|   treeSpec
+	|   ^(TREE_BEGIN element+)
 	;
 
 atom:   ^(('^'|'!') atom)
-	|	range
-	|	notSet
+	|	^(CHAR_RANGE CHAR_LITERAL CHAR_LITERAL optionsSpec?)
+	|	^('~' notTerminal optionsSpec?)
+	|	^('~' block optionsSpec?)
     |	^(RULE_REF ARG_ACTION)
     |	RULE_REF
-    |   terminal
+    |   CHAR_LITERAL
+    |   ^(CHAR_LITERAL optionsSpec)
+    |	TOKEN_REF
+    |	^(TOKEN_REF optionsSpec)
+    |	^(TOKEN_REF ARG_ACTION optionsSpec)
+    |	^(TOKEN_REF ARG_ACTION)
+    |	STRING_LITERAL
+    |	^(STRING_LITERAL optionsSpec)
+    |	'.'
+    |	^('.' optionsSpec?)
     ;
-
-notSet
-	:	^('~' notTerminal)
-	|	^('~' block)
-	;
-
-treeSpec
-	:	^(TREE_BEGIN element+)
-	;
 
 /** Matches ENBF blocks (and token sets via block rule) */
 ebnf
 	:	^(SYNPRED block)
+	|	^(OPTIONAL block)
+  	|	^(CLOSURE block)
+   	|	^(POSITIVE_CLOSURE block)
 	|	SYN_SEMPRED
-	|	^(ebnfSuffix block)
 	|	block
-	;
-
-range
-	:	^(CHAR_RANGE CHAR_LITERAL CHAR_LITERAL)
-	;
-
-terminal
-    :   CHAR_LITERAL
-    |	TOKEN_REF
-    |	STRING_LITERAL
-    |	^(TOKEN_REF ARG_ACTION)
-    |	'.'
 	;
 
 notTerminal
@@ -193,13 +181,7 @@ notTerminal
 	|	TOKEN_REF
 	|	STRING_LITERAL
 	;
-	
-ebnfSuffix
-	:	OPTIONAL
-  	|	CLOSURE
-   	|	POSITIVE_CLOSURE
-	;
-	
+		
 // R E W R I T E  S Y N T A X
 
 rewrite
@@ -239,7 +221,9 @@ rewrite_tree_atom
 	;
 
 rewrite_tree_ebnf
-	:	^(ebnfSuffix rewrite_tree_block)
+	:	^(OPTIONAL rewrite_tree_block)
+  	|	^(CLOSURE rewrite_tree_block)
+   	|	^(POSITIVE_CLOSURE rewrite_tree_block)
 	;
 	
 rewrite_tree
@@ -273,3 +257,5 @@ rewrite_template_args
 rewrite_template_arg
 	:   ^(ARG ID ACTION)
 	;
+
+qid	:	ID ('.' ID)* ;

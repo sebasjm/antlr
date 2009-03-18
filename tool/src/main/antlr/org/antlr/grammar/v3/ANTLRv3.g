@@ -144,7 +144,7 @@ option
  	;
  	
 optionValue
-    :   id
+    :   qid
     |   STRING_LITERAL
     |   CHAR_LITERAL
     |   INT
@@ -232,10 +232,6 @@ finallyClause
     ;
 
 element
-	:	elementNoOptionSpec
-	;
-
-elementNoOptionSpec
 	:	id (labelOp='='|labelOp='+=') atom
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK["BLOCK"] ^(ALT["ALT"] ^($labelOp id atom) EOA["EOA"]) EOB["EOB"]))
 		|				-> ^($labelOp id atom)
@@ -257,25 +253,62 @@ elementNoOptionSpec
 		)
 	;
 
-atom:   range ( (op='^'|op='!') -> ^($op range) | -> range )
-    |   terminal
-    |	notSet ( (op='^'|op='!') -> ^($op notSet) | -> notSet )
-    |   RULE_REF ( arg=ARG_ACTION )? ( (op='^'|op='!') )?
-    	-> {$arg!=null&&op!=null}?	^($op RULE_REF $arg)
-    	-> {$arg!=null}?			^(RULE_REF $arg)
-    	-> {$op!=null}?				^($op RULE_REF)
-    	-> RULE_REF
+atom:   terminal
+	|	range 
+		(	(op='^'|op='!')	-> ^($op range)
+		|					-> range
+		)
+    |	notSet
+		(	(op='^'|op='!')	-> ^($op notSet)
+		|					-> notSet
+		)
+    |   RULE_REF ARG_ACTION?
+		(	(op='^'|op='!')	-> ^($op RULE_REF ARG_ACTION?)
+		|					-> ^(RULE_REF ARG_ACTION?)
+		)
     ;
 
 notSet
 	:	'~'
-		(	notTerminal	-> ^('~' notTerminal)
-		|	block		-> ^('~' block)
+		(	notTerminal elementOptions?	-> ^('~' notTerminal elementOptions?)
+		|	block elementOptions?		-> ^('~' block elementOptions?)
 		)
 	;
 
+notTerminal
+	:   CHAR_LITERAL
+	|	TOKEN_REF
+	|	STRING_LITERAL
+	;
+	
+elementOptions
+	:	'<' qid '>'					 -> ^(OPTIONS qid)
+	|	'<' option (';' option)* '>' -> ^(OPTIONS option+)
+	;
+
+elementOption
+	:	id '=' optionValue -> ^('=' id optionValue)
+	;
+	
 treeSpec
 	:	'^(' element ( element )+ ')' -> ^(TREE_BEGIN element+)
+	;
+
+range!
+	:	c1=CHAR_LITERAL RANGE c2=CHAR_LITERAL elementOptions?
+		-> ^(CHAR_RANGE[$c1,".."] $c1 $c2 elementOptions?)
+	;
+
+terminal
+    :   (	CHAR_LITERAL elementOptions?    	  -> ^(CHAR_LITERAL elementOptions?)
+	    	// Args are only valid for lexer rules
+		|   TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF ARG_ACTION? elementOptions?)
+		|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL elementOptions?)
+		|   '.' elementOptions?		 			  -> ^('.' elementOptions?)
+		)
+		(	'^'							-> ^('^' $terminal)
+		|	'!' 						-> ^('!' $terminal)
+		)?
 	;
 
 /** Matches ENBF blocks (and token sets via block rule) */
@@ -302,31 +335,6 @@ ebnf
 		)
 	;
 
-range!
-	:	c1=CHAR_LITERAL RANGE c2=CHAR_LITERAL -> ^(CHAR_RANGE[$c1,".."] $c1 $c2)
-	;
-
-terminal
-    :   (	CHAR_LITERAL				-> CHAR_LITERAL
-    		// Args are only valid for lexer rules
-		|   TOKEN_REF
-			( ARG_ACTION				-> ^(TOKEN_REF ARG_ACTION)
-			|							-> TOKEN_REF
-			)
-		|   STRING_LITERAL				-> STRING_LITERAL
-		|   '.'							-> '.'
-		)	
-		(	'^'							-> ^('^' $terminal)
-		|	'!' 						-> ^('!' $terminal)
-		)?
-	;
-
-notTerminal
-	:   CHAR_LITERAL
-	|	TOKEN_REF
-	|	STRING_LITERAL
-	;
-	
 ebnfSuffix
 @init {
 	Token op = input.LT(1);
@@ -452,6 +460,8 @@ rewrite_template_arg
 	:   id '=' ACTION -> ^(ARG[$id.start] id ACTION)
 	;
 
+qid :	id ('.' id)* ;
+	
 id	:	TOKEN_REF -> ID[$TOKEN_REF]
 	|	RULE_REF  -> ID[$RULE_REF]
 	;
