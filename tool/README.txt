@@ -1,5 +1,5 @@
-ANTLR v3.1.2
-February 22, 2009
+ANTLR v3.1.3
+March 17, 2009
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -108,13 +108,13 @@ How do I install this damn thing?
 
 Just untar and you'll get:
 
-antlr-3.1.2/README.txt (this file)
-antlr-3.1.2/LICENSE.txt
-antlr-3.1.2/src/main/java/org/antlr/...
-antlr-3.1.2/lib/stringtemplate-3.2.jar
-antlr-3.1.2/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
-antlr-3.1.2/lib/antlr-3.1.2.jar (all jars combined, runtime and tools)
-antlr-3.1.2/lib/antlr-runtime-3.1.2.jar (only what is needed to use ANTLR parsers)
+antlr-3.1.3/README.txt (this file)
+antlr-3.1.3/LICENSE.txt
+antlr-3.1.3/src/main/java/org/antlr/...
+antlr-3.1.3/lib/stringtemplate-3.2.jar
+antlr-3.1.3/lib/antlr-2.7.7.jar (ANTLR v3 currently written in v2)
+antlr-3.1.3/lib/antlr-3.1.3.jar (all jars combined, runtime and tools)
+antlr-3.1.3/lib/antlr-runtime-3.1.3.jar (only what is needed to use ANTLR parsers)
 
 Then you need to add all the jars in lib to your CLASSPATH.
 
