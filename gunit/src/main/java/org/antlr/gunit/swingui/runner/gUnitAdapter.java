@@ -4,6 +4,7 @@
 package org.antlr.gunit.swingui.runner;
 
 import java.io.File;
+import java.io.IOException;
 import org.antlr.runtime.*;
 import org.antlr.runtime.CharStream;
 import org.antlr.gunit.*;
@@ -16,32 +17,33 @@ import org.antlr.gunit.swingui.model.TestSuite;
 public class gUnitAdapter {
 
     private ParserLoader loader ;
+    private TestSuite testSuite;
 
+    public gUnitAdapter(TestSuite suite) throws IOException {
+        loader = new ParserLoader(suite.getGrammarName(), 
+                                  suite.getTestSuiteFile().getParent());
+        testSuite = suite;
+    }
 
-    public void run(String testSuiteFileName, TestSuite testSuite) {
-        if (testSuiteFileName == null || testSuiteFileName.equals(""))
-            throw new IllegalArgumentException("Null test suite file name.");
+    public void run() {
+        if (testSuite == null)
+            throw new IllegalArgumentException("Null testsuite.");
+        
         
         try {
 
             // Parse gUnit test suite file
-            final CharStream input = new ANTLRFileStream(testSuiteFileName);
+            final CharStream input = new ANTLRFileStream(testSuite.getTestSuiteFile().getCanonicalPath());
             final gUnitLexer lexer = new gUnitLexer(input);
             final CommonTokenStream tokens = new CommonTokenStream(lexer);
             final GrammarInfo grammarInfo = new GrammarInfo();
             final gUnitParser parser = new gUnitParser(tokens, grammarInfo);
             parser.gUnitDef();	// parse gunit script and save elements to grammarInfo
 
-            // Get test suite dir
-            final File f = new File(testSuiteFileName);
-            final String fullPath = f.getCanonicalPath();
-            final String filename = f.getName();
-            final String testsuiteDir =
-                    fullPath.substring(0, fullPath.length()-filename.length());
-
             // Execute test suite
             final gUnitExecutor executer = new NotifiedTestExecuter(
-                    grammarInfo, loader, testsuiteDir, testSuite);
+                    grammarInfo, loader, 
+                    testSuite.getTestSuiteFile().getParent(), testSuite);
             executer.execTest();
             
         } catch (Exception e) {

@@ -4,7 +4,8 @@ import org.antlr.gunit.*;
 import org.antlr.gunit.swingui.model.*;
 
 /**
- *
+ * The gUnit test executer that will respond to the fail/pass event during the
+ * execution.  The executer is passed into gUnit Interp for execution.
  * @author scai
  */
 public class NotifiedTestExecuter extends gUnitExecutor {

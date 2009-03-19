@@ -1,6 +1,8 @@
 
 package org.antlr.gunit.swingui;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.antlr.gunit.swingui.runner.gUnitAdapter;
 import java.awt.*;
 import java.io.IOException;
@@ -8,8 +10,6 @@ import org.antlr.gunit.swingui.model.*;
 import org.antlr.gunit.swingui.images.ImageFactory;
 import java.awt.event.*;
 import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
@@ -152,11 +152,16 @@ public class WorkSpaceController implements IController{
     }
 
     private void OnRunTest() {
-        gUnitAdapter adapter = new gUnitAdapter();
-        if(currentTestSuite == null) return;
-        adapter.run(testSuiteFileName, currentTestSuite);
-        view.tabEditors.addTab("Test Result", ImageFactory.FILE16, runner.getView());
-        runner.OnShowSuiteResult(currentTestSuite);
+        try {
+            final gUnitAdapter adapter = new gUnitAdapter(currentTestSuite);
+            if(currentTestSuite == null) return;
+            adapter.run();
+            view.tabEditors.addTab("Test Result", ImageFactory.FILE16, runner.getView());
+            runner.OnShowSuiteResult(currentTestSuite);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(view, "Fail to run test:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
     }
 
     private void initToolbar() {
