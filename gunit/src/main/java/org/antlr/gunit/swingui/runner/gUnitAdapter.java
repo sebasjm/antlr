@@ -15,8 +15,7 @@ import org.antlr.gunit.swingui.model.TestSuite;
  */
 public class gUnitAdapter {
 
-    private ParserLoader loader = new ParserLoader(
-            "ini", "/Users/scai/Desktop/gUnitEditor/ini") ;
+    private ParserLoader loader ;
 
 
     public void run(String testSuiteFileName, TestSuite testSuite) {

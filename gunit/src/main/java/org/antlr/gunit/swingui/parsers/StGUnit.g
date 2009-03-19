@@ -42,10 +42,10 @@ package org.antlr.gunit.swingui.parsers;
 import org.antlr.gunit.swingui.model.*;
 }
 
-@lexer::header {package org.antlr.gunit.swingui;}
+@lexer::header {package org.antlr.gunit.swingui.parsers;}
 
 @members {
-public Translator.TestSuiteAdapter adapter ;;
+public TestSuiteAdapter adapter ;;
 }
 
 gUnitDef

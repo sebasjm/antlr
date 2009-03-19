@@ -1,4 +1,4 @@
-// $ANTLR 3.1.1 /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g 2009-02-15 15:43:43
+// $ANTLR 3.1.2 G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g 2009-03-18 15:00:48
 package org.antlr.gunit.swingui.parsers;
 
 import org.antlr.runtime.*;
@@ -7,35 +7,35 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class StGUnitLexer extends Lexer {
-    public static final int RETVAL=10;
-    public static final int AST=11;
-    public static final int NESTED_ACTION=20;
-    public static final int T__28=28;
-    public static final int EXT=14;
-    public static final int FAIL=5;
-    public static final int WS=24;
-    public static final int STRING=12;
-    public static final int OK=4;
-    public static final int ACTION=7;
-    public static final int TOKEN_REF=9;
-    public static final int ESC=17;
-    public static final int XDIGIT=23;
-    public static final int RULE_REF=8;
     public static final int T__29=29;
-    public static final int NESTED_AST=19;
-    public static final int T__30=30;
-    public static final int CHAR_LITERAL=22;
-    public static final int T__31=31;
-    public static final int EOF=-1;
+    public static final int RETVAL=10;
+    public static final int T__28=28;
+    public static final int NESTED_ACTION=20;
     public static final int T__27=27;
-    public static final int STRING_LITERAL=21;
     public static final int T__26=26;
     public static final int T__25=25;
+    public static final int NESTED_AST=19;
+    public static final int ESC=17;
     public static final int ML_STRING=13;
+    public static final int OK=4;
+    public static final int EOF=-1;
+    public static final int NESTED_RETVAL=18;
+    public static final int FAIL=5;
+    public static final int RULE_REF=8;
+    public static final int ACTION=7;
+    public static final int TOKEN_REF=9;
+    public static final int T__30=30;
     public static final int ML_COMMENT=16;
+    public static final int T__31=31;
+    public static final int STRING_LITERAL=21;
+    public static final int WS=24;
+    public static final int CHAR_LITERAL=22;
+    public static final int EXT=14;
+    public static final int XDIGIT=23;
     public static final int SL_COMMENT=15;
     public static final int DOC_COMMENT=6;
-    public static final int NESTED_RETVAL=18;
+    public static final int AST=11;
+    public static final int STRING=12;
 
     // delegates
     // delegators
@@ -48,15 +48,15 @@ public class StGUnitLexer extends Lexer {
         super(input,state);
 
     }
-    public String getGrammarFileName() { return "/Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g"; }
+    public String getGrammarFileName() { return "G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g"; }
 
     // $ANTLR start "OK"
     public final void mOK() throws RecognitionException {
         try {
             int _type = OK;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:9:4: ( 'OK' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:9:6: 'OK'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:9:4: ( 'OK' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:9:6: 'OK'
             {
             match("OK"); 
 
@@ -76,8 +76,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = FAIL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:10:6: ( 'FAIL' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:10:8: 'FAIL'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:10:6: ( 'FAIL' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:10:8: 'FAIL'
             {
             match("FAIL"); 
 
@@ -97,8 +97,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__25;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:11:7: ( 'gunit' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:11:9: 'gunit'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:11:7: ( 'gunit' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:11:9: 'gunit'
             {
             match("gunit"); 
 
@@ -118,8 +118,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__26;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:12:7: ( 'walks' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:12:9: 'walks'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:12:7: ( 'walks' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:12:9: 'walks'
             {
             match("walks"); 
 
@@ -139,8 +139,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__27;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:13:7: ( ';' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:13:9: ';'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:13:7: ( ';' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:13:9: ';'
             {
             match(';'); 
 
@@ -159,8 +159,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__28;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:14:7: ( '@header' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:14:9: '@header'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:14:7: ( '@header' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:14:9: '@header'
             {
             match("@header"); 
 
@@ -180,8 +180,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__29;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:15:7: ( ':' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:15:9: ':'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:15:7: ( ':' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:15:9: ':'
             {
             match(':'); 
 
@@ -200,8 +200,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__30;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:16:7: ( 'returns' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:16:9: 'returns'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:16:7: ( 'returns' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:16:9: 'returns'
             {
             match("returns"); 
 
@@ -221,8 +221,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = T__31;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:17:7: ( '->' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:17:9: '->'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:17:7: ( '->' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:17:9: '->'
             {
             match("->"); 
 
@@ -242,12 +242,12 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = SL_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:108:3: ( '//' (~ ( '\\r' | '\\n' ) )* ( '\\r' )? '\\n' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:108:5: '//' (~ ( '\\r' | '\\n' ) )* ( '\\r' )? '\\n'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:108:3: ( '//' (~ ( '\\r' | '\\n' ) )* ( '\\r' )? '\\n' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:108:5: '//' (~ ( '\\r' | '\\n' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:108:10: (~ ( '\\r' | '\\n' ) )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:108:10: (~ ( '\\r' | '\\n' ) )*
             loop1:
             do {
                 int alt1=2;
@@ -260,7 +260,7 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:108:10: ~ ( '\\r' | '\\n' )
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:108:10: ~ ( '\\r' | '\\n' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -280,7 +280,7 @@ public class StGUnitLexer extends Lexer {
                 }
             } while (true);
 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:108:24: ( '\\r' )?
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:108:24: ( '\\r' )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -289,7 +289,7 @@ public class StGUnitLexer extends Lexer {
             }
             switch (alt2) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:108:24: '\\r'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:108:24: '\\r'
                     {
                     match('\r'); 
 
@@ -316,13 +316,13 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = ML_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:112:2: ( '/*' ( . )* '*/' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:112:4: '/*' ( . )* '*/'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:112:2: ( '/*' ( . )* '*/' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:112:4: '/*' ( . )* '*/'
             {
             match("/*"); 
 
             _channel=HIDDEN;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:112:28: ( . )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:112:28: ( . )*
             loop3:
             do {
                 int alt3=2;
@@ -347,7 +347,7 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:112:28: .
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:112:28: .
             	    {
             	    matchAny(); 
 
@@ -377,11 +377,11 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:116:2: ( '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:116:4: '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:116:2: ( '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:116:4: '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:116:8: ( ESC | ~ ( '\\\\' | '\"' ) )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:116:8: ( ESC | ~ ( '\\\\' | '\"' ) )*
             loop4:
             do {
                 int alt4=3;
@@ -397,14 +397,14 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt4) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:116:10: ESC
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:116:10: ESC
             	    {
             	    mESC(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:116:16: ~ ( '\\\\' | '\"' )
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:116:16: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -441,12 +441,12 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = ML_STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:120:2: ( '<<' ( . )* '>>' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:120:4: '<<' ( . )* '>>'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:120:2: ( '<<' ( . )* '>>' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:120:4: '<<' ( . )* '>>'
             {
             match("<<"); 
 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:120:9: ( . )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:120:9: ( . )*
             loop5:
             do {
                 int alt5=2;
@@ -471,7 +471,7 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt5) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:120:9: .
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:120:9: .
             	    {
             	    matchAny(); 
 
@@ -501,11 +501,11 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = TOKEN_REF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:124:2: ( 'A' .. 'Z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:124:4: 'A' .. 'Z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:124:2: ( 'A' .. 'Z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:124:4: 'A' .. 'Z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             {
             matchRange('A','Z'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:124:13: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:124:13: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             loop6:
             do {
                 int alt6=2;
@@ -518,7 +518,7 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt6) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:
             	    {
             	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -554,11 +554,11 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = RULE_REF;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:128:2: ( 'a' .. 'z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:128:4: 'a' .. 'z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:128:2: ( 'a' .. 'z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:128:4: 'a' .. 'z' ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             {
             matchRange('a','z'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:128:13: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:128:13: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
             loop7:
             do {
                 int alt7=2;
@@ -571,7 +571,7 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt7) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:
             	    {
             	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -607,11 +607,11 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = EXT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:131:5: ( '.' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+ )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:131:7: '.' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:131:5: ( '.' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+ )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:131:7: '.' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+
             {
             match('.'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:131:10: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:131:10: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+
             int cnt8=0;
             loop8:
             do {
@@ -625,7 +625,7 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt8) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:
             	    {
             	    if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -665,8 +665,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = RETVAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:133:8: ( NESTED_RETVAL )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:133:10: NESTED_RETVAL
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:133:8: ( NESTED_RETVAL )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:133:10: NESTED_RETVAL
             {
             mNESTED_RETVAL(); 
 
@@ -683,11 +683,11 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "NESTED_RETVAL"
     public final void mNESTED_RETVAL() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:137:15: ( '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:138:2: '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:137:15: ( '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:138:2: '[' ( options {greedy=false; } : NESTED_RETVAL | . )* ']'
             {
             match('['); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:139:2: ( options {greedy=false; } : NESTED_RETVAL | . )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:139:2: ( options {greedy=false; } : NESTED_RETVAL | . )*
             loop9:
             do {
                 int alt9=3;
@@ -706,14 +706,14 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt9) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:140:4: NESTED_RETVAL
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:140:4: NESTED_RETVAL
             	    {
             	    mNESTED_RETVAL(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:141:4: .
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:141:4: .
             	    {
             	    matchAny(); 
 
@@ -740,11 +740,11 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = AST;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:146:5: ( NESTED_AST ( ( ' ' )? NESTED_AST )* )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:146:7: NESTED_AST ( ( ' ' )? NESTED_AST )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:146:5: ( NESTED_AST ( ( ' ' )? NESTED_AST )* )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:146:7: NESTED_AST ( ( ' ' )? NESTED_AST )*
             {
             mNESTED_AST(); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:146:18: ( ( ' ' )? NESTED_AST )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:146:18: ( ( ' ' )? NESTED_AST )*
             loop11:
             do {
                 int alt11=2;
@@ -757,9 +757,9 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt11) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:146:19: ( ' ' )? NESTED_AST
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:146:19: ( ' ' )? NESTED_AST
             	    {
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:146:19: ( ' ' )?
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:146:19: ( ' ' )?
             	    int alt10=2;
             	    int LA10_0 = input.LA(1);
 
@@ -768,7 +768,7 @@ public class StGUnitLexer extends Lexer {
             	    }
             	    switch (alt10) {
             	        case 1 :
-            	            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:146:19: ' '
+            	            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:146:19: ' '
             	            {
             	            match(' '); 
 
@@ -801,11 +801,11 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "NESTED_AST"
     public final void mNESTED_AST() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:149:12: ( '(' ( options {greedy=false; } : NESTED_AST | . )* ')' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:150:2: '(' ( options {greedy=false; } : NESTED_AST | . )* ')'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:149:12: ( '(' ( options {greedy=false; } : NESTED_AST | . )* ')' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:150:2: '(' ( options {greedy=false; } : NESTED_AST | . )* ')'
             {
             match('('); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:151:2: ( options {greedy=false; } : NESTED_AST | . )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:151:2: ( options {greedy=false; } : NESTED_AST | . )*
             loop12:
             do {
                 int alt12=3;
@@ -824,14 +824,14 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt12) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:152:4: NESTED_AST
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:152:4: NESTED_AST
             	    {
             	    mNESTED_AST(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:153:4: .
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:153:4: .
             	    {
             	    matchAny(); 
 
@@ -858,8 +858,8 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = ACTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:159:2: ( NESTED_ACTION )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:159:4: NESTED_ACTION
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:159:2: ( NESTED_ACTION )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:159:4: NESTED_ACTION
             {
             mNESTED_ACTION(); 
 
@@ -876,39 +876,39 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "NESTED_ACTION"
     public final void mNESTED_ACTION() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:163:15: ( '{' ( options {greedy=false; k=3; } : NESTED_ACTION | STRING_LITERAL | CHAR_LITERAL | . )* '}' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:164:2: '{' ( options {greedy=false; k=3; } : NESTED_ACTION | STRING_LITERAL | CHAR_LITERAL | . )* '}'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:163:15: ( '{' ( options {greedy=false; k=3; } : NESTED_ACTION | STRING_LITERAL | CHAR_LITERAL | . )* '}' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:164:2: '{' ( options {greedy=false; k=3; } : NESTED_ACTION | STRING_LITERAL | CHAR_LITERAL | . )* '}'
             {
             match('{'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:165:2: ( options {greedy=false; k=3; } : NESTED_ACTION | STRING_LITERAL | CHAR_LITERAL | . )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:165:2: ( options {greedy=false; k=3; } : NESTED_ACTION | STRING_LITERAL | CHAR_LITERAL | . )*
             loop13:
             do {
                 int alt13=5;
                 alt13 = dfa13.predict(input);
                 switch (alt13) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:166:4: NESTED_ACTION
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:166:4: NESTED_ACTION
             	    {
             	    mNESTED_ACTION(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:167:4: STRING_LITERAL
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:167:4: STRING_LITERAL
             	    {
             	    mSTRING_LITERAL(); 
 
             	    }
             	    break;
             	case 3 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:168:4: CHAR_LITERAL
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:168:4: CHAR_LITERAL
             	    {
             	    mCHAR_LITERAL(); 
 
             	    }
             	    break;
             	case 4 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:169:4: .
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:169:4: .
             	    {
             	    matchAny(); 
 
@@ -933,11 +933,11 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "CHAR_LITERAL"
     public final void mCHAR_LITERAL() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:176:2: ( '\\'' ( ESC | ~ ( '\\'' | '\\\\' ) ) '\\'' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:176:4: '\\'' ( ESC | ~ ( '\\'' | '\\\\' ) ) '\\''
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:176:2: ( '\\'' ( ESC | ~ ( '\\'' | '\\\\' ) ) '\\'' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:176:4: '\\'' ( ESC | ~ ( '\\'' | '\\\\' ) ) '\\''
             {
             match('\''); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:176:9: ( ESC | ~ ( '\\'' | '\\\\' ) )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:176:9: ( ESC | ~ ( '\\'' | '\\\\' ) )
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -955,14 +955,14 @@ public class StGUnitLexer extends Lexer {
             }
             switch (alt14) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:176:11: ESC
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:176:11: ESC
                     {
                     mESC(); 
 
                     }
                     break;
                 case 2 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:176:17: ~ ( '\\'' | '\\\\' )
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:176:17: ~ ( '\\'' | '\\\\' )
                     {
                     if ( (input.LA(1)>='\u0000' && input.LA(1)<='&')||(input.LA(1)>='(' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
                         input.consume();
@@ -992,11 +992,11 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "STRING_LITERAL"
     public final void mSTRING_LITERAL() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:181:2: ( '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:181:4: '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"'
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:181:2: ( '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:181:4: '\"' ( ESC | ~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:181:8: ( ESC | ~ ( '\\\\' | '\"' ) )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:181:8: ( ESC | ~ ( '\\\\' | '\"' ) )*
             loop15:
             do {
                 int alt15=3;
@@ -1012,14 +1012,14 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt15) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:181:10: ESC
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:181:10: ESC
             	    {
             	    mESC(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:181:16: ~ ( '\\\\' | '\"' )
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:181:16: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1052,79 +1052,79 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "ESC"
     public final void mESC() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:185:5: ( '\\\\' ( 'n' | 'r' | 't' | 'b' | 'f' | '\"' | '\\'' | '\\\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . ) )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:185:7: '\\\\' ( 'n' | 'r' | 't' | 'b' | 'f' | '\"' | '\\'' | '\\\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:185:5: ( '\\\\' ( 'n' | 'r' | 't' | 'b' | 'f' | '\"' | '\\'' | '\\\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . ) )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:185:7: '\\\\' ( 'n' | 'r' | 't' | 'b' | 'f' | '\"' | '\\'' | '\\\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . )
             {
             match('\\'); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:186:3: ( 'n' | 'r' | 't' | 'b' | 'f' | '\"' | '\\'' | '\\\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:186:3: ( 'n' | 'r' | 't' | 'b' | 'f' | '\"' | '\\'' | '\\\\' | '>' | 'u' XDIGIT XDIGIT XDIGIT XDIGIT | . )
             int alt16=11;
             alt16 = dfa16.predict(input);
             switch (alt16) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:186:5: 'n'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:186:5: 'n'
                     {
                     match('n'); 
 
                     }
                     break;
                 case 2 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:187:5: 'r'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:187:5: 'r'
                     {
                     match('r'); 
 
                     }
                     break;
                 case 3 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:188:5: 't'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:188:5: 't'
                     {
                     match('t'); 
 
                     }
                     break;
                 case 4 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:189:5: 'b'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:189:5: 'b'
                     {
                     match('b'); 
 
                     }
                     break;
                 case 5 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:190:5: 'f'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:190:5: 'f'
                     {
                     match('f'); 
 
                     }
                     break;
                 case 6 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:191:5: '\"'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:191:5: '\"'
                     {
                     match('\"'); 
 
                     }
                     break;
                 case 7 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:192:5: '\\''
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:192:5: '\\''
                     {
                     match('\''); 
 
                     }
                     break;
                 case 8 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:193:5: '\\\\'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:193:5: '\\\\'
                     {
                     match('\\'); 
 
                     }
                     break;
                 case 9 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:194:5: '>'
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:194:5: '>'
                     {
                     match('>'); 
 
                     }
                     break;
                 case 10 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:195:5: 'u' XDIGIT XDIGIT XDIGIT XDIGIT
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:195:5: 'u' XDIGIT XDIGIT XDIGIT XDIGIT
                     {
                     match('u'); 
                     mXDIGIT(); 
@@ -1135,7 +1135,7 @@ public class StGUnitLexer extends Lexer {
                     }
                     break;
                 case 11 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:196:5: .
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:196:5: .
                     {
                     matchAny(); 
 
@@ -1156,8 +1156,8 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR start "XDIGIT"
     public final void mXDIGIT() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:201:8: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:201:8: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:
             {
             if ( (input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f') ) {
                 input.consume();
@@ -1182,10 +1182,10 @@ public class StGUnitLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:207:4: ( ( ' ' | '\\t' | ( '\\r' )? '\\n' )+ )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:207:6: ( ' ' | '\\t' | ( '\\r' )? '\\n' )+
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:207:4: ( ( ' ' | '\\t' | ( '\\r' )? '\\n' )+ )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:207:6: ( ' ' | '\\t' | ( '\\r' )? '\\n' )+
             {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:207:6: ( ' ' | '\\t' | ( '\\r' )? '\\n' )+
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:207:6: ( ' ' | '\\t' | ( '\\r' )? '\\n' )+
             int cnt18=0;
             loop18:
             do {
@@ -1212,23 +1212,23 @@ public class StGUnitLexer extends Lexer {
 
                 switch (alt18) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:207:8: ' '
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:207:8: ' '
             	    {
             	    match(' '); 
 
             	    }
             	    break;
             	case 2 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:208:5: '\\t'
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:208:5: '\\t'
             	    {
             	    match('\t'); 
 
             	    }
             	    break;
             	case 3 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:209:5: ( '\\r' )? '\\n'
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:209:5: ( '\\r' )? '\\n'
             	    {
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:209:5: ( '\\r' )?
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:209:5: ( '\\r' )?
             	    int alt17=2;
             	    int LA17_0 = input.LA(1);
 
@@ -1237,7 +1237,7 @@ public class StGUnitLexer extends Lexer {
             	    }
             	    switch (alt17) {
             	        case 1 :
-            	            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:209:5: '\\r'
+            	            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:209:5: '\\r'
             	            {
             	            match('\r'); 
 
@@ -1273,145 +1273,145 @@ public class StGUnitLexer extends Lexer {
     // $ANTLR end "WS"
 
     public void mTokens() throws RecognitionException {
-        // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:8: ( OK | FAIL | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | SL_COMMENT | ML_COMMENT | STRING | ML_STRING | TOKEN_REF | RULE_REF | EXT | RETVAL | AST | ACTION | WS )
+        // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:8: ( OK | FAIL | T__25 | T__26 | T__27 | T__28 | T__29 | T__30 | T__31 | SL_COMMENT | ML_COMMENT | STRING | ML_STRING | TOKEN_REF | RULE_REF | EXT | RETVAL | AST | ACTION | WS )
         int alt19=20;
         alt19 = dfa19.predict(input);
         switch (alt19) {
             case 1 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:10: OK
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:10: OK
                 {
                 mOK(); 
 
                 }
                 break;
             case 2 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:13: FAIL
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:13: FAIL
                 {
                 mFAIL(); 
 
                 }
                 break;
             case 3 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:18: T__25
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:18: T__25
                 {
                 mT__25(); 
 
                 }
                 break;
             case 4 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:24: T__26
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:24: T__26
                 {
                 mT__26(); 
 
                 }
                 break;
             case 5 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:30: T__27
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:30: T__27
                 {
                 mT__27(); 
 
                 }
                 break;
             case 6 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:36: T__28
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:36: T__28
                 {
                 mT__28(); 
 
                 }
                 break;
             case 7 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:42: T__29
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:42: T__29
                 {
                 mT__29(); 
 
                 }
                 break;
             case 8 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:48: T__30
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:48: T__30
                 {
                 mT__30(); 
 
                 }
                 break;
             case 9 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:54: T__31
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:54: T__31
                 {
                 mT__31(); 
 
                 }
                 break;
             case 10 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:60: SL_COMMENT
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:60: SL_COMMENT
                 {
                 mSL_COMMENT(); 
 
                 }
                 break;
             case 11 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:71: ML_COMMENT
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:71: ML_COMMENT
                 {
                 mML_COMMENT(); 
 
                 }
                 break;
             case 12 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:82: STRING
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:82: STRING
                 {
                 mSTRING(); 
 
                 }
                 break;
             case 13 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:89: ML_STRING
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:89: ML_STRING
                 {
                 mML_STRING(); 
 
                 }
                 break;
             case 14 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:99: TOKEN_REF
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:99: TOKEN_REF
                 {
                 mTOKEN_REF(); 
 
                 }
                 break;
             case 15 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:109: RULE_REF
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:109: RULE_REF
                 {
                 mRULE_REF(); 
 
                 }
                 break;
             case 16 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:118: EXT
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:118: EXT
                 {
                 mEXT(); 
 
                 }
                 break;
             case 17 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:122: RETVAL
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:122: RETVAL
                 {
                 mRETVAL(); 
 
                 }
                 break;
             case 18 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:129: AST
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:129: AST
                 {
                 mAST(); 
 
                 }
                 break;
             case 19 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:133: ACTION
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:133: ACTION
                 {
                 mACTION(); 
 
                 }
                 break;
             case 20 :
-                // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:1:140: WS
+                // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:1:140: WS
                 {
                 mWS(); 
 
@@ -1431,44 +1431,45 @@ public class StGUnitLexer extends Lexer {
     static final String DFA13_eofS =
         "\116\uffff";
     static final String DFA13_minS =
-        "\1\0\2\uffff\2\0\2\uffff\1\0\1\uffff\3\0\1\uffff\2\0\1\uffff\2\0"+
-        "\74\uffff";
+        "\1\0\2\uffff\2\0\2\uffff\1\0\1\uffff\3\0\1\uffff\2\0\1\uffff\2"+
+        "\0\74\uffff";
     static final String DFA13_maxS =
         "\1\uffff\2\uffff\2\uffff\2\uffff\1\uffff\1\uffff\3\uffff\1\uffff"+
         "\2\uffff\1\uffff\2\uffff\74\uffff";
     static final String DFA13_acceptS =
         "\1\uffff\1\5\1\1\2\uffff\2\4\1\uffff\1\2\3\uffff\1\4\5\uffff\37"+
-        "\2\1\3\4\uffff\1\3\5\uffff\16\3\4\uffff";
+        "\2\3\uffff\1\3\4\uffff\1\3\2\uffff\15\3\3\uffff\1\3\1\uffff";
     static final String DFA13_specialS =
-        "\1\0\2\uffff\1\1\1\2\2\uffff\1\3\1\uffff\1\4\1\5\1\6\1\uffff\1\7"+
-        "\1\10\1\uffff\1\11\1\12\74\uffff}>";
+        "\1\0\2\uffff\1\1\1\2\2\uffff\1\3\1\uffff\1\4\1\5\1\6\1\uffff\1"+
+        "\7\1\10\1\uffff\1\11\1\12\74\uffff}>";
     static final String[] DFA13_transitionS = {
             "\42\5\1\3\4\5\1\4\123\5\1\2\1\5\1\1\uff82\5",
             "",
             "",
-            "\42\13\1\10\4\13\1\11\64\13\1\12\36\13\1\7\1\13\1\6\uff82\13",
+            "\42\13\1\10\4\13\1\11\64\13\1\12\36\13\1\7\1\13\1\6\uff82"+
+            "\13",
             "\42\21\1\16\4\21\1\5\64\21\1\20\36\21\1\15\1\21\1\14\uff82"+
             "\21",
             "",
             "",
-            "\42\27\1\23\4\27\1\24\64\27\1\26\36\27\1\22\1\27\1\25\uff82"+
+            "\42\27\1\22\4\27\1\26\64\27\1\23\36\27\1\25\1\27\1\24\uff82"+
             "\27",
             "",
-            "\42\34\1\33\4\34\1\35\64\34\1\30\36\34\1\32\1\34\1\31\uff82"+
-            "\34",
+            "\42\35\1\31\4\35\1\33\64\35\1\30\36\35\1\34\1\35\1\32\uff82"+
+            "\35",
             "\42\52\1\40\4\52\1\41\26\52\1\50\35\52\1\47\5\52\1\45\3\52"+
             "\1\46\7\52\1\42\3\52\1\43\1\52\1\44\1\51\5\52\1\37\1\52\1\36"+
             "\uff82\52",
-            "\42\60\1\55\4\60\1\56\64\60\1\57\36\60\1\54\1\60\1\53\uff82"+
+            "\42\60\1\53\4\60\1\57\64\60\1\54\36\60\1\56\1\60\1\55\uff82"+
             "\60",
             "",
-            "\47\5\1\61\uffd8\5",
-            "\47\5\1\66\uffd8\5",
+            "\47\5\1\64\uffd8\5",
+            "\47\5\1\71\uffd8\5",
             "",
-            "\42\110\1\101\4\110\1\102\26\110\1\104\35\110\1\103\5\110\1"+
-            "\77\3\110\1\100\7\110\1\74\3\110\1\75\1\110\1\76\1\105\5\110"+
+            "\42\110\1\101\4\110\1\102\26\110\1\104\35\110\1\103\5\110"+
+            "\1\77\3\110\1\100\7\110\1\74\3\110\1\75\1\110\1\76\1\105\5\110"+
             "\1\107\1\110\1\106\uff82\110",
-            "\47\5\1\111\uffd8\5",
+            "\47\5\1\114\uffd8\5",
             "",
             "",
             "",
@@ -1623,15 +1624,15 @@ public class StGUnitLexer extends Lexer {
                         int LA13_7 = input.LA(1);
 
                         s = -1;
-                        if ( (LA13_7=='{') ) {s = 18;}
+                        if ( (LA13_7=='\"') ) {s = 18;}
 
-                        else if ( (LA13_7=='\"') ) {s = 19;}
+                        else if ( (LA13_7=='\\') ) {s = 19;}
 
-                        else if ( (LA13_7=='\'') ) {s = 20;}
+                        else if ( (LA13_7=='}') ) {s = 20;}
 
-                        else if ( (LA13_7=='}') ) {s = 21;}
+                        else if ( (LA13_7=='{') ) {s = 21;}
 
-                        else if ( (LA13_7=='\\') ) {s = 22;}
+                        else if ( (LA13_7=='\'') ) {s = 22;}
 
                         else if ( ((LA13_7>='\u0000' && LA13_7<='!')||(LA13_7>='#' && LA13_7<='&')||(LA13_7>='(' && LA13_7<='[')||(LA13_7>=']' && LA13_7<='z')||LA13_7=='|'||(LA13_7>='~' && LA13_7<='\uFFFF')) ) {s = 23;}
 
@@ -1643,15 +1644,15 @@ public class StGUnitLexer extends Lexer {
                         s = -1;
                         if ( (LA13_9=='\\') ) {s = 24;}
 
-                        else if ( (LA13_9=='}') ) {s = 25;}
+                        else if ( (LA13_9=='\"') ) {s = 25;}
 
-                        else if ( (LA13_9=='{') ) {s = 26;}
+                        else if ( (LA13_9=='}') ) {s = 26;}
 
-                        else if ( (LA13_9=='\"') ) {s = 27;}
+                        else if ( (LA13_9=='\'') ) {s = 27;}
 
-                        else if ( ((LA13_9>='\u0000' && LA13_9<='!')||(LA13_9>='#' && LA13_9<='&')||(LA13_9>='(' && LA13_9<='[')||(LA13_9>=']' && LA13_9<='z')||LA13_9=='|'||(LA13_9>='~' && LA13_9<='\uFFFF')) ) {s = 28;}
+                        else if ( (LA13_9=='{') ) {s = 28;}
 
-                        else if ( (LA13_9=='\'') ) {s = 29;}
+                        else if ( ((LA13_9>='\u0000' && LA13_9<='!')||(LA13_9>='#' && LA13_9<='&')||(LA13_9>='(' && LA13_9<='[')||(LA13_9>=']' && LA13_9<='z')||LA13_9=='|'||(LA13_9>='~' && LA13_9<='\uFFFF')) ) {s = 29;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -1691,15 +1692,15 @@ public class StGUnitLexer extends Lexer {
                         int LA13_11 = input.LA(1);
 
                         s = -1;
-                        if ( (LA13_11=='}') ) {s = 43;}
+                        if ( (LA13_11=='\"') ) {s = 43;}
 
-                        else if ( (LA13_11=='{') ) {s = 44;}
+                        else if ( (LA13_11=='\\') ) {s = 44;}
 
-                        else if ( (LA13_11=='\"') ) {s = 45;}
+                        else if ( (LA13_11=='}') ) {s = 45;}
 
-                        else if ( (LA13_11=='\'') ) {s = 46;}
+                        else if ( (LA13_11=='{') ) {s = 46;}
 
-                        else if ( (LA13_11=='\\') ) {s = 47;}
+                        else if ( (LA13_11=='\'') ) {s = 47;}
 
                         else if ( ((LA13_11>='\u0000' && LA13_11<='!')||(LA13_11>='#' && LA13_11<='&')||(LA13_11>='(' && LA13_11<='[')||(LA13_11>=']' && LA13_11<='z')||LA13_11=='|'||(LA13_11>='~' && LA13_11<='\uFFFF')) ) {s = 48;}
 
@@ -1709,9 +1710,9 @@ public class StGUnitLexer extends Lexer {
                         int LA13_13 = input.LA(1);
 
                         s = -1;
-                        if ( (LA13_13=='\'') ) {s = 49;}
+                        if ( ((LA13_13>='\u0000' && LA13_13<='&')||(LA13_13>='(' && LA13_13<='\uFFFF')) ) {s = 5;}
 
-                        else if ( ((LA13_13>='\u0000' && LA13_13<='&')||(LA13_13>='(' && LA13_13<='\uFFFF')) ) {s = 5;}
+                        else if ( (LA13_13=='\'') ) {s = 52;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -1719,9 +1720,9 @@ public class StGUnitLexer extends Lexer {
                         int LA13_14 = input.LA(1);
 
                         s = -1;
-                        if ( (LA13_14=='\'') ) {s = 54;}
+                        if ( ((LA13_14>='\u0000' && LA13_14<='&')||(LA13_14>='(' && LA13_14<='\uFFFF')) ) {s = 5;}
 
-                        else if ( ((LA13_14>='\u0000' && LA13_14<='&')||(LA13_14>='(' && LA13_14<='\uFFFF')) ) {s = 5;}
+                        else if ( (LA13_14=='\'') ) {s = 57;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -1761,9 +1762,9 @@ public class StGUnitLexer extends Lexer {
                         int LA13_17 = input.LA(1);
 
                         s = -1;
-                        if ( (LA13_17=='\'') ) {s = 73;}
+                        if ( ((LA13_17>='\u0000' && LA13_17<='&')||(LA13_17>='(' && LA13_17<='\uFFFF')) ) {s = 5;}
 
-                        else if ( ((LA13_17>='\u0000' && LA13_17<='&')||(LA13_17>='(' && LA13_17<='\uFFFF')) ) {s = 5;}
+                        else if ( (LA13_17=='\'') ) {s = 76;}
 
                         if ( s>=0 ) return s;
                         break;
@@ -1896,10 +1897,10 @@ public class StGUnitLexer extends Lexer {
     static final String DFA19_specialS =
         "\55\uffff}>";
     static final String[] DFA19_transitionS = {
-            "\2\23\2\uffff\1\23\22\uffff\1\23\1\uffff\1\13\5\uffff\1\21\4"+
-            "\uffff\1\11\1\17\1\12\12\uffff\1\7\1\5\1\14\3\uffff\1\6\5\15"+
-            "\1\2\10\15\1\1\13\15\1\20\5\uffff\6\16\1\3\12\16\1\10\4\16\1"+
-            "\4\3\16\1\22",
+            "\2\23\2\uffff\1\23\22\uffff\1\23\1\uffff\1\13\5\uffff\1\21"+
+            "\4\uffff\1\11\1\17\1\12\12\uffff\1\7\1\5\1\14\3\uffff\1\6\5"+
+            "\15\1\2\10\15\1\1\13\15\1\20\5\uffff\6\16\1\3\12\16\1\10\4\16"+
+            "\1\4\3\16\1\22",
             "\1\24",
             "\1\25",
             "\1\26",

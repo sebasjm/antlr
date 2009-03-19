@@ -1,7 +1,6 @@
-// $ANTLR 3.1.1 /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g 2009-02-15 15:43:43
+// $ANTLR 3.1.2 G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g 2009-03-18 15:00:48
 
 package org.antlr.gunit.swingui.parsers;
-import org.antlr.gunit.swingui.*;
 import org.antlr.gunit.swingui.model.*;
 
 
@@ -14,35 +13,35 @@ public class StGUnitParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "OK", "FAIL", "DOC_COMMENT", "ACTION", "RULE_REF", "TOKEN_REF", "RETVAL", "AST", "STRING", "ML_STRING", "EXT", "SL_COMMENT", "ML_COMMENT", "ESC", "NESTED_RETVAL", "NESTED_AST", "NESTED_ACTION", "STRING_LITERAL", "CHAR_LITERAL", "XDIGIT", "WS", "'gunit'", "'walks'", "';'", "'@header'", "':'", "'returns'", "'->'"
     };
-    public static final int RETVAL=10;
-    public static final int NESTED_ACTION=20;
-    public static final int AST=11;
-    public static final int T__28=28;
-    public static final int EXT=14;
-    public static final int FAIL=5;
-    public static final int WS=24;
-    public static final int STRING=12;
-    public static final int OK=4;
-    public static final int ACTION=7;
-    public static final int TOKEN_REF=9;
-    public static final int ESC=17;
-    public static final int XDIGIT=23;
-    public static final int RULE_REF=8;
     public static final int T__29=29;
-    public static final int NESTED_AST=19;
-    public static final int T__30=30;
-    public static final int CHAR_LITERAL=22;
-    public static final int T__31=31;
-    public static final int EOF=-1;
-    public static final int STRING_LITERAL=21;
+    public static final int NESTED_ACTION=20;
+    public static final int T__28=28;
+    public static final int RETVAL=10;
     public static final int T__27=27;
     public static final int T__26=26;
-    public static final int ML_STRING=13;
     public static final int T__25=25;
+    public static final int NESTED_AST=19;
+    public static final int ESC=17;
+    public static final int ML_STRING=13;
+    public static final int OK=4;
+    public static final int EOF=-1;
+    public static final int NESTED_RETVAL=18;
+    public static final int FAIL=5;
+    public static final int RULE_REF=8;
+    public static final int ACTION=7;
+    public static final int TOKEN_REF=9;
     public static final int ML_COMMENT=16;
+    public static final int T__30=30;
+    public static final int T__31=31;
+    public static final int WS=24;
+    public static final int STRING_LITERAL=21;
+    public static final int CHAR_LITERAL=22;
+    public static final int XDIGIT=23;
+    public static final int EXT=14;
     public static final int SL_COMMENT=15;
     public static final int DOC_COMMENT=6;
-    public static final int NESTED_RETVAL=18;
+    public static final int AST=11;
+    public static final int STRING=12;
 
     // delegates
     // delegators
@@ -58,22 +57,22 @@ public class StGUnitParser extends Parser {
         
 
     public String[] getTokenNames() { return StGUnitParser.tokenNames; }
-    public String getGrammarFileName() { return "/Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g"; }
+    public String getGrammarFileName() { return "G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g"; }
 
 
-    public Translator.TestSuiteAdapter adapter ;;
+    public TestSuiteAdapter adapter ;;
 
 
 
     // $ANTLR start "gUnitDef"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:51:1: gUnitDef : 'gunit' name= id ( 'walks' id )? ';' ( header )? ( suite )* ;
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:51:1: gUnitDef : 'gunit' name= id ( 'walks' id )? ';' ( header )? ( suite )* ;
     public final void gUnitDef() throws RecognitionException {
         StGUnitParser.id_return name = null;
 
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:52:2: ( 'gunit' name= id ( 'walks' id )? ';' ( header )? ( suite )* )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:52:4: 'gunit' name= id ( 'walks' id )? ';' ( header )? ( suite )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:52:2: ( 'gunit' name= id ( 'walks' id )? ';' ( header )? ( suite )* )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:52:4: 'gunit' name= id ( 'walks' id )? ';' ( header )? ( suite )*
             {
             match(input,25,FOLLOW_25_in_gUnitDef68); 
             pushFollow(FOLLOW_id_in_gUnitDef72);
@@ -82,7 +81,7 @@ public class StGUnitParser extends Parser {
             state._fsp--;
 
             adapter.setGrammarName((name!=null?input.toString(name.start,name.stop):null));
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:53:6: ( 'walks' id )?
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:53:6: ( 'walks' id )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -91,7 +90,7 @@ public class StGUnitParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:53:7: 'walks' id
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:53:7: 'walks' id
                     {
                     match(input,26,FOLLOW_26_in_gUnitDef82); 
                     pushFollow(FOLLOW_id_in_gUnitDef84);
@@ -106,7 +105,7 @@ public class StGUnitParser extends Parser {
             }
 
             match(input,27,FOLLOW_27_in_gUnitDef88); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:54:3: ( header )?
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:54:3: ( header )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -115,7 +114,7 @@ public class StGUnitParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:54:3: header
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:54:3: header
                     {
                     pushFollow(FOLLOW_header_in_gUnitDef93);
                     header();
@@ -128,7 +127,7 @@ public class StGUnitParser extends Parser {
 
             }
 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:54:11: ( suite )*
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:54:11: ( suite )*
             loop3:
             do {
                 int alt3=2;
@@ -141,7 +140,7 @@ public class StGUnitParser extends Parser {
 
                 switch (alt3) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:54:11: suite
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:54:11: suite
             	    {
             	    pushFollow(FOLLOW_suite_in_gUnitDef96);
             	    suite();
@@ -173,11 +172,11 @@ public class StGUnitParser extends Parser {
 
 
     // $ANTLR start "header"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:57:1: header : '@header' ACTION ;
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:57:1: header : '@header' ACTION ;
     public final void header() throws RecognitionException {
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:58:2: ( '@header' ACTION )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:58:4: '@header' ACTION
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:58:2: ( '@header' ACTION )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:58:4: '@header' ACTION
             {
             match(input,28,FOLLOW_28_in_header108); 
             match(input,ACTION,FOLLOW_ACTION_in_header110); 
@@ -197,16 +196,16 @@ public class StGUnitParser extends Parser {
 
 
     // $ANTLR start "suite"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:61:1: suite : (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF ) ':' ( test )+ ;
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:61:1: suite : (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF ) ':' ( test )+ ;
     public final void suite() throws RecognitionException {
         Token parserRule=null;
         Token lexerRule=null;
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:62:2: ( (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF ) ':' ( test )+ )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:62:4: (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF ) ':' ( test )+
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:62:2: ( (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF ) ':' ( test )+ )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:62:4: (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF ) ':' ( test )+
             {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:62:4: (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:62:4: (parserRule= RULE_REF ( 'walks' RULE_REF )? | lexerRule= TOKEN_REF )
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -224,10 +223,10 @@ public class StGUnitParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:62:6: parserRule= RULE_REF ( 'walks' RULE_REF )?
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:62:6: parserRule= RULE_REF ( 'walks' RULE_REF )?
                     {
                     parserRule=(Token)match(input,RULE_REF,FOLLOW_RULE_REF_in_suite127); 
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:62:26: ( 'walks' RULE_REF )?
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:62:26: ( 'walks' RULE_REF )?
                     int alt4=2;
                     int LA4_0 = input.LA(1);
 
@@ -236,7 +235,7 @@ public class StGUnitParser extends Parser {
                     }
                     switch (alt4) {
                         case 1 :
-                            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:62:27: 'walks' RULE_REF
+                            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:62:27: 'walks' RULE_REF
                             {
                             match(input,26,FOLLOW_26_in_suite130); 
                             match(input,RULE_REF,FOLLOW_RULE_REF_in_suite132); 
@@ -251,7 +250,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:64:5: lexerRule= TOKEN_REF
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:64:5: lexerRule= TOKEN_REF
                     {
                     lexerRule=(Token)match(input,TOKEN_REF,FOLLOW_TOKEN_REF_in_suite154); 
                     adapter.startRule((lexerRule!=null?lexerRule.getText():null));
@@ -262,7 +261,7 @@ public class StGUnitParser extends Parser {
             }
 
             match(input,29,FOLLOW_29_in_suite168); 
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:68:3: ( test )+
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:68:3: ( test )+
             int cnt6=0;
             loop6:
             do {
@@ -301,7 +300,7 @@ public class StGUnitParser extends Parser {
 
                 switch (alt6) {
             	case 1 :
-            	    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:68:3: test
+            	    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:68:3: test
             	    {
             	    pushFollow(FOLLOW_test_in_suite172);
             	    test();
@@ -338,7 +337,7 @@ public class StGUnitParser extends Parser {
 
 
     // $ANTLR start "test"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:72:1: test : input expect ;
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:72:1: test : input expect ;
     public final void test() throws RecognitionException {
         ITestCaseInput input1 = null;
 
@@ -346,8 +345,8 @@ public class StGUnitParser extends Parser {
 
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:73:2: ( input expect )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:73:4: input expect
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:73:2: ( input expect )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:73:4: input expect
             {
             pushFollow(FOLLOW_input_in_test188);
             input1=input();
@@ -376,7 +375,7 @@ public class StGUnitParser extends Parser {
 
 
     // $ANTLR start "expect"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:77:1: expect returns [ITestCaseOutput out] : ( OK | FAIL | 'returns' RETVAL | '->' output | '->' AST );
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:77:1: expect returns [ITestCaseOutput out] : ( OK | FAIL | 'returns' RETVAL | '->' output | '->' AST );
     public final ITestCaseOutput expect() throws RecognitionException {
         ITestCaseOutput out = null;
 
@@ -386,7 +385,7 @@ public class StGUnitParser extends Parser {
 
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:78:2: ( OK | FAIL | 'returns' RETVAL | '->' output | '->' AST )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:78:2: ( OK | FAIL | 'returns' RETVAL | '->' output | '->' AST )
             int alt7=5;
             switch ( input.LA(1) ) {
             case OK:
@@ -431,7 +430,7 @@ public class StGUnitParser extends Parser {
 
             switch (alt7) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:78:4: OK
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:78:4: OK
                     {
                     match(input,OK,FOLLOW_OK_in_expect210); 
                     out = adapter.createBoolOutput(true);
@@ -439,7 +438,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:79:4: FAIL
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:79:4: FAIL
                     {
                     match(input,FAIL,FOLLOW_FAIL_in_expect219); 
                     out = adapter.createBoolOutput(false);
@@ -447,7 +446,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:80:4: 'returns' RETVAL
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:80:4: 'returns' RETVAL
                     {
                     match(input,30,FOLLOW_30_in_expect227); 
                     RETVAL3=(Token)match(input,RETVAL,FOLLOW_RETVAL_in_expect229); 
@@ -456,7 +455,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:81:4: '->' output
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:81:4: '->' output
                     {
                     match(input,31,FOLLOW_31_in_expect236); 
                     pushFollow(FOLLOW_output_in_expect238);
@@ -469,7 +468,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:82:4: '->' AST
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:82:4: '->' AST
                     {
                     match(input,31,FOLLOW_31_in_expect245); 
                     AST5=(Token)match(input,AST,FOLLOW_AST_in_expect247); 
@@ -492,7 +491,7 @@ public class StGUnitParser extends Parser {
 
 
     // $ANTLR start "input"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:85:1: input returns [ITestCaseInput in] : ( STRING | ML_STRING | fileInput );
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:85:1: input returns [ITestCaseInput in] : ( STRING | ML_STRING | fileInput );
     public final ITestCaseInput input() throws RecognitionException {
         ITestCaseInput in = null;
 
@@ -502,7 +501,7 @@ public class StGUnitParser extends Parser {
 
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:86:2: ( STRING | ML_STRING | fileInput )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:86:2: ( STRING | ML_STRING | fileInput )
             int alt8=3;
             switch ( input.LA(1) ) {
             case STRING:
@@ -530,7 +529,7 @@ public class StGUnitParser extends Parser {
 
             switch (alt8) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:86:4: STRING
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:86:4: STRING
                     {
                     STRING6=(Token)match(input,STRING,FOLLOW_STRING_in_input264); 
                     in = adapter.createStringInput((STRING6!=null?STRING6.getText():null));
@@ -538,7 +537,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:87:4: ML_STRING
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:87:4: ML_STRING
                     {
                     ML_STRING7=(Token)match(input,ML_STRING,FOLLOW_ML_STRING_in_input273); 
                     in = adapter.createMultiInput((ML_STRING7!=null?ML_STRING7.getText():null));
@@ -546,7 +545,7 @@ public class StGUnitParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:88:4: fileInput
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:88:4: fileInput
                     {
                     pushFollow(FOLLOW_fileInput_in_input280);
                     fileInput8=fileInput();
@@ -574,14 +573,14 @@ public class StGUnitParser extends Parser {
     };
 
     // $ANTLR start "output"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:91:1: output : ( STRING | ML_STRING | ACTION );
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:91:1: output : ( STRING | ML_STRING | ACTION );
     public final StGUnitParser.output_return output() throws RecognitionException {
         StGUnitParser.output_return retval = new StGUnitParser.output_return();
         retval.start = input.LT(1);
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:92:2: ( STRING | ML_STRING | ACTION )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:92:2: ( STRING | ML_STRING | ACTION )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:
             {
             if ( input.LA(1)==ACTION||(input.LA(1)>=STRING && input.LA(1)<=ML_STRING) ) {
                 input.consume();
@@ -610,7 +609,7 @@ public class StGUnitParser extends Parser {
 
 
     // $ANTLR start "fileInput"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:97:1: fileInput returns [String path] : id ( EXT )? ;
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:97:1: fileInput returns [String path] : id ( EXT )? ;
     public final String fileInput() throws RecognitionException {
         String path = null;
 
@@ -619,8 +618,8 @@ public class StGUnitParser extends Parser {
 
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:98:2: ( id ( EXT )? )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:98:4: id ( EXT )?
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:98:2: ( id ( EXT )? )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:98:4: id ( EXT )?
             {
             pushFollow(FOLLOW_id_in_fileInput319);
             id9=id();
@@ -628,7 +627,7 @@ public class StGUnitParser extends Parser {
             state._fsp--;
 
             path = (id9!=null?input.toString(id9.start,id9.stop):null);
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:98:27: ( EXT )?
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:98:27: ( EXT )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -637,7 +636,7 @@ public class StGUnitParser extends Parser {
             }
             switch (alt9) {
                 case 1 :
-                    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:98:28: EXT
+                    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:98:28: EXT
                     {
                     EXT10=(Token)match(input,EXT,FOLLOW_EXT_in_fileInput324); 
                     path += (EXT10!=null?EXT10.getText():null);
@@ -665,14 +664,14 @@ public class StGUnitParser extends Parser {
     };
 
     // $ANTLR start "id"
-    // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:101:1: id : ( TOKEN_REF | RULE_REF );
+    // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:101:1: id : ( TOKEN_REF | RULE_REF );
     public final StGUnitParser.id_return id() throws RecognitionException {
         StGUnitParser.id_return retval = new StGUnitParser.id_return();
         retval.start = input.LT(1);
 
         try {
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:101:5: ( TOKEN_REF | RULE_REF )
-            // /Users/scai/NetBeansProjects/gUnitEditor/src/org/antlr/gunit/swingui/StGUnit.g:
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:101:5: ( TOKEN_REF | RULE_REF )
+            // G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g:
             {
             if ( (input.LA(1)>=RULE_REF && input.LA(1)<=TOKEN_REF) ) {
                 input.consume();

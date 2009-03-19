@@ -1,39 +1,26 @@
 package org.antlr.gunit.swingui.model;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import org.antlr.runtime.CommonTokenStream;
+import java.io.*;
+import java.util.*;
+import org.antlr.runtime.*;
 
 public class TestSuite {
 
-    private List<Rule> rules = new ArrayList<Rule>();
-    private String grammarName = "";
-    private String grammarDir = "";
-    private CommonTokenStream tokens;
+    protected List<Rule> rules ;
+    protected String grammarName ;
+    protected CommonTokenStream tokens;
+    protected File testSuiteFile;      
 
-    private static final String TEST_SUITE_EXT = ".gunit";
-    private static final String GRAMMAR_EXT = ".g";
-
-    public TestSuite() {}
-
-    public TestSuite(File grammarFile, List<Rule> rules) {
-        final String grammarFileName = grammarFile.getName();
-        grammarName = grammarFileName.substring(
-                0, grammarFileName.lastIndexOf("."));
-
-        grammarDir = grammarFile.getParent();
+    protected TestSuite(String gname, File testFile) {
+        grammarName = gname;
+        testSuiteFile = testFile;
+        rules = new ArrayList<Rule>();
     }
-
+    
     /* Get the gUnit test suite file name. */
-    public String getTestSuiteFileName() {
-        return grammarDir + File.separator + grammarName + TEST_SUITE_EXT;
-    }
-
-    /* Get the ANTLR grammar file name. */
-    public String getGrammarFileName() {
-        return grammarDir + File.separator + grammarName + GRAMMAR_EXT;
-    }
+    public File getTestSuiteFile() {
+        return testSuiteFile;
+    }       
 
     public void addRule(Rule currentRule) {
         if(currentRule == null) throw new IllegalArgumentException("Null rule");

@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -21,7 +22,6 @@ public class WorkSpaceController implements IController{
 
     /* MODEL */
     private TestSuite currentTestSuite;
-    private gUnitAdapter adapter = new gUnitAdapter();
     private String testSuiteFileName = null;    // path + file
 
     /* VIEW */
@@ -61,16 +61,24 @@ public class WorkSpaceController implements IController{
         JFileChooser jfc = new JFileChooser();
         jfc.setDialogTitle("Create test suite from grammar");
         jfc.setDialogType(JFileChooser.OPEN_DIALOG);
+        jfc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getName().toLowerCase().endsWith(TestSuiteFactory.GRAMMAR_EXT);
+            }
+
+            @Override
+            public String getDescription() {
+                return "ANTLR grammar file (*.g)";
+            }
+        });        
         if( jfc.showOpenDialog(view) != JFileChooser.APPROVE_OPTION ) return;
 
         view.paneStatus.setProgressIndetermined(true);
         final File grammarFile = jfc.getSelectedFile();
-        //final String sName = grammarFile.getName().substring(
-        //        0, grammarFile.getName().length() - 2);
-        currentTestSuite = new TestSuite(grammarFile, Translator.loadRulesFromGrammar(grammarFile));
-        // trim ".g"
-        //currentTestSuite.setGrammarName(sName);
-        //currentTestSuite.setRules(Translator.loadRulesFromGrammar(grammarFile));
+
+        currentTestSuite = TestSuiteFactory.createTestSuite(grammarFile);
+
         view.listRules.initialize(currentTestSuite);
         view.tabEditors.setSelectedIndex(0);
         view.paneStatus.setText("Grammar: " + currentTestSuite.getGrammarName());
@@ -80,36 +88,8 @@ public class WorkSpaceController implements IController{
     }
 
     private void OnSaveTest() {
-        File file;
-        view.paneStatus.setProgressIndetermined(true);
-        try {
-
-            if(testSuiteFileName == null || testSuiteFileName.equals("")) {
-                JFileChooser jfc = new JFileChooser();
-                jfc.setDialogTitle("Save test suite");
-                jfc.setDialogType(JFileChooser.SAVE_DIALOG);
-                if( jfc.showSaveDialog(view) != JFileChooser.APPROVE_OPTION ) return;
-
-                file = jfc.getSelectedFile();
-                testSuiteFileName = file.getCanonicalPath();
-            } else {
-                file = new File(testSuiteFileName);
-            }
-
-            FileWriter fw = new FileWriter(file);
-            fw.write(Translator.toScript(currentTestSuite));
-            fw.flush();
-            fw.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        view.paneStatus.setProgressIndetermined(false);
-
-    }
-
-    private void OnSaveAsTest() {
-
+        TestSuiteFactory.saveTestSuite(currentTestSuite);
+        JOptionPane.showMessageDialog(view, "Testsuite saved to:\n" + currentTestSuite.getTestSuiteFile().getAbsolutePath());
     }
 
     private void OnOpenTest()  {
@@ -117,6 +97,18 @@ public class WorkSpaceController implements IController{
         JFileChooser jfc = new JFileChooser();
         jfc.setDialogTitle("Open existing gUnit test suite");
         jfc.setDialogType(JFileChooser.OPEN_DIALOG);
+        jfc.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return f.isDirectory() || f.getName().toLowerCase().endsWith(TestSuiteFactory.TEST_SUITE_EXT);
+            }
+
+            @Override
+            public String getDescription() {
+                return "ANTLR unit test file (*.gunit)";
+            }
+        });
         if( jfc.showOpenDialog(view) != JFileChooser.APPROVE_OPTION ) return;
 
         final File testSuiteFile = jfc.getSelectedFile();
@@ -128,7 +120,7 @@ public class WorkSpaceController implements IController{
 
         view.paneStatus.setProgressIndetermined(true);
 
-        currentTestSuite = Translator.toTestSuite(testSuiteFile, new ArrayList());
+        currentTestSuite = TestSuiteFactory.loadTestSuite(testSuiteFile);
         view.listRules.initialize(currentTestSuite);
         view.paneStatus.setText(currentTestSuite.getGrammarName());
         view.tabEditors.setSelectedIndex(0);
@@ -151,7 +143,7 @@ public class WorkSpaceController implements IController{
             public void run() {
                 view.paneStatus.setProgressIndetermined(true);
                 view.txtEditor.setText(
-                    Translator.toScript(currentTestSuite));
+                    TestSuiteFactory.getScript(currentTestSuite));
                 view.paneStatus.setProgressIndetermined(false);
             }
         };
@@ -160,6 +152,7 @@ public class WorkSpaceController implements IController{
     }
 
     private void OnRunTest() {
+        gUnitAdapter adapter = new gUnitAdapter();
         if(currentTestSuite == null) return;
         adapter.run(testSuiteFileName, currentTestSuite);
         view.tabEditors.addTab("Test Result", ImageFactory.FILE16, runner.getView());
@@ -203,13 +196,6 @@ public class WorkSpaceController implements IController{
         }
         
     }
-
-
-
-
-
-
-
     
 
     /** Create test suite action. */
@@ -235,16 +221,6 @@ public class WorkSpaceController implements IController{
         }
     }
 
-    /** Save as test suite action. */
-    private class SaveAsAction extends AbstractAction {
-        public SaveAsAction() {
-            super("Save as", ImageFactory.SAVEAS);
-            putValue(SHORT_DESCRIPTION, "Save a copy");
-        }
-        public void actionPerformed(ActionEvent e) {
-            OnSaveAsTest();
-        }
-    }
 
     /** Open test suite action. */
     private class OpenAction extends AbstractAction {
