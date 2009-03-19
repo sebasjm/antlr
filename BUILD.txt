@@ -208,6 +208,15 @@ grammar files).
 This catch-22 situation means that the pom.xml file in the antlr3-maven-plugin directory
 MUST be updated manually (or we must write a script to do this).
 
+Finally, we need to remember that because the tool is dependent on the antlr3-maven-plugin
+and the plugin is itself dependent on the the tool, that we must manually update
+the versions of each that they reference. So, when we bump the version of the toolset
+to say 3.1.4-SNAPSHOT, we need to change the antlr3-maven-plugin pom.xml to reference
+that version of the antlr tool. The tool itself is always built with the prior released
+version of the plugin, so when we release we must change the main branch of the plugin
+to use the newly released version of the plugin. This is covered in the release
+checklist.
+
 Deploying
 ----------
 Deploying the tools at the current version is relatively easy, but to deploy to the
@@ -345,7 +354,11 @@ to 3.1.4-SNAPSHOT.
     3.1.3-SNAPSHOT to 3.1.3.
 
 12) Edit the pom.xml file for antlr3-maven-plugin under the release-3.1.3 directory and
-    change the version from 3.1.3-SNAPSHOT to 3.1.3.
+    change the version from 3.1.3-SNAPSHOT to 3.1.3. Also change the version of
+    the tool that the this pom.xml references from 3.1.3-SNAPSHOT to 3.1.3 as we
+    are now releasing the plugin of course and it needs to reference the version
+    we are about to release. You will find this reference in the dependencies
+    section of the antlr3-maven-plugin pom.xml.
 
 13)  Now (from the release-3.1.3 directory), run the command:
 
@@ -380,7 +393,36 @@ to 3.1.4-SNAPSHOT.
         Note that we must skip the tests as Maven will not let you deploy releases
         that fail any junit tests.
 
-17)  Reward anyone around you with good beer.
+17)  The final step is that we must update the main branch pom.xml for the
+     tool to reference the newly release version of the antlr3-maven-plugin. This is
+     because each release of ANTLR is built with the prior release of ANTLR, and
+     we have just released a new version. Edit the pom.xml for the tool (main/tool/pom.xml)
+     under the main (that's the MAIN branch, not the release branch) and find
+     the dependency reference to the antlr plugin. If you just release say
+     3.1.3, then the tool should now reference version 3.1.3 of the plugin. Having done
+     this, you should probably rebuild the main branch and let it run the junit
+     tests. Later, I will automate this dependency update as mvn can do this
+     for us.
+
+18)  Having deployed the release to maven, you will want to create the
+     uber jar for the new release, to make it downloadable from the
+     antlr.org website. This is a repeat of the earlier described step
+     to build the uber jar:
+
+       mvn =Dmaven.test.skip=true package assembly:assembly
+
+     MAven will produce the uber jar in the target directory:
+
+	antlr-master-3.1.3-completejar.jar
+
+     And this is the complete jar that can be downloaded from the web site. You
+     may wish to produce an md5 checksum to go with the jar:
+
+     md5sum target/antlr-master-3.1.3-completejar.jar
+     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  target/antlr-master-3.1.4-SNAPSHOT-completejar.jar
+
+
+19)  Reward anyone around you with good beer.
 
 
 Miscellany
