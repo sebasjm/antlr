@@ -76,7 +76,6 @@ namespace Antlr.Runtime
         public BaseRecognizer()
         {
             state = new RecognizerSharedState();
-            Initialize();
             InitDFAs();
         }
 
@@ -87,15 +86,10 @@ namespace Antlr.Runtime
                 state = new RecognizerSharedState();
             }
             this.state = state;
-            Initialize();
             InitDFAs();
         }
 
         protected virtual void InitDFAs()
-        {
-        }
-
-        protected virtual void Initialize()
         {
         }
 
