@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\DebugGrammar.g3 2009-03-16 13:19:16
+// $ANTLR 3.1.2 BuildOptions\\DebugGrammar.g3 2009-03-20 14:23:04
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -60,9 +60,11 @@ public partial class DebugGrammarParser : DebugParser
 		public DebugGrammarParser( ITokenStream input, int port, RecognizerSharedState state )
 			: base( input, state )
 		{
+			InitializeTreeAdaptor();
+			if ( TreeAdaptor == null )
+				TreeAdaptor = new CommonTreeAdaptor();
 			DebugEventSocketProxy proxy = new DebugEventSocketProxy( this, port, adaptor );
 			DebugListener = proxy;
-            // TODO: I had to manually correct this line from ITokenStream
 			TokenStream = new DebugTokenStream( input, proxy );
 			try
 			{
@@ -79,7 +81,9 @@ public partial class DebugGrammarParser : DebugParser
 	public DebugGrammarParser( ITokenStream input, IDebugEventListener dbg )
 		: base( input, dbg )
 	{
-
+		InitializeTreeAdaptor();
+		if ( TreeAdaptor == null )
+			TreeAdaptor = new CommonTreeAdaptor();
 
 		ITreeAdaptor adap = new CommonTreeAdaptor();
 		TreeAdaptor = adap;
@@ -91,7 +95,10 @@ public partial class DebugGrammarParser : DebugParser
 		return result;
 	}
 
+	// Implement this function in your helper file to use a custom tree adaptor
+	partial void InitializeTreeAdaptor();
 	protected DebugTreeAdaptor adaptor;
+
 	public ITreeAdaptor TreeAdaptor
 	{
 		get
@@ -1421,12 +1428,7 @@ public partial class DebugGrammarParser : DebugParser
 		return retval;
 	}
 	// $ANTLR end "atom"
-	#endregion
-
-	// Delegated rules
-
-	#region Synpreds
-	#endregion
+	#endregion Rules
 
 	#region DFA
 	DFA2 dfa2;
@@ -1507,9 +1509,9 @@ public partial class DebugGrammarParser : DebugParser
 	}
 
 
-	#endregion
+	#endregion DFA
 
-	#region Follow Sets
+	#region Follow sets
 	public static class Follow
 	{
 		public static readonly BitSet _stat_in_prog53 = new BitSet(new ulong[]{0x11C2UL});
@@ -1547,5 +1549,5 @@ public partial class DebugGrammarParser : DebugParser
 		public static readonly BitSet _13_in_atom395 = new BitSet(new ulong[]{0x2UL});
 
 	}
-	#endregion
+	#endregion Follow sets
 }

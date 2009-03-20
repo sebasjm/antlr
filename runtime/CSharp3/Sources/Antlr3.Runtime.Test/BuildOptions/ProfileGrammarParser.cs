@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\ProfileGrammar.g3 2009-03-16 13:19:19
+// $ANTLR 3.1.2 BuildOptions\\ProfileGrammar.g3 2009-03-20 14:23:07
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -62,6 +62,9 @@ public partial class ProfileGrammarParser : DebugParser
 		{
 			Profiler p = (Profiler)dbg;
 			p.setParser(this);
+			InitializeTreeAdaptor();
+			if ( TreeAdaptor == null )
+				TreeAdaptor = new CommonTreeAdaptor();
 			ITreeAdaptor adap = new CommonTreeAdaptor();
 			TreeAdaptor = adap;
 			proxy.TreeAdaptor = adap;
@@ -71,7 +74,9 @@ public partial class ProfileGrammarParser : DebugParser
 		: base( input, dbg )
 	{
 		Profiler p = (Profiler)dbg;
-		p.setParser(this);
+		p.setParser(this);InitializeTreeAdaptor();
+		if ( TreeAdaptor == null )
+			TreeAdaptor = new CommonTreeAdaptor();
 
 		ITreeAdaptor adap = new CommonTreeAdaptor();
 		TreeAdaptor = adap;
@@ -94,7 +99,10 @@ public partial class ProfileGrammarParser : DebugParser
 		return result;
 	}
 
+	// Implement this function in your helper file to use a custom tree adaptor
+	partial void InitializeTreeAdaptor();
 	protected DebugTreeAdaptor adaptor;
+
 	public ITreeAdaptor TreeAdaptor
 	{
 		get
@@ -1424,12 +1432,7 @@ public partial class ProfileGrammarParser : DebugParser
 		return retval;
 	}
 	// $ANTLR end "atom"
-	#endregion
-
-	// Delegated rules
-
-	#region Synpreds
-	#endregion
+	#endregion Rules
 
 	#region DFA
 	DFA2 dfa2;
@@ -1510,9 +1513,9 @@ public partial class ProfileGrammarParser : DebugParser
 	}
 
 
-	#endregion
+	#endregion DFA
 
-	#region Follow Sets
+	#region Follow sets
 	public static class Follow
 	{
 		public static readonly BitSet _stat_in_prog53 = new BitSet(new ulong[]{0x11C2UL});
@@ -1550,5 +1553,5 @@ public partial class ProfileGrammarParser : DebugParser
 		public static readonly BitSet _13_in_atom395 = new BitSet(new ulong[]{0x2UL});
 
 	}
-	#endregion
+	#endregion Follow sets
 }

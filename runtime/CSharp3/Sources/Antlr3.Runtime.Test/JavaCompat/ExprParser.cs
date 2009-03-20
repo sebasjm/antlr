@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-03-16 13:19:15
+// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-03-20 14:23:03
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -487,23 +487,9 @@ public partial class ExprParser : Parser
 		return value;
 	}
 	// $ANTLR end "atom"
-	#endregion
+	#endregion Rules
 
-	// Delegated rules
-
-	#region Synpreds
-	#endregion
-
-	#region DFA
-
-	protected override void InitDFAs()
-	{
-		base.InitDFAs();
-	}
-
-	#endregion
-
-	#region Follow Sets
+	#region Follow sets
 	public static class Follow
 	{
 		public static readonly BitSet _stat_in_prog40 = new BitSet(new ulong[]{0x272UL});
@@ -529,5 +515,5 @@ public partial class ExprParser : Parser
 		public static readonly BitSet _10_in_atom267 = new BitSet(new ulong[]{0x2UL});
 
 	}
-	#endregion
+	#endregion Follow sets
 }
