@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+March 21, 2009
+
+* Added ctor to RecognizerSharedState to allow cloning it.
+
 March 17, 2009
 
 * improved ANTLRv3.g to handle <...> element options

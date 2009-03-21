@@ -116,4 +116,29 @@ public class RecognizerSharedState {
 	 *  the input char buffer.  Use setText() or can set this instance var.
  	 */
 	public String text;
+
+    public RecognizerSharedState() {;}
+    
+    public RecognizerSharedState(RecognizerSharedState state) {
+        if ( this.following.length < state.following.length ) {
+            this.following = new BitSet[state.following.length];
+        }
+        System.arraycopy(state.following, 0, this.following, 0, state.following.length);
+        this._fsp = state._fsp;
+        this.errorRecovery = state.errorRecovery;
+        this.lastErrorIndex = state.lastErrorIndex;
+        this.failed = state.failed;
+        this.syntaxErrors = state.syntaxErrors;
+        this.backtracking = state.backtracking;
+        if ( state.ruleMemo!=null ) {
+            this.ruleMemo = new Map[state.ruleMemo.length];
+            System.arraycopy(state.ruleMemo, 0, this.ruleMemo, 0, state.ruleMemo.length);
+        }
+        this.token = state.token;
+        this.tokenStartCharIndex = state.tokenStartCharIndex;
+        this.tokenStartCharPositionInLine = state.tokenStartCharPositionInLine;
+        this.channel = state.channel;
+        this.type = state.type;
+        this.text = state.text;
+    }
 }
