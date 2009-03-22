@@ -44,7 +44,6 @@ public class gUnitTestSuite {
 	protected Map<gUnitTestInput, AbstractTest> testSuites = new LinkedHashMap<gUnitTestInput, AbstractTest>();
 	
 	public gUnitTestSuite() {
-		;
 	}
 	
 	public gUnitTestSuite(String rule) {
@@ -67,7 +66,12 @@ public class gUnitTestSuite {
 	
 	public void addTestCase(gUnitTestInput input, AbstractTest expect) {
 		if ( input!=null && expect!=null ) {
-			expect.setTestedRuleName(this.rule);
+            /*
+             * modified by shaoting
+             * if rule is null, use lexRule name
+             */
+            //expect.setTestedRuleName(this.rule);
+			expect.setTestedRuleName(this.rule ==null ? this.lexicalRule : this.rule);
 			expect.setTestCaseIndex(this.testSuites.size());
 			this.testSuites.put(input, expect);
 		}
