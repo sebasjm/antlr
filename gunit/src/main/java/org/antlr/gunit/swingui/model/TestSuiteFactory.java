@@ -2,8 +2,7 @@ package org.antlr.gunit.swingui.model;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.antlr.gunit.swingui.Tool;
 import org.antlr.gunit.swingui.parsers.*;
 import org.antlr.runtime.*;
 import org.antlr.stringtemplate.*;
@@ -16,7 +15,7 @@ public class TestSuiteFactory {
     public static final String GRAMMAR_EXT = ".g";
     
     static  {
-        InputStream in = TestSuiteFactory.class.getResourceAsStream(TEMPLATE_FILE);
+        InputStream in = Tool.class.getResourceAsStream(TEMPLATE_FILE);
         Reader rd = new InputStreamReader(in);
         templates = new StringTemplateGroup(rd);
     }

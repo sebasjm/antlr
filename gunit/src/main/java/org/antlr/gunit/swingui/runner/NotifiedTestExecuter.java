@@ -14,6 +14,7 @@ public class NotifiedTestExecuter extends gUnitExecutor {
 
     public NotifiedTestExecuter(GrammarInfo grammarInfo, ClassLoader loader, String testsuiteDir, TestSuite suite) {
     	super(grammarInfo, loader, testsuiteDir);
+        
         testSuite = suite;
     }
 

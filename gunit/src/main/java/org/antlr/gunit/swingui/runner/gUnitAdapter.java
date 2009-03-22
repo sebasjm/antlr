@@ -20,6 +20,7 @@ public class gUnitAdapter {
     private TestSuite testSuite;
 
     public gUnitAdapter(TestSuite suite) throws IOException {
+        int i = 3;
         loader = new ParserLoader(suite.getGrammarName(), 
                                   suite.getTestSuiteFile().getParent());
         testSuite = suite;
