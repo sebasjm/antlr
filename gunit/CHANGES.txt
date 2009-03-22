@@ -6,6 +6,12 @@ leonsu at mac com
 
 CHANGES
 
+March 21, 2009
+
+* gUnitTestSuite.java: use lexer rule name if parser rule name is null (by Shaoting)
+
+* add gunit/swingui package for gUnitEditor GUI
+
 Feb 17, 2009
 
 * added new interfaces for GUI editor
