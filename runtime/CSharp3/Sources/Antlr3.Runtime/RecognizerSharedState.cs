@@ -4,7 +4,7 @@
  * All rights reserved.
  *
  * Conversion to C#:
- * Copyright (c) 2008 Sam Harwell, Pixel Mine, Inc.
+ * Copyright (c) 2008-2009 Sam Harwell, Pixel Mine, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,8 +53,8 @@ namespace Antlr.Runtime
          *  and keeps going.
          *  </summary>
          */
-        public BitSet[] following = new BitSet[BaseRecognizer.INITIAL_FOLLOW_STACK_SIZE];
-        public int _fsp = -1;
+        public BitSet[] following;
+        public int _fsp;
 
         /** <summary>
          *  This is true when we see an error and before having successfully
@@ -62,7 +62,7 @@ namespace Antlr.Runtime
          *  per error.
          *  </summary>
          */
-        public bool errorRecovery = false;
+        public bool errorRecovery;
 
         /** <summary>
          *  The index into the input stream where the last error occurred.
@@ -72,24 +72,24 @@ namespace Antlr.Runtime
          *  one token/tree node is consumed for two errors.
          *  </summary>
          */
-        public int lastErrorIndex = -1;
+        public int lastErrorIndex;
 
         /** <summary>
          *  In lieu of a return value, this indicates that a rule or token
          *  has failed to match.  Reset to false upon valid token match.
          *  </summary>
          */
-        public bool failed = false;
+        public bool failed;
 
         /** <summary>Did the recognizer encounter a syntax error?  Track how many.</summary> */
-        public int syntaxErrors = 0;
+        public int syntaxErrors;
 
         /** <summary>
          *  If 0, no backtracking is going on.  Safe to exec actions etc...
          *  If >0 then it's the level of backtracking.
          *  </summary>
          */
-        public int backtracking = 0;
+        public int backtracking;
 
         /** <summary>
          *  An array[size num rules] of Map<Integer,Integer> that tracks
@@ -125,7 +125,7 @@ namespace Antlr.Runtime
          *  the start of nextToken.
          *  </summary>
          */
-        public int tokenStartCharIndex = -1;
+        public int tokenStartCharIndex;
 
         /** <summary>The line on which the first character of the token resides</summary> */
         public int tokenStartLine;
@@ -145,5 +145,37 @@ namespace Antlr.Runtime
          *  </summary>
          */
         public string text;
+
+        public RecognizerSharedState()
+        {
+            following = new BitSet[BaseRecognizer.InitialFollowStackSize];
+            _fsp = -1;
+            lastErrorIndex = -1;
+            tokenStartCharIndex = -1;
+        }
+        public RecognizerSharedState( RecognizerSharedState state )
+        {
+            if ( following.Length < state.following.Length )
+                following = (BitSet[])state.following.Clone();
+            else
+                System.Array.Copy( state.following, following, state.following.Length );
+
+            _fsp = state._fsp;
+            errorRecovery = state.errorRecovery;
+            lastErrorIndex = state.lastErrorIndex;
+            failed = state.failed;
+            syntaxErrors = state.syntaxErrors;
+            backtracking = state.backtracking;
+
+            if ( state.ruleMemo != null )
+                ruleMemo = (IDictionary<int, int>[])state.ruleMemo.Clone();
+
+            token = state.token;
+            tokenStartCharIndex = state.tokenStartCharIndex;
+            tokenStartCharPositionInLine = state.tokenStartCharPositionInLine;
+            channel = state.channel;
+            type = state.type;
+            text = state.text;
+        }
     }
 }

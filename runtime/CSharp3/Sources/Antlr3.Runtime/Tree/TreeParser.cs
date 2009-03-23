@@ -43,8 +43,8 @@ namespace Antlr.Runtime.Tree
     */
     public class TreeParser : BaseRecognizer
     {
-        public const int DOWN = TokenConstants.DOWN;
-        public const int UP = TokenConstants.UP;
+        public const int DOWN = TokenConstants.Down;
+        public const int UP = TokenConstants.Up;
 
         // precompiled regex used by inContext
         static string dotdot = ".*[^.]\\.\\.[^.].*";
@@ -138,7 +138,7 @@ namespace Antlr.Runtime.Tree
                     case UP:
                         level--;
                         break;
-                    case TokenConstants.EOF:
+                    case TokenConstants.Eof:
                         return;
                     default:
                         break;

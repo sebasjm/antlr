@@ -205,7 +205,7 @@ namespace Antlr.Runtime.Tree
             {
                 return m;
             }
-            for ( int ttype = TokenConstants.MIN_TOKEN_TYPE; ttype < tokenNames.Length; ttype++ )
+            for ( int ttype = TokenConstants.MinTokenType; ttype < tokenNames.Length; ttype++ )
             {
                 string name = tokenNames[ttype];
                 m[name] = ttype;
@@ -218,14 +218,14 @@ namespace Antlr.Runtime.Tree
         {
             if ( tokenNameToTypeMap == null )
             {
-                return TokenConstants.INVALID_TOKEN_TYPE;
+                return TokenConstants.InvalidTokenType;
             }
 
             int value;
             if ( tokenNameToTypeMap.TryGetValue( tokenName, out value ) )
                 return value;
 
-            return TokenConstants.INVALID_TOKEN_TYPE;
+            return TokenConstants.InvalidTokenType;
         }
 
         /** <summary>

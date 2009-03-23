@@ -34,6 +34,6 @@ namespace Antlr.Runtime.Tree
 {
     public static class TreeConstants
     {
-        public static readonly ITree INVALID_NODE = new CommonTree( TokenConstants.INVALID_TOKEN );
+        public static readonly ITree INVALID_NODE = new CommonTree( TokenConstants.InvalidToken );
     }
 }

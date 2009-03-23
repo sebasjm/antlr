@@ -200,7 +200,7 @@ namespace Antlr.Runtime.Tree
             get
             {
                 if ( token == null )
-                    return TokenConstants.INVALID_TOKEN_TYPE;
+                    return TokenConstants.InvalidTokenType;
 
                 return token.Type;
             }
@@ -252,7 +252,7 @@ namespace Antlr.Runtime.Tree
             {
                 return "nil";
             }
-            if ( Type == TokenConstants.INVALID_TOKEN_TYPE )
+            if ( Type == TokenConstants.InvalidTokenType )
             {
                 return "<errornode>";
             }

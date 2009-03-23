@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\ProfileTreeGrammar.g3 2009-03-20 14:23:08
+// $ANTLR 3.1.2 BuildOptions\\ProfileTreeGrammar.g3 2009-03-23 17:50:37
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -299,7 +299,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 59, 10 );
 				Match(input,17,Follow._17_in_stat98); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 59, 14 );
 				ID2=(CommonTree)Match(input,ID,Follow._ID_in_stat100); 
 				dbg.Location( 59, 17 );
@@ -309,7 +309,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				state._fsp--;
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 				dbg.Location( 59, 35 );
 				 globalMemory[(ID2!=null?ID2.Text:null)] = expr3; 
 
@@ -324,7 +324,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 60, 10 );
 				Match(input,FUNC,Follow._FUNC_in_stat128); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 60, 15 );
 				// BuildOptions\\ProfileTreeGrammar.g3:60:16: ( . )+
 				int cnt2=0;
@@ -391,7 +391,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				}
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 
 				}
 				break;
@@ -523,7 +523,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 64, 10 );
 				Match(input,16,Follow._16_in_expr172); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 64, 15 );
 				PushFollow(Follow._expr_in_expr176);
 				a=expr();
@@ -537,7 +537,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				state._fsp--;
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 				dbg.Location( 64, 35 );
 				 value = a.add(b); 
 
@@ -552,7 +552,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 65, 10 );
 				Match(input,10,Follow._10_in_expr200); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 65, 15 );
 				PushFollow(Follow._expr_in_expr204);
 				a=expr();
@@ -566,7 +566,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				state._fsp--;
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 				dbg.Location( 65, 35 );
 				 value = a.subtract(b); 
 
@@ -581,7 +581,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 66, 10 );
 				Match(input,14,Follow._14_in_expr228); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 66, 15 );
 				PushFollow(Follow._expr_in_expr232);
 				a=expr();
@@ -595,7 +595,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				state._fsp--;
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 				dbg.Location( 66, 35 );
 				 value = a.multiply(b); 
 
@@ -610,7 +610,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 67, 10 );
 				Match(input,15,Follow._15_in_expr256); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 67, 15 );
 				PushFollow(Follow._expr_in_expr260);
 				a=expr();
@@ -624,7 +624,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				state._fsp--;
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 				dbg.Location( 67, 35 );
 				 value = a.divide(b); 
 
@@ -639,7 +639,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				dbg.Location( 68, 10 );
 				Match(input,11,Follow._11_in_expr284); 
 
-				Match(input, TokenConstants.DOWN, null); 
+				Match(input, TokenConstants.Down, null); 
 				dbg.Location( 68, 15 );
 				PushFollow(Follow._expr_in_expr288);
 				a=expr();
@@ -653,7 +653,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 				state._fsp--;
 
 
-				Match(input, TokenConstants.UP, null); 
+				Match(input, TokenConstants.Up, null); 
 				dbg.Location( 68, 35 );
 				 value = a.remainder(b); 
 
@@ -759,7 +759,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 			dbg.Location( 75, 10 );
 			Match(input,CALL,Follow._CALL_in_call430); 
 
-			Match(input, TokenConstants.DOWN, null); 
+			Match(input, TokenConstants.Down, null); 
 			dbg.Location( 75, 15 );
 			ID8=(CommonTree)Match(input,ID,Follow._ID_in_call432); 
 			dbg.Location( 75, 18 );
@@ -769,7 +769,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 			state._fsp--;
 
 
-			Match(input, TokenConstants.UP, null); 
+			Match(input, TokenConstants.Up, null); 
 			dbg.Location( 75, 35 );
 			 BigInteger p = expr7;
 			                                     CommonTree funcRoot = findFunction((ID8!=null?ID8.Text:null), p);

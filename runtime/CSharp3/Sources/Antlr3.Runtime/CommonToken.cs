@@ -4,7 +4,7 @@
  * All rights reserved.
  *
  * Conversion to C#:
- * Copyright (c) 2008 Sam Harwell, Pixel Mine, Inc.
+ * Copyright (c) 2008-2009 Sam Harwell, Pixel Mine, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ namespace Antlr.Runtime
         int type;
         int line;
         int charPositionInLine = -1; // set to invalid position
-        int channel = TokenConstants.DEFAULT_CHANNEL;
+        int channel = TokenConstants.DefaultChannel;
         [NonSerialized]
         ICharStream input;
 
@@ -80,7 +80,7 @@ namespace Antlr.Runtime
         public CommonToken( int type, string text )
         {
             this.type = type;
-            this.channel = TokenConstants.DEFAULT_CHANNEL;
+            this.channel = TokenConstants.DefaultChannel;
             this.text = text;
         }
 

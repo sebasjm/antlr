@@ -75,19 +75,19 @@ namespace Antlr.Runtime
                                           BitSet follow )
         {
             string tokenText = null;
-            if ( expectedTokenType == TokenConstants.EOF )
+            if ( expectedTokenType == TokenConstants.Eof )
                 tokenText = "<missing EOF>";
             else
                 tokenText = "<missing " + GetTokenNames()[expectedTokenType] + ">";
             CommonToken t = new CommonToken( expectedTokenType, tokenText );
             IToken current = ( (ITokenStream)input ).LT( 1 );
-            if ( current.Type == TokenConstants.EOF )
+            if ( current.Type == TokenConstants.Eof )
             {
                 current = ( (ITokenStream)input ).LT( -1 );
             }
             t.Line = current.Line;
             t.CharPositionInLine = current.CharPositionInLine;
-            t.Channel = DEFAULT_TOKEN_CHANNEL;
+            t.Channel = DefaultTokenChannel;
             return t;
         }
 

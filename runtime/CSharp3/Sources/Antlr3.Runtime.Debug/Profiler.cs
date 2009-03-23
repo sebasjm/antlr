@@ -124,7 +124,7 @@ namespace Antlr.Runtime.Debug
         {
             //System.out.println("examine memo "+ruleName);
             int stopIndex = parser.GetRuleMemoization( ruleIndex, input.Index );
-            if ( stopIndex == BaseRecognizer.MEMO_RULE_UNKNOWN )
+            if ( stopIndex == BaseRecognizer.MemoRuleUnknown )
             {
                 //System.out.println("rule "+ruleIndex+" missed @ "+input.index());
                 numMemoizationCacheMisses++;
@@ -343,7 +343,7 @@ namespace Antlr.Runtime.Debug
             for ( int i = 0; i < input.Size() && lastTokenConsumed != null && i <= lastTokenConsumed.TokenIndex; i++ )
             {
                 IToken t = input.Get( i );
-                if ( t.Channel != TokenConstants.DEFAULT_CHANNEL )
+                if ( t.Channel != TokenConstants.DefaultChannel )
                 {
                     numHiddenTokens++;
                     numHiddenCharsMatched += t.Text.Length;
@@ -554,7 +554,7 @@ namespace Antlr.Runtime.Debug
             for ( int ti = i; ti < input.Size() && ti <= j; ti++ )
             {
                 IToken t = input.Get( ti );
-                if ( t.Channel != TokenConstants.DEFAULT_CHANNEL )
+                if ( t.Channel != TokenConstants.DefaultChannel )
                 {
                     n++;
                 }

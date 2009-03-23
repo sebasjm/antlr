@@ -4,7 +4,7 @@
  * All rights reserved.
  *
  * Conversion to C#:
- * Copyright (c) 2008 Sam Harwell, Pixel Mine, Inc.
+ * Copyright (c) 2008-2009 Sam Harwell, Pixel Mine, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ namespace Antlr.Runtime.Tree
             //System.out.println("start: "+start+", stop: "+stop);
             if ( stop == null ||
                  ( stop.TokenIndex < start.TokenIndex &&
-                  stop.Type != TokenConstants.EOF ) )
+                  stop.Type != TokenConstants.Eof ) )
             {
                 // sometimes resync does not consume a token (when LT(1) is
                 // in follow set.  So, stop will be 1 to left to start. adjust.
@@ -79,7 +79,7 @@ namespace Antlr.Runtime.Tree
                 {
                     int i = ( (IToken)start ).TokenIndex;
                     int j = ( (IToken)stop ).TokenIndex;
-                    if ( ( (IToken)stop ).Type == TokenConstants.EOF )
+                    if ( ( (IToken)stop ).Type == TokenConstants.Eof )
                     {
                         j = ( (ITokenStream)input ).Size();
                     }
@@ -105,7 +105,7 @@ namespace Antlr.Runtime.Tree
         {
             get
             {
-                return TokenConstants.INVALID_TOKEN_TYPE;
+                return TokenConstants.InvalidTokenType;
             }
             set
             {

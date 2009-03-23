@@ -71,7 +71,7 @@ namespace Antlr.Runtime.Tree
         }
 
         public CommonTreeNodeStream( ITreeAdaptor adaptor, object tree )
-            : base( adaptor.Create(TokenConstants.EOF,"EOF") ) // set EOF
+            : base( adaptor.Create(TokenConstants.Eof,"EOF") ) // set EOF
         {
             this._root = tree;
             this._adaptor = adaptor;
@@ -227,7 +227,7 @@ namespace Antlr.Runtime.Tree
             StringBuilder buf = new StringBuilder();
             object o = LT( 1 );
             int type = _adaptor.GetType( o );
-            while ( type != TokenConstants.EOF )
+            while ( type != TokenConstants.Eof )
             {
                 buf.Append( " " );
                 buf.Append( type );

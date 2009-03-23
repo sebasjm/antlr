@@ -35,7 +35,7 @@ namespace Antlr.Runtime
 
     public static class CharStreamConstants
     {
-        public const int EOF = -1;
+        public const int Eof = -1;
     }
 
 }

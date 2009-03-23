@@ -67,9 +67,9 @@ namespace Antlr.Runtime.Tree
             this.tree = tree;
             this.root = tree;
             nodes = new Queue<object>();
-            down = adaptor.Create( TokenConstants.DOWN, "DOWN" );
-            up = adaptor.Create( TokenConstants.UP, "UP" );
-            eof = adaptor.Create( TokenConstants.EOF, "EOF" );
+            down = adaptor.Create( TokenConstants.Down, "DOWN" );
+            up = adaptor.Create( TokenConstants.Up, "UP" );
+            eof = adaptor.Create( TokenConstants.Eof, "EOF" );
         }
 
         #region IEnumerator<object> Members

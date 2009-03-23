@@ -65,7 +65,7 @@ namespace Antlr.Runtime
         protected HashSet<int> discardSet;
 
         /** <summary>Skip tokens on any channel but this one; this is how we skip whitespace...</summary> */
-        protected int channel = TokenConstants.DEFAULT_CHANNEL;
+        protected int channel = TokenConstants.DefaultChannel;
 
         /** <summary>By default, track all incoming tokens</summary> */
         protected bool discardOffChannelTokens = false;
@@ -111,7 +111,7 @@ namespace Antlr.Runtime
             this.tokenSource = tokenSource;
             tokens.Clear();
             p = -1;
-            channel = TokenConstants.DEFAULT_CHANNEL;
+            channel = TokenConstants.DefaultChannel;
         }
 
         /** <summary>
@@ -124,7 +124,7 @@ namespace Antlr.Runtime
         {
             int index = 0;
             IToken t = tokenSource.NextToken();
-            while ( t != null && t.Type != CharStreamConstants.EOF )
+            while ( t != null && t.Type != CharStreamConstants.Eof )
             {
                 bool discard = false;
                 // is there a channel override for token type?
@@ -321,7 +321,7 @@ namespace Antlr.Runtime
             //System.out.print("LT(p="+p+","+k+")=");
             if ( ( p + k - 1 ) >= tokens.Count )
             {
-                return TokenConstants.EOF_TOKEN;
+                return TokenConstants.EofToken;
             }
             //System.out.println(tokens.get(p+k-1));
             int i = p;
@@ -335,7 +335,7 @@ namespace Antlr.Runtime
             }
             if ( i >= tokens.Count )
             {
-                return TokenConstants.EOF_TOKEN;
+                return TokenConstants.EofToken;
             }
             return (IToken)tokens[i];
         }

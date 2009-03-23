@@ -173,9 +173,9 @@ namespace Antlr.Runtime.Tree
             this.root = tree;
             this.adaptor = adaptor;
             nodes = new List<object>( initialBufferSize );
-            down = adaptor.Create( TokenConstants.DOWN, "DOWN" );
-            up = adaptor.Create( TokenConstants.UP, "UP" );
-            eof = adaptor.Create( TokenConstants.EOF, "EOF" );
+            down = adaptor.Create( TokenConstants.Down, "DOWN" );
+            up = adaptor.Create( TokenConstants.Up, "UP" );
+            eof = adaptor.Create( TokenConstants.Eof, "EOF" );
         }
 
         #region Properties
@@ -255,7 +255,7 @@ namespace Antlr.Runtime.Tree
             int n = adaptor.GetChildCount( t );
             if ( !nil && n > 0 )
             {
-                AddNavigationNode( TokenConstants.DOWN );
+                AddNavigationNode( TokenConstants.Down );
             }
             // and now add all its children
             for ( int c = 0; c < n; c++ )
@@ -266,7 +266,7 @@ namespace Antlr.Runtime.Tree
             // add UP node if t has children
             if ( !nil && n > 0 )
             {
-                AddNavigationNode( TokenConstants.UP );
+                AddNavigationNode( TokenConstants.Up );
             }
         }
 
@@ -297,11 +297,11 @@ namespace Antlr.Runtime.Tree
         protected virtual void AddNavigationNode( int ttype )
         {
             object navNode = null;
-            if ( ttype == TokenConstants.DOWN )
+            if ( ttype == TokenConstants.Down )
             {
                 if ( UniqueNavigationNodes )
                 {
-                    navNode = adaptor.Create( TokenConstants.DOWN, "DOWN" );
+                    navNode = adaptor.Create( TokenConstants.Down, "DOWN" );
                 }
                 else
                 {
@@ -312,7 +312,7 @@ namespace Antlr.Runtime.Tree
             {
                 if ( UniqueNavigationNodes )
                 {
-                    navNode = adaptor.Create( TokenConstants.UP, "UP" );
+                    navNode = adaptor.Create( TokenConstants.Up, "UP" );
                 }
                 else
                 {
@@ -579,11 +579,11 @@ namespace Antlr.Runtime.Tree
                 int endTokenIndex = adaptor.GetTokenStopIndex( stop );
                 // if it's a tree, use start/stop index from start node
                 // else use token range from start/stop nodes
-                if ( adaptor.GetType( stop ) == TokenConstants.UP )
+                if ( adaptor.GetType( stop ) == TokenConstants.Up )
                 {
                     endTokenIndex = adaptor.GetTokenStopIndex( start );
                 }
-                else if ( adaptor.GetType( stop ) == TokenConstants.EOF )
+                else if ( adaptor.GetType( stop ) == TokenConstants.Eof )
                 {
                     endTokenIndex = Size() - 2; // don't use EOF
                 }

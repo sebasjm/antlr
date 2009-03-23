@@ -178,7 +178,7 @@ namespace Antlr.Runtime.Debug
             public override string ToString()
             {
                 string channelStr = "";
-                if ( channel != TokenConstants.DEFAULT_CHANNEL )
+                if ( channel != TokenConstants.DefaultChannel )
                 {
                     channelStr = ",channel=" + channel;
                 }

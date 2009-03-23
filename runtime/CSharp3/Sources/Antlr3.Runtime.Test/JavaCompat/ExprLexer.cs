@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-03-16 13:19:15
+// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-03-23 17:50:33
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -47,7 +47,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = T__8;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:7:8: ( '-' )
 			// JavaCompat\\Expr.g3:7:8: '-'
 			{
@@ -70,7 +70,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = T__9;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:8:8: ( '(' )
 			// JavaCompat\\Expr.g3:8:8: '('
 			{
@@ -93,7 +93,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = T__10;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:9:9: ( ')' )
 			// JavaCompat\\Expr.g3:9:9: ')'
 			{
@@ -116,7 +116,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = T__11;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:10:9: ( '*' )
 			// JavaCompat\\Expr.g3:10:9: '*'
 			{
@@ -139,7 +139,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = T__12;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:11:9: ( '+' )
 			// JavaCompat\\Expr.g3:11:9: '+'
 			{
@@ -162,7 +162,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = T__13;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:12:9: ( '=' )
 			// JavaCompat\\Expr.g3:12:9: '='
 			{
@@ -185,7 +185,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = ID;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:107:9: ( ( 'a' .. 'z' | 'A' .. 'Z' )+ )
 			// JavaCompat\\Expr.g3:107:9: ( 'a' .. 'z' | 'A' .. 'Z' )+
 			{
@@ -244,7 +244,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = INT;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:108:9: ( ( '0' .. '9' )+ )
 			// JavaCompat\\Expr.g3:108:9: ( '0' .. '9' )+
 			{
@@ -303,7 +303,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = NEWLINE;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:109:9: ( ( '\\r' )? '\\n' )
 			// JavaCompat\\Expr.g3:109:9: ( '\\r' )? '\\n'
 			{
@@ -346,7 +346,7 @@ public partial class ExprLexer : Lexer
 		try
 		{
 			int _type = WS;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// JavaCompat\\Expr.g3:110:9: ( ( ' ' | '\\t' )+ )
 			// JavaCompat\\Expr.g3:110:9: ( ' ' | '\\t' )+
 			{

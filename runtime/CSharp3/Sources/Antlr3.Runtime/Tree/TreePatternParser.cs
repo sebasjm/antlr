@@ -166,7 +166,7 @@ namespace Antlr.Runtime.Tree
 
             // create node
             int treeNodeType = wizard.GetTokenType( tokenName );
-            if ( treeNodeType == TokenConstants.INVALID_TOKEN_TYPE )
+            if ( treeNodeType == TokenConstants.InvalidTokenType )
             {
                 return null;
             }

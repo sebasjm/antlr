@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\ProfileGrammar.g3 2009-03-16 13:19:19
+// $ANTLR 3.1.2 BuildOptions\\ProfileGrammar.g3 2009-03-23 17:50:36
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -51,7 +51,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__10;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:7:9: ( '-' )
 			// BuildOptions\\ProfileGrammar.g3:7:9: '-'
 			{
@@ -74,7 +74,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__11;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:8:9: ( '%' )
 			// BuildOptions\\ProfileGrammar.g3:8:9: '%'
 			{
@@ -97,7 +97,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__12;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:9:9: ( '(' )
 			// BuildOptions\\ProfileGrammar.g3:9:9: '('
 			{
@@ -120,7 +120,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__13;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:10:9: ( ')' )
 			// BuildOptions\\ProfileGrammar.g3:10:9: ')'
 			{
@@ -143,7 +143,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__14;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:11:9: ( '*' )
 			// BuildOptions\\ProfileGrammar.g3:11:9: '*'
 			{
@@ -166,7 +166,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__15;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:12:9: ( '/' )
 			// BuildOptions\\ProfileGrammar.g3:12:9: '/'
 			{
@@ -189,7 +189,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__16;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:13:9: ( '+' )
 			// BuildOptions\\ProfileGrammar.g3:13:9: '+'
 			{
@@ -212,7 +212,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = T__17;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:14:9: ( '=' )
 			// BuildOptions\\ProfileGrammar.g3:14:9: '='
 			{
@@ -235,7 +235,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = ID;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:88:9: ( ( 'a' .. 'z' | 'A' .. 'Z' )+ )
 			// BuildOptions\\ProfileGrammar.g3:88:9: ( 'a' .. 'z' | 'A' .. 'Z' )+
 			{
@@ -294,7 +294,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = INT;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:91:9: ( ( '0' .. '9' )+ )
 			// BuildOptions\\ProfileGrammar.g3:91:9: ( '0' .. '9' )+
 			{
@@ -353,7 +353,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = NEWLINE;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:95:7: ( ( '\\r' )? '\\n' )
 			// BuildOptions\\ProfileGrammar.g3:95:7: ( '\\r' )? '\\n'
 			{
@@ -396,7 +396,7 @@ public partial class ProfileGrammarLexer : Lexer
 		try
 		{
 			int _type = WS;
-			int _channel = DEFAULT_TOKEN_CHANNEL;
+			int _channel = DefaultTokenChannel;
 			// BuildOptions\\ProfileGrammar.g3:98:9: ( ( ' ' | '\\t' )+ )
 			// BuildOptions\\ProfileGrammar.g3:98:9: ( ' ' | '\\t' )+
 			{

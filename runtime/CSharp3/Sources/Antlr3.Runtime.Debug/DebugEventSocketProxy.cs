@@ -51,8 +51,8 @@ namespace Antlr.Runtime.Debug
      */
     public class DebugEventSocketProxy : BlankDebugEventListener
     {
-        public const int DEFAULT_DEBUGGER_PORT = 49100;
-        protected int port = DEFAULT_DEBUGGER_PORT;
+        public const int DefaultDebuggerPort = 49100;
+        protected int port = DefaultDebuggerPort;
         protected TcpListener serverSocket;
         protected Socket socket;
         protected string grammarFileName;
@@ -71,7 +71,7 @@ namespace Antlr.Runtime.Debug
         protected ITreeAdaptor adaptor;
 
         public DebugEventSocketProxy( BaseRecognizer recognizer, ITreeAdaptor adaptor ) :
-            this( recognizer, DEFAULT_DEBUGGER_PORT, adaptor )
+            this( recognizer, DefaultDebuggerPort, adaptor )
         {
         }
 
@@ -352,7 +352,7 @@ namespace Antlr.Runtime.Debug
             buf.Append( "errorNode\t" );
             buf.Append( ID );
             buf.Append( "\t" );
-            buf.Append( TokenConstants.INVALID_TOKEN_TYPE );
+            buf.Append( TokenConstants.InvalidTokenType );
             SerializeText( buf, text );
             Transmit( buf.ToString() );
         }

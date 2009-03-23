@@ -34,27 +34,27 @@ namespace Antlr.Runtime
 {
     public static class TokenConstants
     {
-        public const int EOR_TOKEN_TYPE = 1;
+        public const int EorTokenType = 1;
 
         /** <summary>imaginary tree navigation type; traverse "get child" link</summary> */
-        public const int DOWN = 2;
+        public const int Down = 2;
         /** <summary>imaginary tree navigation type; finish with a child list</summary> */
-        public const int UP = 3;
+        public const int Up = 3;
 
-        public const int MIN_TOKEN_TYPE = UP + 1;
+        public const int MinTokenType = Up + 1;
 
-        public const int EOF = CharStreamConstants.EOF;
-        public static readonly IToken EOF_TOKEN = new CommonToken( EOF );
+        public const int Eof = CharStreamConstants.Eof;
+        public static readonly IToken EofToken = new CommonToken( Eof );
 
-        public const int INVALID_TOKEN_TYPE = 0;
-        public static readonly IToken INVALID_TOKEN = new CommonToken( INVALID_TOKEN_TYPE );
+        public const int InvalidTokenType = 0;
+        public static readonly IToken InvalidToken = new CommonToken( InvalidTokenType );
 
         /** <summary>
          *  In an action, a lexer rule can set token to this SKIP_TOKEN and ANTLR
          *  will avoid creating a token for this symbol and try to fetch another.
          *  </summary>
          */
-        public static readonly IToken SKIP_TOKEN = new CommonToken( INVALID_TOKEN_TYPE );
+        public static readonly IToken SkipToken = new CommonToken( InvalidTokenType );
 
         /** <summary>
          *  All tokens go to the parser (unless skip() is called in that rule)
@@ -62,13 +62,13 @@ namespace Antlr.Runtime
          *  so that whitespace etc... can go to the parser on a "hidden" channel.
          *  </summary>
          */
-        public const int DEFAULT_CHANNEL = 0;
+        public const int DefaultChannel = 0;
 
         /** <summary>
          *  Anything on different channel than DEFAULT_CHANNEL is not parsed
          *  by parser.
          *  </summary>
          */
-        public const int HIDDEN_CHANNEL = 99;
+        public const int HiddenChannel = 99;
     }
 }

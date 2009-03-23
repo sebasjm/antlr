@@ -115,8 +115,8 @@ namespace Antlr.Runtime
                 return; // no shared state work to do
             }
             state.token = null;
-            state.type = TokenConstants.INVALID_TOKEN_TYPE;
-            state.channel = TokenConstants.DEFAULT_CHANNEL;
+            state.type = TokenConstants.InvalidTokenType;
+            state.channel = TokenConstants.DefaultChannel;
             state.tokenStartCharIndex = -1;
             state.tokenStartCharPositionInLine = -1;
             state.tokenStartLine = -1;
@@ -129,14 +129,14 @@ namespace Antlr.Runtime
             for ( ; ; )
             {
                 state.token = null;
-                state.channel = TokenConstants.DEFAULT_CHANNEL;
+                state.channel = TokenConstants.DefaultChannel;
                 state.tokenStartCharIndex = input.Index;
                 state.tokenStartCharPositionInLine = input.CharPositionInLine;
                 state.tokenStartLine = input.Line;
                 state.text = null;
-                if ( input.LA( 1 ) == CharStreamConstants.EOF )
+                if ( input.LA( 1 ) == CharStreamConstants.Eof )
                 {
-                    return TokenConstants.EOF_TOKEN;
+                    return TokenConstants.EofToken;
                 }
                 try
                 {
@@ -145,7 +145,7 @@ namespace Antlr.Runtime
                     {
                         Emit();
                     }
-                    else if ( state.token == TokenConstants.SKIP_TOKEN )
+                    else if ( state.token == TokenConstants.SkipToken )
                     {
                         continue;
                     }
@@ -174,7 +174,7 @@ namespace Antlr.Runtime
          */
         public virtual void Skip()
         {
-            state.token = TokenConstants.SKIP_TOKEN;
+            state.token = TokenConstants.SkipToken;
         }
 
         /** <summary>This is the lexer entry point that sets instance var 'token'</summary> */
@@ -394,7 +394,7 @@ namespace Antlr.Runtime
             string s = c.ToString(); //string.valueOf((char)c);
             switch ( c )
             {
-            case TokenConstants.EOF:
+            case TokenConstants.Eof:
                 s = "<EOF>";
                 break;
             case '\n':
