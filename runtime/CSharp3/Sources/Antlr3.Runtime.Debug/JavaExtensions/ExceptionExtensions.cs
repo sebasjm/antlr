@@ -81,7 +81,8 @@ namespace Antlr.Runtime.JavaExtensions
         public static void PrintStackTrace( this Exception e, System.IO.TextWriter writer )
         {
             writer.WriteLine( e.ToString() );
-            foreach ( string line in e.StackTrace.Split( '\n', '\r' ) )
+            string trace = e.StackTrace ?? string.Empty;
+            foreach ( string line in trace.Split( '\n', '\r' ) )
             {
                 if ( !string.IsNullOrEmpty( line ) )
                     writer.WriteLine( "        " + line );
