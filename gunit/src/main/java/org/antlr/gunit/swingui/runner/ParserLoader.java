@@ -44,9 +44,11 @@ public class ParserLoader extends ClassLoader {
      * @param grammarName
      * @param classDir
      */
-    public ParserLoader(String grammarName, String classDir) throws IOException {
+    public ParserLoader(String grammarName, String classDir) throws IOException, ClassNotFoundException {
 
-        // load all the classes in the "classDir" related to the grammarName
+        final String lexerName = grammarName + "Lexer";
+
+        // load all the class files in the "classDir" related to the grammarName
         File dir = new File(classDir);
         if(dir.isDirectory()) {
             classList = new HashMap<String, Class>();
@@ -73,6 +75,10 @@ public class ParserLoader extends ClassLoader {
             }
         } else {
             throw new IOException(classDir + " is not a directory.");
+        }
+
+        if(classList.isEmpty() || !classList.containsKey(lexerName)) {
+            throw new ClassNotFoundException(lexerName + " not found.");
         }
 
     }

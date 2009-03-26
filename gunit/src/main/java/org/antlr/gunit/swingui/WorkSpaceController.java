@@ -179,15 +179,21 @@ public class WorkSpaceController implements IController{
     }
 
     private void OnRunTest() {
+        // save before run
+        TestSuiteFactory.saveTestSuite(currentTestSuite);
+
+        // run
         try {
             final gUnitAdapter adapter = new gUnitAdapter(currentTestSuite);
             if(currentTestSuite == null) return;
             adapter.run();
-            view.tabEditors.addTab("Test Result", ImageFactory.FILE16, runner.getView());
+            
             runner.OnShowSuiteResult(currentTestSuite);
-        } catch (IOException ex) {
+            view.tabEditors.addTab("Test Result", ImageFactory.FILE16, runner.getView());
+            view.tabEditors.setSelectedComponent(runner.getView());
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(view, "Fail to run test:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        } 
 
     }
 

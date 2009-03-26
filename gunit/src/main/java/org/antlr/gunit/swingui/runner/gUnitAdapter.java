@@ -44,7 +44,7 @@ public class gUnitAdapter {
     private ParserLoader loader ;
     private TestSuite testSuite;
 
-    public gUnitAdapter(TestSuite suite) throws IOException {
+    public gUnitAdapter(TestSuite suite) throws IOException, ClassNotFoundException {
         int i = 3;
         loader = new ParserLoader(suite.getGrammarName(), 
                                   suite.getTestSuiteFile().getParent());
