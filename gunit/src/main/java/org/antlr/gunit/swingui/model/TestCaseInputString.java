@@ -42,7 +42,7 @@ public class TestCaseInputString implements ITestCaseInput {
 
     @Override
     public String toString() {
-        return '"' + script + '"';
+        return '"' + TestCase.convertPreservedChars(script) + '"';
     }
 
 

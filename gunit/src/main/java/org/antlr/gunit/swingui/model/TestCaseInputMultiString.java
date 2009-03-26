@@ -43,7 +43,7 @@ public class TestCaseInputMultiString implements ITestCaseInput {
 
     @Override
     public String toString() {
-        return "<<" + script + ">>";
+        return "<<" + TestCase.convertPreservedChars(script) + ">>";
     }
 
     public void setScript(String script) {

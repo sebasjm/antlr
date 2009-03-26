@@ -67,4 +67,9 @@ public class TestCase {
         this.output = out;
     }
 
+    public static String convertPreservedChars(String input) {
+        //return input.replace("\"", "\\\"");
+        return input;
+    }
+
 }
