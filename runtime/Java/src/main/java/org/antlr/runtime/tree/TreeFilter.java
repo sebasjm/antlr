@@ -40,7 +40,7 @@ public class TreeFilter extends TreeParser {
     protected TreeAdaptor originalAdaptor;
 
     public TreeFilter(TreeNodeStream input) {
-        super(input);
+        this(input, new RecognizerSharedState());
     }
     public TreeFilter(TreeNodeStream input, RecognizerSharedState state) {
         super(input, state);

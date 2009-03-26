@@ -40,7 +40,7 @@ public class TreeRewriter extends TreeParser {
     protected TreeAdaptor originalAdaptor;
     
     public TreeRewriter(TreeNodeStream input) {
-        super(input);
+        this(input, new RecognizerSharedState());
     }
     public TreeRewriter(TreeNodeStream input, RecognizerSharedState state) {
         super(input, state);

@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+March 26, 2009
+
+* Made ctor in TreeRewriter and TreeFilter call this not super.
+
 March 21, 2009
 
 * Added ctor to RecognizerSharedState to allow cloning it.
