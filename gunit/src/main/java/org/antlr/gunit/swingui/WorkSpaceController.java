@@ -189,7 +189,7 @@ public class WorkSpaceController implements IController{
             adapter.run();
             
             runner.OnShowSuiteResult(currentTestSuite);
-            view.tabEditors.addTab("Test Result", ImageFactory.FILE16, runner.getView());
+            view.tabEditors.addTab("Test Result", ImageFactory.getSingleton().FILE16, runner.getView());
             view.tabEditors.setSelectedComponent(runner.getView());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(view, "Fail to run test:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -239,7 +239,7 @@ public class WorkSpaceController implements IController{
     /** Create test suite action. */
     private class CreateAction extends AbstractAction {
         public CreateAction() {
-            super("Create", ImageFactory.ADDFILE);
+            super("Create", ImageFactory.getSingleton().ADDFILE);
             putValue(SHORT_DESCRIPTION, "Create a test suite from an ANTLR grammar");
         }
         public void actionPerformed(ActionEvent e) {
@@ -251,7 +251,7 @@ public class WorkSpaceController implements IController{
     /** Save test suite action. */
     private class SaveAction extends AbstractAction {
         public SaveAction() {
-            super("Save", ImageFactory.SAVE);
+            super("Save", ImageFactory.getSingleton().SAVE);
             putValue(SHORT_DESCRIPTION, "Save the test suite");
         }
         public void actionPerformed(ActionEvent e) {
@@ -263,7 +263,7 @@ public class WorkSpaceController implements IController{
     /** Open test suite action. */
     private class OpenAction extends AbstractAction {
         public OpenAction() {
-            super("Open", ImageFactory.OPEN);
+            super("Open", ImageFactory.getSingleton().OPEN);
             putValue(SHORT_DESCRIPTION, "Open an existing test suite");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                     KeyEvent.VK_O, InputEvent.CTRL_MASK));
@@ -276,7 +276,7 @@ public class WorkSpaceController implements IController{
     /** Run test suite action. */
     private class RunAction extends AbstractAction {
         public RunAction() {
-            super("Run", ImageFactory.NEXT);
+            super("Run", ImageFactory.getSingleton().NEXT);
             putValue(SHORT_DESCRIPTION, "Run the current test suite");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                     KeyEvent.VK_R, InputEvent.CTRL_MASK));

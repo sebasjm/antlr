@@ -123,7 +123,7 @@ public class RuleListController implements IController {
                 setText(item.toString());
                 setForeground(list.getForeground());
 
-                setIcon(item.getNotEmpty() ? ImageFactory.FAV16 : null);
+                setIcon(item.getNotEmpty() ? ImageFactory.getSingleton().FAV16 : null);
 
                 if(list.getSelectedValue() == item ) {
                     setBackground(Color.LIGHT_GRAY);

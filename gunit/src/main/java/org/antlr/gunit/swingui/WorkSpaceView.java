@@ -79,8 +79,8 @@ public class WorkSpaceView extends JFrame {
         this.scrollCode.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         this.tabEditors = new JTabbedPane();
-        this.tabEditors.addTab("Case Editor", ImageFactory.TEXTFILE16, this.paneEditor.getView());
-        this.tabEditors.addTab("Script Source", ImageFactory.WINDOW16, this.scrollCode);
+        this.tabEditors.addTab("Case Editor", ImageFactory.getSingleton().TEXTFILE16, this.paneEditor.getView());
+        this.tabEditors.addTab("Script Source", ImageFactory.getSingleton().WINDOW16, this.scrollCode);
 
         this.listRules = new RuleListController();
 

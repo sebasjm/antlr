@@ -34,14 +34,21 @@ import javax.swing.UIManager;
 public class Tool {
 
     public static void main(String[] args) throws IOException {
+
+        if(args.length == 1 && "-version".equals(args[0])) {
+            System.out.println("gUnitEditor Swing GUI\nby Shaoting Cai\n");
+        } else {
+            showUI();
+        }
+    }
+
+    private static void showUI() {
         try {
-            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
         }
-        catch (Exception e) {
-        }
-
-
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 WorkSpaceController control = new WorkSpaceController();
                 control.show();

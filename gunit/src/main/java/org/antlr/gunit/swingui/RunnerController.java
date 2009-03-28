@@ -208,19 +208,22 @@ public class RunnerController implements IController {
             if(value instanceof TestSuiteTreeNode) {
 
                 label.setText(value.toString());
-                label.setIcon(ImageFactory.TESTSUITE);
+                label.setIcon(ImageFactory.getSingleton().TESTSUITE);
 
             } else if(value instanceof TestGroupTreeNode) {
 
                 TestGroupTreeNode node = (TestGroupTreeNode) value;
                 label.setText(value.toString());
-                label.setIcon( node.hasFail ? ImageFactory.TESTGROUPX : ImageFactory.TESTGROUP);
+                label.setIcon( node.hasFail ? 
+                    ImageFactory.getSingleton().TESTGROUPX :
+                    ImageFactory.getSingleton().TESTGROUP);
 
             } else if(value instanceof TestCaseTreeNode) {
 
                 TestCaseTreeNode node = (TestCaseTreeNode) value;
                 label.setIcon( (node.data.isPass())?
-                    ImageFactory.RUN_PASS : ImageFactory.RUN_FAIL);
+                    ImageFactory.getSingleton().RUN_PASS :
+                    ImageFactory.getSingleton().RUN_FAIL);
                 label.setText(value.toString());
 
             } else {

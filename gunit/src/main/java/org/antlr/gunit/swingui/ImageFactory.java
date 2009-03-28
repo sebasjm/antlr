@@ -1,59 +1,84 @@
 package org.antlr.gunit.swingui;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 public class ImageFactory {
-    public static final ImageIcon ACCEPT = new ImageIcon(
-            ImageFactory.class.getResource("./images/accept.png"));
-    public static final ImageIcon ADD = new ImageIcon(
-            ImageFactory.class.getResource("./images/add.png"));
-    public static final ImageIcon DELETE = new ImageIcon(
-            ImageFactory.class.getResource("./images/delete24.png"));
-    public static final ImageIcon HELP = new ImageIcon(
-            ImageFactory.class.getResource("./images/help24.png"));
-    public static final ImageIcon NEXT = new ImageIcon(
-            ImageFactory.class.getResource("./images/next24.png"));
-    public static final ImageIcon REDO = new ImageIcon(
-            ImageFactory.class.getResource("./images/redo24.png"));
-    public static final ImageIcon UNDO = new ImageIcon(
-            ImageFactory.class.getResource("./images/undo24.png"));
-    public static final ImageIcon REFRESH = new ImageIcon(
-            ImageFactory.class.getResource("./images/refresh24.png"));
-    public static final ImageIcon TEXTFILE = new ImageIcon(
-            ImageFactory.class.getResource("./images/textfile24.png"));
-    public static final ImageIcon ADDFILE = new ImageIcon(
-            ImageFactory.class.getResource("./images/addfile24.png"));
 
-    public static final ImageIcon TEXTFILE16 = new ImageIcon(
-            ImageFactory.class.getResource("./images/textfile16.png"));
-    public static final ImageIcon WINDOW16 = new ImageIcon(
-            ImageFactory.class.getResource("./images/windowb16.png"));
-    public static final ImageIcon FAV16 = new ImageIcon(
-            ImageFactory.class.getResource("./images/favb16.png"));
-    public static final ImageIcon SAVE = new ImageIcon(
-            ImageFactory.class.getResource("./images/floppy24.png"));
-    public static final ImageIcon SAVEAS = new ImageIcon(
-            ImageFactory.class.getResource("./images/saveas24.png"));
+    private static ImageFactory singleton ;
 
-    public static final ImageIcon OPEN = new ImageIcon(
-            ImageFactory.class.getResource("./images/folder24.png"));
-    public static final ImageIcon FILESEARCH = new ImageIcon(
-            ImageFactory.class.getResource("./images/filesearch24.png"));
-    public static final ImageIcon EDIT16 = new ImageIcon(
-            ImageFactory.class.getResource("./images/edit16.png"));
-    public static final ImageIcon FILE16 = new ImageIcon(
-            ImageFactory.class.getResource("./images/file16.png"));
+    public static ImageFactory getSingleton() {
+        if(singleton == null) singleton = new ImageFactory();
+        return singleton;
+    }
 
+    private ImageFactory() {
+        ACCEPT = getImage("accept.png");
+        ADD = getImage("add.png");
+        DELETE = getImage("delete24.png");
+        TEXTFILE = getImage("textfile24.png");
+        TEXTFILE16 = getImage("textfile16.png");
+        ADDFILE = getImage("addfile24.png");
+        WINDOW16 = getImage("windowb16.png");
+        FAV16 = getImage("favb16.png");
+        SAVE = getImage("floppy24.png");
+        OPEN = getImage("folder24.png");
+        EDIT16 = getImage("edit16.png");
+        FILE16 = getImage("file16.png");
+        RUN_PASS = getImage("runpass.png");
+        RUN_FAIL = getImage("runfail.png");
+        TESTSUITE = getImage("testsuite.png");
+        TESTGROUP = getImage("testgroup.png");
+        TESTGROUPX = getImage("testgroupx.png");
+        NEXT = getImage("next24.png");
+    }
+    
+    private ImageIcon getImage(String name) {
+        name = "org/antlr/gunit/swingui/images/" + name;
+        try {
+            ClassLoader loader = ImageFactory.class.getClassLoader();
+            InputStream in = loader.getResourceAsStream(name);
+            byte[] data = new byte[in.available()];
+            in.read(data);
+            in.close();
+            System.out.println(data.length);
+            return new ImageIcon(data);
+        } catch (IOException ex) {
+            System.err.println("Can't load image file: " + name);
+            System.exit(1);
+        } catch(RuntimeException e) {
+            System.err.println("Can't load image file: " + name);
+            System.exit(1);
+        }
+        return null;
+    }
+    
+    private static final String IMG_DIR = "org/antlr/gunit/swingui/images/";
 
-    public static final ImageIcon RUN_PASS = new ImageIcon(
-            ImageFactory.class.getResource("./images/runpass.png"));
-    public static final ImageIcon RUN_FAIL = new ImageIcon(
-            ImageFactory.class.getResource("./images/runfail.png"));
-    public static final ImageIcon TESTSUITE = new ImageIcon(
-            ImageFactory.class.getResource("./images/testsuite.png"));
-    public static final ImageIcon TESTGROUP = new ImageIcon(
-            ImageFactory.class.getResource("./images/testgroup.png"));
-    public static final ImageIcon TESTGROUPX = new ImageIcon(
-            ImageFactory.class.getResource("./images/testgroupx.png"));
+    public ImageIcon ACCEPT;
+    public ImageIcon ADD;
+    public ImageIcon DELETE;
+    public ImageIcon TEXTFILE ;
+    public ImageIcon ADDFILE;
+
+    public ImageIcon TEXTFILE16 ;
+    public ImageIcon WINDOW16;
+    public ImageIcon FAV16;
+    public ImageIcon SAVE ;
+
+    public ImageIcon OPEN ;
+    public ImageIcon EDIT16;
+    public ImageIcon FILE16;
+    public ImageIcon NEXT;
+
+    public ImageIcon RUN_PASS;
+    public ImageIcon RUN_FAIL;
+    public ImageIcon TESTSUITE;
+    public ImageIcon TESTGROUP ;
+    public ImageIcon TESTGROUPX;
 
 }

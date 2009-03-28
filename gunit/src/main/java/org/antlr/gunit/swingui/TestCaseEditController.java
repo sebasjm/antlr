@@ -553,7 +553,7 @@ public class TestCaseEditController implements IController {
 
     private class AddTestCaseAction extends AbstractAction {
         public AddTestCaseAction() {
-            super("Add", ImageFactory.ADD);
+            super("Add", ImageFactory.getSingleton().ADD);
             putValue(SHORT_DESCRIPTION, "Add a gUnit test case.");
         }
         public void actionPerformed(ActionEvent e) {
@@ -563,7 +563,7 @@ public class TestCaseEditController implements IController {
 
     private class RemoveTestCaseAction extends AbstractAction {
         public RemoveTestCaseAction() {
-            super("Remove", ImageFactory.DELETE);
+            super("Remove", ImageFactory.getSingleton().DELETE);
             putValue(SHORT_DESCRIPTION, "Remove a gUnit test case.");
         }
         public void actionPerformed(ActionEvent e) {
@@ -616,7 +616,8 @@ public class TestCaseEditController implements IController {
                 labIn.setFont(IN_FONT);
 
                 labIn.setIcon(item.getInput() instanceof TestCaseInputFile ?
-                    ImageFactory.FILE16 : ImageFactory.EDIT16);
+                    ImageFactory.getSingleton().FILE16 :
+                    ImageFactory.getSingleton().EDIT16);
 
                 pane.setBorder(BorderFactory.createEtchedBorder());
                 pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
