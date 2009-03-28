@@ -40,6 +40,7 @@ tokens {
 @header {
 package org.antlr.gunit.swingui.parsers;
 import org.antlr.gunit.swingui.model.*;
+import org.antlr.gunit.swingui.runner.*;
 }
 
 @lexer::header {package org.antlr.gunit.swingui.parsers;}
