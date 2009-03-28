@@ -1,6 +1,7 @@
 // $ANTLR 3.1.2 G:\\Documents and Settings\\Shaoting\\Perforce\\shaoting_antlr.org_666_1\\code\\antlr\\main\\gunit\\src\\main\\java\\org\\antlr\\gunit\\swingui\\parsers\\StGUnit.g 2009-03-18 15:00:48
 
 package org.antlr.gunit.swingui.parsers;
+import org.antlr.gunit.swingui.runner.TestSuiteAdapter;
 import org.antlr.gunit.swingui.model.*;
 
 
