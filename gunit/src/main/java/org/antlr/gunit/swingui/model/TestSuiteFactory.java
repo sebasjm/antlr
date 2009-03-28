@@ -27,6 +27,7 @@
 */
 package org.antlr.gunit.swingui.model;
 
+import org.antlr.gunit.swingui.runner.TestSuiteAdapter;
 import java.io.*;
 import java.util.*;
 import org.antlr.gunit.swingui.Tool;
