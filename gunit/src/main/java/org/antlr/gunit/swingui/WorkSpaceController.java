@@ -34,7 +34,7 @@ import org.antlr.gunit.swingui.runner.gUnitAdapter;
 import java.awt.*;
 import java.io.IOException;
 import org.antlr.gunit.swingui.model.*;
-import org.antlr.gunit.swingui.images.ImageFactory;
+import org.antlr.gunit.swingui.ImageFactory;
 import java.awt.event.*;
 import java.io.File;
 import javax.swing.*;

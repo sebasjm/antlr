@@ -30,7 +30,7 @@ package org.antlr.gunit.swingui;
 
 import javax.swing.event.ListDataListener;
 import org.antlr.gunit.swingui.model.Rule;
-import org.antlr.gunit.swingui.images.ImageFactory;
+import org.antlr.gunit.swingui.ImageFactory;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;

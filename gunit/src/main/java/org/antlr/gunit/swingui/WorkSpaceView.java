@@ -32,7 +32,7 @@
 
 package org.antlr.gunit.swingui;
 
-import org.antlr.gunit.swingui.images.ImageFactory;
+import org.antlr.gunit.swingui.ImageFactory;
 import java.awt.*;
 import javax.swing.*;
 

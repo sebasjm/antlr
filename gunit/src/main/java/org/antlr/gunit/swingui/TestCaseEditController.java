@@ -29,7 +29,7 @@
 package org.antlr.gunit.swingui;
 
 import org.antlr.gunit.swingui.model.*;
-import org.antlr.gunit.swingui.images.ImageFactory;
+import org.antlr.gunit.swingui.ImageFactory;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;

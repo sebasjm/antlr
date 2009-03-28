@@ -46,7 +46,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import org.antlr.gunit.swingui.images.ImageFactory;
+import org.antlr.gunit.swingui.ImageFactory;
 import org.antlr.gunit.swingui.model.*;
 
 /**
