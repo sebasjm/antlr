@@ -37,13 +37,14 @@ import org.antlr.stringtemplate.*;
 
 public class TestSuiteFactory {
     
-    private static String TEMPLATE_FILE = "gunit.stg";
+    private static String TEMPLATE_FILE = "org/antlr/gunit/swingui/gunit.stg";
     private static StringTemplateGroup templates;
     public static final String TEST_SUITE_EXT = ".gunit";
     public static final String GRAMMAR_EXT = ".g";
     
     static  {
-        InputStream in = Tool.class.getResourceAsStream(TEMPLATE_FILE);
+        ClassLoader loader = TestSuiteFactory.class.getClassLoader();
+        InputStream in = loader.getResourceAsStream(TEMPLATE_FILE);
         Reader rd = new InputStreamReader(in);
         templates = new StringTemplateGroup(rd);
     }

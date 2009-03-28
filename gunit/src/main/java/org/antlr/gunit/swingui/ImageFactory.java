@@ -38,14 +38,13 @@ public class ImageFactory {
     }
     
     private ImageIcon getImage(String name) {
-        name = "org/antlr/gunit/swingui/images/" + name;
+        name = IMG_DIR + name;
         try {
-            ClassLoader loader = ImageFactory.class.getClassLoader();
-            InputStream in = loader.getResourceAsStream(name);
-            byte[] data = new byte[in.available()];
+            final ClassLoader loader = ImageFactory.class.getClassLoader();
+            final InputStream in = loader.getResourceAsStream(name);
+            final byte[] data = new byte[in.available()];
             in.read(data);
             in.close();
-            System.out.println(data.length);
             return new ImageIcon(data);
         } catch (IOException ex) {
             System.err.println("Can't load image file: " + name);
