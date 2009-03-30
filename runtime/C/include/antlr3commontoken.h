@@ -65,7 +65,7 @@
 
 /** First token that can be used by users/generated code
  */
-fdskljglkjn
+
 #define	ANTLR3_MIN_TOKEN_TYPE	ANTLR3_TOKEN_UP + 1
 
 /** End of file token
