@@ -194,7 +194,7 @@ outputFile( LEXER,
 #define	SCOPE_TYPE(scope)   p<name>_##scope##_SCOPE
 #define SCOPE_STACK(scope)  p<name>_##scope##Stack
 #define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
-#define	SCOPE_SIZE(scope)			(ctx->SCOPE_STACK(scope)->size(ctx->SCOPE_STACK(scope)))
+#define	SCOPE_SIZE(scope)		ctx->p<name>_##scope##Stack_limit
 #define SCOPE_INSTANCE(scope, i)	(ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope),i))
 
 <if(LEXER)>
