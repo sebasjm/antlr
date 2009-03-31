@@ -10,7 +10,7 @@ ANTLR v3 Maven plugin
 
  The ANTLR v3 Maven plugin is completely re-written as of version 3.1.3; if you are familiar
  with prior versions, you should note that there are some behavioral differences that make
- it worthwhile reading this documentation.
+ it worthwhile reading this documentation. 
 
  The job of the plugin is essentially to tell the standard ANTLR parser generator where the
  input grammar files are and where the output files should be generated. As with all Maven
@@ -27,6 +27,12 @@ ANTLR v3 Maven plugin
  The plugin version tracks the version of the ANTLR tool that it controls. Hence if you
  use version 3.1.3 of the plugin, you will build your grammars using version 3.1.3 of the
  ANTLR tool, version 3.2 of the plugin will use version 3.2 of the ANTLR tool and so on.
+
+ You may also find that there are patch versions of the plugin suchas 3.1.3-1 3.1.3-2 and
+ so on. Use the latest patch release of the plugin.
+
+ The current version of the plugin is shown at the top of this page after the <<Last Deployed>> date.
+ 
 
 * Default directories
 

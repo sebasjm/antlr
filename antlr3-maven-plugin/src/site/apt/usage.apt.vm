@@ -17,6 +17,8 @@ Usage
 
 * Plugin Descriptor
 
+ The current version of the plugin is shown at the top of this page after the <<Last Deployed>> date.
+
  The full layout of the descriptor (at least, those parts that are not standard Maven things),
  showing the default values of the configuration options, is as follows:
 
@@ -24,7 +26,7 @@ Usage
 <plugin>
     <groupId>org.antlr</groupId>
     <artifactId>antlr3-maven-plugin</artifactId>
-    <version>3.1.3-SNAPSHOT</version>
+    <version>3.1.3-1</version>
 
     <executions>
         
