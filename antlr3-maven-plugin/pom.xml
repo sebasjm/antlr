@@ -218,9 +218,11 @@ Jim Idle - March 2009
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
+
             <releases>
                 <enabled>false</enabled>
             </releases>
+            
         </repository>
 
     </repositories>
