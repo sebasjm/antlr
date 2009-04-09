@@ -520,22 +520,31 @@ public class Tool {
     public void sortGrammarFiles() throws IOException {
         //System.out.println("Grammar names "+getGrammarFileNames());
         Graph g = new Graph();
-        for (String gfile : getGrammarFileNames()) {
-            GrammarSpelunker grammar = new GrammarSpelunker(inputDirectory, gfile);
-            grammar.parse();
-            String vocabName = grammar.getTokenVocab();
-            String grammarName = grammar.getGrammarName();
-            // Make all grammars depend on any tokenVocab options
-            if ( vocabName!=null ) g.addEdge(gfile, vocabName+CodeGenerator.VOCAB_FILE_EXTENSION);
-            // Make all generated tokens files depend on their grammars
-            g.addEdge(grammarName+CodeGenerator.VOCAB_FILE_EXTENSION, gfile);
+        List<String> missingFiles = new ArrayList<String>();
+        for (String gfile : grammarFileNames) {
+            try {
+                GrammarSpelunker grammar = new GrammarSpelunker(inputDirectory, gfile);
+                grammar.parse();
+                String vocabName = grammar.getTokenVocab();
+                String grammarName = grammar.getGrammarName();
+                // Make all grammars depend on any tokenVocab options
+                if ( vocabName!=null ) g.addEdge(gfile, vocabName+CodeGenerator.VOCAB_FILE_EXTENSION);
+                // Make all generated tokens files depend on their grammars
+                g.addEdge(grammarName+CodeGenerator.VOCAB_FILE_EXTENSION, gfile);
+            }
+            catch (FileNotFoundException fnfe) {
+                ErrorManager.error(ErrorManager.MSG_CANNOT_OPEN_FILE, gfile);
+                missingFiles.add(gfile);
+            }
         }
         List<Object> sorted = g.sort();
         //System.out.println("sorted="+sorted);
         grammarFileNames.clear(); // wipe so we can give new ordered list
         for (int i = 0; i < sorted.size(); i++) {
             String f = (String)sorted.get(i);
-            if ( f.endsWith(".g") ) grammarFileNames.add(f);
+            if ( missingFiles.contains(f) ) continue;
+            if ( !(f.endsWith(".g") || f.endsWith(".g3")) ) continue;
+            grammarFileNames.add(f);
         }
         //System.out.println("new grammars="+grammarFileNames);
     }
