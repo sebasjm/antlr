@@ -41,10 +41,8 @@ namespace Antlr.Runtime.Tree
         System.Action bottomup_action;
 
         public TreeFilter( ITreeNodeStream input )
-            : base( input )
+            : this( input, new RecognizerSharedState() )
         {
-            topdown_action = () => Topdown();
-            bottomup_action = () => Bottomup();
         }
         public TreeFilter( ITreeNodeStream input, RecognizerSharedState state )
             : base( input, state )

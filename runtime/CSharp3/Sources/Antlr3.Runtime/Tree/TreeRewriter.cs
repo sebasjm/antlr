@@ -43,10 +43,8 @@ namespace Antlr.Runtime.Tree
         System.Func<TreeRuleReturnScope> bottomup_func;
 
         public TreeRewriter( ITreeNodeStream input )
-            : base( input )
+            : this( input, new RecognizerSharedState() )
         {
-            topdown_func = () => Topdown();
-            bottomup_func = () => Bottomup();
         }
         public TreeRewriter( ITreeNodeStream input, RecognizerSharedState state )
             : base( input, state )
