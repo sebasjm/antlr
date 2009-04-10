@@ -55,7 +55,6 @@
     <Compile Include="ClassicToken.cs" />
     <Compile Include="CommonToken.cs" />
     <Compile Include="CommonTokenStream.cs" />
-    <Compile Include="Debug\DebugEventListenerConstants.cs" />
     <Compile Include="Debug\IDebugEventListener.cs" />
     <Compile Include="DFA.cs" />
     <Compile Include="EarlyExitException.cs" />

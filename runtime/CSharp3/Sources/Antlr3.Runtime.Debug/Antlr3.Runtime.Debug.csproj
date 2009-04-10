@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="BlankDebugEventListener.cs" />
     <Compile Include="DebugEventHub.cs" />
+    <Compile Include="DebugEventListenerConstants.cs" />
     <Compile Include="DebugEventRepeater.cs" />
     <Compile Include="DebugEventSocketProxy.cs" />
     <Compile Include="DebugParser.cs" />
