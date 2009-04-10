@@ -227,6 +227,9 @@ namespace Antlr.Runtime.Tree
 
         public virtual object Create( int tokenType, IToken fromToken, string text )
         {
+            if ( fromToken == null )
+                return Create( tokenType, text );
+
             fromToken = CreateToken( fromToken );
             fromToken.Type = tokenType;
             fromToken.Text = text;
