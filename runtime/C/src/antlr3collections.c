@@ -2319,7 +2319,10 @@ addEdge          (pANTLR3_TOPO topo, ANTLR3_UINT32 edge, ANTLR3_UINT32 dependenc
     // do nothing as it means this routine was just called to add it
     // in to the list of nodes.
     //
-
+    if  (edge == dependency)
+    {
+        return;
+    }
     // Pick up the bit map for the requested edge
     //
     edgeDeps = *((topo->edges) + edge);
