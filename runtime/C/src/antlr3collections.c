@@ -2239,7 +2239,7 @@ antlr3TopoNew()
     // Initialize variables
     //
 
-    topo->visited   = antlr3BitsetNew(0);   // Don't know how big it is yet
+    topo->visited   = NULL;                 // Don't know how big it is yet
     topo->limit     = 1;                    // No edges added yet
     topo->edges     = NULL;                 // No edges added yet
     topo->sorted    = NULL;                 // Nothing sorted at the start
@@ -2323,21 +2323,21 @@ addEdge          (pANTLR3_TOPO topo, ANTLR3_UINT32 edge, ANTLR3_UINT32 dependenc
     {
         return;
     }
+
     // Pick up the bit map for the requested edge
     //
     edgeDeps = *((topo->edges) + edge);
 
     if  (edgeDeps == NULL)
     {
-        // No edges ere defined yet for this node
+        // No edges are defined yet for this node
         //
-        edgeDeps = antlr3BitsetNew(0);
+        edgeDeps                = antlr3BitsetNew(0);
+        *((topo->edges) + edge) = edgeDeps;
         if (edgeDeps == NULL )
         {
             return;  // Out of memory
         }
-
-        *((topo->edges) + edge) = edgeDeps;
     }
 
     // Set the bit in the bitmap that corresponds to the requested
@@ -2415,7 +2415,7 @@ DFS(pANTLR3_TOPO topo, ANTLR3_UINT32 node)
     topo->visited->add(topo->visited, node);
 
     // Now, if this node has edges, then we want to ensure we visit
-    // them all before we drop throught and add this node into the sorted
+    // them all before we drop through and add this node into the sorted
     // list.
     //
     edges = *((topo->edges) + node);
@@ -2431,7 +2431,7 @@ DFS(pANTLR3_TOPO topo, ANTLR3_UINT32 node)
         numBits = edges->numBits(edges);
         range   = edges->size(edges);   // Number of set bits
 
-        // Stop if we exahust the bit list or have check the
+        // Stop if we exahust the bit list or have checked the
         // number of edges that this node refers to (so we don't
         // check bits at the end that cannot possibly be set).
         //
@@ -2512,6 +2512,13 @@ sortToArray      (pANTLR3_TOPO topo)
             break;
         }
     }
+
+    // Reset the limit to the number we recorded as if we hit a
+    // cycle, then limit will have stopped at the node where we
+    // discovered the cycle, but in order to free the edge bitmaps
+    // we need to know how many we may have allocated and traverse them all.
+    //
+    topo->limit = oldLimit;
 
     // Having traversed all the nodes we were given, we
     // are guaranteed to have ordered all the nodes or detected a
@@ -2623,27 +2630,6 @@ freeTopo             (pANTLR3_TOPO topo)
 {
     ANTLR3_UINT32   i;
 
-    // Free any edgemaps
-    //
-    if  (topo->edges != NULL)
-    {
-        pANTLR3_BITSET edgeList;
-
-        
-        for (i=0; i<topo->limit; i++)
-        {
-            edgeList = *((topo->edges) + i);
-
-            if  (edgeList != NULL)
-            {
-                edgeList->free(edgeList);
-            }
-        }
-
-        ANTLR3_FREE(topo->edges);
-    }
-    topo->edges = NULL;
-
     // Free the result vector
     //
     if  (topo->sorted != NULL)
@@ -2656,10 +2642,31 @@ freeTopo             (pANTLR3_TOPO topo)
     //
     if  (topo->visited != NULL)
     {
+
         topo->visited->free(topo->visited);
         topo->visited = NULL;
     }
 
+    // Free any edgemaps
+    //
+    if  (topo->edges != NULL)
+    {
+        pANTLR3_BITSET edgeList;
+
+        
+        for (i=0; i<topo->limit; i++)
+        {
+            edgeList = *((topo->edges) + i);
+            if  (edgeList != NULL)
+            {
+                edgeList->free(edgeList);
+            }
+        }
+
+        ANTLR3_FREE(topo->edges);
+    }
+    topo->edges = NULL;
+    
     // Free any cycle map
     //
     if  (topo->cycle != NULL)
