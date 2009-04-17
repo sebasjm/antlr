@@ -72,12 +72,6 @@ namespace Antlr.Runtime.Debug
         }
         #endregion
 
-        [System.Obsolete]
-        public void SetDebugListener( IDebugEventListener dbg )
-        {
-            DebugListener = dbg;
-        }
-
         public virtual void Consume()
         {
             if ( initialStreamState )

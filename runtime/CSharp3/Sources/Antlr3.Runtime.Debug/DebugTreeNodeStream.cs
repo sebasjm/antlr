@@ -122,18 +122,6 @@ namespace Antlr.Runtime.Debug
 
         #endregion
 
-        [Obsolete]
-        public void SetDebugListener( IDebugEventListener dbg )
-        {
-            DebugListener = dbg;
-        }
-
-        [Obsolete]
-        public ITreeAdaptor GetTreeAdaptor()
-        {
-            return TreeAdaptor;
-        }
-
         public virtual void Consume()
         {
             object node = input.LT( 1 );
@@ -204,24 +192,12 @@ namespace Antlr.Runtime.Debug
             return input.Size();
         }
 
-        [Obsolete]
-        public object GetTreeSource()
-        {
-            return TreeSource;
-        }
-
         public virtual string SourceName
         {
             get
             {
                 return TokenStream.SourceName;
             }
-        }
-
-        [Obsolete]
-        public ITokenStream GetTokenStream()
-        {
-            return TokenStream;
         }
 
         public virtual void ReplaceChildren( object parent, int startChildIndex, int stopChildIndex, object t )

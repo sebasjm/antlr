@@ -64,6 +64,11 @@ namespace Antlr.Runtime.Tree
         {
         }
 
+        /** <summary>
+         *  Get the children internal List; note that if you directly mess with
+         *  the list, do so at your own risk.
+         *  </summary>
+         */
         public virtual IList<ITree> Children
         {
             get
@@ -161,17 +166,6 @@ namespace Antlr.Runtime.Tree
                 return null;
 
             return children[i];
-        }
-
-        /** <summary>
-         *  Get the children internal List; note that if you directly mess with
-         *  the list, do so at your own risk.
-         *  </summary>
-         */
-        [Obsolete]
-        public IList<ITree> GetChildren()
-        {
-            return Children;
         }
 
         public virtual ITree GetFirstChildWithType( int type )
