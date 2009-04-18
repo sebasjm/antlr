@@ -142,7 +142,10 @@ namespace Antlr.Runtime
          *  value includes a single EOF.
          *  </summary>
          */
-        int Size();
+        int Count
+        {
+            get;
+        }
 
         /** <summary>
          *  Where are you getting symbols from?  Normally, implementations will

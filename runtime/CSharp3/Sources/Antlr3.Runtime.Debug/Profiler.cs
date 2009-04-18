@@ -340,7 +340,7 @@ namespace Antlr.Runtime.Debug
         public virtual string ToNotifyString()
         {
             ITokenStream input = parser.TokenStream;
-            for ( int i = 0; i < input.Size() && lastTokenConsumed != null && i <= lastTokenConsumed.TokenIndex; i++ )
+            for ( int i = 0; i < input.Count && lastTokenConsumed != null && i <= lastTokenConsumed.TokenIndex; i++ )
             {
                 IToken t = input.Get( i );
                 if ( t.Channel != TokenChannels.Default )
@@ -393,7 +393,7 @@ namespace Antlr.Runtime.Debug
             buf.Append( '\t' );
             buf.Append( numSemanticPredicates );
             buf.Append( '\t' );
-            buf.Append( parser.TokenStream.Size() );
+            buf.Append( parser.TokenStream.Count );
             buf.Append( '\t' );
             buf.Append( numHiddenTokens );
             buf.Append( '\t' );
@@ -551,7 +551,7 @@ namespace Antlr.Runtime.Debug
         {
             int n = 0;
             ITokenStream input = parser.TokenStream;
-            for ( int ti = i; ti < input.Size() && ti <= j; ti++ )
+            for ( int ti = i; ti < input.Count && ti <= j; ti++ )
             {
                 IToken t = input.Get( ti );
                 if ( t.Channel != TokenChannels.Default )

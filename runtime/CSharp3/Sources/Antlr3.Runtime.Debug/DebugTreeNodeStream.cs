@@ -187,9 +187,12 @@ namespace Antlr.Runtime.Debug
             input.Seek( index );
         }
 
-        public virtual int Size()
+        public virtual int Count
         {
-            return input.Size();
+            get
+            {
+                return input.Count;
+            }
         }
 
         public virtual string SourceName

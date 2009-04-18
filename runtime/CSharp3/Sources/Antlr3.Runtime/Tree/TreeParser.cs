@@ -105,7 +105,7 @@ namespace Antlr.Runtime.Tree
                                           BitSet follow )
         {
             string tokenText =
-                "<missing " + GetTokenNames()[expectedTokenType] + ">";
+                "<missing " + TokenNames[expectedTokenType] + ">";
             return new CommonTree( new CommonToken( expectedTokenType, tokenText ) );
         }
 

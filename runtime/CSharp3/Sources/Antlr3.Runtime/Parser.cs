@@ -78,7 +78,7 @@ namespace Antlr.Runtime
             if ( expectedTokenType == TokenTypes.EndOfFile )
                 tokenText = "<missing EOF>";
             else
-                tokenText = "<missing " + GetTokenNames()[expectedTokenType] + ">";
+                tokenText = "<missing " + TokenNames[expectedTokenType] + ">";
             CommonToken t = new CommonToken( expectedTokenType, tokenText );
             IToken current = ( (ITokenStream)input ).LT( 1 );
             if ( current.Type == TokenTypes.EndOfFile )

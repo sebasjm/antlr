@@ -237,14 +237,5 @@ namespace Antlr.Runtime.Tree
             }
             return buf.ToString();
         }
-
-        #region IIntStream Members
-
-        int IIntStream.Size()
-        {
-            return Count;
-        }
-
-        #endregion
     }
 }

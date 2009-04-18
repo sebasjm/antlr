@@ -36,6 +36,7 @@ namespace Antlr.Runtime.Tree
 
     using Console = System.Console;
     using IList = System.Collections.IList;
+    using InvalidOperationException = System.InvalidOperationException;
     using StringBuilder = System.Text.StringBuilder;
 
     /** <summary>A buffered stream of tree nodes.  Nodes can be from a tree of ANY kind.</summary>
@@ -179,6 +180,18 @@ namespace Antlr.Runtime.Tree
         }
 
         #region Properties
+
+        public virtual int Count
+        {
+            get
+            {
+                if ( p == -1 )
+                {
+                    throw new InvalidOperationException( "Cannot determine the Count before the buffer is filled." );
+                }
+                return nodes.Count;
+            }
+        }
 
         public virtual object TreeSource
         {
@@ -328,7 +341,7 @@ namespace Antlr.Runtime.Tree
             {
                 if ( p == -1 )
                 {
-                    FillBuffer();
+                    throw new InvalidOperationException( "Cannot get the node at index i before the buffer is filled." );
                 }
                 return nodes[i];
             }
@@ -489,15 +502,6 @@ namespace Antlr.Runtime.Tree
             }
         }
 
-        public virtual int Size()
-        {
-            if ( p == -1 )
-            {
-                FillBuffer();
-            }
-            return nodes.Count;
-        }
-
         public virtual IEnumerator<object> Iterator()
         {
             if ( p == -1 )
@@ -561,7 +565,7 @@ namespace Antlr.Runtime.Tree
             }
             if ( p == -1 )
             {
-                FillBuffer();
+                throw new InvalidOperationException( "Buffer is not yet filled." );
             }
             //Console.Out.WriteLine( "stop: " + stop );
             if ( start is CommonTree )
@@ -585,7 +589,7 @@ namespace Antlr.Runtime.Tree
                 }
                 else if ( adaptor.GetType( stop ) == TokenTypes.EndOfFile )
                 {
-                    endTokenIndex = Size() - 2; // don't use EOF
+                    endTokenIndex = Count - 2; // don't use EOF
                 }
                 return tokens.ToString( beginTokenIndex, endTokenIndex );
             }

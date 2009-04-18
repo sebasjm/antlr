@@ -257,7 +257,7 @@ public <grammar.recognizerName>( <inputStreamType> input, RecognizerSharedState 
 }
 	<@end>
 
-	public override string[] GetTokenNames() { return <grammar.composite.rootGrammar.recognizerName>.tokenNames; }
+	public override string[] TokenNames { get { return <grammar.composite.rootGrammar.recognizerName>.tokenNames; } }
 	public override string GrammarFileName { get { return "<fileName>"; } }
 
 	<members>

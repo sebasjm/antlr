@@ -205,9 +205,12 @@ namespace Antlr.Runtime
             return LA( i );
         }
 
-        public virtual int Size()
+        public virtual int Count
         {
-            return n;
+            get
+            {
+                return n;
+            }
         }
 
         public virtual int Mark()

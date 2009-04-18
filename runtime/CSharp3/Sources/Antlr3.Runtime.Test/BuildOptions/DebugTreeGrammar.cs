@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\DebugTreeGrammar.g3 2009-04-17 13:32:25
+// $ANTLR 3.1.2 BuildOptions\\DebugTreeGrammar.g3 2009-04-18 02:34:36
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -85,7 +85,7 @@ public partial class DebugTreeGrammar : DebugTreeParser
 	}
 
 
-	public override string[] GetTokenNames() { return DebugTreeGrammar.tokenNames; }
+	public override string[] TokenNames { get { return DebugTreeGrammar.tokenNames; } }
 	public override string GrammarFileName { get { return "BuildOptions\\DebugTreeGrammar.g3"; } }
 
 

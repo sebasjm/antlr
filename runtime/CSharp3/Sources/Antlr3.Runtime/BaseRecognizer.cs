@@ -228,7 +228,7 @@ namespace Antlr.Runtime
             state.syntaxErrors++; // don't count spurious
             state.errorRecovery = true;
 
-            DisplayRecognitionError( this.GetTokenNames(), e );
+            DisplayRecognitionError( this.TokenNames, e );
         }
 
         public virtual void DisplayRecognitionError( string[] tokenNames,
@@ -683,7 +683,7 @@ namespace Antlr.Runtime
             {
                 e = new UnwantedTokenException( ttype, input )
                 {
-                    tokenNames = GetTokenNames()
+                    tokenNames = TokenNames
                 };
                 /*
                 System.err.println("recoverFromMismatchedToken deleting "+
@@ -710,7 +710,7 @@ namespace Antlr.Runtime
             // even that didn't work; must throw the exception
             e = new MismatchedTokenException( ttype, input )
             {
-                tokenNames = GetTokenNames()
+                tokenNames = TokenNames
             };
             throw e;
         }
@@ -899,9 +899,12 @@ namespace Antlr.Runtime
          *  that overrides this to point to their String[] tokenNames.
          *  </summary>
          */
-        public virtual string[] GetTokenNames()
+        public virtual string[] TokenNames
         {
-            return null;
+            get
+            {
+                return null;
+            }
         }
 
         /** <summary>

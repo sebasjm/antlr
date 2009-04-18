@@ -64,11 +64,15 @@ namespace Antlr.Runtime
         {
             get
             {
-                return GetText();
+                if ( state.text != null )
+                {
+                    return state.text;
+                }
+                return input.substring( state.tokenStartCharIndex, GetCharIndex() - 1 );
             }
             set
             {
-                SetText( value );
+                state.text = value;
             }
         }
         public int Line
@@ -91,13 +95,6 @@ namespace Antlr.Runtime
             set
             {
                 input.CharPositionInLine = value;
-            }
-        }
-        public string[] TokenNames
-        {
-            get
-            {
-                return GetTokenNames();
             }
         }
         #endregion
@@ -251,7 +248,7 @@ namespace Antlr.Runtime
                     MismatchedTokenException mte =
                         new MismatchedTokenException( s[i], input )
                         {
-                            tokenNames = GetTokenNames()
+                            tokenNames = TokenNames
                         };
                     Recover( mte );
                     throw mte;
@@ -279,7 +276,7 @@ namespace Antlr.Runtime
                 MismatchedTokenException mte =
                     new MismatchedTokenException( c, input )
                     {
-                        tokenNames = GetTokenNames()
+                        tokenNames = TokenNames
                     };
                 Recover( mte );  // don't really recover; just consume in lexer
                 throw mte;
@@ -313,19 +310,17 @@ namespace Antlr.Runtime
         }
 
         /** <summary>Return the text matched so far for the current token or any text override.</summary> */
-        public virtual string GetText()
+        [System.Obsolete]
+        public string GetText()
         {
-            if ( state.text != null )
-            {
-                return state.text;
-            }
-            return input.substring( state.tokenStartCharIndex, GetCharIndex() - 1 );
+            return Text;
         }
 
         /** <summary>Set the complete text of this token; it wipes any previous changes to the text.</summary> */
-        public virtual void SetText( string text )
+        [System.Obsolete]
+        public void SetText( string text )
         {
-            state.text = text;
+            Text = text;
         }
 
         public override void ReportError( RecognitionException e )
@@ -341,7 +336,7 @@ namespace Antlr.Runtime
             errorRecovery = true;
              */
 
-            DisplayRecognitionError( this.GetTokenNames(), e );
+            DisplayRecognitionError( this.TokenNames, e );
         }
 
         public override string GetErrorMessage( RecognitionException e, string[] tokenNames )

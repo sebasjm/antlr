@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\DebugGrammar.g3 2009-03-23 17:50:34
+// $ANTLR 3.1.2 BuildOptions\\DebugGrammar.g3 2009-04-18 02:34:35
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -113,7 +113,7 @@ public partial class DebugGrammarParser : DebugParser
 	}
 
 
-	public override string[] GetTokenNames() { return DebugGrammarParser.tokenNames; }
+	public override string[] TokenNames { get { return DebugGrammarParser.tokenNames; } }
 	public override string GrammarFileName { get { return "BuildOptions\\DebugGrammar.g3"; } }
 
 
@@ -1429,6 +1429,7 @@ public partial class DebugGrammarParser : DebugParser
 	}
 	// $ANTLR end "atom"
 	#endregion Rules
+
 
 	#region DFA
 	DFA2 dfa2;

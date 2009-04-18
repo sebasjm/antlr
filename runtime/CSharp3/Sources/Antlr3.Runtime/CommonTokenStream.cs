@@ -34,6 +34,7 @@ namespace Antlr.Runtime
 {
     using System.Collections.Generic;
 
+    using InvalidOperationException = System.InvalidOperationException;
     using StringBuilder = System.Text.StringBuilder;
 
     /** <summary>
@@ -120,8 +121,12 @@ namespace Antlr.Runtime
          *  set some token type / channel overrides before filling buffer.
          *  </summary>
          */
-        protected virtual void FillBuffer()
+        public virtual void FillBuffer()
         {
+            // fast return if the buffer is already full
+            if ( p != -1 )
+                return;
+
             int index = 0;
             IToken t = tokenSource.NextToken();
             while ( t != null && t.Type != CharStreamConstants.EndOfFile )
@@ -403,9 +408,12 @@ namespace Antlr.Runtime
             // no resources to release
         }
 
-        public virtual int Size()
+        public virtual int Count
         {
-            return tokens.Count;
+            get
+            {
+                return tokens.Count;
+            }
         }
 
         public virtual void Rewind( int marker )
@@ -449,7 +457,7 @@ namespace Antlr.Runtime
         {
             if ( p == -1 )
             {
-                FillBuffer();
+                throw new InvalidOperationException( "Buffer is not yet filled." );
             }
             return ToString( 0, tokens.Count - 1 );
         }
@@ -462,7 +470,7 @@ namespace Antlr.Runtime
             }
             if ( p == -1 )
             {
-                FillBuffer();
+                throw new InvalidOperationException( "Buffer is not yet filled." );
             }
             if ( stop >= tokens.Count )
             {

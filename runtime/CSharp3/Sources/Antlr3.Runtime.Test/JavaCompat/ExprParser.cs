@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-03-20 14:23:03
+// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-04-18 02:34:06
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -50,7 +50,7 @@ public partial class ExprParser : Parser
 	}
 		
 
-	public override string[] GetTokenNames() { return ExprParser.tokenNames; }
+	public override string[] TokenNames { get { return ExprParser.tokenNames; } }
 	public override string GrammarFileName { get { return "JavaCompat\\Expr.g3"; } }
 
 
@@ -488,6 +488,7 @@ public partial class ExprParser : Parser
 	}
 	// $ANTLR end "atom"
 	#endregion Rules
+
 
 	#region Follow sets
 	public static class Follow

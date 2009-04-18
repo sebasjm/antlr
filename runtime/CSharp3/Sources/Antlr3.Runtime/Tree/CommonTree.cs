@@ -86,7 +86,7 @@ namespace Antlr.Runtime.Tree
                 {
                     if ( ChildCount > 0 )
                     {
-                        return GetChild( 0 ).CharPositionInLine;
+                        return Children[0].CharPositionInLine;
                     }
                     return 0;
                 }
@@ -123,7 +123,7 @@ namespace Antlr.Runtime.Tree
                 {
                     if ( ChildCount > 0 )
                     {
-                        return GetChild( 0 ).Line;
+                        return Children[0].Line;
                     }
                     return 0;
                 }
