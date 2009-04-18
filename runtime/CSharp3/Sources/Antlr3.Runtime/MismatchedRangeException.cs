@@ -52,7 +52,7 @@ namespace Antlr.Runtime
 
         public override string ToString()
         {
-            return "MismatchedNotSetException(" + UnexpectedType + " not in [" + a + "," + b + "])";
+            return "MismatchedRangeException(" + UnexpectedType + " not in [" + a + "," + b + "])";
         }
     }
 }
