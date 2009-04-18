@@ -35,6 +35,7 @@ namespace Antlr.Runtime
     using System.Collections.Generic;
 
     using ArgumentException = System.ArgumentException;
+    using DebuggerDisplay = System.Diagnostics.DebuggerDisplayAttribute;
     using Exception = System.Exception;
     using StringBuilder = System.Text.StringBuilder;
     using Type = System.Type;
@@ -91,6 +92,7 @@ namespace Antlr.Runtime
      *  the first example shows.
      */
     [System.Serializable]
+    [DebuggerDisplay( "TODO: TokenRewriteStream debugger display" )]
     public class TokenRewriteStream : CommonTokenStream
     {
         public const string DEFAULT_PROGRAM_NAME = "default";
