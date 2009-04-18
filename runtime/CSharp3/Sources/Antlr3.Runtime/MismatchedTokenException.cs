@@ -37,7 +37,7 @@ namespace Antlr.Runtime
     [System.Serializable]
     public class MismatchedTokenException : RecognitionException
     {
-        public int expecting = TokenConstants.InvalidTokenType;
+        public int expecting = TokenTypes.Invalid;
         public string[] tokenNames;
 
         /** <summary>Used for remote debugger deserialization</summary> */

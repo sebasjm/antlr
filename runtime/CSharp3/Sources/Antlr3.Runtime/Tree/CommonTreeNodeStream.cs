@@ -71,12 +71,12 @@ namespace Antlr.Runtime.Tree
         }
 
         public CommonTreeNodeStream( ITreeAdaptor adaptor, object tree )
-            : base( adaptor.Create(TokenConstants.Eof,"EOF") ) // set EOF
+            : base( adaptor.Create( TokenTypes.EndOfFile, "EOF" ) ) // set EOF
         {
             this._root = tree;
             this._adaptor = adaptor;
             _it = new TreeIterator( adaptor, _root );
-            _it.eof = this.Eof; // make sure tree iterator returns the EOF we want
+            _it.eof = this.EndOfFile; // make sure tree iterator returns the EOF we want
         }
 
         #region Properties
@@ -227,7 +227,7 @@ namespace Antlr.Runtime.Tree
             StringBuilder buf = new StringBuilder();
             object o = LT( 1 );
             int type = _adaptor.GetType( o );
-            while ( type != TokenConstants.Eof )
+            while ( type != TokenTypes.EndOfFile )
             {
                 buf.Append( " " );
                 buf.Append( type );

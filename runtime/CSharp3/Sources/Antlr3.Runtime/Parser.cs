@@ -75,13 +75,13 @@ namespace Antlr.Runtime
                                           BitSet follow )
         {
             string tokenText = null;
-            if ( expectedTokenType == TokenConstants.Eof )
+            if ( expectedTokenType == TokenTypes.EndOfFile )
                 tokenText = "<missing EOF>";
             else
                 tokenText = "<missing " + GetTokenNames()[expectedTokenType] + ">";
             CommonToken t = new CommonToken( expectedTokenType, tokenText );
             IToken current = ( (ITokenStream)input ).LT( 1 );
-            if ( current.Type == TokenConstants.Eof )
+            if ( current.Type == TokenTypes.EndOfFile )
             {
                 current = ( (ITokenStream)input ).LT( -1 );
             }

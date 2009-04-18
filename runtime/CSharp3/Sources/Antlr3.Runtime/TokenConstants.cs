@@ -32,43 +32,47 @@
 
 namespace Antlr.Runtime
 {
-    public static class TokenConstants
+    public static class TokenChannels
     {
-        public const int EorTokenType = 1;
-
-        /** <summary>imaginary tree navigation type; traverse "get child" link</summary> */
-        public const int Down = 2;
-        /** <summary>imaginary tree navigation type; finish with a child list</summary> */
-        public const int Up = 3;
-
-        public const int MinTokenType = Up + 1;
-
-        public const int Eof = CharStreamConstants.Eof;
-        public static readonly IToken EofToken = new CommonToken( Eof );
-
-        public const int InvalidTokenType = 0;
-        public static readonly IToken InvalidToken = new CommonToken( InvalidTokenType );
-
-        /** <summary>
-         *  In an action, a lexer rule can set token to this SKIP_TOKEN and ANTLR
-         *  will avoid creating a token for this symbol and try to fetch another.
-         *  </summary>
-         */
-        public static readonly IToken SkipToken = new CommonToken( InvalidTokenType );
-
         /** <summary>
          *  All tokens go to the parser (unless skip() is called in that rule)
          *  on a particular "channel".  The parser tunes to a particular channel
          *  so that whitespace etc... can go to the parser on a "hidden" channel.
          *  </summary>
          */
-        public const int DefaultChannel = 0;
+        public const int Default = 0;
 
         /** <summary>
          *  Anything on different channel than DEFAULT_CHANNEL is not parsed
          *  by parser.
          *  </summary>
          */
-        public const int HiddenChannel = 99;
+        public const int Hidden = 99;
+    }
+
+    public static class TokenTypes
+    {
+        public const int EndOfFile = CharStreamConstants.EndOfFile;
+        public const int Invalid = 0;
+        public const int EndOfRule = 1;
+        /** <summary>imaginary tree navigation type; traverse "get child" link</summary> */
+        public const int Down = 2;
+        /** <summary>imaginary tree navigation type; finish with a child list</summary> */
+        public const int Up = 3;
+        public const int Min = Up + 1;
+    }
+
+    public static class Tokens
+    {
+        public static readonly IToken EndOfFile = new CommonToken( TokenTypes.EndOfFile );
+
+        public static readonly IToken Invalid = new CommonToken( TokenTypes.Invalid );
+
+        /** <summary>
+         *  In an action, a lexer rule can set token to this SKIP_TOKEN and ANTLR
+         *  will avoid creating a token for this symbol and try to fetch another.
+         *  </summary>
+         */
+        public static readonly IToken Skip = new CommonToken( TokenTypes.Invalid );
     }
 }

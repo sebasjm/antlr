@@ -42,7 +42,7 @@ namespace Antlr.Runtime
         int type;
         int line;
         int charPositionInLine = -1; // set to invalid position
-        int channel = TokenConstants.DefaultChannel;
+        int channel = TokenChannels.Default;
         [NonSerialized]
         ICharStream input;
 
@@ -80,7 +80,7 @@ namespace Antlr.Runtime
         public CommonToken( int type, string text )
         {
             this.type = type;
-            this.channel = TokenConstants.DefaultChannel;
+            this.channel = TokenChannels.Default;
             this.text = text;
         }
 

@@ -107,7 +107,7 @@ namespace Antlr.Runtime.Tree
             if ( payload is IToken )
             {
                 IToken t = (IToken)payload;
-                if ( t.Type == TokenConstants.Eof )
+                if ( t.Type == TokenTypes.EndOfFile )
                 {
                     return "<EOF>";
                 }

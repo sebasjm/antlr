@@ -343,7 +343,7 @@ namespace Antlr.Runtime.Debug
             for ( int i = 0; i < input.Size() && lastTokenConsumed != null && i <= lastTokenConsumed.TokenIndex; i++ )
             {
                 IToken t = input.Get( i );
-                if ( t.Channel != TokenConstants.DefaultChannel )
+                if ( t.Channel != TokenChannels.Default )
                 {
                     numHiddenTokens++;
                     numHiddenCharsMatched += t.Text.Length;
@@ -554,7 +554,7 @@ namespace Antlr.Runtime.Debug
             for ( int ti = i; ti < input.Size() && ti <= j; ti++ )
             {
                 IToken t = input.Get( ti );
-                if ( t.Channel != TokenConstants.DefaultChannel )
+                if ( t.Channel != TokenChannels.Default )
                 {
                     n++;
                 }

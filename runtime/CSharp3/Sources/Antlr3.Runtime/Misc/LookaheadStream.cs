@@ -63,7 +63,7 @@ namespace Antlr.Runtime.Misc
             this._eof = eof;
         }
 
-        public T Eof
+        public T EndOfFile
         {
             get
             {

@@ -58,8 +58,8 @@ namespace Antlr.Runtime
         public const int InitialFollowStackSize = 100;
 
         // copies from Token object for convenience in actions
-        public const int DefaultTokenChannel = TokenConstants.DefaultChannel;
-        public const int Hidden = TokenConstants.HiddenChannel;
+        public const int DefaultTokenChannel = TokenChannels.Default;
+        public const int Hidden = TokenChannels.Hidden;
 
         public const string NextTokenRuleName = "nextToken";
 
@@ -172,13 +172,13 @@ namespace Antlr.Runtime
                 return false;
             }
             // compute what can follow this grammar element reference
-            if ( follow.Member( TokenConstants.EorTokenType ) )
+            if ( follow.Member( TokenTypes.EndOfRule ) )
             {
                 BitSet viableTokensFollowingThisRule = ComputeContextSensitiveRuleFOLLOW();
                 follow = follow.Or( viableTokensFollowingThisRule );
                 if ( state._fsp >= 0 )
                 { // remove EOR if we're not the start symbol
-                    follow.Remove( TokenConstants.EorTokenType );
+                    follow.Remove( TokenTypes.EndOfRule );
                 }
             }
             // if current token is consistent with what could come after set
@@ -191,7 +191,7 @@ namespace Antlr.Runtime
             // BitSet cannot handle negative numbers like -1 (EOF) so I leave EOR
             // in follow set to indicate that the fall of the start symbol is
             // in the set (EOF can follow).
-            if ( follow.Member( input.LA( 1 ) ) || follow.Member( TokenConstants.EorTokenType ) )
+            if ( follow.Member( input.LA( 1 ) ) || follow.Member( TokenTypes.EndOfRule ) )
             {
                 //System.out.println("LT(1)=="+((TokenStream)input).LT(1)+" is consistent with what follows; inserting...");
                 return true;
@@ -269,9 +269,9 @@ namespace Antlr.Runtime
             {
                 UnwantedTokenException ute = (UnwantedTokenException)e;
                 string tokenName = "<unknown>";
-                if ( ute.expecting == TokenConstants.Eof )
+                if ( ute.expecting == TokenTypes.EndOfFile )
                 {
-                    tokenName = "EOF";
+                    tokenName = "EndOfFile";
                 }
                 else
                 {
@@ -284,9 +284,9 @@ namespace Antlr.Runtime
             {
                 MissingTokenException mte = (MissingTokenException)e;
                 string tokenName = "<unknown>";
-                if ( mte.expecting == TokenConstants.Eof )
+                if ( mte.expecting == TokenTypes.EndOfFile )
                 {
-                    tokenName = "EOF";
+                    tokenName = "EndOfFile";
                 }
                 else
                 {
@@ -298,9 +298,9 @@ namespace Antlr.Runtime
             {
                 MismatchedTokenException mte = (MismatchedTokenException)e;
                 string tokenName = "<unknown>";
-                if ( mte.expecting == TokenConstants.Eof )
+                if ( mte.expecting == TokenTypes.EndOfFile )
                 {
-                    tokenName = "EOF";
+                    tokenName = "EndOfFile";
                 }
                 else
                 {
@@ -313,9 +313,9 @@ namespace Antlr.Runtime
             {
                 MismatchedTreeNodeException mtne = (MismatchedTreeNodeException)e;
                 string tokenName = "<unknown>";
-                if ( mtne.expecting == TokenConstants.Eof )
+                if ( mtne.expecting == TokenTypes.EndOfFile )
                 {
-                    tokenName = "EOF";
+                    tokenName = "EndOfFile";
                 }
                 else
                 {
@@ -399,7 +399,7 @@ namespace Antlr.Runtime
             string s = t.Text;
             if ( s == null )
             {
-                if ( t.Type == TokenConstants.Eof )
+                if ( t.Type == TokenTypes.EndOfFile )
                 {
                     s = "<EOF>";
                 }
@@ -628,13 +628,13 @@ namespace Antlr.Runtime
                 if ( exact )
                 {
                     // can we see end of rule?
-                    if ( localFollowSet.Member( TokenConstants.EorTokenType ) )
+                    if ( localFollowSet.Member( TokenTypes.EndOfRule ) )
                     {
                         // Only leave EOR in set if at top (start rule); this lets
                         // us know if have to include follow(start rule); i.e., EOF
                         if ( i > 0 )
                         {
-                            followSet.Remove( TokenConstants.EorTokenType );
+                            followSet.Remove( TokenTypes.EndOfRule );
                         }
                     }
                     else
@@ -725,7 +725,7 @@ namespace Antlr.Runtime
                 // System.out.println("missing token");
                 ReportError( e );
                 // we don't know how to conjure up a token for sets yet
-                return GetMissingSymbol( input, e, TokenConstants.InvalidTokenType, follow );
+                return GetMissingSymbol( input, e, TokenTypes.Invalid, follow );
             }
             // TODO do single token deletion like above for Token mismatch
             throw e;
@@ -780,7 +780,7 @@ namespace Antlr.Runtime
         {
             //System.out.println("consumeUntil "+tokenType);
             int ttype = input.LA( 1 );
-            while ( ttype != TokenConstants.Eof && ttype != tokenType )
+            while ( ttype != TokenTypes.EndOfFile && ttype != tokenType )
             {
                 input.Consume();
                 ttype = input.LA( 1 );
@@ -792,7 +792,7 @@ namespace Antlr.Runtime
         {
             //System.out.println("consumeUntil("+set.toString(getTokenNames())+")");
             int ttype = input.LA( 1 );
-            while ( ttype != TokenConstants.Eof && !set.Member( ttype ) )
+            while ( ttype != TokenTypes.EndOfFile && !set.Member( ttype ) )
             {
                 //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
                 input.Consume();

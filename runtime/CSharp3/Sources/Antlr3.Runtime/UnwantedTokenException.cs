@@ -63,7 +63,7 @@ namespace Antlr.Runtime
             string expected = ( tokenNames != null && expecting >= 0 && expecting < tokenNames.Length ) ? tokenNames[expecting] : expecting.ToString();
 
             String exp = ", expected " + expected;
-            if ( expecting == TokenConstants.InvalidTokenType )
+            if ( expecting == TokenTypes.Invalid )
             {
                 exp = "";
             }

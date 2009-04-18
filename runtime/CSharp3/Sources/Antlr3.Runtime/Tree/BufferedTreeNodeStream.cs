@@ -173,9 +173,9 @@ namespace Antlr.Runtime.Tree
             this.root = tree;
             this.adaptor = adaptor;
             nodes = new List<object>( initialBufferSize );
-            down = adaptor.Create( TokenConstants.Down, "DOWN" );
-            up = adaptor.Create( TokenConstants.Up, "UP" );
-            eof = adaptor.Create( TokenConstants.Eof, "EOF" );
+            down = adaptor.Create( TokenTypes.Down, "DOWN" );
+            up = adaptor.Create( TokenTypes.Up, "UP" );
+            eof = adaptor.Create( TokenTypes.EndOfFile, "EOF" );
         }
 
         #region Properties
@@ -255,7 +255,7 @@ namespace Antlr.Runtime.Tree
             int n = adaptor.GetChildCount( t );
             if ( !nil && n > 0 )
             {
-                AddNavigationNode( TokenConstants.Down );
+                AddNavigationNode( TokenTypes.Down );
             }
             // and now add all its children
             for ( int c = 0; c < n; c++ )
@@ -266,7 +266,7 @@ namespace Antlr.Runtime.Tree
             // add UP node if t has children
             if ( !nil && n > 0 )
             {
-                AddNavigationNode( TokenConstants.Up );
+                AddNavigationNode( TokenTypes.Up );
             }
         }
 
@@ -297,11 +297,11 @@ namespace Antlr.Runtime.Tree
         protected virtual void AddNavigationNode( int ttype )
         {
             object navNode = null;
-            if ( ttype == TokenConstants.Down )
+            if ( ttype == TokenTypes.Down )
             {
                 if ( UniqueNavigationNodes )
                 {
-                    navNode = adaptor.Create( TokenConstants.Down, "DOWN" );
+                    navNode = adaptor.Create( TokenTypes.Down, "DOWN" );
                 }
                 else
                 {
@@ -312,7 +312,7 @@ namespace Antlr.Runtime.Tree
             {
                 if ( UniqueNavigationNodes )
                 {
-                    navNode = adaptor.Create( TokenConstants.Up, "UP" );
+                    navNode = adaptor.Create( TokenTypes.Up, "UP" );
                 }
                 else
                 {
@@ -371,9 +371,9 @@ namespace Antlr.Runtime.Tree
             }
             Console.Out.WriteLine( "start last node: " + i + " size==" + nodes.Count );
             while ( i >= 0 &&
-                ( adaptor.getType( this[i] ) == TokenConstants.EOF ||
-                 adaptor.getType( this[i] ) == TokenConstants.UP ||
-                 adaptor.getType( this[i] ) == TokenConstants.DOWN ) )
+                ( adaptor.getType( this[i] ) == TokenTypes.EOF ||
+                 adaptor.getType( this[i] ) == TokenTypes.UP ||
+                 adaptor.getType( this[i] ) == TokenTypes.DOWN ) )
             {
                 i--;
             }
@@ -579,11 +579,11 @@ namespace Antlr.Runtime.Tree
                 int endTokenIndex = adaptor.GetTokenStopIndex( stop );
                 // if it's a tree, use start/stop index from start node
                 // else use token range from start/stop nodes
-                if ( adaptor.GetType( stop ) == TokenConstants.Up )
+                if ( adaptor.GetType( stop ) == TokenTypes.Up )
                 {
                     endTokenIndex = adaptor.GetTokenStopIndex( start );
                 }
-                else if ( adaptor.GetType( stop ) == TokenConstants.Eof )
+                else if ( adaptor.GetType( stop ) == TokenTypes.EndOfFile )
                 {
                     endTokenIndex = Size() - 2; // don't use EOF
                 }

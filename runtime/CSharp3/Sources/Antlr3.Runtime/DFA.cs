@@ -164,7 +164,7 @@ namespace Antlr.Runtime
                         input.Consume();
                         continue;
                     }
-                    if ( c == unchecked((char)TokenConstants.Eof) && eof[s] >= 0 )
+                    if ( c == unchecked( (char)TokenTypes.EndOfFile ) && eof[s] >= 0 )
                     {  // EOF Transition to accept state?
                         if ( debug )
                             Console.Error.WriteLine( "accept via EOF; predict " + accept[eof[s]] + " from " + eof[s] );

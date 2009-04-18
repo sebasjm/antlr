@@ -50,7 +50,7 @@ namespace Antlr.Runtime
         protected int type;
         protected int line;
         protected int charPositionInLine;
-        protected int channel = TokenConstants.DefaultChannel;
+        protected int channel = TokenChannels.Default;
 
         /** <summary>What token number is this from 0..n-1 tokens</summary> */
         protected int index;

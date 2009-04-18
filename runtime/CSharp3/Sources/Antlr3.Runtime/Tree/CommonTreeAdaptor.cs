@@ -164,7 +164,7 @@ namespace Antlr.Runtime.Tree
         public override int GetType( object t )
         {
             if ( t == null )
-                return TokenConstants.InvalidTokenType;
+                return TokenTypes.Invalid;
 
             return ( (ITree)t ).Type;
         }

@@ -352,7 +352,7 @@ namespace Antlr.Runtime.Debug
             buf.Append( "errorNode\t" );
             buf.Append( ID );
             buf.Append( "\t" );
-            buf.Append( TokenConstants.InvalidTokenType );
+            buf.Append( TokenTypes.Invalid );
             SerializeText( buf, text );
             Transmit( buf.ToString() );
         }
