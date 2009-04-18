@@ -62,14 +62,16 @@ namespace Antlr.Runtime
         #region Properties
         public string Text
         {
+            /** <summary>Return the text matched so far for the current token or any text override.</summary> */
             get
             {
                 if ( state.text != null )
                 {
                     return state.text;
                 }
-                return input.substring( state.tokenStartCharIndex, GetCharIndex() - 1 );
+                return input.substring( state.tokenStartCharIndex, CharIndex - 1 );
             }
+            /** <summary>Set the complete text of this token; it wipes any previous changes to the text.</summary> */
             set
             {
                 state.text = value;
@@ -177,17 +179,19 @@ namespace Antlr.Runtime
         /** <summary>This is the lexer entry point that sets instance var 'token'</summary> */
         public abstract void mTokens();
 
-        /** <summary>Set the char stream and reset the lexer</summary> */
-        public virtual void SetCharStream( ICharStream input )
+        public virtual ICharStream CharStream
         {
-            this.input = null;
-            Reset();
-            this.input = input;
-        }
-
-        public virtual ICharStream GetCharStream()
-        {
-            return this.input;
+            get
+            {
+                return input;
+            }
+            /** <summary>Set the char stream and reset the lexer</summary> */
+            set
+            {
+                input = null;
+                Reset();
+                input = value;
+            }
         }
 
         public override string SourceName
@@ -225,7 +229,7 @@ namespace Antlr.Runtime
          */
         public virtual IToken Emit()
         {
-            IToken t = new CommonToken( input, state.type, state.channel, state.tokenStartCharIndex, GetCharIndex() - 1 );
+            IToken t = new CommonToken( input, state.type, state.channel, state.tokenStartCharIndex, CharIndex - 1 );
             t.Line = state.tokenStartLine;
             t.Text = state.text;
             t.CharPositionInLine = state.tokenStartCharPositionInLine;
@@ -304,23 +308,12 @@ namespace Antlr.Runtime
         }
 
         /** <summary>What is the index of the current character of lookahead?</summary> */
-        public virtual int GetCharIndex()
+        public virtual int CharIndex
         {
-            return input.Index;
-        }
-
-        /** <summary>Return the text matched so far for the current token or any text override.</summary> */
-        [System.Obsolete]
-        public string GetText()
-        {
-            return Text;
-        }
-
-        /** <summary>Set the complete text of this token; it wipes any previous changes to the text.</summary> */
-        [System.Obsolete]
-        public void SetText( string text )
-        {
-            Text = text;
+            get
+            {
+                return input.Index;
+            }
         }
 
         public override void ReportError( RecognitionException e )
@@ -386,7 +379,7 @@ namespace Antlr.Runtime
 
         public virtual string GetCharErrorDisplay( int c )
         {
-            string s = c.ToString(); //string.valueOf((char)c);
+            string s = ( (char)c ).ToString();
             switch ( c )
             {
             case TokenTypes.EndOfFile:

@@ -381,14 +381,14 @@ namespace Antlr.Runtime
         /** <summary>What is the error header, normally line/character position information?</summary> */
         public virtual string GetErrorHeader( RecognitionException e )
         {
-            return "line " + e.line + ":" + e.charPositionInLine;
+            return "line " + e.line + ":" + ( e.charPositionInLine + 1 );
         }
 
         /** <summary>
          *  How should a token be displayed in an error message? The default
          *  is to display just the text, but during development you might
          *  want to have a lot of information spit out.  Override in that case
-         *  to use t.toString() (which, for CommonToken, dumps everything about
+         *  to use t.ToString() (which, for CommonToken, dumps everything about
          *  the token). This is better than forcing you to override a method in
          *  your token objects because you don't have to go modify your lexer
          *  so that it creates a new Java type.

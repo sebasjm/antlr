@@ -98,13 +98,16 @@ namespace Antlr.Runtime
         public int c;
 
         /** <summary>
-         *  Track the line at which the error occurred in case this is
+         *  Track the line (1-based) at which the error occurred in case this is
          *  generated from a lexer.  We need to track this since the
          *  unexpected char doesn't carry the line info.
          *  </summary>
          */
         public int line;
 
+        /// <summary>
+        /// The 0-based index into the line where the error occurred.
+        /// </summary>
         public int charPositionInLine;
 
         /** <summary>

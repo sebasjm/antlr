@@ -838,9 +838,9 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label) ::= <<
 <if(label)>
-int <label>Start = GetCharIndex();
+int <label>Start = CharIndex;
 Match(<string>); <checkRuleBacktrackFailure()>
-<label> = new CommonToken(input, TokenTypes.Invalid, TokenChannels.Default, <label>Start, GetCharIndex()-1);
+<label> = new CommonToken(input, TokenTypes.Invalid, TokenChannels.Default, <label>Start, CharIndex-1);
 <else>
 Match(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -898,9 +898,9 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
  */
 lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
-int <label>Start<elementIndex> = GetCharIndex();
+int <label>Start<elementIndex> = CharIndex;
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
-<label> = new CommonToken(input, TokenTypes.Invalid, TokenChannels.Default, <label>Start<elementIndex>, GetCharIndex()-1);
+<label> = new CommonToken(input, TokenTypes.Invalid, TokenChannels.Default, <label>Start<elementIndex>, CharIndex-1);
 <else>
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
@@ -915,9 +915,9 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 /** EOF in the lexer */
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
-int <label>Start<elementIndex> = GetCharIndex();
+int <label>Start<elementIndex> = CharIndex;
 Match(EndOfFile); <checkRuleBacktrackFailure()>
-<labelType> <label> = new CommonToken(input, EndOfFile, TokenChannels.Default, <label>Start<elementIndex>, GetCharIndex()-1);
+<labelType> <label> = new CommonToken(input, EndOfFile, TokenChannels.Default, <label>Start<elementIndex>, CharIndex-1);
 <else>
 Match(EndOfFile); <checkRuleBacktrackFailure()>
 <endif>
@@ -1470,7 +1470,7 @@ lexerRulePropertyRef_pos(scope,attr) ::= "state.tokenStartCharPositionInLine"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_channel(scope,attr) ::= "_channel"
 lexerRulePropertyRef_start(scope,attr) ::= "state.tokenStartCharIndex"
-lexerRulePropertyRef_stop(scope,attr) ::= "(GetCharIndex()-1)"
+lexerRulePropertyRef_stop(scope,attr) ::= "(CharIndex-1)"
 lexerRulePropertyRef_int(scope,attr) ::= "int.Parse(<scope>.Text)"
 
 // setting $st and $tree is allowed in local rule. everything else
