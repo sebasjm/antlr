@@ -365,7 +365,7 @@ makeDot	(pANTLR3_BASE_TREE_ADAPTOR adaptor, void * theTree)
 	pANTLR3_STRING      text;
 	int                 j;
 
-	dotSpec = adaptor->strFactory->newStr
+	dotSpec = adaptor->strFactory->newStr8
 		
 		(
 			adaptor->strFactory,
