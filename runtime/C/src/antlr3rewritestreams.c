@@ -120,9 +120,10 @@ freeNodeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
         for (i = 1; i<= stream->elements->count; i++)
         {
             tree = (pANTLR3_BASE_TREE)(stream->elements->elements[i-1].element);
-            if  (tree->isNilNode(tree))
+            if  (tree != NULL && tree->isNilNode(tree))
             {
-                 tree->reuse(tree);
+                // Had to remove this for now, check is not comprehensive enough
+                // tree->reuse(tree);
             }
 
         }
@@ -146,9 +147,11 @@ freeNodeRS(pANTLR3_REWRITE_RULE_ELEMENT_STREAM stream)
             tree = (pANTLR3_BASE_TREE)(stream->singleElement);
             if  (tree->isNilNode(tree))
             {
-                 tree->reuse(tree);
+                // Had to remove this for now, check is not comprehensive enough
+              //   tree->reuse(tree);
             }
         }
+        stream->singleElement = NULL;
 		stream->freeElements = ANTLR3_FALSE; // Just in case
 	}
 
