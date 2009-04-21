@@ -2471,6 +2471,12 @@ sortToArray      (pANTLR3_TOPO topo)
     ANTLR3_UINT32 v;
     ANTLR3_UINT32 oldLimit;
 
+    // Guard against being called with no edges defined
+    //
+    if  (topo->edges == NULL)
+    {
+        return 0;
+    }
     // First we need a vector to populate with enough
     // entries to accomodate the sorted list and another to accomodate
     // the maximum cycle we could detect which is all nodes such as 0->1->2->3->0
@@ -2550,7 +2556,10 @@ sortVector       (pANTLR3_TOPO topo, pANTLR3_VECTOR v)
     // Sort into an array, then we can use the array that is
     // stored in the topo
     //
-    topo->sortToArray(topo);
+    if  (topo->sortToArray(topo) == 0)
+    {
+        return;     // There were no edges
+    }
 
     if  (topo->hasCycle == ANTLR3_TRUE)
     {
