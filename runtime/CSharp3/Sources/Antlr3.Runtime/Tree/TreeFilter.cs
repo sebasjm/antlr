@@ -37,9 +37,6 @@ namespace Antlr.Runtime.Tree
         protected ITokenStream originalTokenStream;
         protected ITreeAdaptor originalAdaptor;
 
-        System.Action topdown_action;
-        System.Action bottomup_action;
-
         public TreeFilter( ITreeNodeStream input )
             : this( input, new RecognizerSharedState() )
         {
@@ -49,8 +46,6 @@ namespace Antlr.Runtime.Tree
         {
             originalAdaptor = input.TreeAdaptor;
             originalTokenStream = input.TokenStream;
-            topdown_action = () => Topdown();
-            bottomup_action = () => Bottomup();
         }
 
         public virtual void ApplyOnce( object t, System.Action whichRule )
@@ -78,12 +73,12 @@ namespace Antlr.Runtime.Tree
             TreeVisitor v = new TreeVisitor( new CommonTreeAdaptor() );
             System.Func<object, object> pre = ( o ) =>
             {
-                ApplyOnce( o, topdown_action );
+                ApplyOnce( o, Topdown );
                 return o;
             };
             System.Func<object, object> post = ( o ) =>
             {
-                ApplyOnce( o, topdown_action );
+                ApplyOnce( o, Bottomup );
                 return o;
             };
             v.Visit( t, pre, post );
@@ -92,10 +87,10 @@ namespace Antlr.Runtime.Tree
         // methods the downup strategy uses to do the up and down rules.
         // to override, just define tree grammar rule topdown and turn on
         // filter=true.
-        public virtual void Topdown()
+        protected virtual void Topdown()
         {
         }
-        public virtual void Bottomup()
+        protected virtual void Bottomup()
         {
         }
     }
