@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+April 22, 2009
+
+* Fixed ANTLR-374.  Was caused by moved of grammars. %foo() stuff didn't work
+
 April 9, 2009
 
 * .g and .g3 file extensions work again.

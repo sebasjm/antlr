@@ -1046,7 +1046,7 @@ public class CodeGenerator {
 	{
 		// first, parse with antlr.g
 		//System.out.println("translate template: "+templateActionText);
-		ANTLRLexer lexer = new ANTLRLexer(new StringReader(templateActionText));
+		org.antlr.grammar.v2.ANTLRLexer lexer = new org.antlr.grammar.v2.ANTLRLexer(new StringReader(templateActionText));
 		lexer.setFilename(grammar.getFileName());
 		lexer.setTokenObjectClass("antlr.TokenWithIndex");
 		TokenStreamRewriteEngine tokenBuffer = new TokenStreamRewriteEngine(lexer);
