@@ -7,6 +7,10 @@ University of San Francisco
 
 CHANGES
 
+April 23, 2009
+
+* Added reset to TreeNodeStream interface.
+
 April 22, 2009
 
 * Fixed ANTLR-374.  Was caused by moved of grammars. %foo() stuff didn't work

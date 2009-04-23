@@ -305,6 +305,27 @@ public class TestTreeNodeStream extends BaseTest {
 		assertEquals(104, ((Tree)stream.LT(1)).getType());
 	}
 
+    @Test public void testReset() throws Exception {
+        // ^(101 ^(102 103 ^(106 107) ) 104 105)
+        // stream has 7 real + 6 nav nodes
+        // Sequence of types: 101 DN 102 DN 103 106 DN 107 UP UP 104 105 UP EOF
+        Tree r0 = new CommonTree(new CommonToken(101));
+        Tree r1 = new CommonTree(new CommonToken(102));
+        r0.addChild(r1);
+        r1.addChild(new CommonTree(new CommonToken(103)));
+        Tree r2 = new CommonTree(new CommonToken(106));
+        r2.addChild(new CommonTree(new CommonToken(107)));
+        r1.addChild(r2);
+        r0.addChild(new CommonTree(new CommonToken(104)));
+        r0.addChild(new CommonTree(new CommonToken(105)));
+
+        TreeNodeStream stream = newStream(r0);
+        String v = toNodesOnlyString(stream); // scan all
+        stream.reset();
+        String v2 = toNodesOnlyString(stream); // scan all
+        assertEquals(v,v2);
+    }
+
 	public String toNodesOnlyString(TreeNodeStream nodes) {
         TreeAdaptor adaptor = nodes.getTreeAdaptor();
 		StringBuffer buf = new StringBuffer();

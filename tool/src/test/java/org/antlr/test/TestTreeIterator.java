@@ -41,12 +41,7 @@ public class TestTreeIterator {
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonTree t = (CommonTree)wiz.create("A");
         TreeIterator it = new TreeIterator(t);
-        StringBuffer buf = new StringBuffer();
-        while ( it.hasNext() ) {
-            CommonTree n = (CommonTree)it.next();
-            buf.append(n);
-            if ( it.hasNext() ) buf.append(" ");
-        }
+        StringBuffer buf = toString(it);
         String expecting = "A EOF";
         String found = buf.toString();
         assertEquals(expecting, found);
@@ -57,12 +52,7 @@ public class TestTreeIterator {
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonTree t = (CommonTree)wiz.create("(nil A B)");
         TreeIterator it = new TreeIterator(t);
-        StringBuffer buf = new StringBuffer();
-        while ( it.hasNext() ) {
-            CommonTree n = (CommonTree)it.next();
-            buf.append(n);
-            if ( it.hasNext() ) buf.append(" ");
-        }
+        StringBuffer buf = toString(it);
         String expecting = "nil DOWN A B UP EOF";
         String found = buf.toString();
         assertEquals(expecting, found);
@@ -73,12 +63,7 @@ public class TestTreeIterator {
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonTree t = (CommonTree)wiz.create("(A B)");
         TreeIterator it = new TreeIterator(t);
-        StringBuffer buf = new StringBuffer();
-        while ( it.hasNext() ) {
-            CommonTree n = (CommonTree)it.next();
-            buf.append(n);
-            if ( it.hasNext() ) buf.append(" ");
-        }
+        StringBuffer buf = toString(it);
         String expecting = "A DOWN B UP EOF";
         String found = buf.toString();
         assertEquals(expecting, found);
@@ -89,12 +74,7 @@ public class TestTreeIterator {
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonTree t = (CommonTree)wiz.create("(A B C)");
         TreeIterator it = new TreeIterator(t);
-        StringBuffer buf = new StringBuffer();
-        while ( it.hasNext() ) {
-            CommonTree n = (CommonTree)it.next();
-            buf.append(n);
-            if ( it.hasNext() ) buf.append(" ");
-        }
+        StringBuffer buf = toString(it);
         String expecting = "A DOWN B C UP EOF";
         String found = buf.toString();
         assertEquals(expecting, found);
@@ -105,12 +85,7 @@ public class TestTreeIterator {
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonTree t = (CommonTree)wiz.create("(A (B C))");
         TreeIterator it = new TreeIterator(t);
-        StringBuffer buf = new StringBuffer();
-        while ( it.hasNext() ) {
-            CommonTree n = (CommonTree)it.next();
-            buf.append(n);
-            if ( it.hasNext() ) buf.append(" ");
-        }
+        StringBuffer buf = toString(it);
         String expecting = "A DOWN B DOWN C UP UP EOF";
         String found = buf.toString();
         assertEquals(expecting, found);
@@ -121,14 +96,36 @@ public class TestTreeIterator {
         TreeWizard wiz = new TreeWizard(adaptor, tokens);
         CommonTree t = (CommonTree)wiz.create("(A (B (C D E) F) G)");
         TreeIterator it = new TreeIterator(t);
+        StringBuffer buf = toString(it);
+        String expecting = "A DOWN B DOWN C DOWN D E UP F UP G UP EOF";
+        String found = buf.toString();
+        assertEquals(expecting, found);
+    }
+
+    @Test public void testReset() {
+        TreeAdaptor adaptor = new CommonTreeAdaptor();
+        TreeWizard wiz = new TreeWizard(adaptor, tokens);
+        CommonTree t = (CommonTree)wiz.create("(A (B (C D E) F) G)");
+        TreeIterator it = new TreeIterator(t);
+        StringBuffer buf = toString(it);
+        String expecting = "A DOWN B DOWN C DOWN D E UP F UP G UP EOF";
+        String found = buf.toString();
+        assertEquals(expecting, found);
+
+        it.reset();
+        buf = toString(it);
+        expecting = "A DOWN B DOWN C DOWN D E UP F UP G UP EOF";
+        found = buf.toString();
+        assertEquals(expecting, found);
+    }
+
+    protected static StringBuffer toString(TreeIterator it) {
         StringBuffer buf = new StringBuffer();
         while ( it.hasNext() ) {
             CommonTree n = (CommonTree)it.next();
             buf.append(n);
             if ( it.hasNext() ) buf.append(" ");
         }
-        String expecting = "A DOWN B DOWN C DOWN D E UP F UP G UP EOF";
-        String found = buf.toString();
-        assertEquals(expecting, found);
+        return buf;
     }
 }

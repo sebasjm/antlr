@@ -76,6 +76,11 @@ public interface TreeNodeStream extends IntStream {
 	 */
 	public void setUniqueNavigationNodes(boolean uniqueNavigationNodes);
 
+    /** Reset the tree node stream in such a way that it acts like
+     *  a freshly constructed stream.
+     */
+    public void reset();
+
 	/** Return the text of all nodes from start to stop, inclusive.
 	 *  If the stream does not buffer all the nodes then it can still
 	 *  walk recursively from start until stop.  You can always return

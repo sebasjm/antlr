@@ -122,7 +122,9 @@ public class DebugTreeNodeStream implements TreeNodeStream {
 		return input.size();
 	}
 
-	public Object getTreeSource() {
+    public void reset() { ; }
+
+    public Object getTreeSource() {
 		return input;
 	}
 
