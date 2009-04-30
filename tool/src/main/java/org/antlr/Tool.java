@@ -343,18 +343,25 @@ public class Tool {
 
         List<File> outputFiles = bd.getGeneratedFileList();
         List<File> inputFiles = bd.getDependenciesFileList();
-        File grammarFile = new File(grammarFileName);
+        // Note that input directory must be set to use buildRequired
+        File grammarFile;
+        if (haveInputDir) {
+            grammarFile = new File(inputDirectory, grammarFileName);
+        }
+        else {
+            grammarFile = new File(grammarFileName);
+        }
         long grammarLastModified = grammarFile.lastModified();
         for (File outputFile : outputFiles) {
             if (!outputFile.exists() || grammarLastModified > outputFile.lastModified()) {
                 // One of the output files does not exist or is out of date, so we must build it
                 return true;
             }
-
             // Check all of the imported grammars and see if any of these are younger
             // than any of the output files.
             if (inputFiles != null) {
                 for (File inputFile : inputFiles) {
+
                     if (inputFile.lastModified() > outputFile.lastModified()) {
                         // One of the imported grammar files has been updated so we must build
                         return true;
@@ -363,7 +370,7 @@ public class Tool {
             }
         }
         if (isVerbose()) {
-            System.out.println("Grammar " + grammarFileName + " is up to date - build skipped");
+            System.out.println("Grammar " + grammarFile + " is up to date - build skipped");
         }
         return false;
     }
