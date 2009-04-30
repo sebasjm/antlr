@@ -323,7 +323,7 @@ root_<treeLevel> = <ASTLabelType>(adaptor.becomeRoot(<createRewriteNodeFromEleme
 >>
 
 rewriteImaginaryTokenRef(args,token,hetero,elementIndex) ::= <<
-adaptor.addChild(root_<treeLevel>, <createImaginaryNode(tokenType=token, ...)>));<\n>
+adaptor.addChild(root_<treeLevel>, <createImaginaryNode(tokenType=token, ...)>);<\n>
 >>
 
 rewriteImaginaryTokenRefRoot(args,token,hetero,elementIndex) ::= <<
