@@ -48,7 +48,6 @@
                 <include>org.antlr:antlr</include>
           
             </includes>
-
             <!--
                 Of the binaries, such as the depencies that the
                 above modules need, which do we want and which do we not.
@@ -75,7 +74,7 @@
             </includes>
 
             <!--
-                We do not want any of the dependencies tha tgunit has as they
+                We do not want any of the dependencies that gunit has as they
                 are inlcuded with the tool. In particular we want to exclude
                 the junit dependency.
               -->

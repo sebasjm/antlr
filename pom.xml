@@ -197,9 +197,12 @@
                     remember that they need stringtemplate.jar in their CLASSPATH and so
                     on.
 
-                    Note that this is only the tool Uber jar as anything else is standalone.
+                    This does not preclude any of the module generated jars from
+                    being used on their own of course.
 
-                    The uber-jar is then self contained for developing and testing.
+                    Here, we also build a master source jar as I was unable to pursuade
+                    this plugin to use multiple configurations and not have the thing
+                    screw up because of multiple modules :-(
                     
                   -->
 
@@ -213,6 +216,7 @@
                 <configuration>
                     <descriptors>
                         <descriptor>antlrjar.xml</descriptor>
+                        <descriptor>antlrsources.xml</descriptor>
                     </descriptors>
                         <!--
 
