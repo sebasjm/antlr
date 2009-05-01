@@ -29,6 +29,7 @@
         <module>tool</module>
         <module>antlr3-maven-plugin</module>
         <module>gunit</module>
+        <module>gunit-maven-plugin</module>
     </modules>
   <!--
 

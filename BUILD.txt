@@ -139,6 +139,7 @@ should see:
 [INFO] ANTLR Grammar Tool .................................... SUCCESS [5.431s]
 [INFO] Maven plugin for ANTLR V3 ............................. SUCCESS [1.277s]
 [INFO] ANTLR gUnit ........................................... SUCCESS [1.566s]
+[INFO] Maven plugin for gUnit ANTLR V3 ....................... SUCCESS [0.079s]
 [INFO] ------------------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
@@ -200,22 +201,23 @@ This command will then update the child pom.xml files to reflect the version num
 defined in the master pom.xml.
 
 There is unfortunately one last catch here though and that is that the antlr3-maven-plugin
-is not able to use the parent pom. The reason for this is subtle but makes sense as
-doing so would create a circular dependency between the ANTLR tool (which uses the
-plugin to build its own grammar files), and the plugin (which uses the tool to build
-grammar files).
+and the gunit-maven-plugin are not able to use the parent pom. The reason for 
+this is subtle but makes sense as doing so would create a circular dependency 
+between the ANTLR tool (which uses the plugin to build its own grammar files), 
+and the plugins (which uses the tool to build grammar files and gunit to test).
 
 This catch-22 situation means that the pom.xml file in the antlr3-maven-plugin directory
-MUST be updated manually (or we must write a script to do this).
+and the one in the gunit-maven-plugin directory MUST be updated manually (or we 
+must write a script to do this).
 
 Finally, we need to remember that because the tool is dependent on the antlr3-maven-plugin
 and the plugin is itself dependent on the the tool, that we must manually update
 the versions of each that they reference. So, when we bump the version of the toolset
-to say 3.1.4-SNAPSHOT, we need to change the antlr3-maven-plugin pom.xml to reference
-that version of the antlr tool. The tool itself is always built with the prior released
-version of the plugin, so when we release we must change the main branch of the plugin
-to use the newly released version of the plugin. This is covered in the release
-checklist.
+to say 3.1.4-SNAPSHOT, we need to change the antlr3-maven-plugin pom.xml and the 
+gunit-maven-plugin pom.xml to reference that version of the antlr tool. The tool 
+itself is always built with the prior released version of the plugin, so when we 
+release we must change the main branch of the plugin to use the newly released 
+version of the plugin. This is covered in the release checklist.
 
 Deploying
 ----------
@@ -312,7 +314,8 @@ to 3.1.4-SNAPSHOT.
    3.1.3-SNAPSHOT to 3.1.4-SNAPSHOT.
 
 4) Edit the pom.xml file for antlr3-maven-plugin under the main directory and
-   change the version from 3.1.3-SNAPSHOT to 3.1.4-SNAPSHOT.
+   change the version from 3.1.3-SNAPSHOT to 3.1.4-SNAPSHOT. Do the same for the
+   pom.xml in the gunit-maven-plugin directory.
 
 5) Now (from the main directory), run the command:
 
@@ -342,7 +345,7 @@ to 3.1.4-SNAPSHOT.
 	  mvn -N deploy
           mvn -Dmaven.test.skip=true deploy
 
-9) You are now finished with the main development branch and change
+9) You are now finished with the main development branch and should change
    working directories to the release branch you made earlier.
 
 --- Use release branch from here ---
@@ -358,7 +361,8 @@ to 3.1.4-SNAPSHOT.
     the tool that the this pom.xml references from 3.1.3-SNAPSHOT to 3.1.3 as we
     are now releasing the plugin of course and it needs to reference the version
     we are about to release. You will find this reference in the dependencies
-    section of the antlr3-maven-plugin pom.xml.
+    section of the antlr3-maven-plugin pom.xml. Also change the version references
+    in the pom for gunit-maven-plugin.
 
 13)  Now (from the release-3.1.3 directory), run the command:
 
@@ -398,7 +402,7 @@ to 3.1.4-SNAPSHOT.
      because each release of ANTLR is built with the prior release of ANTLR, and
      we have just released a new version. Edit the pom.xml for the tool (main/tool/pom.xml)
      under the main (that's the MAIN branch, not the release branch) and find
-     the dependency reference to the antlr plugin. If you just release say
+     the dependency reference to the antlr plugin. If you just released say
      3.1.3, then the tool should now reference version 3.1.3 of the plugin. Having done
      this, you should probably rebuild the main branch and let it run the junit
      tests. Later, I will automate this dependency update as mvn can do this
@@ -421,6 +425,13 @@ to 3.1.4-SNAPSHOT.
      md5sum target/antlr-master-3.1.3-completejar.jar
      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  target/antlr-master-3.1.4-SNAPSHOT-completejar.jar
 
+     The command you just ran will also produce a second jar:
+
+        antlr-master-3.1.3-src.jar
+
+     This is the source code for everythign you just deployed and can be unjarred
+     and built from scratch using the very procedures described here, which means
+     you will now be reading this BUILD.txt file for ever.
 
 19)  Reward anyone around you with good beer.
 
@@ -454,11 +465,14 @@ the master pom.xml will override it and build with the interim versions we just 
 
 However, strictly speaking, we need a third build where we rebuild the tool again with
 the version of the tool that was built with itself and not deploy the version that was
-built buy the version of itself that was built by a prior version of itself. I decided that this
+built by the version of itself that was built by a prior version of itself. I decided that this
 was not particularly useful and complicates things too much. Building with a prior
 version of the tool is fine and if there was ever a need to, we could release twice
 in quick succession.
 
+I have occasionally seen the MAven reactor screw up (or perhaps it is the ANTLR tool) when
+building. If this happens you will see an ANTLR Panic - cannot find en.stg message. If this
+happens to you, then just rerun the build and it will eventually work.
 
 Jim Idle - March 2009
 
