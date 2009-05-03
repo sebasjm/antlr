@@ -12,6 +12,7 @@
     <AssemblyName>Antlr3.Runtime.Test</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -35,6 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -57,6 +59,27 @@
       <Project>{8FDC0A87-9005-4D5A-AB75-E55CEB575559}</Project>
       <Name>Antlr3.Runtime</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Antlr3 Include="SimpleExpression.g3">
+      <OutputFiles>SimpleExpressionLexer.cs;SimpleExpressionParser.cs;SimpleExpression.tokens</OutputFiles>
+    </Antlr3>
+    <Compile Include="SimpleExpressionLexer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SimpleExpression.g3</DependentUpon>
+    </Compile>
+    <Compile Include="SimpleExpressionLexerHelper.cs">
+      <DependentUpon>SimpleExpression.g3</DependentUpon>
+    </Compile>
+    <Compile Include="SimpleExpressionParser.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SimpleExpression.g3</DependentUpon>
+    </Compile>
+    <Compile Include="SimpleExpressionParserHelper.cs">
+      <DependentUpon>SimpleExpression.g3</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Antlr3 Include="JavaCompat\Expr.g3">
@@ -108,6 +131,7 @@
     <Compile Include="BuildOptions\DebugTreeGrammarHelper.cs">
       <DependentUpon>DebugTreeGrammar.g3</DependentUpon>
     </Compile>
+    <Compile Include="TestDotTreeGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Antlr3 Include="BuildOptions\ProfileGrammar.g3">
