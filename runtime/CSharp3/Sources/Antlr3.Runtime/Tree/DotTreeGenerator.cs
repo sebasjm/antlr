@@ -54,7 +54,7 @@ namespace Antlr.Runtime.Tree
      *      StringTemplate st = gen.toDOT(t);
      *      System.out.println(st);
      */
-    public class DOTTreeGenerator
+    public class DotTreeGenerator
     {
         readonly string[] HeaderLines =
             {
