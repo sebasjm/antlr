@@ -59,13 +59,13 @@ namespace Antlr.Runtime.Tree
         /** <summary>Get next token from stream and make a node for it</summary> */
         public virtual object NextNode()
         {
-            IToken t = (IToken)_Next();
+            IToken t = (IToken)NextCore();
             return adaptor.Create( t );
         }
 
         public virtual IToken NextToken()
         {
-            return (IToken)_Next();
+            return (IToken)NextCore();
         }
 
         /** <summary>

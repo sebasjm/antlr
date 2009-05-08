@@ -47,9 +47,9 @@ namespace Antlr.Runtime.Misc
     public class FastQueue<T>
     {
         /** <summary>dynamically-sized buffer of elements</summary> */
-        protected List<T> _data = new List<T>();
+        internal List<T> _data = new List<T>();
         /** <summary>index of next element to fill</summary> */
-        protected int _p = 0;
+        internal int _p = 0;
 
         /** <summary>Get and remove first element in queue</summary> */
         public virtual T Dequeue()

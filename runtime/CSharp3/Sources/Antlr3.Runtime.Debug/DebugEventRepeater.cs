@@ -46,7 +46,7 @@ namespace Antlr.Runtime.Debug
      */
     public class DebugEventRepeater : IDebugEventListener
     {
-        protected IDebugEventListener _listener;
+        IDebugEventListener _listener;
 
         public DebugEventRepeater( IDebugEventListener listener )
         {

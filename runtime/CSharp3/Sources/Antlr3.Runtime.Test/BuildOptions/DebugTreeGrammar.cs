@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\DebugTreeGrammar.g3 2009-04-18 02:34:36
+// $ANTLR 3.1.2 BuildOptions\\DebugTreeGrammar.g3 2009-05-07 13:12:29
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -23,7 +23,7 @@ using Antlr.Runtime.Debug;
 using IOException = System.IO.IOException;
 public partial class DebugTreeGrammar : DebugTreeParser
 {
-	public static readonly string[] tokenNames = new string[] {
+	internal static readonly string[] tokenNames = new string[] {
 		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "CALL", "FUNC", "ID", "INT", "NEWLINE", "WS", "'-'", "'%'", "'('", "')'", "'*'", "'/'", "'+'", "'='"
 	};
 	public const int EOF=-1;
@@ -810,7 +810,7 @@ public partial class DebugTreeGrammar : DebugTreeParser
 
 
 	#region Follow sets
-	public static class Follow
+	static class Follow
 	{
 		public static readonly BitSet _stat_in_prog48 = new BitSet(new ulong[]{0x3CCF2UL});
 		public static readonly BitSet _expr_in_stat63 = new BitSet(new ulong[]{0x2UL});

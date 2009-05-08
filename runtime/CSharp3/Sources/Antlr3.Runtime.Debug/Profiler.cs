@@ -51,17 +51,17 @@ namespace Antlr.Runtime.Debug
          *  computations to be consistent.
          */
         public const string Version = "2";
-        public const string RUNTIME_STATS_FILENAME = "runtime.stats";
-        public const int NUM_RUNTIME_STATS = 29;
+        public const string RuntimeStatsFileName = "runtime.stats";
+        public const int NumRuntimeStats = 29;
 
-        public DebugParser parser = null;
+        DebugParser _parser = null;
 
         #region working variables
 
-        protected int ruleLevel = 0;
-        protected int decisionLevel = 0;
-        protected int maxLookaheadInCurrentDecision = 0;
-        protected CommonToken lastTokenConsumed = null;
+        int _ruleLevel = 0;
+        int _decisionLevel = 0;
+        int _maxLookaheadInCurrentDecision = 0;
+        CommonToken _lastTokenConsumed = null;
 
         protected Stack<int> lookaheadStack = new Stack<int>();
 
@@ -97,17 +97,17 @@ namespace Antlr.Runtime.Debug
 
         public Profiler( DebugParser parser )
         {
-            this.parser = parser;
+            this._parser = parser;
         }
 
         public override void EnterRule( string grammarFileName, string ruleName )
         {
             //System.out.println("enterRule "+ruleName);
-            ruleLevel++;
+            _ruleLevel++;
             numRuleInvocations++;
-            if ( ruleLevel > maxRuleInvocationDepth )
+            if ( _ruleLevel > maxRuleInvocationDepth )
             {
-                maxRuleInvocationDepth = ruleLevel;
+                maxRuleInvocationDepth = _ruleLevel;
             }
 
         }
@@ -123,7 +123,7 @@ namespace Antlr.Runtime.Debug
                                            string ruleName )
         {
             //System.out.println("examine memo "+ruleName);
-            int stopIndex = parser.GetRuleMemoization( ruleIndex, input.Index );
+            int stopIndex = _parser.GetRuleMemoization( ruleIndex, input.Index );
             if ( stopIndex == BaseRecognizer.MemoRuleUnknown )
             {
                 //System.out.println("rule "+ruleIndex+" missed @ "+input.index());
@@ -150,13 +150,13 @@ namespace Antlr.Runtime.Debug
 
         public override void ExitRule( string grammarFileName, string ruleName )
         {
-            ruleLevel--;
+            _ruleLevel--;
         }
 
         public override void EnterDecision( int decisionNumber )
         {
-            decisionLevel++;
-            int startingLookaheadIndex = parser.TokenStream.Index;
+            _decisionLevel++;
+            int startingLookaheadIndex = _parser.TokenStream.Index;
             //System.out.println("enterDecision "+decisionNumber+" @ index "+startingLookaheadIndex);
             lookaheadStack.Push( startingLookaheadIndex );
         }
@@ -166,7 +166,7 @@ namespace Antlr.Runtime.Debug
             //System.out.println("exitDecision "+decisionNumber);
             // track how many of acyclic, cyclic here as we don't know what kind
             // yet in enterDecision event.
-            if ( parser.isCyclicDecision )
+            if ( _parser.isCyclicDecision )
             {
                 numCyclicDecisions++;
             }
@@ -175,8 +175,8 @@ namespace Antlr.Runtime.Debug
                 numFixedDecisions++;
             }
             lookaheadStack.Pop(); // pop lookahead depth counter
-            decisionLevel--;
-            if ( parser.isCyclicDecision )
+            _decisionLevel--;
+            if ( _parser.isCyclicDecision )
             {
                 if ( numCyclicDecisions >= decisionMaxCyclicLookaheads.Length )
                 {
@@ -184,7 +184,7 @@ namespace Antlr.Runtime.Debug
                     Array.Copy( decisionMaxCyclicLookaheads, bigger, decisionMaxCyclicLookaheads.Length );
                     decisionMaxCyclicLookaheads = bigger;
                 }
-                decisionMaxCyclicLookaheads[numCyclicDecisions - 1] = maxLookaheadInCurrentDecision;
+                decisionMaxCyclicLookaheads[numCyclicDecisions - 1] = _maxLookaheadInCurrentDecision;
             }
             else
             {
@@ -194,16 +194,16 @@ namespace Antlr.Runtime.Debug
                     Array.Copy( decisionMaxFixedLookaheads, bigger, decisionMaxFixedLookaheads.Length );
                     decisionMaxFixedLookaheads = bigger;
                 }
-                decisionMaxFixedLookaheads[numFixedDecisions - 1] = maxLookaheadInCurrentDecision;
+                decisionMaxFixedLookaheads[numFixedDecisions - 1] = _maxLookaheadInCurrentDecision;
             }
-            parser.isCyclicDecision = false; // can't nest so just reset to false
-            maxLookaheadInCurrentDecision = 0;
+            _parser.isCyclicDecision = false; // can't nest so just reset to false
+            _maxLookaheadInCurrentDecision = 0;
         }
 
         public override void ConsumeToken( IToken token )
         {
             //System.out.println("consume token "+token);
-            lastTokenConsumed = (CommonToken)token;
+            _lastTokenConsumed = (CommonToken)token;
         }
 
         /** <summary>
@@ -215,14 +215,14 @@ namespace Antlr.Runtime.Debug
         {
             get
             {
-                return decisionLevel > 0;
+                return _decisionLevel > 0;
             }
         }
 
         public override void ConsumeHiddenToken( IToken token )
         {
             //System.out.println("consume hidden token "+token);
-            lastTokenConsumed = (CommonToken)token;
+            _lastTokenConsumed = (CommonToken)token;
         }
 
         /** <summary>Track refs to lookahead if in a fixed/nonfixed decision.</summary> */
@@ -233,16 +233,16 @@ namespace Antlr.Runtime.Debug
                 // get starting index off stack
                 int startingIndex = lookaheadStack.Peek();
                 // compute lookahead depth
-                int thisRefIndex = parser.TokenStream.Index;
+                int thisRefIndex = _parser.TokenStream.Index;
                 int numHidden = GetNumberOfHiddenTokens( startingIndex, thisRefIndex );
                 int depth = i + thisRefIndex - startingIndex - numHidden;
                 /*
                 System.out.println("LT("+i+") @ index "+thisRefIndex+" is depth "+depth+
                     " max is "+maxLookaheadInCurrentDecision);
                 */
-                if ( depth > maxLookaheadInCurrentDecision )
+                if ( depth > _maxLookaheadInCurrentDecision )
                 {
-                    maxLookaheadInCurrentDecision = depth;
+                    _maxLookaheadInCurrentDecision = depth;
                 }
             }
         }
@@ -277,7 +277,7 @@ namespace Antlr.Runtime.Debug
         {
             //System.out.println("exit backtrack "+level+": "+successful);
             decisionMaxSynPredLookaheads.Add(
-                maxLookaheadInCurrentDecision
+                _maxLookaheadInCurrentDecision
             );
         }
 
@@ -320,7 +320,7 @@ namespace Antlr.Runtime.Debug
             string stats = ToNotifyString();
             try
             {
-                Stats.WriteReport( RUNTIME_STATS_FILENAME, stats );
+                Stats.WriteReport( RuntimeStatsFileName, stats );
             }
             catch ( IOException ioe )
             {
@@ -332,15 +332,15 @@ namespace Antlr.Runtime.Debug
 
         public virtual void SetParser( DebugParser parser )
         {
-            this.parser = parser;
+            this._parser = parser;
         }
 
         #region Reporting
 
         public virtual string ToNotifyString()
         {
-            ITokenStream input = parser.TokenStream;
-            for ( int i = 0; i < input.Count && lastTokenConsumed != null && i <= lastTokenConsumed.TokenIndex; i++ )
+            ITokenStream input = _parser.TokenStream;
+            for ( int i = 0; i < input.Count && _lastTokenConsumed != null && i <= _lastTokenConsumed.TokenIndex; i++ )
             {
                 IToken t = input.Get( i );
                 if ( t.Channel != TokenChannels.Default )
@@ -349,13 +349,13 @@ namespace Antlr.Runtime.Debug
                     numHiddenCharsMatched += t.Text.Length;
                 }
             }
-            numCharsMatched = lastTokenConsumed.StopIndex + 1;
+            numCharsMatched = _lastTokenConsumed.StopIndex + 1;
             decisionMaxFixedLookaheads = Trim( decisionMaxFixedLookaheads, numFixedDecisions );
             decisionMaxCyclicLookaheads = Trim( decisionMaxCyclicLookaheads, numCyclicDecisions );
             StringBuilder buf = new StringBuilder();
             buf.Append( Version );
             buf.Append( '\t' );
-            buf.Append( parser.GetType().Name );
+            buf.Append( _parser.GetType().Name );
             buf.Append( '\t' );
             buf.Append( numRuleInvocations );
             buf.Append( '\t' );
@@ -393,7 +393,7 @@ namespace Antlr.Runtime.Debug
             buf.Append( '\t' );
             buf.Append( numSemanticPredicates );
             buf.Append( '\t' );
-            buf.Append( parser.TokenStream.Count );
+            buf.Append( _parser.TokenStream.Count );
             buf.Append( '\t' );
             buf.Append( numHiddenTokens );
             buf.Append( '\t' );
@@ -420,7 +420,7 @@ namespace Antlr.Runtime.Debug
 
         protected static string[] DecodeReportData( string data )
         {
-            string[] fields = new string[NUM_RUNTIME_STATS];
+            string[] fields = new string[NumRuntimeStats];
             StringTokenizer st = new StringTokenizer( data, "\t" );
             int i = 0;
             while ( st.hasMoreTokens() )
@@ -428,7 +428,7 @@ namespace Antlr.Runtime.Debug
                 fields[i] = st.nextToken();
                 i++;
             }
-            if ( i != NUM_RUNTIME_STATS )
+            if ( i != NumRuntimeStats )
             {
                 return null;
             }
@@ -550,7 +550,7 @@ namespace Antlr.Runtime.Debug
         public virtual int GetNumberOfHiddenTokens( int i, int j )
         {
             int n = 0;
-            ITokenStream input = parser.TokenStream;
+            ITokenStream input = _parser.TokenStream;
             for ( int ti = i; ti < input.Count && ti <= j; ti++ )
             {
                 IToken t = input.Get( ti );

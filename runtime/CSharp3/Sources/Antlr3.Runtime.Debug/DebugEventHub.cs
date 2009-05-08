@@ -44,7 +44,7 @@ namespace Antlr.Runtime.Debug
      */
     public class DebugEventHub : IDebugEventListener
     {
-        protected IList<IDebugEventListener> _listeners = new List<IDebugEventListener>();
+        List<IDebugEventListener> _listeners = new List<IDebugEventListener>();
 
         public DebugEventHub( params IDebugEventListener[] listeners )
         {

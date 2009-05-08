@@ -98,7 +98,7 @@ partial class DebugTreeGrammar
     }
 
     /** Get value of name up call stack. */
-    public BigInteger getValue( string name )
+    internal BigInteger getValue( string name )
     {
         BigInteger value;
         if ( localMemory.TryGetValue( name, out value ) && value != null )

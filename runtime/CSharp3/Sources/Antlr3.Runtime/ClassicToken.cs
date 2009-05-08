@@ -32,8 +32,6 @@
 
 namespace Antlr.Runtime
 {
-    using Regex = System.Text.RegularExpressions.Regex;
-
     /** <summary>
      *  A Token object like we'd use in ANTLR 2.x; has an actual string created
      *  and associated with this object.  These objects are needed for imaginary
@@ -46,14 +44,14 @@ namespace Antlr.Runtime
     [System.Serializable]
     public class ClassicToken : IToken
     {
-        protected string text;
-        protected int type;
-        protected int line;
-        protected int charPositionInLine;
-        protected int channel = TokenChannels.Default;
+        string text;
+        int type;
+        int line;
+        int charPositionInLine;
+        int channel = TokenChannels.Default;
 
         /** <summary>What token number is this from 0..n-1 tokens</summary> */
-        protected int index;
+        int index;
 
         public ClassicToken( int type )
         {
@@ -143,6 +141,28 @@ namespace Antlr.Runtime
             }
         }
 
+        public int StartIndex
+        {
+            get
+            {
+                return -1;
+            }
+            set
+            {
+            }
+        }
+
+        public int StopIndex
+        {
+            get
+            {
+                return -1;
+            }
+            set
+            {
+            }
+        }
+
         public int TokenIndex
         {
             get
@@ -178,9 +198,9 @@ namespace Antlr.Runtime
             string txt = Text;
             if ( txt != null )
             {
-                txt = Regex.Replace( txt, "\n", "\\\\n" );
-                txt = Regex.Replace( txt, "\r", "\\\\r" );
-                txt = Regex.Replace( txt, "\t", "\\\\t" );
+                txt = txt.Replace( "\n", "\\\\n" );
+                txt = txt.Replace( "\r", "\\\\r" );
+                txt = txt.Replace( "\t", "\\\\t" );
             }
             else
             {

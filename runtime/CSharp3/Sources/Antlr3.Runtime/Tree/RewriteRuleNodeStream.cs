@@ -63,7 +63,7 @@ namespace Antlr.Runtime.Tree
 
         public virtual object NextNode()
         {
-            return _Next();
+            return NextCore();
         }
 
         protected override object ToTree( object el )

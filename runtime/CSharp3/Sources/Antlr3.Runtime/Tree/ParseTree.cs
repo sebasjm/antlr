@@ -146,21 +146,21 @@ namespace Antlr.Runtime.Tree
         public virtual string ToInputString()
         {
             StringBuilder buf = new StringBuilder();
-            _ToStringLeaves( buf );
+            ToStringLeaves( buf );
             return buf.ToString();
         }
 
-        public virtual void _ToStringLeaves( StringBuilder buf )
+        protected virtual void ToStringLeaves( StringBuilder buf )
         {
             if ( payload is IToken )
             { // leaf node token?
                 buf.Append( this.ToStringWithHiddenTokens() );
                 return;
             }
-            for ( int i = 0; children != null && i < children.Count; i++ )
+            for ( int i = 0; Children != null && i < Children.Count; i++ )
             {
-                ParseTree t = (ParseTree)children[i];
-                t._ToStringLeaves( buf );
+                ParseTree t = (ParseTree)Children[i];
+                t.ToStringLeaves( buf );
             }
         }
     }

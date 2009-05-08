@@ -35,6 +35,7 @@ namespace Antlr.Runtime
     using System.Collections.Generic;
 
     using Array = System.Array;
+    using CLSCompliant = System.CLSCompliantAttribute;
     using ICloneable = System.ICloneable;
     using Math = System.Math;
     using StringBuilder = System.Text.StringBuilder;
@@ -70,6 +71,7 @@ namespace Antlr.Runtime
         }
 
         /** <summary>Construction from a static array of longs</summary> */
+        [CLSCompliant( false )]
         public BitSet( ulong[] bits )
         {
             _bits = bits;
@@ -338,11 +340,6 @@ namespace Antlr.Runtime
                 }
             }
             return elems;
-        }
-
-        public virtual ulong[] ToPackedArray()
-        {
-            return _bits;
         }
 
         private static int WordNumber( int bit )

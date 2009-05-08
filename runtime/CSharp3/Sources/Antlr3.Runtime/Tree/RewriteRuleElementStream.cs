@@ -156,11 +156,11 @@ namespace Antlr.Runtime.Tree
             if ( dirty || ( cursor >= n && n == 1 ) )
             {
                 // if out of elements and size is 1, dup
-                object el = _Next();
+                object el = NextCore();
                 return Dup( el );
             }
             // test size above then fetch
-            object el2 = _Next();
+            object el2 = NextCore();
             return el2;
         }
 
@@ -172,7 +172,7 @@ namespace Antlr.Runtime.Tree
          *  protected so you can override in a subclass if necessary.
          *  </summary>
          */
-        protected virtual object _Next()
+        protected virtual object NextCore()
         {
             int n = Count;
             if ( n == 0 )

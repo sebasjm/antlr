@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 SimpleExpression.g3 2009-05-03 05:39:08
+// $ANTLR 3.1.2 SimpleExpression.g3 2009-05-07 13:13:51
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -18,7 +18,7 @@ using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 
 public partial class SimpleExpressionParser : Parser
 {
-	public static readonly string[] tokenNames = new string[] {
+	internal static readonly string[] tokenNames = new string[] {
 		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "IDENTIFIER", "NUMBER", "WS", "'-'", "'%'", "'*'", "'/'", "'+'"
 	};
 	public const int EOF=-1;
@@ -69,7 +69,7 @@ public partial class SimpleExpressionParser : Parser
 	#region Rules
 	public class expression_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -129,7 +129,7 @@ public partial class SimpleExpressionParser : Parser
 
 	public class additive_expression_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -267,7 +267,7 @@ public partial class SimpleExpressionParser : Parser
 
 	public class multiplicative_expression_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -426,7 +426,7 @@ public partial class SimpleExpressionParser : Parser
 
 	public class atom_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -489,7 +489,7 @@ public partial class SimpleExpressionParser : Parser
 
 
 	#region Follow sets
-	public static class Follow
+	static class Follow
 	{
 		public static readonly BitSet _additive_expression_in_expression39 = new BitSet(new ulong[]{0x0UL});
 		public static readonly BitSet _EOF_in_expression43 = new BitSet(new ulong[]{0x2UL});

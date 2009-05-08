@@ -50,7 +50,7 @@ namespace Antlr.Runtime
     public class CommonTokenStream : ITokenStream
     {
         [System.NonSerialized]
-        protected ITokenSource tokenSource;
+        ITokenSource _tokenSource;
 
         /** <summary>
          *  Record every single token pulled from the source so we can reproduce
@@ -89,7 +89,7 @@ namespace Antlr.Runtime
         public CommonTokenStream( ITokenSource tokenSource )
             : this()
         {
-            this.tokenSource = tokenSource;
+            this._tokenSource = tokenSource;
         }
 
         public CommonTokenStream( ITokenSource tokenSource, int channel )
@@ -109,7 +109,7 @@ namespace Antlr.Runtime
         /** <summary>Reset this token stream by setting its token source.</summary> */
         public virtual void SetTokenSource( ITokenSource tokenSource )
         {
-            this.tokenSource = tokenSource;
+            this._tokenSource = tokenSource;
             tokens.Clear();
             p = -1;
             channel = TokenChannels.Default;
@@ -128,7 +128,7 @@ namespace Antlr.Runtime
                 return;
 
             int index = 0;
-            IToken t = tokenSource.NextToken();
+            IToken t = _tokenSource.NextToken();
             while ( t != null && t.Type != CharStreamConstants.EndOfFile )
             {
                 bool discard = false;
@@ -160,7 +160,7 @@ namespace Antlr.Runtime
                     tokens.Add( t );
                     index++;
                 }
-                t = tokenSource.NextToken();
+                t = _tokenSource.NextToken();
             }
             // leave p pointing at first token on channel
             p = 0;
@@ -441,7 +441,7 @@ namespace Antlr.Runtime
         {
             get
             {
-                return tokenSource;
+                return _tokenSource;
             }
         }
 

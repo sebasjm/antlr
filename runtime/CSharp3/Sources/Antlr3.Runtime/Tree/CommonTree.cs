@@ -32,6 +32,8 @@
 
 namespace Antlr.Runtime.Tree
 {
+    using CLSCompliant = System.CLSCompliantAttribute;
+
     /** <summary>
      *  A tree node that is wrapper for a Token object.  After 3.0 release
      *  while building tree rewrite stuff, it became clear that computing
@@ -44,6 +46,7 @@ namespace Antlr.Runtime.Tree
     public class CommonTree : BaseTree
     {
         /** <summary>A single token is the payload</summary> */
+        [CLSCompliant( false )]
         public IToken token;
 
         /** <summary>
@@ -55,10 +58,10 @@ namespace Antlr.Runtime.Tree
         protected int stopIndex = -1;
 
         /** <summary>Who is the parent node of this node; if null, implies node is root</summary> */
-        public CommonTree parent;
+        CommonTree parent;
 
         /** <summary>What index is this node in the child list? Range: 0..n-1</summary> */
-        public int childIndex = -1;
+        int childIndex = -1;
 
         public CommonTree()
         {
@@ -164,6 +167,10 @@ namespace Antlr.Runtime.Tree
             {
                 return token;
             }
+            set
+            {
+                token = value;
+            }
         }
         public override int TokenStartIndex
         {
@@ -223,7 +230,7 @@ namespace Antlr.Runtime.Tree
          */
         public virtual void SetUnknownTokenBoundaries()
         {
-            if ( children == null )
+            if ( Children == null )
             {
                 if ( startIndex < 0 || stopIndex < 0 )
                 {
@@ -231,16 +238,16 @@ namespace Antlr.Runtime.Tree
                 }
                 return;
             }
-            for ( int i = 0; i < children.Count; i++ )
+            for ( int i = 0; i < Children.Count; i++ )
             {
-                ( (CommonTree)children[i] ).SetUnknownTokenBoundaries();
+                ( (CommonTree)Children[i] ).SetUnknownTokenBoundaries();
             }
             if ( startIndex >= 0 && stopIndex >= 0 )
                 return; // already set
-            if ( children.Count > 0 )
+            if ( Children.Count > 0 )
             {
-                CommonTree firstChild = (CommonTree)children[0];
-                CommonTree lastChild = (CommonTree)children[children.Count - 1];
+                CommonTree firstChild = (CommonTree)Children[0];
+                CommonTree lastChild = (CommonTree)Children[Children.Count - 1];
                 startIndex = firstChild.TokenStartIndex;
                 stopIndex = lastChild.TokenStopIndex;
             }

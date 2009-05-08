@@ -33,6 +33,7 @@
 namespace Antlr.Runtime
 {
     using System.Collections.Generic;
+    using CLSCompliant = System.CLSCompliantAttribute;
 
     /** <summary>
      *  The set of fields needed by an abstract recognizer to recognize input
@@ -53,7 +54,9 @@ namespace Antlr.Runtime
          *  and keeps going.
          *  </summary>
          */
+        //public List<BitSet> following;
         public BitSet[] following;
+        [CLSCompliant( false )]
         public int _fsp;
 
         /** <summary>
@@ -148,6 +151,7 @@ namespace Antlr.Runtime
 
         public RecognizerSharedState()
         {
+            //following = new List<BitSet>( BaseRecognizer.InitialFollowStackSize );
             following = new BitSet[BaseRecognizer.InitialFollowStackSize];
             _fsp = -1;
             lastErrorIndex = -1;

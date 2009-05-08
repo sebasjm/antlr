@@ -42,8 +42,10 @@ namespace Antlr.Runtime.Tree
     [System.Serializable]
     public class TreeRuleReturnScope : RuleReturnScope
     {
-        /** <summary>First node or root node of tree matched for this rule.</summary> */
+        [System.CLSCompliant( false )]
         public object start;
+
+        /** <summary>Gets the first node or root node of tree matched for this rule.</summary> */
         public override object Start
         {
             get

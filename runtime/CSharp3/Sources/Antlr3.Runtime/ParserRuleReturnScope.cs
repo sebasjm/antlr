@@ -32,6 +32,7 @@
 
 namespace Antlr.Runtime
 {
+    using CLSCompliant = System.CLSCompliantAttribute;
 
     /** <summary>
      *  Rules that return more than a single value must return an object
@@ -57,7 +58,9 @@ namespace Antlr.Runtime
      */
     public class ParserRuleReturnScope : RuleReturnScope
     {
+        [CLSCompliant( false )]
         public IToken start;
+        [CLSCompliant( false )]
         public IToken stop;
 
         public override object Start

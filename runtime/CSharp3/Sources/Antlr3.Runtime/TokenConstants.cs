@@ -64,7 +64,7 @@ namespace Antlr.Runtime
 
     public static class Tokens
     {
-        public static readonly IToken EndOfFile = new CommonToken( TokenTypes.EndOfFile );
+        public static readonly IToken EndOfFile = Tokens<CommonToken>.EndOfFile;
 
         public static readonly IToken Invalid = new CommonToken( TokenTypes.Invalid );
 
@@ -74,5 +74,24 @@ namespace Antlr.Runtime
          *  </summary>
          */
         public static readonly IToken Skip = new CommonToken( TokenTypes.Invalid );
+    }
+
+    public static class Tokens<T>
+        where T : IToken, new()
+    {
+        public static readonly T EndOfFile = new T()
+        {
+            Type = TokenTypes.EndOfFile
+        };
+
+        public static readonly T Invalid = new T()
+        {
+            Type = TokenTypes.Invalid
+        };
+
+        public static readonly T Skip = new T()
+        {
+            Type = TokenTypes.Invalid
+        };
     }
 }

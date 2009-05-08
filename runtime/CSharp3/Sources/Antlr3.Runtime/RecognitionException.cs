@@ -191,7 +191,7 @@ namespace Antlr.Runtime
                 this.charPositionInLine = ( (Tree.ITree)this.node ).CharPositionInLine;
                 if ( this.node is CommonTree )
                 {
-                    this.token = ( (CommonTree)this.node ).token;
+                    this.token = ( (CommonTree)this.node ).Token;
                 }
             }
             else

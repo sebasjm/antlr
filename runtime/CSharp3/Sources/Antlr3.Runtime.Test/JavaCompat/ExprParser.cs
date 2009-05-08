@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-04-18 02:34:06
+// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-05-07 13:12:26
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -22,7 +22,7 @@ using ArrayList = System.Collections.Generic.List<object>;
 
 public partial class ExprParser : Parser
 {
-	public static readonly string[] tokenNames = new string[] {
+	internal static readonly string[] tokenNames = new string[] {
 		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "ID", "INT", "NEWLINE", "WS", "'-'", "'('", "')'", "'*'", "'+'", "'='"
 	};
 	public const int EOF=-1;
@@ -491,7 +491,7 @@ public partial class ExprParser : Parser
 
 
 	#region Follow sets
-	public static class Follow
+	static class Follow
 	{
 		public static readonly BitSet _stat_in_prog40 = new BitSet(new ulong[]{0x272UL});
 		public static readonly BitSet _expr_in_stat51 = new BitSet(new ulong[]{0x40UL});

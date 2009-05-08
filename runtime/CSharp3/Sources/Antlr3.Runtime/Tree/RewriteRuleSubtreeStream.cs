@@ -79,11 +79,11 @@ namespace Antlr.Runtime.Tree
             {
                 // if out of elements and size is 1, dup (at most a single node
                 // since this is for making root nodes).
-                object el = _Next();
+                object el = NextCore();
                 return adaptor.DupNode( el );
             }
             // test size above then fetch
-            object el2 = _Next();
+            object el2 = NextCore();
             return el2;
         }
 

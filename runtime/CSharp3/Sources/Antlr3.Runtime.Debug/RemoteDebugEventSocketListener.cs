@@ -150,6 +150,28 @@ namespace Antlr.Runtime.Debug
                 }
             }
 
+            public int StartIndex
+            {
+                get
+                {
+                    return -1;
+                }
+                set
+                {
+                }
+            }
+
+            public int StopIndex
+            {
+                get
+                {
+                    return -1;
+                }
+                set
+                {
+                }
+            }
+
             public int TokenIndex
             {
                 get
@@ -189,11 +211,11 @@ namespace Antlr.Runtime.Debug
         public class ProxyTree : BaseTree
         {
             public int ID;
-            public int type;
-            public int line = 0;
+            int type;
+            int line = 0;
             public int charPos = -1;
             public int tokenIndex = -1;
-            public string text;
+            string text;
 
             public ProxyTree( int ID, int type, int line, int charPos, int tokenIndex, string text )
             {

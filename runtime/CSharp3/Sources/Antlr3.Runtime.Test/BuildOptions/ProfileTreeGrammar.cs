@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\ProfileTreeGrammar.g3 2009-04-17 13:32:27
+// $ANTLR 3.1.2 BuildOptions\\ProfileTreeGrammar.g3 2009-05-07 13:12:32
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -23,7 +23,7 @@ using Antlr.Runtime.Debug;
 using IOException = System.IO.IOException;
 public partial class ProfileTreeGrammar : DebugTreeParser
 {
-	public static readonly string[] tokenNames = new string[] {
+	internal static readonly string[] tokenNames = new string[] {
 		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "CALL", "FUNC", "ID", "INT", "NEWLINE", "WS", "'-'", "'%'", "'('", "')'", "'*'", "'/'", "'+'", "'='"
 	};
 	public const int EOF=-1;
@@ -90,7 +90,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 	}
 
 
-	public override string[] GetTokenNames() { return ProfileTreeGrammar.tokenNames; }
+	public override string[] TokenNames { get { return ProfileTreeGrammar.tokenNames; } }
 	public override string GrammarFileName { get { return "BuildOptions\\ProfileTreeGrammar.g3"; } }
 
 
@@ -815,7 +815,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 
 
 	#region Follow sets
-	public static class Follow
+	static class Follow
 	{
 		public static readonly BitSet _stat_in_prog48 = new BitSet(new ulong[]{0x3CCF2UL});
 		public static readonly BitSet _expr_in_stat63 = new BitSet(new ulong[]{0x2UL});

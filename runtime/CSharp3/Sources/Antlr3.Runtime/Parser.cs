@@ -123,26 +123,5 @@ namespace Antlr.Runtime
         {
             base.TraceOut( ruleName, ruleIndex, input.LT( 1 ) );
         }
-
-#if false
-        protected bool EvaluatePredicate( System.Action predicate )
-        {
-            state.backtracking++;
-            int start = input.Mark();
-            try
-            {
-                predicate();
-            }
-            catch ( RecognitionException re )
-            {
-                System.Console.Error.WriteLine( "impossible: " + re );
-            }
-            bool success = !state.failed;
-            input.Rewind( start );
-            state.backtracking--;
-            state.failed = false;
-            return success;
-        }
-#endif
     }
 }

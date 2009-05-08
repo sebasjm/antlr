@@ -63,6 +63,10 @@ namespace Antlr.Runtime
         /** <summary>The char position into the input buffer where this token stops</summary> */
         int stop;
 
+        public CommonToken()
+        {
+        }
+
         public CommonToken( int type )
         {
             this.type = type;
@@ -174,6 +178,30 @@ namespace Antlr.Runtime
             }
         }
 
+        public int StartIndex
+        {
+            get
+            {
+                return start;
+            }
+            set
+            {
+                start = value;
+            }
+        }
+
+        public int StopIndex
+        {
+            get
+            {
+                return stop;
+            }
+            set
+            {
+                stop = value;
+            }
+        }
+
         public int TokenIndex
         {
             get
@@ -199,30 +227,6 @@ namespace Antlr.Runtime
         }
 
         #endregion
-
-        public int StartIndex
-        {
-            get
-            {
-                return start;
-            }
-            set
-            {
-                start = value;
-            }
-        }
-
-        public int StopIndex
-        {
-            get
-            {
-                return stop;
-            }
-            set
-            {
-                stop = value;
-            }
-        }
 
         public override string ToString()
         {

@@ -239,15 +239,15 @@ namespace Antlr.Runtime.Tree
          *  TODO: save this index so that find and visit are faster
          *  </remarks>
          */
-        public virtual IDictionary<int, IList> Index( object t )
+        public IDictionary<int, IList> Index( object t )
         {
             IDictionary<int, IList> m = new Dictionary<int, IList>();
-            _Index( t, m );
+            IndexCore( t, m );
             return m;
         }
 
         /** <summary>Do the work for index</summary> */
-        protected virtual void _Index( object t, IDictionary<int, IList> m )
+        protected virtual void IndexCore( object t, IDictionary<int, IList> m )
         {
             if ( t == null )
             {
@@ -265,7 +265,7 @@ namespace Antlr.Runtime.Tree
             for ( int i = 0; i < n; i++ )
             {
                 object child = adaptor.GetChild( t, i );
-                _Index( child, m );
+                IndexCore( child, m );
             }
         }
 
@@ -295,7 +295,7 @@ namespace Antlr.Runtime.Tree
 
             public void Visit( object t, object parent, int childIndex, IDictionary<string, object> labels )
             {
-                if ( _outer._Parse( t, _tpattern, null ) )
+                if ( _outer.ParseCore( t, _tpattern, null ) )
                 {
                     _subtrees.Add( t );
                 }
@@ -348,18 +348,18 @@ namespace Antlr.Runtime.Tree
          *  a token type rather than a pattern doesn't let us set a label.
          *  </summary>
          */
-        public virtual void Visit( object t, int ttype, IContextVisitor visitor )
+        public void Visit( object t, int ttype, IContextVisitor visitor )
         {
-            _Visit( t, null, 0, ttype, visitor );
+            VisitCore( t, null, 0, ttype, visitor );
         }
 
-        public virtual void Visit( object t, int ttype, System.Action<object> action )
+        public void Visit( object t, int ttype, System.Action<object> action )
         {
             Visit( t, ttype, new ActionVisitor( action ) );
         }
 
         /** <summary>Do the recursive work for visit</summary> */
-        protected virtual void _Visit( object t, object parent, int childIndex, int ttype, IContextVisitor visitor )
+        protected virtual void VisitCore( object t, object parent, int childIndex, int ttype, IContextVisitor visitor )
         {
             if ( t == null )
             {
@@ -373,7 +373,7 @@ namespace Antlr.Runtime.Tree
             for ( int i = 0; i < n; i++ )
             {
                 object child = adaptor.GetChild( t, i );
-                _Visit( child, t, i, ttype, visitor );
+                VisitCore( child, t, i, ttype, visitor );
             }
         }
 
@@ -396,7 +396,7 @@ namespace Antlr.Runtime.Tree
             {
                 // the unusedlabels arg is null as visit on token type doesn't set.
                 _labels.Clear();
-                if ( _outer._Parse( t, _tpattern, _labels ) )
+                if ( _outer.ParseCore( t, _tpattern, _labels ) )
                 {
                     _visitor.Visit( t, parent, childIndex, _labels );
                 }
@@ -410,7 +410,7 @@ namespace Antlr.Runtime.Tree
          *  Patterns with wildcard roots are also not allowed.
          *  </summary>
          */
-        public virtual void Visit( object t, string pattern, IContextVisitor visitor )
+        public void Visit( object t, string pattern, IContextVisitor visitor )
         {
             // Create a TreePattern from the pattern
             TreePatternLexer tokenizer = new TreePatternLexer( pattern );
@@ -444,7 +444,7 @@ namespace Antlr.Runtime.Tree
          *  TODO: what's a better way to indicate bad pattern? Exceptions are a hassle 
          *  </remarks>
          */
-        public virtual bool Parse( object t, string pattern, IDictionary<string, object> labels )
+        public bool Parse( object t, string pattern, IDictionary<string, object> labels )
         {
             TreePatternLexer tokenizer = new TreePatternLexer( pattern );
             TreePatternParser parser =
@@ -454,11 +454,11 @@ namespace Antlr.Runtime.Tree
             System.out.println("t="+((Tree)t).toStringTree());
             System.out.println("scant="+tpattern.toStringTree());
             */
-            bool matched = _Parse( t, tpattern, labels );
+            bool matched = ParseCore( t, tpattern, labels );
             return matched;
         }
 
-        public virtual bool Parse( object t, string pattern )
+        public bool Parse( object t, string pattern )
         {
             return Parse( t, pattern, null );
         }
@@ -470,7 +470,7 @@ namespace Antlr.Runtime.Tree
          *  in tree matched against nodes in pattern with labels.
          *  </summary>
          */
-        protected virtual bool _Parse( object t1, TreePattern tpattern, IDictionary<string, object> labels )
+        protected virtual bool ParseCore( object t1, TreePattern tpattern, IDictionary<string, object> labels )
         {
             // make sure both are non-null
             if ( t1 == null || tpattern == null )
@@ -506,7 +506,7 @@ namespace Antlr.Runtime.Tree
             {
                 object child1 = adaptor.GetChild( t1, i );
                 TreePattern child2 = (TreePattern)tpattern.GetChild( i );
-                if ( !_Parse( child1, child2, labels ) )
+                if ( !ParseCore( child1, child2, labels ) )
                 {
                     return false;
                 }
@@ -555,7 +555,7 @@ namespace Antlr.Runtime.Tree
          */
         public static bool Equals( object t1, object t2, ITreeAdaptor adaptor )
         {
-            return _Equals( t1, t2, adaptor );
+            return EqualsCore( t1, t2, adaptor );
         }
 
         /** <summary>
@@ -563,12 +563,12 @@ namespace Antlr.Runtime.Tree
          *  this instance of a TreeWizard.
          *  </summary>
          */
-        public virtual new bool Equals( object t1, object t2 )
+        public new bool Equals( object t1, object t2 )
         {
-            return _Equals( t1, t2, adaptor );
+            return EqualsCore( t1, t2, adaptor );
         }
 
-        protected static bool _Equals( object t1, object t2, ITreeAdaptor adaptor )
+        protected static bool EqualsCore( object t1, object t2, ITreeAdaptor adaptor )
         {
             // make sure both are non-null
             if ( t1 == null || t2 == null )
@@ -595,7 +595,7 @@ namespace Antlr.Runtime.Tree
             {
                 object child1 = adaptor.GetChild( t1, i );
                 object child2 = adaptor.GetChild( t2, i );
-                if ( !_Equals( child1, child2, adaptor ) )
+                if ( !EqualsCore( child1, child2, adaptor ) )
                 {
                     return false;
                 }

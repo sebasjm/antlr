@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\ProfileGrammar.g3 2009-03-20 14:23:07
+// $ANTLR 3.1.2 BuildOptions\\ProfileGrammar.g3 2009-05-07 13:14:16
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -20,7 +20,7 @@ using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 
 public partial class ProfileGrammarParser : DebugParser
 {
-	public static readonly string[] tokenNames = new string[] {
+	internal static readonly string[] tokenNames = new string[] {
 		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "CALL", "FUNC", "ID", "INT", "NEWLINE", "WS", "'-'", "'%'", "'('", "')'", "'*'", "'/'", "'+'", "'='"
 	};
 	public const int EOF=-1;
@@ -117,14 +117,14 @@ public partial class ProfileGrammarParser : DebugParser
 	}
 
 
-	public override string[] GetTokenNames() { return ProfileGrammarParser.tokenNames; }
+	public override string[] TokenNames { get { return ProfileGrammarParser.tokenNames; } }
 	public override string GrammarFileName { get { return "BuildOptions\\ProfileGrammar.g3"; } }
 
 
 	#region Rules
 	public class prog_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -256,7 +256,7 @@ public partial class ProfileGrammarParser : DebugParser
 
 	public class stat_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -543,7 +543,7 @@ public partial class ProfileGrammarParser : DebugParser
 
 	public class func_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -676,7 +676,7 @@ public partial class ProfileGrammarParser : DebugParser
 		finally
 		{
 
-				  functionDefinitions.Add(((CommonTree)retval.tree));
+				  functionDefinitions.Add(((CommonTree)retval.Tree));
 				
 		}
 		dbg.Location(60, 4);
@@ -698,7 +698,7 @@ public partial class ProfileGrammarParser : DebugParser
 
 	public class formalPar_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -787,7 +787,7 @@ public partial class ProfileGrammarParser : DebugParser
 
 	public class expr_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -1000,7 +1000,7 @@ public partial class ProfileGrammarParser : DebugParser
 
 	public class multExpr_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -1158,7 +1158,7 @@ public partial class ProfileGrammarParser : DebugParser
 
 	public class atom_return : ParserRuleReturnScope
 	{
-		public CommonTree tree;
+		internal CommonTree tree;
 		public override object Tree { get { return tree; } }
 	}
 
@@ -1434,6 +1434,7 @@ public partial class ProfileGrammarParser : DebugParser
 	// $ANTLR end "atom"
 	#endregion Rules
 
+
 	#region DFA
 	DFA2 dfa2;
 
@@ -1516,7 +1517,7 @@ public partial class ProfileGrammarParser : DebugParser
 	#endregion DFA
 
 	#region Follow sets
-	public static class Follow
+	static class Follow
 	{
 		public static readonly BitSet _stat_in_prog53 = new BitSet(new ulong[]{0x11C2UL});
 		public static readonly BitSet _expr_in_stat70 = new BitSet(new ulong[]{0x100UL});

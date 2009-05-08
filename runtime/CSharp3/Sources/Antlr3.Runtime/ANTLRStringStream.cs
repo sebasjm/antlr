@@ -53,10 +53,10 @@ namespace Antlr.Runtime
         protected int p = 0;
 
         /** <summary>line number 1..n within the input</summary> */
-        protected int line = 1;
+        int line = 1;
 
         /** <summary>The index of the character relative to the beginning of the line 0..n-1</summary> */
-        protected int charPositionInLine = 0;
+        int charPositionInLine = 0;
 
         /** <summary>tracks how deep mark() calls are nested</summary> */
         protected int markDepth = 0;

@@ -48,7 +48,7 @@ namespace Antlr.Runtime.Tree
     [System.Serializable]
     public abstract class BaseTree : ITree
     {
-        protected List<ITree> children;
+        List<ITree> children;
 
         public BaseTree()
         {

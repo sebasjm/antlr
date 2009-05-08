@@ -146,7 +146,7 @@ namespace Antlr.Runtime.Tree
         ITreeAdaptor adaptor;
 
         /** <summary>Reuse same DOWN, UP navigation nodes unless this is true</summary> */
-        protected bool uniqueNavigationNodes = false;
+        bool uniqueNavigationNodes = false;
 
         /** <summary>The index into the nodes list of the current node (next node
          *  to consume).  If -1, nodes array not filled yet.</summary>

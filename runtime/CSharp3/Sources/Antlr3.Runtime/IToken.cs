@@ -68,6 +68,18 @@ namespace Antlr.Runtime
             set;
         }
 
+        int StartIndex
+        {
+            get;
+            set;
+        }
+
+        int StopIndex
+        {
+            get;
+            set;
+        }
+
         /** <summary>
          *  An index from 0..n-1 of the token object in the input stream.
          *  This must be valid in order to use the ANTLRWorks debugger.
