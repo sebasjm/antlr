@@ -210,6 +210,8 @@ AC_C_INLINE
 # Checks for library functions.
 AC_CHECK_FUNCS([memmove memset strdup accept])
 
+AC_CONFIG_MACRO_DIR([m4])
+
 AC_CONFIG_HEADERS(antlr3config.h)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
