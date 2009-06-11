@@ -524,6 +524,10 @@ rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot((<ASTLabelType>)(stream_<label> == NULL ? NULL : stream_<label>->nextNode(stream_<label>), root_<treeLevel>));<\n>
 >>
 
+rewriteWildcardLabelRef(label) ::= <<
+ADAPTOR->addChild(ADAPTOR, root_<treeLevel>, stream_<label> == NULL ? NULL : stream_<label>->nextTree(stream_<label>));<\n>
+>>
+
 createImaginaryNode(tokenType,hetero,args) ::= <<
 <if(hetero)>
 <! new MethodNode(IDLabel, args) !>
