@@ -169,8 +169,8 @@ package org.antlr.runtime.tree {
 				newChildren = newTree.children;
 			}
 			else {
-				newChildren = new Array(1);
-				newChildren.add(newTree);
+				newChildren = new Array();
+				newChildren.push(newTree);
 			}
 			replacingWithHowMany = newChildren.length;
 			var numNewChildren:int = newChildren.length;
