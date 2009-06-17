@@ -12,7 +12,7 @@ package org.antlr.runtime {
 		 *  Stack grows upwards.  When it hits the max, it grows 2x in size
 		 *  and keeps going.
 		 */
-		public var following:Array = new Array(BaseRecognizer.INITIAL_FOLLOW_STACK_SIZE);
+		public var following:Array = new Array();
 		public var _fsp:int = -1;
 	
 		/** This is true when we see an error and before having successfully
