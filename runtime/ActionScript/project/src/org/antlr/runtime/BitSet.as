@@ -51,7 +51,7 @@ package org.antlr.runtime {
 	            this.bits = new Array();
 	        }
 	        else {
-    	        this.bits = new Array(bits.length);
+    	        this.bits = new Array();
     			for (var i:int = 0; i < bits.length; i++) {
     				this.bits[i] = bits[i];
     	    	}

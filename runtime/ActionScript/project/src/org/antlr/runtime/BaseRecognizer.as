@@ -701,7 +701,7 @@ package org.antlr.runtime {
 		 */
 		public function toStrings(tokens:Array):Array {
 			if ( tokens==null ) return null;
-			var strings:Array = new Array(tokens.length);
+			var strings:Array = new Array();
 			for (var i:int = 0; i<tokens.length; i++) {
 				strings.push(tokens[i].text);
 			}

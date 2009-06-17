@@ -366,7 +366,7 @@ package org.antlr.runtime.tree {
     			fillBuffer();
     		}
     		var buf:String = "";
-    		for (var i:int = start; i < nodes.size() && i <= stop; i++) {
+    		for (var i:int = start; i < nodes.length && i <= stop; i++) {
     			var t:Object = nodes[i];
     			buf += " ";
     			buf += adaptor.getToken(t);

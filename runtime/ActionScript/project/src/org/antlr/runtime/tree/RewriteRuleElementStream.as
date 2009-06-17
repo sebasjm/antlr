@@ -108,7 +108,7 @@ package org.antlr.runtime.tree {
     			return;
     		}
     		// adding 2nd element, move to list
-    		elements = new Array(5);
+    		elements = new Array();
     		elements.push(singleElement);
     		singleElement = null;
     		elements.push(el);
