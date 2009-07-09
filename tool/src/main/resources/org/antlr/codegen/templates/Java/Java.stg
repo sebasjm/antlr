@@ -71,7 +71,7 @@ import java.util.HashMap;
 <recognizer>
 >>
 
-lexer(grammar, name, tokens, scopes, rules, numRules, labelType="Token",
+lexer(grammar, name, tokens, scopes, rules, numRules, labelType="CommonToken",
       filterMode, superClass="Lexer") ::= <<
 public class <grammar.recognizerName> extends <@superClassName><superClass><@end> {
     <tokens:{public static final int <it.name>=<it.type>;}; separator="\n">
