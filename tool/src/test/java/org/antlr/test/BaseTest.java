@@ -135,6 +135,8 @@ public abstract class BaseTest {
 			stdout.start();
 			stderr.start();
 			process.waitFor();
+            stdout.join();
+            stderr.join();
 			if ( stdout.toString().length()>0 ) {
 				System.err.println("compile stdout from: "+cmdLine);
 				System.err.println(stdout);
