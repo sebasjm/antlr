@@ -36,6 +36,7 @@ public class GrammarInfo {
 	private String grammarName;					// targeted grammar for unit test
 	private String treeGrammarName = null;		// optional, required for testing tree grammar
 	private String header = null;				// optional, required if using java package
+	private String adaptor = null;              // optional, required if using customized tree adaptor
 	private List<gUnitTestSuite> ruleTestSuites = new ArrayList<gUnitTestSuite>();	// testsuites for each testing rule
 	private StringBuffer unitTestResult = new StringBuffer();
 	
@@ -61,6 +62,14 @@ public class GrammarInfo {
 
 	public void setHeader(String header) {
 		this.header = header;
+	}
+	
+	public String getAdaptor() {
+		return adaptor;
+	}
+	
+	public void setAdaptor(String adaptor) {
+		this.adaptor = adaptor;
 	}
 
 	public List<gUnitTestSuite> getRuleTestSuites() {

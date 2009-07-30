@@ -58,7 +58,26 @@ gUnitDef:	'gunit' g1=id ('walks' g2=id)? ';'
 			grammarInfo.setGrammarName($g1.text);
 		}
 		}
-		header? testsuite*
+		optionsSpec? header? testsuite*
+	;
+	
+optionsSpec 
+	:	OPTIONS (option ';')+ '}'
+	;
+
+// Note: currently, this is the only valid option for setting customized tree adaptor	
+option	:	id '=' treeAdaptor
+		{
+		if ( $id.text.equals("TreeAdaptor") ) {
+		    grammarInfo.setAdaptor($treeAdaptor.text);
+		}
+		// TODO: need a better error logging strategy
+		else System.err.println("Invalid option detected: "+$text);
+		}
+	;
+	
+treeAdaptor
+	:	id EXT*
 	;
 
 header	:	'@header' ACTION
@@ -271,6 +290,9 @@ NESTED_AST :
 	|	.
 	)*
 	')'
+	;
+
+OPTIONS	:	'options' WS* '{'
 	;
 
 ACTION

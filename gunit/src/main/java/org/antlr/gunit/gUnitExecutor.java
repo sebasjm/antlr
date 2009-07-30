@@ -319,6 +319,15 @@ public class gUnitExecutor implements ITestSuite {
             Object[] parArgs = new Object[]{tokens};							// assign value to parser's args  
             Object parObj = parConstructor.newInstance(parArgs);				// makes new instance of parser      
             
+            // set up customized tree adaptor if necessary
+            if ( grammarInfo.getAdaptor()!=null ) {
+            	parArgTypes = new Class[]{TreeAdaptor.class};
+            	Method _setTreeAdaptor = parser.getMethod("setTreeAdaptor", parArgTypes);
+            	classForName("llvm.CC");
+            	Class _treeAdaptor = classForName(grammarInfo.getAdaptor());
+            	_setTreeAdaptor.invoke(parObj, _treeAdaptor.newInstance());
+            }
+            
             Method ruleName = parser.getMethod(testRuleName);
             
             /** Start of I/O Redirecting */
