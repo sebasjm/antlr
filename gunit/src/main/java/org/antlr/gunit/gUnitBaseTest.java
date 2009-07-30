@@ -233,7 +233,8 @@ public abstract class gUnitBaseTest extends TestCase {
 			
 			/** Invalid input */
             if ( tokens.index()!=tokens.size() ) {
-            	throw new InvalidInputException();
+            	//throw new InvalidInputException();
+            	this.stderr = "Invalid input";
             }
             
 			// retVal could be actual return object from rule, stderr or stdout
