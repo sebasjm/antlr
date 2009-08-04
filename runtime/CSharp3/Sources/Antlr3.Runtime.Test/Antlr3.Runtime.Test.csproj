@@ -82,6 +82,27 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Antlr3 Include="FastSimpleExpression.g3">
+      <OutputFiles>FastSimpleExpressionLexer.cs;FastSimpleExpressionParser.cs;FastSimpleExpression.tokens</OutputFiles>
+    </Antlr3>
+    <Compile Include="FastSimpleExpressionLexer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FastSimpleExpression.g3</DependentUpon>
+    </Compile>
+    <Compile Include="FastSimpleExpressionLexerHelper.cs">
+      <DependentUpon>FastSimpleExpression.g3</DependentUpon>
+    </Compile>
+    <Compile Include="FastSimpleExpressionParser.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FastSimpleExpression.g3</DependentUpon>
+    </Compile>
+    <Compile Include="FastSimpleExpressionParserHelper.cs">
+      <DependentUpon>FastSimpleExpression.g3</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Antlr3 Include="JavaCompat\Expr.g3">
       <OutputFiles>JavaCompat\ExprLexer.cs;JavaCompat\ExprParser.cs;JavaCompat\Expr.tokens</OutputFiles>
     </Antlr3>
@@ -131,7 +152,17 @@
     <Compile Include="BuildOptions\DebugTreeGrammarHelper.cs">
       <DependentUpon>DebugTreeGrammar.g3</DependentUpon>
     </Compile>
+    <Compile Include="SlimParsing\ITokenSource`1.cs" />
+    <Compile Include="SlimParsing\ITokenStream`1.cs" />
+    <Compile Include="SlimParsing\SlimLexer.cs" />
+    <Compile Include="SlimParsing\SlimStringStream.cs" />
+    <Compile Include="SlimParsing\SlimToken.cs" />
+    <Compile Include="SlimParsing\SlimTokenStream.cs" />
+    <Compile Include="SlimParsing\Tree\ITreeAdaptor`1.cs" />
+    <Compile Include="SlimParsing\Tree\ITreeFactory.cs" />
+    <Compile Include="SlimParsing\Tree\ITreeNodeStream`1.cs" />
     <Compile Include="TestDotTreeGenerator.cs" />
+    <Compile Include="TestFastLexer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Antlr3 Include="BuildOptions\ProfileGrammar.g3">
