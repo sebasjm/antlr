@@ -108,7 +108,7 @@
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>stringtemplate</artifactId>
-                <version>3.2</version>
+                <version>3.2.1</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -169,7 +169,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>1.5</source>
-                    <target>1.5</target>
+                    <target>jsr14</target>
                     <sourceDirectory>src</sourceDirectory>
                 </configuration>
             </plugin>
