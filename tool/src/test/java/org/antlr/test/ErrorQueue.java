@@ -39,7 +39,6 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.LinkedList;
 
-@Ignore
 public class ErrorQueue implements ANTLRErrorListener {
 	List infos = new LinkedList();
 	List errors = new LinkedList();
