@@ -36,6 +36,8 @@ public class TreeRewriter extends TreeParser {
         public Object rule() throws RecognitionException;
     }
 
+    protected boolean showTransformations = false;
+
     protected TokenStream originalTokenStream;
     protected TreeAdaptor originalAdaptor;
     
@@ -59,9 +61,10 @@ public class TreeRewriter extends TreeParser {
             TreeRuleReturnScope r = (TreeRuleReturnScope)whichRule.rule();
             setBacktrackingLevel(0);
             if ( failed() ) return t;
-            if ( r!=null && !t.equals(r.getTree()) && r.getTree()!=null ) { // show any transformations
-                System.out.println(((CommonTree)t).toStringTree()+" -> "+
-                                   ((CommonTree)r.getTree()).toStringTree());
+            if ( showTransformations &&
+                 r!=null && !t.equals(r.getTree()) && r.getTree()!=null )
+            {
+                reportTransformation(t, r.getTree());
             }
             if ( r!=null && r.getTree()!=null ) return r.getTree();
             else return t;
@@ -80,7 +83,10 @@ public class TreeRewriter extends TreeParser {
         return t;
     }
 
-    public Object downup(Object t) {
+    public Object downup(Object t) { return downup(t, false); }
+
+    public Object downup(Object t, boolean showTransformations) {
+        this.showTransformations = showTransformations;
         TreeVisitor v = new TreeVisitor(new CommonTreeAdaptor());
         TreeVisitorAction actions = new TreeVisitorAction() {
             public Object pre(Object t)  { return applyOnce(t, topdown_fptr); }
@@ -88,6 +94,14 @@ public class TreeRewriter extends TreeParser {
         };
         t = v.visit(t, actions);
         return t;
+    }
+
+    /** Override this if you need transformation tracing to go somewhere
+     *  other than stdout or if you're not using Tree-derived trees.
+     */
+    public void reportTransformation(Object oldTree, Object newTree) {
+        System.out.println(((Tree)oldTree).toStringTree()+" -> "+
+                           ((Tree)newTree).toStringTree());
     }
 
     fptr topdown_fptr = new fptr() {
