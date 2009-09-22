@@ -1,5 +1,5 @@
-ANTLR 3.1.3 Release
-March 17, 2009
+ANTLR 3.2 Release
+Sep 21, 2009
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -8,7 +8,25 @@ University of San Francisco
 CHANGES
 
 September 22, 2009 -- ANTLR v3.2
+Sep 21, 2009 - Jim Idle
 
+* Added new options for tool invocation to control the points at which the code
+  generator tells the target code to use its equivalent of switch() instead of
+  inline ifs.
+      -Xmaxswitchcaselabels m don't generate switch() statements for dfas
+                              bigger  than m [300]
+      -Xminswitchalts m       don't generate switch() statements for dfas smaller
+                              than m [3]
+* Upgraded -X help output to include new optins and provide the default
+  settings, as well as provide units for those settings that need them.
+
+* Change the C Target to overide the deafults for the new settings to 
+  generate the most optimizable C code from the modern C compiler point of
+  view. This is essentially to always use swtich statements unless there
+  is absolutely no other option. C defaults are to use 1 for minimum and
+  3000 for maximum number of alts that trigger switch(). This results in
+  object code that is 30% smaller and up to 20% faster.
+ 
 April 23, 2009
 
 * Added reset to TreeNodeStream interface.

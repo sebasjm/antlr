@@ -273,6 +273,24 @@ public class Tool {
                     CodeGenerator.MAX_ACYCLIC_DFA_STATES_INLINE = Integer.parseInt(args[i]);
                 }
             }
+            else if (args[i].equals("-Xmaxswitchcaselabels")) {
+                if (i + 1 >= args.length) {
+                    System.err.println("missing max switch case labels -Xmaxswitchcaselabels option; ignoring");
+                }
+                else {
+                    i++;
+                    CodeGenerator.MAX_SWITCH_CASE_LABELS = Integer.parseInt(args[i]);
+                }
+            }
+            else if (args[i].equals("-Xminswitchalts")) {
+                if (i + 1 >= args.length) {
+                    System.err.println("missing min switch alternatives -Xminswitchalts option; ignoring");
+                }
+                else {
+                    i++;
+                    CodeGenerator.MIN_SWITCH_ALTS = Integer.parseInt(args[i]);
+                }
+            }
             else if (args[i].equals("-Xm")) {
                 if (i + 1 >= args.length) {
                     System.err.println("missing max recursion with -Xm option; ignoring");
@@ -712,23 +730,45 @@ public class Tool {
 
     private static void Xhelp() {
         ErrorManager.info("ANTLR Parser Generator  Version " + new Tool().VERSION);
-        System.err.println("  -Xgrtree               print the grammar AST");
-        System.err.println("  -Xdfa                  print DFA as text ");
-        System.err.println("  -Xnoprune              test lookahead against EBNF block exit branches");
-        System.err.println("  -Xnocollapse           collapse incident edges into DFA states");
-        System.err.println("  -Xdbgconversion        dump lots of info during NFA conversion");
-        System.err.println("  -Xmultithreaded        run the analysis in 2 threads");
-        System.err.println("  -Xnomergestopstates    do not merge stop states");
-        System.err.println("  -Xdfaverbose           generate DFA states in DOT with NFA configs");
-        System.err.println("  -Xwatchconversion      print a message for each NFA before converting");
-        System.err.println("  -XdbgST                put tags at start/stop of all templates in output");
-        System.err.println("  -Xm m                  max number of rule invocations during conversion");
-        System.err.println("  -Xmaxdfaedges m        max \"comfortable\" number of edges for single DFA state");
-        System.err.println("  -Xconversiontimeout t  set NFA conversion timeout for each decision");
-        System.err.println("  -Xmaxinlinedfastates m max DFA states before table used rather than inlining");
-        System.err.println("  -Xnfastates            for nondeterminisms, list NFA states for each path");
+        System.err.println("  -Xgrtree                print the grammar AST");
+        System.err.println("  -Xdfa                   print DFA as text ");
+        System.err.println("  -Xnoprune               test lookahead against EBNF block exit branches");
+        System.err.println("  -Xnocollapse            collapse incident edges into DFA states");
+        System.err.println("  -Xdbgconversion         dump lots of info during NFA conversion");
+        System.err.println("  -Xmultithreaded         run the analysis in 2 threads");
+        System.err.println("  -Xnomergestopstates     do not merge stop states");
+        System.err.println("  -Xdfaverbose            generate DFA states in DOT with NFA configs");
+        System.err.println("  -Xwatchconversion       print a message for each NFA before converting");
+        System.err.println("  -XdbgST                 put tags at start/stop of all templates in output");
+        System.err.println("  -Xnfastates             for nondeterminisms, list NFA states for each path");
+        System.err.println("  -Xm m                   max number of rule invocations during conversion           [" + NFAContext.MAX_SAME_RULE_INVOCATIONS_PER_NFA_CONFIG_STACK + "]");
+        System.err.println("  -Xmaxdfaedges m         max \"comfortable\" number of edges for single DFA state     [" + DFA.MAX_STATE_TRANSITIONS_FOR_TABLE + "]");
+        System.err.println("  -Xconversiontimeout t   set NFA conversion timeout (ms) for each decision          [" + DFA.MAX_TIME_PER_DFA_CREATION + "]");
+        System.err.println("  -Xmaxinlinedfastates m  max DFA states before table used rather than inlining      [" + CodeGenerator.MADSI_DEFAULT +"]");
+        System.err.println("  -Xmaxswitchcaselabels m don't generate switch() statements for dfas bigger  than m [" + CodeGenerator.MSCL_DEFAULT +"]");
+        System.err.println("  -Xminswitchalts m       don't generate switch() statements for dfas smaller than m [" + CodeGenerator.MSA_DEFAULT + "]");
     }
 
+    /**
+     * Set the threshold of case labels beyond which ANTLR will not instruct the target template
+     * to generate switch() { case xxx: ... 
+     * 
+     * @param maxSwitchCaseLabels Maximum number of case lables that ANTLR should allow the target code
+     */
+    public void setMaxSwitchCaseLabels(int maxSwitchCaseLabels) {
+        CodeGenerator.MAX_SWITCH_CASE_LABELS = maxSwitchCaseLabels;
+    }
+
+    /**
+     * Set the threshold of the number alts, below which ANTLR will not instruct the target
+     * template to use a switch statement.
+     *
+     * @param minSwitchAlts the minimum number of alts required to use a switch staement
+     */
+    public void setMinSwitchAlts(int minSwitchAlts) {
+        CodeGenerator.MIN_SWITCH_ALTS = minSwitchAlts;
+    }
+    
     /**
      * Set the location (base directory) where output files should be produced
      * by the ANTLR tool.

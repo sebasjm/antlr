@@ -81,11 +81,14 @@ public class CodeGenerator {
 	 *  limit will be hit only for lexers where wildcard in a UNICODE
 	 *  vocabulary environment would generate a SWITCH with 65000 labels.
 	 */
-	public int MAX_SWITCH_CASE_LABELS = 300;
-	public int MIN_SWITCH_ALTS = 3;
+        public final static int MSCL_DEFAULT = 300;
+	public static int MAX_SWITCH_CASE_LABELS = MSCL_DEFAULT;
+        public final static int MSA_DEFAULT = 3;
+	public static int MIN_SWITCH_ALTS = MSA_DEFAULT;
 	public boolean GENERATE_SWITCHES_WHEN_POSSIBLE = true;
 	//public static boolean GEN_ACYCLIC_DFA_INLINE = true;
 	public static boolean EMIT_TEMPLATE_DELIMITERS = false;
+        public final static int MADSI_DEFAULT = 10;
 	public static int MAX_ACYCLIC_DFA_STATES_INLINE = 10;
 
 	public String classpathTemplateRootDirectoryName =

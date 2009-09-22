@@ -149,6 +149,21 @@ public class Antlr3Mojo
      * @parameter default-value="10000"
      */
     private int conversionTimeout;
+
+    /**
+     * The number of alts, beyond which ANTLR will not generate a switch statement
+     * for the DFA.
+     *
+     * @parameter default-value="300"
+     */
+    private int maxSwitchCaseLabels;
+
+    /**
+     * The number of alts, below which ANTLR will not choose to generate a switch
+     * statement over an if statement.
+     */
+    private int minSwitchAlts;
+
     /* --------------------------------------------------------------------
      * The following are Maven specific parameters, rather than specificlly
      * options that the ANTLR tool can use.
@@ -271,16 +286,18 @@ public class Antlr3Mojo
 
             // Flags
             //
-            log.debug("ANTLR: report: " + report);
-            log.debug("ANTLR: printGrammar: " + printGrammar);
-            log.debug("ANTLR: debug: " + debug);
-            log.debug("ANTLR: profile: " + profile);
-            log.debug("ANTLR: nfa: " + nfa);
-            log.debug("ANTLR: dfa: " + dfa);
-            log.debug("ANTLR: trace: " + trace);
-            log.debug("ANTLR: messageFormat: " + messageFormat);
-            log.debug("ANTLR: conversionTimeout: " + conversionTimeout);
-            log.debug("ANTLR: verbose: " + verbose);
+            log.debug("ANTLR: report              : " + report);
+            log.debug("ANTLR: printGrammar        : " + printGrammar);
+            log.debug("ANTLR: debug               : " + debug);
+            log.debug("ANTLR: profile             : " + profile);
+            log.debug("ANTLR: nfa                 : " + nfa);
+            log.debug("ANTLR: dfa                 : " + dfa);
+            log.debug("ANTLR: trace               : " + trace);
+            log.debug("ANTLR: messageFormat       : " + messageFormat);
+            log.debug("ANTLR: conversionTimeout   : " + conversionTimeout);
+            log.debug("ANTLR: maxSwitchCaseLabels : " + maxSwitchCaseLabels);
+            log.debug("ANTLR: minSwitchAlts       : " + minSwitchAlts);
+            log.debug("ANTLR: verbose             : " + verbose);
         }
 
         // Ensure that the output directory path is all in tact so that
@@ -317,6 +334,8 @@ public class Antlr3Mojo
         tool.setTrace(trace);
         tool.setVerbose(verbose);
         tool.setMessageFormat(messageFormat);
+        tool.setMaxSwitchCaseLabels(maxSwitchCaseLabels);
+        tool.setMinSwitchAlts(minSwitchAlts);
 
         // Where do we want ANTLR to produce its output? (Base directory)
         //

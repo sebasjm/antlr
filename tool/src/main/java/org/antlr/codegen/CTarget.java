@@ -193,7 +193,6 @@ public class CTarget extends Target {
             CodeGenerator generator,
             String literal) {
         int index;
-        int outc;
         String bytes;
         StringBuffer buf = new StringBuffer();
 
@@ -271,6 +270,60 @@ public class CTarget extends Target {
         String strref = "lit_" + String.valueOf(index + 1);
 
         return strref;
+    }
+
+    /**
+     * Overrides the standard grammar analysis so we can prepare the analyser
+     * a little differently from the other targets.
+     *
+     * In particular we want to influence the way the code generator makes assumptions about
+     * switchs vs ifs, vs table driven DFAs. In general, C code should be generated that
+     * has the minimum use of tables, and tha meximum use of large switch statements. This
+     * allows the optimizers to generate very efficient code, it can reduce object code size
+     * by about 30% and give about a 20% performance improvement over not doing this. Hence,
+     * for the C target only, we change the defaults here, but only if they are still set to the
+     * defaults.
+     *
+     * @param generator An instance of the generic code generator class.
+     * @param grammar The grammar that we are currently analyzing
+     */
+    @Override
+    protected void performGrammarAnalysis(CodeGenerator generator, Grammar grammar) {
+
+        // Check to see if the maximum inline DFA states is still set to
+        // the default size. If it is then whack it all the way up to the maximum that
+        // we can sensibly get away with.
+        //
+        if (CodeGenerator.MAX_ACYCLIC_DFA_STATES_INLINE == CodeGenerator.MADSI_DEFAULT) {
+
+            CodeGenerator.MAX_ACYCLIC_DFA_STATES_INLINE = 65535;
+        }
+
+        // Check to see if the maximum switch size is still set to the default
+        // and bring it up much higher if it is. Modern C compilers can handle
+        // much bigger switch statements than say Java can and if anyone finds a compiler
+        // that cannot deal with such big switches, all the need do is generate the
+        // code with a reduced -Xmaxswitchcaselabels nnn
+        //
+        if  (CodeGenerator.MAX_SWITCH_CASE_LABELS == CodeGenerator.MSCL_DEFAULT) {
+
+            CodeGenerator.MAX_SWITCH_CASE_LABELS = 3000;
+        }
+
+        // Check to see if the number of transitions considered a miminum for using
+        // a switch is still at the default. Because a switch is still generally faster than
+        // an if even with small sets, and given that the optimizer will do the best thing with it
+        // anyway, then we simply want to generate a switch for any number of states.
+        //
+        if (CodeGenerator.MIN_SWITCH_ALTS == CodeGenerator.MSA_DEFAULT) {
+
+            CodeGenerator.MIN_SWITCH_ALTS = 1;
+        }
+
+        // Now we allow the superclass implementation to do whatever it feels it
+        // must do.
+        //
+        super.performGrammarAnalysis(generator, grammar);
     }
 }
 
