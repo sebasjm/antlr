@@ -873,6 +873,7 @@ public class TestTreeGrammarRewriteAST extends BaseTest {
         assertEquals("(12 (abc 34))\n", found);
     }
 
+    @Ignore
     @Test public void testRewriteOfRuleRefRootListLabeled() throws Exception {
         String grammar =
             "grammar T;\n" +
