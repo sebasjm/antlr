@@ -536,6 +536,31 @@ public class TestCompositeGrammars extends BaseTest {
 		assertEquals("JavaDecl: floatx=3;\n", found);
 	}
 
+    @Test public void testDelegatorRuleOverridesDelegates() throws Exception {
+        String slave =
+            "parser grammar S;\n" +
+            "a : b {System.out.println(\"S.a\");} ;\n" +
+            "b : B ;\n" ;
+        mkdir(tmpdir);
+        writeFile(tmpdir, "S.g", slave);
+
+        String slave2 =
+            "parser grammar T;\n" +
+            "tokens { A='x'; }\n" +
+            "b : B {System.out.println(\"T.b\");} ;\n";
+        writeFile(tmpdir, "T.g", slave2);
+
+        String master =
+            "grammar M;\n" +
+            "import S, T;\n" +
+            "b : 'b'|'c' {System.out.println(\"M.b\");}|B|A ;\n" +
+            "WS : (' '|'\\n') {skip();} ;\n" ;
+        String found = execParser("M.g", master, "MParser", "MLexer",
+                                  "a", "c", debug);
+        assertEquals("M.b\n" +
+                     "S.a\n", found);
+    }
+
 	// LEXER INHERITANCE
 
 	@Test public void testLexerDelegatorInvokesDelegateRule() throws Exception {
