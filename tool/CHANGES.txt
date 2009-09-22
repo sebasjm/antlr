@@ -7,6 +7,8 @@ University of San Francisco
 
 CHANGES
 
+September 22, 2009 -- ANTLR v3.2
+
 April 23, 2009
 
 * Added reset to TreeNodeStream interface.
@@ -29,7 +31,7 @@ March 21, 2009
 
 * Added ctor to RecognizerSharedState to allow cloning it.
 
-March 17, 2009
+March 17, 2009 -- ANTLR v3.1.3
 
 * improved ANTLRv3.g to handle <...> element options
 
@@ -105,6 +107,8 @@ This feature will be announced in 3.2, but I am integrating from my development 
   nextElement() to say how to get next node or token.
 
 END CHANGES FOR TREE FILTER MODE
+
+February 23, 2009 -- ANTLR v3.1.2
 
 February 18, 2009
 
