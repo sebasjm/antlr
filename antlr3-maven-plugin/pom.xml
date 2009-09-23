@@ -289,7 +289,7 @@ Jim Idle - March 2009
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr</artifactId>
-            <version>3.2-SNAPSHOT</version>
+            <version>3.2.1-SNAPSHOT</version>
         </dependency>
 
         <!--
