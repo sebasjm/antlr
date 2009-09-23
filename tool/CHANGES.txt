@@ -1,5 +1,5 @@
 ANTLR 3.2 Release
-Sep 21, 2009
+September 23, 2009
 
 Terence Parr, parrt at cs usfca edu
 ANTLR project lead and supreme dictator for life
@@ -7,7 +7,7 @@ University of San Francisco
 
 CHANGES
 
-September 22, 2009 -- ANTLR v3.2
+September 23, 2009 -- ANTLR v3.2
 
 September 21, 2009 [Jim Idle]
 
