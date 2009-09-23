@@ -8,7 +8,8 @@ University of San Francisco
 CHANGES
 
 September 22, 2009 -- ANTLR v3.2
-Sep 21, 2009 - Jim Idle
+
+September 21, 2009 [Jim Idle]
 
 * Added new options for tool invocation to control the points at which the code
   generator tells the target code to use its equivalent of switch() instead of
