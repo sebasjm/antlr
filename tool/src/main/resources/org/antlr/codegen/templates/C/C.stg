@@ -1541,9 +1541,13 @@ if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 {
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!ruleDescriptor.isSynPred)>
-	retval.start = 0;
-	<scopeClean()><\n>
+	retval.start = 0;<\n>
 <endif>
+<endif>
+    <(ruleDescriptor.actions.after):execAfter()>
+    <finalCode(finalBlock=finally)>
+<if(!ruleDescriptor.isSynPred)>
+    <scopeClean()><\n>
 <endif>
     return <ruleReturnValue()>; 
 }
@@ -1570,7 +1574,7 @@ ruleBacktrackFailure() ::= <<
 <if(backtracking)>
 if (BACKTRACKING>0)
 {
-    FAILEDFLAG = <true()>; 
+    FAILEDFLAG = <true()>;
     <scopeClean()>
     return <ruleReturnValue()>;
 }
@@ -1609,44 +1613,55 @@ static <returnType()>
     }
     else
     {
-	<(ruleDescriptor.actions.after):execAction()>
+	<(ruleDescriptor.actions.after):execAfter()>
     }
 <else>
-<if(!emptyRule)>
-<if(actions.(actionScope).rulecatch)>
-    <actions.(actionScope).rulecatch>
-<else>
-    if (HASEXCEPTION())
-    {
-        PREPORTERROR();
-        PRECOVER();
-        <@setErrorReturnValue()>
-    }
-<if(ruleDescriptor.actions.after)>
-    else
-    {
-	<(ruleDescriptor.actions.after):execAction()>
-    }<\n>
+    <if(!emptyRule)>
+        <if(actions.(actionScope).rulecatch)>
+            <actions.(actionScope).rulecatch>
+        <else>
+            if (HASEXCEPTION())
+            {
+                PREPORTERROR();
+                PRECOVER();
+                <@setErrorReturnValue()>
+            }
+            <if(ruleDescriptor.actions.after)>
+            else
+            {
+                <(ruleDescriptor.actions.after):execAfter()>
+            }<\n>
+            <endif>
+        <endif>
+    <endif>
 <endif>
-<endif>
-<endif>
-<endif>
-    <if(trace)>System.out.println("exit <ruleName> "+LT(1)+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
+
+    <if(trace)>ANTLR3_PRINTF("exit <ruleName> %d failed=%s backtracking=%s\n", LT(1), failed, BACKTRACKING);<endif>
     <memoize()>
-    <finally>
+<if(finally)>
+    <finalCode(finalBlock=finally)>
+<endif>
+    <scopeClean()>
     <@postamble()>
     return <ruleReturnValue()>;
 }
 /* $ANTLR end <ruleName> */
 >>
 
+finalCode(finalBlock) ::= <<
+{
+    <finalBlock>
+}
+
+>>
+
 catch(decl,action) ::= <<
 /* catch(decl,action)
  */
-if  ((HASEXCEPTION()) && (EXCEPTION->type == <e.decl>) )
 {
     <e.action>
 }
+
 >>
 
 ruleDeclarations() ::= <<
@@ -1767,7 +1782,6 @@ ruleCleanUp() ::= <<
 //
 goto rule<ruleDescriptor.name>Ex; /* Prevent compiler warnings */
 rule<ruleDescriptor.name>Ex: ;
-<scopeClean()>
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!TREE_PARSER)>
 <if(!ruleDescriptor.isSynPred)>
@@ -1826,7 +1840,7 @@ void m<ruleName>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDes
     <if(trace)> ANTLR3_FPRINTF(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
     <ruleCleanUp()>
     <lexerRuleLabelFree()>
-    <(ruleDescriptor.actions.after):execAction()>
+    <(ruleDescriptor.actions.after):execAfter()>
     <memoize>
 }
 // $ANTLR end <ruleName>
@@ -3150,6 +3164,16 @@ lexerRulePropertyRef_int(scope,attr) ::= "LEXER->getText(LEXER)->toInt32(LEXER->
 ruleSetPropertyRef_tree(scope,attr,expr) ::= "retval.tree=<expr>;"
 ruleSetPropertyRef_st(scope,attr,expr) ::= "retval.st=<expr>;"
 
+
+/** How to deal with an @after for C targets. Because we cannot rely on
+ *  any garbage collection, after code is executed even in backtracking
+ *  mode. Must be documented clearly.
+ */
+execAfter(action) ::= <<
+{
+    <action>
+}
+>>
 
 /** How to execute an action (when not backtracking) */
 execAction(action) ::= <<
