@@ -155,6 +155,15 @@ public class JUnitCodeGen {
 				isTreeGrammar = true;
 			}
 		}
+		// also set up custom tree adaptor if necessary
+		String treeAdaptorPath = null;
+		boolean hasTreeAdaptor = false;
+		if ( grammarInfo.getAdaptor()!=null ) {
+			hasTreeAdaptor = true;
+			treeAdaptorPath = grammarInfo.getAdaptor();
+		}
+		classHeaderST.setAttribute("hasTreeAdaptor", hasTreeAdaptor);
+		classHeaderST.setAttribute("treeAdaptorPath", treeAdaptorPath);
 		classHeaderST.setAttribute("hasPackage", hasPackage);
 		classHeaderST.setAttribute("packagePath", packagePath);
 		classHeaderST.setAttribute("lexerPath", lexerPath);

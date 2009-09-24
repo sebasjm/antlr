@@ -1,10 +1,14 @@
-gUnit 1.0.5
-Nov 25, 2008
+gUnit 1.0.6b
+July 31, 2009
 
 Leon, Jen-Yuan Su
 leonsu at mac com
 
 CHANGES
+
+July 31, 2009
+
+* support custom tree adaptor in gUnit script
 
 March 21, 2009
 

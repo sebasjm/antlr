@@ -323,7 +323,6 @@ public class gUnitExecutor implements ITestSuite {
             if ( grammarInfo.getAdaptor()!=null ) {
             	parArgTypes = new Class[]{TreeAdaptor.class};
             	Method _setTreeAdaptor = parser.getMethod("setTreeAdaptor", parArgTypes);
-            	classForName("llvm.CC");
             	Class _treeAdaptor = classForName(grammarInfo.getAdaptor());
             	_setTreeAdaptor.invoke(parObj, _treeAdaptor.newInstance());
             }
@@ -445,7 +444,7 @@ public class gUnitExecutor implements ITestSuite {
 			else {
 				treeParserPath = grammarInfo.getTreeGrammarName();
 			}
-		
+			
             /** Use Reflection to create instances of lexer and parser */
         	lexer = classForName(lexerName);
             Class[] lexArgTypes = new Class[]{CharStream.class};				// assign type to lexer's args
@@ -460,6 +459,16 @@ public class gUnitExecutor implements ITestSuite {
             Constructor parConstructor = parser.getConstructor(parArgTypes);
             Object[] parArgs = new Object[]{tokens};							// assign value to parser's args  
             Object parObj = parConstructor.newInstance(parArgs);				// makes new instance of parser      
+            
+            // set up customized tree adaptor if necessary
+            TreeAdaptor customTreeAdaptor = null; 
+            if ( grammarInfo.getAdaptor()!=null ) {
+            	parArgTypes = new Class[]{TreeAdaptor.class};
+            	Method _setTreeAdaptor = parser.getMethod("setTreeAdaptor", parArgTypes);
+            	Class _treeAdaptor = classForName(grammarInfo.getAdaptor());
+            	customTreeAdaptor = (TreeAdaptor) _treeAdaptor.newInstance();
+            	_setTreeAdaptor.invoke(parObj, customTreeAdaptor);
+            }
             
             Method ruleName = parser.getMethod(testRuleName);
 
@@ -480,7 +489,13 @@ public class gUnitExecutor implements ITestSuite {
         	CommonTree tree = (CommonTree) returnName.invoke(ruleReturn);
 
         	// Walk resulting tree; create tree nodes stream first
-        	CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+        	CommonTreeNodeStream nodes;
+        	if ( customTreeAdaptor!=null ) {
+        		nodes = new CommonTreeNodeStream(customTreeAdaptor, tree);
+        	}
+        	else {
+        		nodes = new CommonTreeNodeStream(tree);
+        	}
         	// AST nodes have payload that point into token stream
         	nodes.setTokenStream(tokens);
         	// Create a tree walker attached to the nodes stream

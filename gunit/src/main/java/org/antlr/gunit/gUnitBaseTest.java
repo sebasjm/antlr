@@ -41,6 +41,7 @@ import org.antlr.runtime.Lexer;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.stringtemplate.StringTemplate;
 
@@ -52,6 +53,7 @@ import junit.framework.TestCase;
  */
 public abstract class gUnitBaseTest extends TestCase {
 	
+	public String treeAdaptorPath;
 	public String packagePath;
 	public String lexerPath;
 	public String parserPath;
@@ -188,6 +190,14 @@ public abstract class gUnitBaseTest extends TestCase {
             Object[] parArgs = new Object[]{tokens};							// assign value to parser's args  
             Object parObj = parConstructor.newInstance(parArgs);				// makes new instance of parser      
             
+            // set up customized tree adaptor if necessary
+            if ( treeAdaptorPath!=null ) {
+            	parArgTypes = new Class[]{TreeAdaptor.class};
+            	Method _setTreeAdaptor = parser.getMethod("setTreeAdaptor", parArgTypes);
+            	Class _treeAdaptor = Class.forName(treeAdaptorPath);
+            	_setTreeAdaptor.invoke(parObj, _treeAdaptor.newInstance());
+            }
+            
             Method ruleName = parser.getMethod(testRuleName);
 
             /** Start of I/O Redirecting */
@@ -319,6 +329,16 @@ public abstract class gUnitBaseTest extends TestCase {
             Object[] parArgs = new Object[]{tokens};							// assign value to parser's args  
             Object parObj = parConstructor.newInstance(parArgs);				// makes new instance of parser      
             
+            // set up customized tree adaptor if necessary
+            TreeAdaptor customTreeAdaptor = null; 
+            if ( treeAdaptorPath!=null ) {
+            	parArgTypes = new Class[]{TreeAdaptor.class};
+            	Method _setTreeAdaptor = parser.getMethod("setTreeAdaptor", parArgTypes);
+            	Class _treeAdaptor = Class.forName(treeAdaptorPath);
+            	customTreeAdaptor = (TreeAdaptor) _treeAdaptor.newInstance();
+            	_setTreeAdaptor.invoke(parObj, customTreeAdaptor);
+            }
+            
             Method ruleName = parser.getMethod(testRuleName);
 
             /** Start of I/O Redirecting */
@@ -338,7 +358,13 @@ public abstract class gUnitBaseTest extends TestCase {
         	CommonTree tree = (CommonTree) returnName.invoke(ruleReturn);
 
         	// Walk resulting tree; create tree nodes stream first
-        	CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+        	CommonTreeNodeStream nodes;
+        	if ( customTreeAdaptor!=null ) {
+        		nodes = new CommonTreeNodeStream(customTreeAdaptor, tree);
+        	}
+        	else {
+        		nodes = new CommonTreeNodeStream(tree);
+        	}
         	// AST nodes have payload that point into token stream
         	nodes.setTokenStream(tokens);
         	// Create a tree walker attached to the nodes stream
