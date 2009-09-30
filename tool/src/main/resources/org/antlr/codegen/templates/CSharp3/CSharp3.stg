@@ -920,10 +920,10 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 int <label>Start<elementIndex> = CharIndex;
-Match(EndOfFile); <checkRuleBacktrackFailure()>
-<labelType> <label> = new <labelType>(input, EndOfFile, TokenChannels.Default, <label>Start<elementIndex>, CharIndex-1);
+Match(EOF); <checkRuleBacktrackFailure()>
+<labelType> <label> = new <labelType>(input, EOF, TokenChannels.Default, <label>Start<elementIndex>, CharIndex-1);
 <else>
-Match(EndOfFile); <checkRuleBacktrackFailure()>
+Match(EOF); <checkRuleBacktrackFailure()>
 <endif>
 >>
 
