@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-03-23 17:50:33
+// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-09-30 13:18:12
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -12,6 +12,8 @@ using Stack = System.Collections.Generic.Stack<object>;
 using List = System.Collections.IList;
 using ArrayList = System.Collections.Generic.List<object>;
 
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.1.2")]
+[System.CLSCompliant(false)]
 public partial class ExprLexer : Lexer
 {
 	public const int EOF=-1;

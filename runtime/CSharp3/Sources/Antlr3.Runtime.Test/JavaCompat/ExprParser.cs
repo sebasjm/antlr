@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-05-07 13:12:26
+// $ANTLR 3.1.2 JavaCompat\\Expr.g3 2009-09-30 13:18:11
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -20,6 +20,8 @@ using Stack = System.Collections.Generic.Stack<object>;
 using List = System.Collections.IList;
 using ArrayList = System.Collections.Generic.List<object>;
 
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.1.2")]
+[System.CLSCompliant(false)]
 public partial class ExprParser : Parser
 {
 	internal static readonly string[] tokenNames = new string[] {
@@ -236,7 +238,6 @@ public partial class ExprParser : Parser
 	// JavaCompat\\Expr.g3:85:0: expr returns [int value] : e= multExpr ( '+' e= multExpr | '-' e= multExpr )* ;
 	private int expr(  )
 	{
-
 		int value = default(int);
 
 		int e = default(int);
@@ -327,7 +328,6 @@ public partial class ExprParser : Parser
 	// JavaCompat\\Expr.g3:92:0: multExpr returns [int value] : e= atom ( '*' e= atom )* ;
 	private int multExpr(  )
 	{
-
 		int value = default(int);
 
 		int e = default(int);
@@ -401,7 +401,6 @@ public partial class ExprParser : Parser
 	// JavaCompat\\Expr.g3:96:0: atom returns [int value] : ( INT | ID | '(' expr ')' );
 	private int atom(  )
 	{
-
 		int value = default(int);
 
 		IToken INT4=null;
@@ -491,7 +490,7 @@ public partial class ExprParser : Parser
 
 
 	#region Follow sets
-	static class Follow
+	private static class Follow
 	{
 		public static readonly BitSet _stat_in_prog40 = new BitSet(new ulong[]{0x272UL});
 		public static readonly BitSet _expr_in_stat51 = new BitSet(new ulong[]{0x40UL});

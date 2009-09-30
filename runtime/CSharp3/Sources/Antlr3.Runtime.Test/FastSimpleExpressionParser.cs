@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-05-07 13:14:01
+// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-09-30 13:18:09
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -16,6 +16,8 @@ using ArrayList = System.Collections.Generic.List<object>;
 using Antlr.Runtime.Tree;
 using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.1.2")]
+[System.CLSCompliant(false)]
 public partial class FastSimpleExpressionParser : Parser
 {
 	internal static readonly string[] tokenNames = new string[] {
@@ -489,7 +491,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 
 	#region Follow sets
-	static class Follow
+	private static class Follow
 	{
 		public static readonly BitSet _additive_expression_in_expression50 = new BitSet(new ulong[]{0x0UL});
 		public static readonly BitSet _EOF_in_expression54 = new BitSet(new ulong[]{0x2UL});

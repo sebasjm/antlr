@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\DebugGrammar.g3 2009-05-07 13:14:15
+// $ANTLR 3.1.2 BuildOptions\\DebugGrammar.g3 2009-09-30 13:18:13
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -18,6 +18,8 @@ using IOException = System.IO.IOException;
 using Antlr.Runtime.Tree;
 using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.1.2")]
+[System.CLSCompliant(false)]
 public partial class DebugGrammarParser : DebugParser
 {
 	internal static readonly string[] tokenNames = new string[] {
@@ -1513,7 +1515,7 @@ public partial class DebugGrammarParser : DebugParser
 	#endregion DFA
 
 	#region Follow sets
-	static class Follow
+	private static class Follow
 	{
 		public static readonly BitSet _stat_in_prog53 = new BitSet(new ulong[]{0x11C2UL});
 		public static readonly BitSet _expr_in_stat70 = new BitSet(new ulong[]{0x100UL});

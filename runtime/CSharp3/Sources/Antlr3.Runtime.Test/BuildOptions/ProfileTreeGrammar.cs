@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 BuildOptions\\ProfileTreeGrammar.g3 2009-05-07 13:12:32
+// $ANTLR 3.1.2 BuildOptions\\ProfileTreeGrammar.g3 2009-09-30 13:18:19
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -21,6 +21,8 @@ using ArrayList = System.Collections.Generic.List<object>;
 
 using Antlr.Runtime.Debug;
 using IOException = System.IO.IOException;
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.1.2")]
+[System.CLSCompliant(false)]
 public partial class ProfileTreeGrammar : DebugTreeParser
 {
 	internal static readonly string[] tokenNames = new string[] {
@@ -428,7 +430,6 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 	// BuildOptions\\ProfileTreeGrammar.g3:63:0: expr returns [BigInteger value] : ( ^( '+' a= expr b= expr ) | ^( '-' a= expr b= expr ) | ^( '*' a= expr b= expr ) | ^( '/' a= expr b= expr ) | ^( '%' a= expr b= expr ) | ID | INT | call );
 	private BigInteger expr(  )
 	{
-
 		BigInteger value = default(BigInteger);
 
 		CommonTree ID4=null;
@@ -732,7 +733,6 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 	// BuildOptions\\ProfileTreeGrammar.g3:74:0: call returns [BigInteger value] : ^( CALL ID expr ) ;
 	private BigInteger call(  )
 	{
-
 		BigInteger value = default(BigInteger);
 
 		CommonTree ID8=null;
@@ -815,7 +815,7 @@ public partial class ProfileTreeGrammar : DebugTreeParser
 
 
 	#region Follow sets
-	static class Follow
+	private static class Follow
 	{
 		public static readonly BitSet _stat_in_prog48 = new BitSet(new ulong[]{0x3CCF2UL});
 		public static readonly BitSet _expr_in_stat63 = new BitSet(new ulong[]{0x2UL});

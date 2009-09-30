@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-05-07 13:14:01
+// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-09-30 13:18:10
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -15,6 +15,8 @@ using Stack = System.Collections.Generic.Stack<object>;
 using List = System.Collections.IList;
 using ArrayList = System.Collections.Generic.List<object>;
 
+[System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.1.2")]
+[System.CLSCompliant(false)]
 public partial class FastSimpleExpressionLexer : Lexer
 {
 	public const int EOF=-1;
