@@ -1,63 +1,93 @@
 package ANTLR::Runtime::RecognitionException;
-use ANTLR::Runtime::Class;
 
 use Carp;
 use Readonly;
 
+use Moose;
+use Moose::Util::TypeConstraints;
+
 extends 'ANTLR::Runtime::Exception';
 
-has 'input';
-has 'index';
-has 'token';
-has 'node';
-has 'c';
-has 'line';
-has 'char_position_in_line';
+has 'input' => (
+    is   => 'ro',
+    does => 'ANTLR::Runtime::IntStream',
+    required => 1,
+);
 
-sub BUILD {
-    my ($self, $arg_ref) = @_;
+has 'index' => (
+    is  => 'ro',
+    isa => 'Int',
+    default => 0,
+);
 
-    if ($arg_ref) {
-        my $input = $arg_ref->{input};
+has 'token' => (
+    is   => 'ro',
+    does => 'ANTLR::Runtime::Token',
+);
 
-        $self->input($input);
-        $self->index($input->index());
+has 'node' => (
+    is  => 'ro',
+    isa => 'Any',
+);
 
-        if ($input->isa('ANTLR::Runtime::TokenStream')) {
-            $self->token($input->LT(1));
-            $self->line($self->token->get_line());
-            $self->char_position_in_line($self->token->get_char_position_in_line());
-        }
-        if ($input->isa('ANTLR::Runtime::CommonTreeNodeStream')) {
-            $self->node = $input->LT(1);
-            if ($self->node->isa('ANTLR::Runtime::CommonTree')) {
-                $self->token($self->node->token);
-                $self->line($self->token->get_line());
-                $self->char_position_in_line($self->token->get_char_position_in_line());
-            }
+subtype 'Char'
+    => as 'Str'
+    => where { $_ eq '-1' || length == 1 };
 
-        } elsif ($input->isa('ANTLR::Runtime::CharStream')) {
-            $self->c($input->LA(1));
-            $self->line($input->get_line());
-            $self->char_position_in_line($input->get_char_position_in_line());
-        } else {
-            $self->c($input->LA(1));
-        }
+has 'c' => (
+    is  => 'ro',
+    isa => 'Maybe[Char]',
+);
+
+has 'line' => (
+    is  => 'ro',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'char_position_in_line' => (
+    is  => 'ro',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'approximate_line_info' => (
+    is  => 'rw',
+    isa => 'Bool',
+);
+
+sub BUILDARGS {
+    my ($class, @args) = @_;
+    my $args = $class->SUPER::BUILDARGS(@args);
+
+    my $new_args = { %$args };
+    my $input = $args->{input};
+    $new_args->{input} = $input;
+    $new_args->{index} = $input->index();
+
+    if ($input->does('ANTLR::Runtime::TokenStream')) {
+        my $token = $input->LT(1);
+        $new_args->{token} = $token;
+        $new_args->{line} = $token->get_line();
+        $new_args->{char_position_in_line} = $token->get_char_position_in_line();
+    }
+
+    if ($input->does('ANTLR::Runtime::TreeNodeStream')) {
+        # extract_information_from_tree_node_stream($input);
+    }
+    elsif ($input->does('ANTLR::Runtime::CharStream')) {
+        $new_args->{c} = $input->LA(1);
+        $new_args->{line} = $input->get_line();
+        $new_args->{char_position_in_line} = $input->get_char_position_in_line();
     }
     else {
-        $self->input(undef);
-        $self->index(0);
-        $self->token(undef);
-        $self->node(undef);
-        $self->c(0);
-        $self->line(0);
-        $self->char_position_in_line(0);
+        $new_args->{c} = $input->LA(1);
     }
+
+    return $new_args;
 }
 
 sub get_unexpected_type {
-    Readonly my $usage => 'int get_unexpected_type()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     if ($self->input->isa('ANTLR::Runtime::TokenStream')) {
@@ -87,4 +117,6 @@ sub get_token {
     return $self->token;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;

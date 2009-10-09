@@ -1,5 +1,6 @@
 package ANTLR::Runtime::UnwantedTokenException;
-use ANTLR::Runtime::Class;
+
+use Moose;
 
 use overload
     '""' => \&to_string;
@@ -30,5 +31,7 @@ sub to_string {
     }
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
 __END__

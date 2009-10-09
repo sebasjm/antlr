@@ -17,7 +17,7 @@ eval {
     $parser->expr();
     print "ok\n";
     print "errors: ", $parser->get_number_of_syntax_errors(), "\n";
-    print "failed? ", $parser->failed(), "\n";
+    print "failed: ", $parser->failed(), "\n";
 };
 if (my $ex = ANTLR::Runtime::RecognitionException->caught()) {
     print $ex->trace, "\n";

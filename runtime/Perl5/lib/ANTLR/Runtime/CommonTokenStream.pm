@@ -1,56 +1,68 @@
 package ANTLR::Runtime::CommonTokenStream;
-use ANTLR::Runtime::Class;
 
+use Carp;
 use Readonly;
 use UNIVERSAL qw( isa );
-use Carp;
-
-use overload
-    '""' => \&str;
 
 use ANTLR::Runtime::CharStream;
-use ANTLR::Runtime::Class;
 use ANTLR::Runtime::Token;
+use ANTLR::Runtime::TokenSource;
 
-extends 'ANTLR::Runtime::TokenStream';
+use Moose;
 
-has 'token_source';
-has 'tokens';
-has 'channel_override_map';
-has 'discard_set';
-has 'channel';
-has 'discard_off_channel_tokens';
-has 'last_marker';
-has 'p';
+use overload
+    '""' => \&str
+    ;
 
-sub BUILD {
-    my ($self, $arg_ref) = @_;
+with 'ANTLR::Runtime::IntStream',
+     'ANTLR::Runtime::TokenStream';
 
-    if (exists $arg_ref->{token_source}) {
-        $self->token_source($arg_ref->{token_source});
-    }
-    else {
-        $self->token_source(undef);
-    }
+has 'token_source' => (
+    is  => 'rw',
+    does => 'ANTLR::Runtime::TokenSource',
+);
 
-    $self->tokens([]);
-    $self->channel_override_map(undef);
-    $self->discard_set(undef);
+has 'tokens' => (
+    is  => 'rw',
+    isa => 'ArrayRef[ANTLR::Runtime::Token]',
+    default => sub { [] },
+);
 
-    if (exists $arg_ref->{channel}) {
-        $self->channel($arg_ref->{channel});
-    } else {
-        $self->channel(ANTLR::Runtime::Token->DEFAULT_CHANNEL);
-    }
+has 'channel_override_map' => (
+    is  => 'rw',
+    isa => 'HashRef[Int]',
+);
 
-    $self->discard_off_channel_tokens(0);
-    $self->last_marker(0);
-    $self->p(-1);
-}
+has 'discard_set' => (
+    is  => 'rw',
+    isa => 'HashRef[Int]',
+);
+
+has 'channel' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => ANTLR::Runtime::Token->DEFAULT_CHANNEL,
+);
+
+has 'discard_off_channel_tokens' => (
+    is  => 'rw',
+    isa => 'Bool',
+    default => 0,
+);
+
+has 'last_marker' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'p' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => -1,
+);
 
 sub set_token_source {
-    Readonly my $usage => 'void set_token_source(TokenSource token_source)';
-    croak $usage if @_ != 2;
     my ($self, $token_source) = @_;
 
     $self->token_source($token_source);
@@ -60,8 +72,6 @@ sub set_token_source {
 }
 
 sub fill_buffer {
-    Readonly my $usage => 'void fill_buffer()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     my $index = 0;
@@ -97,8 +107,6 @@ sub fill_buffer {
 }
 
 sub consume {
-    Readonly my $usage => 'void consume()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     if ($self->p < @{$self->tokens}) {
@@ -108,8 +116,6 @@ sub consume {
 }
 
 sub skip_off_token_channels {
-    Readonly my $usage => 'int skip_off_token_channels(int i)';
-    croak $usage if @_ != 2;
     my ($self, $i) = @_;
 
     my $n = @{$self->tokens};
@@ -121,8 +127,6 @@ sub skip_off_token_channels {
 }
 
 sub skip_off_token_channels_reverse {
-    Readonly my $usage => 'int skip_off_token_channels_reverse(int i)';
-    croak $usage if @_ != 2;
     my ($self, $i) = @_;
 
     while ($i >= 0 && $self->tokens->[$i]->get_channel() != $self->channel) {
@@ -133,8 +137,6 @@ sub skip_off_token_channels_reverse {
 }
 
 sub set_token_type_channel {
-    Readonly my $usage => 'void set_token_type_channel(int ttype, int channel)';
-    croak $usage if @_ != 3;
     my ($self, $ttype, $channel) = @_;
 
     if (!defined $self->channel_override_map) {
@@ -145,8 +147,6 @@ sub set_token_type_channel {
 }
 
 sub discard_token_type {
-    Readonly my $usage => 'void discard_token_type(int ttype)';
-    croak $usage if @_ != 2;
     my ($self, $ttype) = @_;
 
     if (!defined $self->discard_set) {
@@ -157,8 +157,6 @@ sub discard_token_type {
 }
 
 sub get_tokens {
-    Readonly my $usage => 'List get_tokens($args)';
-    croak $usage if @_ != 2 && @_ != 1;
     my ($self, $args) = @_;
 
     if ($self->p == -1) {
@@ -210,8 +208,6 @@ sub get_tokens {
 }
 
 sub LT {
-    Readonly my $usage => 'Token LT(int k)';
-    croak $usage if @_ != 2;
     my ($self, $k) = @_;
 
     if ($self->p == -1) {
@@ -244,8 +240,6 @@ sub LT {
 }
 
 sub LB {
-    Readonly my $usage => 'Token LB(int k)';
-    croak $usage if @_ != 2;
     my ($self, $k) = @_;
 
     if ($self->p == -1) {
@@ -273,24 +267,18 @@ sub LB {
 }
 
 sub get {
-    Readonly my $usage => 'Token get(int i)';
-    croak $usage if @_ != 2;
     my ($self, $i) = @_;
 
     return $self->tokens->[$i];
 }
 
 sub LA {
-    Readonly my $usage => 'int LA(int i)';
-    croak $usage if @_ != 2;
     my ($self, $i) = @_;
 
     return $self->LT($i)->get_type();
 }
 
 sub mark {
-    Readonly my $usage => 'int mark()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     if ($self->p == -1) {
@@ -301,24 +289,18 @@ sub mark {
 }
 
 sub release {
-    Readonly my $usage => 'void release(int marker)';
-    croak $usage if @_ != 2;
     my ($self, $marker) = @_;
 
     # no resources to release
 }
 
 sub size {
-    Readonly my $usage => 'int size()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return scalar @{$self->tokens};
 }
 
 sub index {
-    Readonly my $usage => 'int index()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->p;
@@ -338,16 +320,12 @@ sub rewind {
 }
 
 sub seek {
-    Readonly my $usage => 'void seek(int index)';
-    croak $usage if @_ != 2;
     my ($self, $index) = @_;
 
     $self->p($index);
 }
 
 sub get_token_source {
-    Readonly my $usage => 'TokenSource get_token_source()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->token_source;
@@ -408,4 +386,7 @@ sub to_string {
     }
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
+__END__

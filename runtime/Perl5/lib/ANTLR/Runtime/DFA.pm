@@ -1,20 +1,57 @@
 package ANTLR::Runtime::DFA;
-use ANTLR::Runtime::Class;
 
 use Params::Validate qw( :types );
-use Error qw( :try );
+use Error qw( try finally );
 
-has 'eot';
-has 'eof';
-has 'min';
-has 'max';
-has 'accept';
-has 'special';
-has 'transition';
-has 'decision_number';
+use Moose;
+
+has 'eot' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Int]',
+);
+
+has 'eof' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Int]',
+);
+
+has 'min' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
+);
+
+has 'max' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Str]',
+);
+
+has 'accept' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Int]',
+);
+
+has 'special' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Int]',
+);
+
+has 'transition' => (
+    is  => 'rw',
+    isa => 'ArrayRef[ArrayRef[Int]]',
+);
+
+has 'decision_number' => (
+    is  => 'rw',
+    isa => 'Int',
+);
+
 
 # Which recognizer encloses this DFA?  Needed to check backtracking
-has 'recognizer';
+has 'recognizer' => (
+    is  => 'rw',
+    isa => 'ANTLR::Runtime::BaseRecognizer',
+);
+
 
 sub get_description {
     return "n/a";
@@ -25,17 +62,7 @@ sub get_description {
 # to the underlying CFL).  Return an alternative number 1..n.  Throw
 # an exception upon error.
 sub predict {
-    my $self = shift;
-    my $param_ref = __PACKAGE__->unpack_params(\@_, {
-        spec => [
-            {
-                name => 'input',
-                isa => 'ANTLR::Runtime::IntStream',
-            }
-
-        ]
-    });
-    my $input = $param_ref->{input};
+    my ($self, $input) = @_;
 
     my $mark = $input->mark();  # remember where decision started in input
     my $s = 0; # we always start at s0
@@ -109,21 +136,7 @@ sub predict {
 }
 
 sub no_viable_alt {
-    my $self = shift;
-    my $param_ref = __PACKAGE__->unpack_params(\@_, {
-	spec => [
-	    {
-		name => 's',
-		type => SCALAR,
-	    },
-	    {
-		name => 'input',
-		isa  => 'ANTLR::Runtime::IntStream'
-	    },
-	]
-    });
-    my $s = $param_ref->{s};
-    my $input = $param_ref->{input};
+    my ($self, $s, $input) = @_;
 
     if ($self->recognizer->state->backtracking > 0) {
 	$self->recognizer->state->failed = 1;
@@ -141,58 +154,13 @@ sub no_viable_alt {
 
 # A hook for debugging interface
 sub error {
-    my $self = shift;
-    my $param_ref = __PACKAGE__->unpack_params(\@_, {
-	spec => [
-	    {
-		name => 'nvae',
-		isa  => 'ANTLR::Runtime::NoViableAltException',
-	    }
-	]
-    });
-
-    my $nvae = $param_ref->{nvae};
+    my ($self, $nvae) = @_;
 }
 
 sub special_state_transition {
-    my $self = shift;
-    my $param_ref  = __PACKAGE__->unpack_params(\@_, {
-	spec => [
-	    {
-		name => 's',
-		type => SCALAR,
-	    },
-	    {
-		name => 'input',
-		isa  => 'ANTLR::Runtime::IntStream',
-	    },
-	]
-    });
+    my ($self, $s, $input) = @_;
 
     return -1;
-}
-
-sub unpack_rle {
-    my $self = shift;
-    my $param_ref = __PACKAGE__->unpack_params(\@_, {
-        spec => [
-            {
-                name => 'rle',
-                type => ARRAYREF,
-            }
-        ]
-    });
-    my $rle = $param_ref->{rle};
-
-    my $data = [];
-    for (my $i = 0; $i < scalar @$rle; $i += 2) {
-        my $count = $rle->[$i];
-        my $item = $rle->[$i];
-
-        push @$data, ($item) x $count;
-    }
-
-    return $data;
 }
 
 # Given a String that has a run-length-encoding of some unsigned shorts
@@ -200,20 +168,10 @@ sub unpack_rle {
 # static short[] which generates so much init code that the class won't
 # compile. :(
 sub unpack_encoded_string {
-    my $self = shift;
-    my $param_ref = __PACKAGE__->unpack_params(\@_, {
-        spec => [
-            {
-                name => 'encoded_string',
-                type => SCALAR,
-            },
-        ]
-    });
-
-    my $encoded_string = $param_ref->{encoded_string};
+    my ($self, $encoded_string) = @_;
 
     my $data = [];
-    while ($encoded_string =~ /(.)(.)/g) {
+    while ($encoded_string =~ /(.)(.)/gxms) {
         my ($n, $v) = ($1, $2);
 
         push @$data, $v x $n;
@@ -223,9 +181,12 @@ sub unpack_encoded_string {
 }
 
 sub unpack_encoded_string_to_unsigned_chars {
-    unpack_encoded_string(@_);
+    my ($self, $encoded_string) = @_;
+   
+    return $self->unpack_encoded_string($encoded_string);
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
-
 __END__

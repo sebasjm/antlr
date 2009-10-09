@@ -1,33 +1,50 @@
 package ANTLR::Runtime::BitSet;
-use ANTLR::Runtime::Class;
 
 use Carp;
 use Readonly;
 use List::Util qw( max );
 
+use Moose;
+use Moose::Util::TypeConstraints;
+
 use overload
     '|=' => \&or_in_place,
     '""' => \&str;
 
-use constant {
-    BITS => 64,    # number of bits / long
-    LOG_BITS => 6, # 2^6 == 64
-};
+# number of bits / long
+Readonly my $BITS => 64;
+sub BITS { return $BITS }
+
+# 2^6 == 64
+Readonly my $LOG_BITS => 6;
+sub LOG_BITS { return $LOG_BITS }
 
 # We will often need to do a mod operator (i mod nbits).  Its
 # turns out that, for powers of two, this mod operation is
 # same as (i & (nbits-1)).  Since mod is slow, we use a
 # precomputed mod mask to do the mod instead.
-use constant MOD_MASK => BITS - 1;
+Readonly my $MOD_MASK => BITS - 1;
+sub MOD_MASK { return $MOD_MASK }
 
 # The actual data bit
-has 'bits';
+has 'bits' => (
+    is  => 'rw',
+    isa => subtype 'Str' => where { /^(?:0|1)*$/xms },
+);
+
+sub trim_hex {
+    my ($number) = @_;
+
+    $number =~ s/^0x//xms;
+
+    return $number;
+}
 
 sub BUILD {
     my ($self, $args) = @_;
 
     my $bits;
-    if (!%$args) {
+    if (!%$args) {  ## no critic (ControlStructures::ProhibitCascadingIfElse)
         # Construct a bitset of size one word (64 bits)
         $bits = '0' x BITS;
     }
@@ -35,7 +52,7 @@ sub BUILD {
         $bits = $args->{bits};
     }
     elsif (exists $args->{number}) {
-        $bits = reverse unpack("B*", pack("N", $args->{number}));
+        $bits = reverse unpack('B*', pack('N', $args->{number}));
     }
     elsif (exists $args->{words64}) {
         # Construction from a static array of longs
@@ -43,12 +60,12 @@ sub BUILD {
 
         # $number is in hex format
         my $number = join '',
-            map { my $word64 = $_; $word64 =~ s/^0x//; $word64; }
+            map { trim_hex($_) }
             reverse @$words64;
 
         $bits = '';
-        foreach my $h (split //, reverse $number) {
-            $bits .= reverse substr(unpack("B*", pack("h", hex $h)), 4);
+        foreach my $h (split //xms, reverse $number) {
+            $bits .= reverse substr(unpack('B*', pack('h', hex $h)), 4);
         }
     }
     elsif (exists $args->{''}) {
@@ -59,10 +76,11 @@ sub BUILD {
         $bits = '0' x $args->{size};
     }
     else {
-        croak "Invalid argument";
+        croak 'Invalid argument';
     }
 
     $self->bits($bits);
+    return;
 }
 
 sub of {
@@ -74,7 +92,7 @@ sub of {
     return $bs;
 }
 
-sub or :method {
+sub or : method {  ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     my ($self, $a) = @_;
 
     if (!defined $a) {
@@ -86,18 +104,18 @@ sub or :method {
     return $s;
 }
 
-sub add :method {
+sub add : method {
     my ($self, $el) = @_;
 
     $self->grow_to_include($el);
     my $bits = $self->bits;
-    substr($bits, $el, 1) = 1;
+    substr($bits, $el, 1, '1');
     $self->bits($bits);
 
     return;
 }
 
-sub grow_to_include :method {
+sub grow_to_include : method {
     my ($self, $bit) = @_;
 
     if ($bit > length $self->bits) {
@@ -107,11 +125,11 @@ sub grow_to_include :method {
     return;
 }
 
-sub or_in_place :method {
+sub or_in_place : method {
     my ($self, $a) = @_;
 
     my $i = 0;
-    foreach my $b (split //, $a->bits) {
+    foreach my $b (split //xms, $a->bits) {
         if ($b) {
             $self->add($i);
         }
@@ -122,81 +140,83 @@ sub or_in_place :method {
     return $self;
 }
 
-sub clone :method {
+sub clone : method {
     my ($self) = @_;
 
     return ANTLR::Runtime::BitSet->new(bits => $self->bits);
 }
 
-sub size :method {
+sub size : method {
     my ($self) = @_;
 
-    return scalar $self->bits =~ /1/;
+    return scalar $self->bits =~ /1/xms;
 }
 
-sub equals :method {
+sub equals : method {
     my ($self, $other) = @_;
 
     return $self->bits eq $other->bits;
 }
 
-sub member :method {
-    Readonly my $usage => 'bool member($el)';
-    croak $usage if @_ != 2;
+sub member : method {
     my ($self, $el) = @_;
 
-    return (substr $self->bits, $el, 1) eq 1;
+    return (substr $self->bits, $el, 1) eq '1';
 }
 
-sub remove :method {
+sub remove : method {
     my ($self, $el) = @_;
 
     my $bits = $self->bits;
-    substr($bits, $el, 1) = 0;
+    substr($bits, $el, 1, '0');
     $self->bits($bits);
+
+    return;
 }
 
-sub is_nil :method {
+sub is_nil : method {
     my ($self) = @_;
 
-    return $self->bits =~ /1/ ? 1 : 0;
+    return $self->bits =~ /1/xms ? 1 : 0;
 }
 
-sub num_bits :method {
+sub num_bits : method {
     my ($self) = @_;
     return length $self->bits;
 }
 
-sub length_in_long_words :method {
+sub length_in_long_words : method {
     my ($self) = @_;
     return $self->num_bits() / $self->BITS;
 }
 
-sub to_array :method {
+sub to_array : method {
     my ($self) = @_;
 
     my $elems = [];
 
-    while ($self->bits =~ /1/g) {
+    while ($self->bits =~ /1/gxms) {
         push @$elems, $-[0];
     }
+
+    return $elems;
 }
 
-sub to_packed_array :method {
+sub to_packed_array : method {
     my ($self) = @_;
 
     return [
-        $self->bits =~ /.{BITS}/g
+        $self->bits =~ /.{BITS}/gxms
     ];
 }
 
-sub str :method {
+sub str : method {
     my ($self) = @_;
 
     return $self->to_string();
 }
 
-sub to_string :method {
+sub to_string : method {
     my ($self, $args) = @_;
 
     my $token_names;
@@ -206,7 +226,7 @@ sub to_string :method {
 
     my @str;
     my $i = 0;
-    foreach my $b (split //, $self->bits) {
+    foreach my $b (split //xms, $self->bits) {
         if ($b) {
             if (defined $token_names) {
                 push @str, $token_names->[$i];
@@ -221,6 +241,8 @@ sub to_string :method {
     return '{' . (join ',', @str) . '}';
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
 __END__
 

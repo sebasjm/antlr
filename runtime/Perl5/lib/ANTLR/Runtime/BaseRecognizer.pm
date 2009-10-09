@@ -1,5 +1,4 @@
 package ANTLR::Runtime::BaseRecognizer;
-use ANTLR::Runtime::Class;
 
 use Readonly;
 use Carp;
@@ -10,35 +9,37 @@ use ANTLR::Runtime::UnwantedTokenException;
 use ANTLR::Runtime::MissingTokenException;
 use ANTLR::Runtime::MismatchedTokenException;
 
-use constant {
-    MEMO_RULE_FAILED => -2,
-    MEMO_RULE_UNKNOWN => -1,
-    INITIAL_FOLLOW_STACK_SIZE => 100,
+use Moose;
 
-    # copies from Token object for convenience in actions
-    DEFAULT_TOKEN_CHANNEL => ANTLR::Runtime::Token->DEFAULT_CHANNEL,
-    HIDDEN => ANTLR::Runtime::Token->HIDDEN_CHANNEL,
+Readonly my $MEMO_RULE_FAILED => -2;
+sub MEMO_RULE_FAILED { $MEMO_RULE_FAILED }
 
-    NEXT_TOKEN_RULE_NAME => 'next_token',
-};
+Readonly my $MEMO_RULE_UNKNOWN => -1;
+sub MEMO_RULE_UNKNOWN { $MEMO_RULE_UNKNOWN }
+
+Readonly my $INITIAL_FOLLOW_STACK_SIZE => 100;
+sub INITIAL_FOLLOW_STACK_SIZE { $INITIAL_FOLLOW_STACK_SIZE }
+
+# copies from Token object for convenience in actions
+Readonly my $DEFAULT_TOKEN_CHANNEL => ANTLR::Runtime::Token->DEFAULT_CHANNEL;
+sub DEFAULT_TOKEN_CHANNEL { $DEFAULT_TOKEN_CHANNEL }
+
+Readonly my $HIDDEN => ANTLR::Runtime::Token->HIDDEN_CHANNEL;
+sub HIDDEN { $HIDDEN }
+
+Readonly my $NEXT_TOKEN_RULE_NAME => 'next_token';
+sub NEXT_TOKEN_RULE_NAME { $NEXT_TOKEN_RULE_NAME }
 
 # State of a lexer, parser, or tree parser are collected into a state
 # object so the state can be shared.  This sharing is needed to
 # have one grammar import others and share same error variables
 # and other state variables.  It's a kind of explicit multiple
 # inheritance via delegation of methods and shared state.
-has 'state';
-
-sub BUILD {
-    my ($self, $arg_ref) = @_;
-
-    if (exists $arg_ref->{state}) {
-        $self->state($arg_ref->{state});
-    }
-    else {
-        $self->state(ANTLR::Runtime::RecognizerSharedState->new());
-    }
-}
+has 'state' => (
+    is  => 'rw',
+    isa => 'ANTLR::Runtime::RecognizerSharedState',
+    default => sub { ANTLR::Runtime::RecognizerSharedState->new() },
+);
 
 sub reset {
     my ($self) = @_;
@@ -355,7 +356,7 @@ sub recover_from_mismatched_token {
 
     ANTLR::Runtime::MismatchedTokenException->new({
         expecting => $ttype,
-        input => $input
+        input => $input,
     })->throw();
 }
 
@@ -599,8 +600,9 @@ sub trace_out {
     print "\n";
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
-
 __END__
 
 =head1 NAME

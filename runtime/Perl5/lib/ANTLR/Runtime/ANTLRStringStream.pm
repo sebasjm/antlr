@@ -1,32 +1,61 @@
 package ANTLR::Runtime::ANTLRStringStream;
-use ANTLR::Runtime::Class;
 
 use Carp;
 use Readonly;
 
 use ANTLR::Runtime::CharStreamState;
 
-extends 'ANTLR::Runtime::CharStream';
+use Moose;
 
-has 'input';
-has 'p';
-has 'line';
-has 'char_position_in_line';
-has 'mark_depth';
-has 'markers';
-has 'last_marker';
+with 'ANTLR::Runtime::IntStream', 'ANTLR::Runtime::CharStream';
 
-sub BUILD {
-    my ($self, $arg_ref) = @_;
+has 'input' => (
+    is  => 'ro',
+    isa => 'Str',
+    required => 1,
+);
 
-    $self->input($arg_ref->{input});
-    $self->p(0);
-    $self->line(1);
-    $self->char_position_in_line(0);
-    $self->mark_depth(0);
-    $self->markers([ undef ]);  # depth 0 means no backtracking, leave blank
-    $self->last_marker(0);
-}
+has 'p' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'line' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 1,
+);
+
+has 'char_position_in_line' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'mark_depth' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'markers' => (
+    is  => 'rw',
+    isa => 'ArrayRef[Maybe[ANTLR::Runtime::CharStreamState]]',
+    default => sub { [ undef ] },
+);
+
+has 'last_marker' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'name' => (
+    is  => 'rw',
+    isa => 'Str',
+    default => q{},
+);
 
 sub get_line {
     my ($self) = @_;
@@ -51,19 +80,16 @@ sub set_char_position_in_line {
 }
 
 sub reset {
-    Readonly my $usage => 'reset()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     $self->p(0);
     $self->line(1);
     $self->char_position_in_line(0);
     $self->mark_depth(0);
+    return;
 }
 
 sub consume {
-    Readonly my $usage => 'consume()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     if ($self->p < length $self->input) {
@@ -74,11 +100,10 @@ sub consume {
         }
         $self->p($self->p + 1);
     }
+    return;
 }
 
 sub LA {
-    Readonly my $usage => 'char LA($i)';
-    croak $usage if @_ != 2;
     my ($self, $i) = @_;
 
     if ($i == 0) {
@@ -100,32 +125,24 @@ sub LA {
 }
 
 sub LT {
-    Readonly my $usage => 'char LT($i)';
-    croak $usage if @_ != 2;
     my ($self, $i) = @_;
 
     return $self->LA($i);
 }
 
 sub index {
-    Readonly my $usage => 'int index()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->p;
 }
 
 sub size {
-    Readonly my $usage => 'int size()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return length $self->input;
 }
 
 sub mark {
-    Readonly my $usage => 'int mark()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     $self->mark_depth($self->mark_depth + 1);
@@ -146,8 +163,6 @@ sub mark {
 }
 
 sub rewind {
-    Readonly my $usage => 'rewind($m)';
-    croak $usage if @_ != 1 && @_ != 2;
     my $self = shift;
     my $m;
     if (@_ == 0) {
@@ -162,24 +177,22 @@ sub rewind {
     $self->line($state->get_line);
     $self->char_position_in_line($state->get_char_position_in_line);
     $self->release($m);
+    return;
 }
 
 sub release {
-    Readonly my $usage => 'release($marker)';
-    croak $usage if @_ != 2;
     my ($self, $marker) = @_;
 
     # unwind any other markers made after m and release m
     $self->mark_depth($marker);
     # release this marker
     $self->mark_depth($self->mark_depth - 1);
+    return;
 }
 
 # consume() ahead unit p == index; can't just set p = index as we must update
 # line and char_position_in_line
 sub seek {
-    Readonly my $usage => 'seek($index)';
-    croak $usage if @_ != 2;
     my ($self, $index) = @_;
 
     if ($index <= $self->p) {
@@ -192,14 +205,20 @@ sub seek {
     while ($self->p < $index) {
         $self->consume();
     }
+    return;
 }
 
 sub substring {
-    Readonly my $usage => 'string substring($start, $stop)';
-    croak $usage if @_ != 3;
     my ($self, $start, $stop) = @_;
 
     return substr $self->input, $start, $stop - $start + 1;
 }
 
+sub get_source_name {
+    my ($self) = @_;
+    return $self->name;
+}
+
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;

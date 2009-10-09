@@ -20,8 +20,9 @@ WriteMakefile(
     AUTHOR        => 'Ronald Blaschke <ron@rblasch.org>',
     PREREQ_PM     => {
                       'Carp'              => '1.04',
+                      'Moose'             => '0.82',
                       'Readonly'          => '1.03',
                       'Test::Class'       => '0.28',
                      },
-    test          => { TESTS => 't/classes/ANTLR/Runtime/*.t t/*.t t/examples/*.t' },
+    test          => { TESTS => 't/*.t t/examples/*.t' },
 );

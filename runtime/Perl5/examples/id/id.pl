@@ -10,11 +10,11 @@ use strict;
 use warnings;
 
 my $input = ANTLR::Runtime::ANTLRStringStream->new({ input => "Hello World!\n42\n" });
-my $lexer = IDLexer->new($input);
+my $lexer = IDLexer->new({ input => $input });
 
 while (1) {
     my $token = $lexer->next_token();
-    last if $token->get_type() == $IDLexer::EOF;
+    last if $token->get_type() == IDLexer->EOF;
 
     print "text: ", $token->get_text(), "\n";
     print "type: ", $token->get_type(), "\n";

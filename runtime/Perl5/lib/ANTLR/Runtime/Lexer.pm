@@ -1,29 +1,26 @@
 package ANTLR::Runtime::Lexer;
-use ANTLR::Runtime::Class;
 
 use English qw( -no_match_vars );
 use Readonly;
 use Carp;
 use Switch;
 
-use ANTLR::Runtime::Class;
 use ANTLR::Runtime::Token;
+use ANTLR::Runtime::CommonToken;
 use ANTLR::Runtime::CharStream;
 use ANTLR::Runtime::MismatchedTokenException;
 
-extends 'ANTLR::Runtime::BaseRecognizer', 'ANTLR::Runtime::TokenSource';
+use Moose;
 
-has 'input';
+extends 'ANTLR::Runtime::BaseRecognizer';
+with 'ANTLR::Runtime::TokenSource';
 
-sub BUILD {
-    my ($self, $arg_ref) = @_;
-
-    $self->input($arg_ref->{input});
-}
+has 'input' => (
+    is => 'rw',
+    does => 'ANTLR::Runtime::CharStream',
+);
 
 sub reset {
-    Readonly my $usage => 'reset()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     # reset all recognizer state variables
@@ -49,8 +46,6 @@ sub reset {
 # Return a token from this source; i.e., match a token on the char
 # stream.
 sub next_token {
-    Readonly my $usage => 'Token next_token()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     while (1) {
@@ -100,8 +95,6 @@ sub next_token {
 # if token==null at end of any token rule, it creates one for you
 # and emits it.
 sub skip {
-    Readonly my $usage => 'skip()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     $self->state->token(ANTLR::Runtime::Token->SKIP_TOKEN);
@@ -115,8 +108,6 @@ sub m_tokens {
 
 # Set the char stream and reset the lexer
 sub set_char_stream {
-    Readonly my $usage => 'set_char_stream(CharStream $input)';
-    croak $usage if @_ != 2;
     my ($self, $input) = @_;
 
     $self->input(undef);
@@ -135,9 +126,6 @@ sub get_source_name {
 }
 
 sub emit {
-    Readonly my $usage => 'void emit(Token $token) | Token emit()';
-    croak $usage if @_ != 1 && @_ != 2;
-
     if (@_ == 1) {
         my ($self) = @_;
 	# The standard method called to automatically emit a token at the
@@ -169,8 +157,6 @@ sub emit {
 }
 
 sub match {
-    Readonly my $usage => 'void match(string|char s)';
-    croak $usage if @_ != 2;
     my ($self, $s) = @_;
 
     foreach my $c (split //, $s) {
@@ -192,16 +178,12 @@ sub match {
 }
 
 sub match_any {
-    Readonly my $usage => 'void match_any()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     $self->input->consume();
 }
 
 sub match_range {
-    Readonly my $usage => 'void match_range($a, $b)';
-    croak $usage if @_ != 3;
     my ($self, $a, $b) = @_;
 
     if ($self->input->LA(1) lt $a || $self->input->LA(1) gt $b) {
@@ -220,16 +202,12 @@ sub match_range {
 }
 
 sub get_line {
-    Readonly my $usage => 'int get_line()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->input->get_line();
 }
 
 sub get_char_position_in_line {
-    Readonly my $usage => 'int get_char_position_in_line()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->input->get_char_position_in_line();
@@ -237,8 +215,6 @@ sub get_char_position_in_line {
 
 # What is the index of the current character of lookahead?
 sub get_char_index {
-    Readonly my $usage => 'int get_char_index()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->input->index();
@@ -247,8 +223,6 @@ sub get_char_index {
 # Return the text matched so far for the current token or any
 # text override.
 sub get_text {
-    Readonly my $usage => 'string get_text()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     if (defined $self->state->text) {
@@ -260,8 +234,6 @@ sub get_text {
 # Set the complete text of this token; it wipes any previous
 # changes to the text.
 sub set_text {
-    Readonly my $usage => 'void set_text(string text)';
-    croak $usage if @_ != 2;
     my ($self, $text) = @_;
 
     $self->state->text($text);
@@ -276,8 +248,6 @@ sub report_error {
 }
 
 sub get_error_message {
-    Readonly my $usage => 'String get_error_message(RecognitionException e, String[] token_names)';
-    croak $usage if @_ != 3;
     my ($self, $e, $token_names) = @_;
 
     my $msg;
@@ -297,7 +267,7 @@ sub get_error_message {
     } elsif ($e->isa('ANTLR::Runtime::MismatchedNotSetException')) {
         $msg = 'mismatched character ' . $self->get_char_error_display($e->get_c())
           . ' expecting set ' . $e->expecting;
-    } elsif ($e->isa('ANTLR::Runtime::MisMatchedRangeException')) {
+    } elsif ($e->isa('ANTLR::Runtime::MismatchedRangeException')) {
         $msg = 'mismatched character ' . $self->get_char_error_display($e->get_c())
           . ' expecting set ' . $self->get_char_error_display($e->a)
           . '..' . $self->get_char_error_display($e->b);
@@ -308,8 +278,6 @@ sub get_error_message {
 }
 
 sub get_char_error_display {
-    Readonly my $usage => 'String get_char_error_display(int c)';
-    croak $usage if @_ != 2;
     my ($self, $c) = @_;
 
     my $s;
@@ -333,16 +301,12 @@ sub get_char_error_display {
 # it all works out.  You can instead use the rule invocation stack
 # to do sophisticated error recovery if you are in a fragment rule.
 sub recover {
-    Readonly my $usage => 'void recover(RecognitionException re)';
-    croak $usage if @_ != 2;
     my ($self, $re) = @_;
 
     $self->input->consume();
 }
 
 sub trace_in {
-    Readonly my $usage => 'void trace_in(String rule_name, int rule_index)';
-    croak $usage if @_ != 3;
     my ($self, $rule_name, $rule_index) = @_;
 
     my $input_symbol = $self->input->LT(1) . ' line=' . $self->get_line() . ':' . $self->get_char_position_in_line();
@@ -350,12 +314,12 @@ sub trace_in {
 }
 
 sub trace_out {
-    Readonly my $usage => 'void trace_out(String rule_name, int rule_index)';
-    croak $usage if @_ != 3;
     my ($self, $rule_name, $rule_index) = @_;
 
     my $input_symbol = $self->input->LT(1) . ' line=' . $self->get_line() . ':' . $self->get_char_position_in_line();
     $self->SUPER::trace_out($rule_name, $rule_index, $input_symbol);
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;

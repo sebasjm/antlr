@@ -1,18 +1,16 @@
 package ANTLR::Runtime::MissingTokenException;
-use ANTLR::Runtime::Class;
+
+use Moose;
 
 use overload
     '""' => \&to_string;
 
 extends 'ANTLR::Runtime::MismatchedTokenException';
 
-has 'inserted';
-
-sub BUILD {
-    my ($self, $arg_ref) = @_;
-    my $inserted = $arg_ref->{inserted};
-    $self->inserted($inserted);
-}
+has 'inserted' => (
+    is  => 'ro',
+    isa => 'Any',
+);
 
 sub get_missing_type {
     my ($self) = @_;
@@ -32,5 +30,7 @@ sub to_string {
     return "MissingTokenException";
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
 __END__

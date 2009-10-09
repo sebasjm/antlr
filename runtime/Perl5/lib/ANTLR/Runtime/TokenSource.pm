@@ -1,12 +1,17 @@
 package ANTLR::Runtime::TokenSource;
-use ANTLR::Runtime::Class;
+
+use Moose::Role;
 
 # Return a Token object from your input stream (usually a CharStream).
 # Do not fail/return upon lexing error; keep chewing on the characters
 # until you get a good one; errors are not passed through to the parser.
-sub next_token {
-}
+requires 'next_token';
 
+# Where are you getting tokens from? normally the implication will simply
+# ask lexers input stream.
+requires 'get_source_name';
+
+no Moose::Role;
 1;
 __END__
 

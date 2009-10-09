@@ -1,10 +1,18 @@
 package ANTLR::Runtime::ParserRuleReturnScope;
-use ANTLR::Runtime::Class;
+
+use Moose;
 
 extends 'ANTLR::Runtime::RuleReturnScope';
 
-has 'start';
-has 'stop';
+has 'start' => (
+    is   => 'rw',
+    does => 'ANTLR::Runtime::Token',
+);
+
+has 'stop' => (
+    is   => 'rw',
+    does => 'ANTLR::Runtime::Token',
+);
 
 sub get_start {
     my ($self) = @_;
@@ -16,5 +24,7 @@ sub get_stop {
     return $self->stop;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
 __END__

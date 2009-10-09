@@ -1,38 +1,23 @@
 package ANTLR::Runtime::Stream;
-use ANTLR::Runtime::Class;
 
-use Readonly;
+use Moose::Role;
 
-sub consume {
-    Readonly my $usage => 'void consume()';
-}
+requires 'consume';
 
-sub LA {
-    Readonly my $usage => 'int LA(int i)';
-}
+requires 'LA';
 
-sub mark {
-    Readonly my $usage => 'int mark()';
-}
+requires 'mark';
 
-sub index {
-    Readonly my $usage => 'int index()';
-}
+requires 'index';
 
-sub rewind {
-    Readonly my $usage => 'void rewind()';
-}
+requires 'rewind';
 
-sub release {
-    Readonly my $usage => 'void release(int marker)';
-}
+requires 'release';
 
-sub seek {
-    Readonly my $usage => 'void seek(int index)';
-}
+requires 'seek';
 
-sub size {
-    Readonly my $usage => 'int size()';
-}
+requires 'size';
 
+no Moose::Role;
 1;
+__END__

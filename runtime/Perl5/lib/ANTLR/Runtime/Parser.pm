@@ -1,22 +1,18 @@
 package ANTLR::Runtime::Parser;
-use ANTLR::Runtime::Class;
 
 use Readonly;
 use Carp;
 
+use Moose;
+
 extends 'ANTLR::Runtime::BaseRecognizer';
 
-has 'input';
-
-sub BUILD {
-    my ($self, $arg_ref) = @_;
-
-    $self->set_token_stream($arg_ref->{input});
-}
+has 'input' => (
+    is   => 'rw',
+    does => 'ANTLR::Runtime::TokenStream'
+);
 
 sub reset {
-    Readonly my $usage => 'void reset()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     $self->SUPER::reset();  #  reset all recognizer state variables
@@ -61,8 +57,6 @@ sub get_missing_symbol {
 }
 
 sub set_token_stream {
-    Readonly my $usage => 'void set_token_stream(TokenStream input)';
-    croak $usage if @_ != 2;
     my ($self, $input) = @_;
 
     $self->input(undef);
@@ -71,8 +65,6 @@ sub set_token_stream {
 }
 
 sub get_token_stream {
-    Readonly my $usage => 'TokenStream get_token_stream()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     return $self->input;
@@ -84,19 +76,18 @@ sub get_source_name {
 }
 
 sub trace_in {
-    Readonly my $usage => 'void trace_in(String rule_name, int rule_index)';
-    croak $usage if @_ != 3;
     my ($self, $rule_name, $rule_index) = @_;
 
     $self->SUPER::trace_in($rule_name, $rule_index, $self->input->LT(1));
 }
 
 sub trace_out {
-    Readonly my $usage => 'void trace_out(String rule_name, int rule_index)';
-    croak $usage if @_ != 3;
     my ($self, $rule_name, $rule_index) = @_;
 
     $self->SUPER::trace_out($rule_name, $rule_index, $self->input->LT(1));
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
+__END__

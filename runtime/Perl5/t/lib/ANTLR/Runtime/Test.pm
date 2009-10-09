@@ -73,7 +73,6 @@ sub g_test_output_is {
     write_file($test_program_file, $test_program);
 
     my $cwd = cwd;
-    chdir $tmpdir;
     my $test_result;
     eval {
         # compile grammar
@@ -87,18 +86,20 @@ sub g_test_output_is {
         else {
             $antlr = 'antlr';
         }
-        my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', $antlr), $grammar_file ]);
+        my $g_result = run_program([ File::Spec->catfile($cwd, 'tools', $antlr), '-o', $tmpdir, $grammar_file ]);
         if ($g_result->{exit_code} >> 8 != 0) {
             croak $g_result->{err};
         }
 
         # run test program
-        $test_result = run_program([ get_perl(), "-Mblib=$cwd", 'test.pl']);
-        if ($test_result->{exit_code} >> 8 != 0) {
-            croak $test_result->{err};
+        {
+            local $ENV{PERLCOV_DB} = File::Spec->catfile($tmpdir, 'perlcov.db');
+            $test_result = run_program([ get_perl(), '-Mblib', "-I$tmpdir", $test_program_file ]);
+            if ($test_result->{exit_code} >> 8 != 0) {
+                croak $test_result->{err};
+            }
         }
     };
-    chdir $cwd;
     die $@ if $@;
 
     my $actual = $test_result->{out};
@@ -125,11 +126,13 @@ sub run_program {
     my $err = read_file('err.tmp');
     close STDERR or die "Can't close stderr: $!";
     open STDERR, '>&', $old_err or die "Can't restore stderr: $!";
+    unlink 'err.tmp' or warn "Can't remove err.tmp: $!";
 
     # restore stdout
     my $out = read_file('out.tmp');
     close STDOUT or die "Can't close stdout: $!";
     open STDOUT, '>&', $old_out or die "Can't restore stdout: $!";
+    unlink 'out.tmp' or warn "Can't remove out.tmp: $!";
 
     my $exit_value;
     if ($exit_code < 0) {

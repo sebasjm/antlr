@@ -25,7 +25,6 @@ lib/ANTLR/Runtime/BaseRecognizer.pm
 lib/ANTLR/Runtime/BitSet.pm
 lib/ANTLR/Runtime/CharStream.pm
 lib/ANTLR/Runtime/CharStreamState.pm
-lib/ANTLR/Runtime/Class.pm
 lib/ANTLR/Runtime/CommonToken.pm
 lib/ANTLR/Runtime/CommonTokenStream.pm
 lib/ANTLR/Runtime/DFA.pm
@@ -37,8 +36,6 @@ lib/ANTLR/Runtime/MismatchedSetException.pm
 lib/ANTLR/Runtime/MismatchedTokenException.pm
 lib/ANTLR/Runtime/MissingTokenException.pm
 lib/ANTLR/Runtime/NoViableAltException.pm
-lib/ANTLR/Runtime/Object.pm
-lib/ANTLR/Runtime/Object/Signature.pm
 lib/ANTLR/Runtime/Parser.pm
 lib/ANTLR/Runtime/RecognitionException.pm
 lib/ANTLR/Runtime/Stream.pm
@@ -52,11 +49,6 @@ t/author/perlcritic.t
 t/author/perlcriticrc
 t/author/pod-coverage.t
 t/author/pod.t
-t/classes/ANTLR/Runtime/ANTLRStringStream.t
-t/classes/ANTLR/Runtime/BitSet.t
-t/classes/ANTLR/Runtime/Exception.t
-t/classes/ANTLR/Runtime/Lexer.t
-t/classes/ANTLR/Runtime/Object.t
 t/examples/expr.t
 t/examples/simplecalc.t
 t/lexer.t

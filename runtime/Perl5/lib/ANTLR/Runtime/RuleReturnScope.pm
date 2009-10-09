@@ -1,5 +1,6 @@
 package ANTLR::Runtime::RuleReturnScope;
-use ANTLR::Runtime::Class;
+
+use Moose;
 
 sub get_start {
     return;
@@ -17,4 +18,6 @@ sub get_template {
     return;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;

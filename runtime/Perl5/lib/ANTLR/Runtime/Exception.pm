@@ -1,41 +1,23 @@
 package ANTLR::Runtime::Exception;
-use ANTLR::Runtime::Class;
 
 use Exception::Class;
 
-has 'base';
+use Moose;
+
+extends 'Moose::Object', 'Exception::Class::Base';
 
 sub BUILD {
-    my ($self, $arg_ref) = @_;
+    my ($self, $args) = @_;
 
-    my %base_args;
-    if (defined (my $message = $arg_ref->{message})) {
-        $base_args{message} = $message;
+    my %exception_args;
+    if (exists $args->{message}) {
+        $exception_args{message} = $args->{message};
     }
-    my $base = Exception::Class::Base->new(%base_args);
 
-    $self->base($base);
+    $self->_initialize(%exception_args);
+    return;
 }
 
-sub message {
-    my ($self, @args) = @_;
-    return $self->base->message(@args);
-}
-
-sub throw {
-    return Exception::Class::Base::throw(@_);
-}
-
-sub rethrow {
-    return Exception::Class::Base::rethrow(@_);
-}
-
-sub caught {
-    return Exception::Class::Base::caught(@_);
-}
-
-sub description {
-    return 'ANTLR::Runtime Base Exception';
-}
-
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;

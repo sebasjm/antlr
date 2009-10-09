@@ -1,31 +1,21 @@
 package ANTLR::Runtime::CharStream;
-use ANTLR::Runtime::Class;
 
 use Carp;
 use Readonly;
 
-extends 'ANTLR::Runtime::IntStream';
+use Moose::Role;
+#extends 'ANTLR::Runtime::IntStream';
 
-use constant {
-    EOF => -1
-};
+Readonly my $EOF => -1;
+sub EOF { return $EOF }
 
-sub substring {
-}
+requires 'substring';
 
-sub LT {
-}
+requires 'LT';
 
-sub get_line {
-}
+requires 'get_line', 'set_line';
 
-sub set_line {
-}
+requires 'get_char_position_in_line', 'set_char_position_in_line';
 
-sub set_char_position_in_line {
-}
-
-sub get_char_position_in_line {
-}
-
+no Moose::Role;
 1;

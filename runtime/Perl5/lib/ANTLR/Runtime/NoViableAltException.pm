@@ -1,20 +1,27 @@
 package ANTLR::Runtime::NoViableAltException;
-use ANTLR::Runtime::Class;
+
+use Moose;
 
 extends 'ANTLR::Runtime::RecognitionException';
 
-has 'grammar_decision_description';
-has 'decision_number';
-has 'state_number';
+has 'grammar_decision_description' => (
+    is  => 'ro',
+    isa => 'Str',
+    required => 1,
+);
 
-sub BUILD {
-    my ($self, $arg_ref) = @_;
-    my ($grammar_decision_description, $decision_number, $state_number, $input) =
-        @$arg_ref{qw( grammar_decision_description decision_number state_number input )};
+has 'decision_number' => (
+    is  => 'ro',
+    isa => 'Int',
+    required => 1,
+);
 
-    $self->grammar_decision_description($grammar_decision_description);
-    $self->decision_number($decision_number);
-    $self->state_number($state_number);
-}
+has 'state_number' => (
+    is  => 'ro',
+    isa => 'Int',
+    required => 1,
+);
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;

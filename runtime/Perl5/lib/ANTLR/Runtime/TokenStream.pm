@@ -1,24 +1,16 @@
 package ANTLR::Runtime::TokenStream;
-use ANTLR::Runtime::Class;
 
-use Readonly;
+use Moose::Role;
+#extends 'ANTLR::Runtime::IntStream';
 
-extends 'ANTLR::Runtime::IntStream';
+requires 'LT';
 
-sub LT {
-    Readonly my $usage => 'Token LT(int k)';
-}
+requires 'get';
 
-sub get {
-    Readonly my $usage => 'Token get(int i)';
-}
+requires 'get_token_source';
 
-sub get_token_source {
-    Readonly my $usage => 'TokenSource get_token_source()';
-}
+requires 'to_string';
 
-sub to_string {
-    Readonly my $usage => 'String to_string(int start, int stop) | String to_string(Token start, Token stop)';
-}
-
+no Moose::Role;
 1;
+__END__

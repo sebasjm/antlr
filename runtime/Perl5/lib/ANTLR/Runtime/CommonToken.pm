@@ -1,72 +1,75 @@
 package ANTLR::Runtime::CommonToken;
-use ANTLR::Runtime::Class;
 
 use Readonly;
+
+use Moose;
 
 use overload
     'bool' => \&not_eof,
     fallback => 1,
     ;
 
-extends 'ANTLR::Runtime::Token';
+with 'ANTLR::Runtime::Token';
 
-has 'type';
-has 'line';
-has 'char_position_in_line';
-has 'channel';
-has 'input';
-has 'text';
-has 'index';
-has 'start';
-has 'stop';
+has 'type' => (
+    is  => 'rw',
+    isa => 'Int',
+    required => 1,
+);
+
+has 'line' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => 0,
+);
+
+has 'char_position_in_line' => (
+    is  => 'rw',
+    isa => 'Int',
+    # set to invalid position
+    default => -1,
+);
+
+has 'channel' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => sub { ANTLR::Runtime::Token->DEFAULT_CHANNEL }
+);
+
+has 'input' => (
+    is  => 'rw',
+    isa => 'Maybe[ANTLR::Runtime::CharStream]',
+);
+
+# We need to be able to change the text once in a while.  If
+# this is non-null, then getText should return this.  Note that
+# start/stop are not affected by changing this.
+has 'text' => (
+    is  => 'rw',
+    isa => 'Maybe[Str]',
+);
+
+# What token number is this from 0..n-1 tokens; < 0 implies invalid index
+has 'index' => (
+    is  => 'rw',
+    isa => 'Int',
+    default => -1,
+);
+
+# The char position into the input buffer where this token starts
+has 'start' => (
+    is  => 'rw',
+    isa => 'Int',
+);
+
+# The char position into the input buffer where this token stops
+has 'stop' => (
+    is  => 'rw',
+    isa => 'Int',
+);
 
 sub BUILD {
     my ($self, $arg_ref) = @_;
-
-    $self->type(undef);
-    $self->line(0);
-    # set to invalid position
-    $self->char_position_in_line(-1);
-    $self->channel($self->DEFAULT_CHANNEL);
-    $self->input(undef);
-
-    # We need to be able to change the text once in a while.  If
-    # this is non-null, then getText should return this.  Note that
-    # start/stop are not affected by changing this.
-    $self->text(undef);
-
-    # What token number is this from 0..n-1 tokens; < 0 implies invalid index
-    $self->index(-1);
-
-    # The char position into the input buffer where this token starts
-    $self->start(undef);
-
-    # The char position into the input buffer where this token stops
-    $self->stop(undef);
-
-    if (exists $arg_ref->{type}) {
-        $self->type($arg_ref->{type});
-    }
-
-    if (exists $arg_ref->{input}) {
-        $self->input($arg_ref->{input});
-    }
-
-    if (exists $arg_ref->{channel}) {
-        $self->channel($arg_ref->{channel});
-    }
-
-    if (exists $arg_ref->{start}) {
-        $self->start($arg_ref->{start});
-    }
-
-    if (exists $arg_ref->{stop}) {
-        $self->stop($arg_ref->{stop});
-    }
-
-    if (exists $arg_ref->{text}) {
-        $self->text($arg_ref->{text});
-    }
 
     if (exists $arg_ref->{token}) {
         my $token = $arg_ref->{token};
@@ -77,23 +80,33 @@ sub BUILD {
         $self->char_position_in_line($token->get_char_position_in_line());
         $self->channel($token->get_channel());
     }
+    return;
 }
 
-ANTLR::Runtime::Class::create_accessors(__PACKAGE__, {
-    type => 'rw',
-    line => 'rw',
-    text => 'w',
-    char_position_in_line => 'rw',
-    channel => 'rw',
-    input => 'rw',
-    index => 'rw',
-    start => 'rw',
-    stop => 'rw',
-});
+sub get_type {
+    my ($self) = @_;
+    return $self->type;
+}
+
+sub set_type {
+    my ($self, $value) = @_;
+    $self->value($value);
+    return;
+}
+
+
+sub get_line {
+    my ($self) = @_;
+    return $self->line;
+}
+
+sub set_line {
+    my ($self, $line) = @_;
+    $self->line($line);
+    return;
+}
 
 sub get_text {
-    Readonly my $usage => 'string get_text()';
-    croak $usage if @_ != 1;
     my ($self) = @_;
 
     if (defined $self->text) {
@@ -106,6 +119,34 @@ sub get_text {
     return $self->text;
 }
 
+sub set_text {
+    my ($self, $text) = @_;
+    $self->text($text);
+    return;
+}
+
+sub get_char_position_in_line {
+    my ($self) = @_;
+    return $self->char_position_in_line;
+}
+
+sub set_char_position_in_line {
+    my ($self, $pos) = @_;
+    $self->char_position_in_line($pos);
+    return;
+}
+
+sub get_channel {
+    my ($self) = @_;
+    return $self->channel;
+}
+
+sub set_channel {
+    my ($self, $channel) = @_;
+    $self->channel($channel);
+    return;
+}
+
 sub get_start_index {
     my ($self) = @_;
     return $self->start;
@@ -114,6 +155,7 @@ sub get_start_index {
 sub set_start_index {
     my ($self, $start) = @_;
     $self->start($start);
+    return;
 }
 
 sub get_stop_index {
@@ -124,6 +166,7 @@ sub get_stop_index {
 sub set_stop_index {
     my ($self, $stop) = @_;
     $self->stop($stop);
+    return;
 }
 
 sub get_token_index {
@@ -134,6 +177,18 @@ sub get_token_index {
 sub set_token_index {
     my ($self, $index) = @_;
     $self->index($index);
+    return;
+}
+
+sub get_input_stream {
+    my ($self) = @_;
+    return $self->input;
+}
+
+sub set_input_stream {
+    my ($self, $input) = @_;
+    $self->input($input);
+    return;
 }
 
 sub not_eof {
@@ -164,4 +219,6 @@ sub not_eof {
 
 =cut
 
+no Moose;
+__PACKAGE__->meta->make_immutable();
 1;
