@@ -93,7 +93,8 @@ sub g_test_output_is {
 
         # run test program
         {
-            local $ENV{PERLCOV_DB} = File::Spec->catfile($tmpdir, 'perlcov.db');
+            #local $ENV{PERLCOV_DB} = File::Spec->catfile($tmpdir, 'perlcov.db');
+            #local $ENV{NYTPROF} = 'file=' . File::Spec->catfile($tmpdir, 'nytprof.out');
             $test_result = run_program([ get_perl(), '-Mblib', "-I$tmpdir", $test_program_file ]);
             if ($test_result->{exit_code} >> 8 != 0) {
                 croak $test_result->{err};
