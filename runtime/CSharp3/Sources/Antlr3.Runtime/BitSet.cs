@@ -47,10 +47,10 @@ namespace Antlr.Runtime
      *  </summary>
      */
     [System.Serializable]
-    public class BitSet : ICloneable
+    public sealed class BitSet : ICloneable
     {
-        protected const int BITS = 64;    // number of bits / long
-        protected const int LOG_BITS = 6; // 2^6 == 64
+        private const int BITS = 64;    // number of bits / long
+        private const int LOG_BITS = 6; // 2^6 == 64
 
         /** <summary>
          *  We will often need to do a mod operator (i mod nbits).  Its
@@ -59,7 +59,7 @@ namespace Antlr.Runtime
          *  precomputed mod mask to do the mod instead.
          *  </summary>
          */
-        protected const int MOD_MASK = BITS - 1;
+        private const int MOD_MASK = BITS - 1;
 
         /** <summary>The actual data bits</summary> */
         ulong[] _bits;
@@ -128,7 +128,7 @@ namespace Antlr.Runtime
         }
 
         /** <summary>return this | a in a new set</summary> */
-        public virtual BitSet Or( BitSet a )
+        public BitSet Or( BitSet a )
         {
             if ( a == null )
             {
@@ -140,7 +140,7 @@ namespace Antlr.Runtime
         }
 
         /** <summary>or this element into this set (grow as necessary to accommodate)</summary> */
-        public virtual void Add( int el )
+        public void Add( int el )
         {
             int n = WordNumber( el );
             if ( n >= _bits.Length )
@@ -153,15 +153,13 @@ namespace Antlr.Runtime
         /** <summary>Grows the set to a larger number of bits.</summary>
          *  <param name="bit">element that must fit in set</param>
          */
-        public virtual void GrowToInclude( int bit )
+        public void GrowToInclude( int bit )
         {
             int newSize = Math.Max( _bits.Length << 1, NumWordsToHold( bit ) );
-            ulong[] newbits = new ulong[newSize];
-            Array.Copy( _bits, newbits, _bits.Length );
-            _bits = newbits;
+            SetSize(newSize);
         }
 
-        public virtual void OrInPlace( BitSet a )
+        public void OrInPlace( BitSet a )
         {
             if ( a == null )
             {
@@ -184,10 +182,7 @@ namespace Antlr.Runtime
          */
         private void SetSize( int nwords )
         {
-            ulong[] newbits = new ulong[nwords];
-            int n = Math.Min( nwords, _bits.Length );
-            Array.Copy( _bits, newbits, n );
-            _bits = newbits;
+            Array.Resize(ref _bits, nwords);
         }
 
         private static ulong BitMask( int bitNumber )
@@ -196,12 +191,12 @@ namespace Antlr.Runtime
             return 1UL << bitPosition;
         }
 
-        public virtual object Clone()
+        public object Clone()
         {
             return new BitSet( (ulong[])_bits.Clone() );
         }
 
-        public virtual int Size()
+        public int Size()
         {
             int deg = 0;
             for ( int i = _bits.Length - 1; i >= 0; i-- )
@@ -272,7 +267,7 @@ namespace Antlr.Runtime
             return true;
         }
 
-        public virtual bool Member( int el )
+        public bool Member( int el )
         {
             if ( el < 0 )
             {
@@ -285,7 +280,7 @@ namespace Antlr.Runtime
         }
 
         // remove this element from this set
-        public virtual void Remove( int el )
+        public void Remove( int el )
         {
             int n = WordNumber( el );
             if ( n < _bits.Length )
@@ -294,7 +289,7 @@ namespace Antlr.Runtime
             }
         }
 
-        public virtual bool IsNil()
+        public bool IsNil()
         {
             for ( int i = _bits.Length - 1; i >= 0; i-- )
             {
@@ -304,18 +299,18 @@ namespace Antlr.Runtime
             return true;
         }
 
-        private int NumWordsToHold( int el )
+        private static int NumWordsToHold( int el )
         {
             return ( el >> LOG_BITS ) + 1;
         }
 
-        public virtual int NumBits()
+        public int NumBits()
         {
             return _bits.Length << LOG_BITS; // num words * bits per word
         }
 
         /** <summary>return how much space is being used by the bits array not how many actually have member bits on.</summary> */
-        public virtual int LengthInLongWords()
+        public int LengthInLongWords()
         {
             return _bits.Length;
         }
@@ -328,7 +323,7 @@ namespace Antlr.Runtime
         }
         */
 
-        public virtual int[] ToArray()
+        public int[] ToArray()
         {
             int[] elems = new int[Size()];
             int en = 0;
@@ -352,7 +347,7 @@ namespace Antlr.Runtime
             return ToString( null );
         }
 
-        public virtual string ToString( string[] tokenNames )
+        public string ToString( string[] tokenNames )
         {
             StringBuilder buf = new StringBuilder();
             string separator = ",";
