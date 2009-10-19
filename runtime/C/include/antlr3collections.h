@@ -300,6 +300,14 @@ typedef struct ANTLR3_VECTOR_FACTORY_struct
          */
         ANTLR3_VECTOR        unTruc;
 
+		/** Consumers from the factory can release a factory produced vector 
+		 * back to the factory so that it may be reused (and thus conserve memory)
+		 * by another caller. The available vectors are stored here. Note that
+		 * the only vectors avaible in the free chain are produced by this factory, so they
+		 * need not be explicitly freed when the factory is closed.
+		 */
+		pANTLR3_STACK		 freeStack;
+
        	/** Function to close the vector factory
 	 */
 	void                (*close)	    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
@@ -307,6 +315,10 @@ typedef struct ANTLR3_VECTOR_FACTORY_struct
 	/** Function to supply a new vector
 	 */
 	pANTLR3_VECTOR      (*newVector)    (struct ANTLR3_VECTOR_FACTORY_struct * factory);
+
+	/// Function to return a vector to the factory for reuse
+	///
+	void				(*returnVector)	(struct ANTLR3_VECTOR_FACTORY_struct * factory, pANTLR3_VECTOR vector);
 
 }
 ANTLR3_VECTOR_FACTORY; 

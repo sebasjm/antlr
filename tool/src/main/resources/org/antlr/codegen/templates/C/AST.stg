@@ -107,6 +107,7 @@ retval.tree  = NULL;
 <endif>
 >>
 
+
 /**  a rule label including default value */
 ruleLabelInitVal(label) ::= <<
 <super.ruleLabelInitVal(...)>

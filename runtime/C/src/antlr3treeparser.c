@@ -210,7 +210,7 @@ getMissingSymbol			(pANTLR3_BASE_RECOGNIZER recognizer, pANTLR3_INT_STREAM	istre
 	pANTLR3_BASE_TREE				current;
 	pANTLR3_COMMON_TOKEN			token;
 	pANTLR3_STRING					text;
-    ANTLR3_UINT32                   i;
+    ANTLR3_INT32                   i;
 
 	// Dereference the standard pointers
 	//
