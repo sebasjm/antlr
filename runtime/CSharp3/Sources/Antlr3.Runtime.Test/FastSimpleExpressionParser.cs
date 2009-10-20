@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-09-30 13:18:09
+// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-10-18 19:39:56
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -40,8 +40,8 @@ public partial class FastSimpleExpressionParser : Parser
 		: this( input, new RecognizerSharedState() )
 	{
 	}
-	public FastSimpleExpressionParser( ITokenStream input, RecognizerSharedState state )
-		: base( input, state )
+	public FastSimpleExpressionParser(ITokenStream input, RecognizerSharedState state)
+		: base(input, state)
 	{
 		InitializeTreeAdaptor();
 		if ( TreeAdaptor == null )
@@ -77,7 +77,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 	// $ANTLR start "expression"
 	// FastSimpleExpression.g3:49:0: public expression : additive_expression EOF ;
-	public FastSimpleExpressionParser.expression_return expression(  )
+	public FastSimpleExpressionParser.expression_return expression()
 	{
 		FastSimpleExpressionParser.expression_return retval = new FastSimpleExpressionParser.expression_return();
 		retval.start = input.LT(1);
@@ -98,8 +98,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 			PushFollow(Follow._additive_expression_in_expression50);
 			additive_expression1=additive_expression();
-
-			state._fsp--;
+			PopFollow();
 
 			adaptor.AddChild(root_0, additive_expression1.Tree);
 			EOF2=(IToken)Match(input,EOF,Follow._EOF_in_expression54); 
@@ -115,7 +114,7 @@ public partial class FastSimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -126,6 +125,7 @@ public partial class FastSimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "expression"
 
@@ -137,7 +137,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 	// $ANTLR start "additive_expression"
 	// FastSimpleExpression.g3:54:0: additive_expression : multiplicative_expression ( ( '+' | '-' ) multiplicative_expression )* ;
-	private FastSimpleExpressionParser.additive_expression_return additive_expression(  )
+	private FastSimpleExpressionParser.additive_expression_return additive_expression()
 	{
 		FastSimpleExpressionParser.additive_expression_return retval = new FastSimpleExpressionParser.additive_expression_return();
 		retval.start = input.LT(1);
@@ -161,17 +161,16 @@ public partial class FastSimpleExpressionParser : Parser
 
 			PushFollow(Follow._multiplicative_expression_in_additive_expression65);
 			multiplicative_expression3=multiplicative_expression();
-
-			state._fsp--;
+			PopFollow();
 
 			adaptor.AddChild(root_0, multiplicative_expression3.Tree);
 			// FastSimpleExpression.g3:56:3: ( ( '+' | '-' ) multiplicative_expression )*
-			for ( ; ; )
+			while (true)
 			{
 				int alt2=2;
 				int LA2_0 = input.LA(1);
 
-				if ( (LA2_0==7||LA2_0==11) )
+				if ((LA2_0==7||LA2_0==11))
 				{
 					alt2=1;
 				}
@@ -186,11 +185,11 @@ public partial class FastSimpleExpressionParser : Parser
 					int alt1=2;
 					int LA1_0 = input.LA(1);
 
-					if ( (LA1_0==11) )
+					if ((LA1_0==11))
 					{
 						alt1=1;
 					}
-					else if ( (LA1_0==7) )
+					else if ((LA1_0==7))
 					{
 						alt1=2;
 					}
@@ -200,7 +199,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 						throw nvae;
 					}
-					switch ( alt1 )
+					switch (alt1)
 					{
 					case 1:
 						// FastSimpleExpression.g3:56:6: '+'
@@ -227,8 +226,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 					PushFollow(Follow._multiplicative_expression_in_additive_expression84);
 					multiplicative_expression6=multiplicative_expression();
-
-					state._fsp--;
+					PopFollow();
 
 					adaptor.AddChild(root_0, multiplicative_expression6.Tree);
 
@@ -253,7 +251,7 @@ public partial class FastSimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -264,6 +262,7 @@ public partial class FastSimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "additive_expression"
 
@@ -275,7 +274,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 	// $ANTLR start "multiplicative_expression"
 	// FastSimpleExpression.g3:61:0: multiplicative_expression : atom ( ( '*' | '/' | '%' ) atom )* ;
-	private FastSimpleExpressionParser.multiplicative_expression_return multiplicative_expression(  )
+	private FastSimpleExpressionParser.multiplicative_expression_return multiplicative_expression()
 	{
 		FastSimpleExpressionParser.multiplicative_expression_return retval = new FastSimpleExpressionParser.multiplicative_expression_return();
 		retval.start = input.LT(1);
@@ -301,17 +300,16 @@ public partial class FastSimpleExpressionParser : Parser
 
 			PushFollow(Follow._atom_in_multiplicative_expression100);
 			atom7=atom();
-
-			state._fsp--;
+			PopFollow();
 
 			adaptor.AddChild(root_0, atom7.Tree);
 			// FastSimpleExpression.g3:63:3: ( ( '*' | '/' | '%' ) atom )*
-			for ( ; ; )
+			while (true)
 			{
 				int alt4=2;
 				int LA4_0 = input.LA(1);
 
-				if ( ((LA4_0>=8 && LA4_0<=10)) )
+				if (((LA4_0>=8 && LA4_0<=10)))
 				{
 					alt4=1;
 				}
@@ -324,7 +322,7 @@ public partial class FastSimpleExpressionParser : Parser
 					{
 					// FastSimpleExpression.g3:63:5: ( '*' | '/' | '%' )
 					int alt3=3;
-					switch ( input.LA(1) )
+					switch (input.LA(1))
 					{
 					case 9:
 						{
@@ -349,7 +347,7 @@ public partial class FastSimpleExpressionParser : Parser
 						}
 					}
 
-					switch ( alt3 )
+					switch (alt3)
 					{
 					case 1:
 						// FastSimpleExpression.g3:63:6: '*'
@@ -386,8 +384,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 					PushFollow(Follow._atom_in_multiplicative_expression124);
 					atom11=atom();
-
-					state._fsp--;
+					PopFollow();
 
 					adaptor.AddChild(root_0, atom11.Tree);
 
@@ -412,7 +409,7 @@ public partial class FastSimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -423,6 +420,7 @@ public partial class FastSimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "multiplicative_expression"
 
@@ -434,7 +432,7 @@ public partial class FastSimpleExpressionParser : Parser
 
 	// $ANTLR start "atom"
 	// FastSimpleExpression.g3:68:0: atom : ( IDENTIFIER | NUMBER );
-	private FastSimpleExpressionParser.atom_return atom(  )
+	private FastSimpleExpressionParser.atom_return atom()
 	{
 		FastSimpleExpressionParser.atom_return retval = new FastSimpleExpressionParser.atom_return();
 		retval.start = input.LT(1);
@@ -453,7 +451,7 @@ public partial class FastSimpleExpressionParser : Parser
 			root_0 = (CommonTree)adaptor.Nil();
 
 			set12=(IToken)input.LT(1);
-			if ( (input.LA(1)>=IDENTIFIER && input.LA(1)<=NUMBER) )
+			if ((input.LA(1)>=IDENTIFIER && input.LA(1)<=NUMBER))
 			{
 				input.Consume();
 				adaptor.AddChild(root_0, (CommonTree)adaptor.Create(set12));
@@ -474,7 +472,7 @@ public partial class FastSimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -485,6 +483,7 @@ public partial class FastSimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "atom"
 	#endregion Rules

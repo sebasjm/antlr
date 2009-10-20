@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 SimpleExpression.g3 2009-09-30 13:14:34
+// $ANTLR 3.1.2 SimpleExpression.g3 2009-10-18 19:39:54
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -40,8 +40,8 @@ public partial class SimpleExpressionParser : Parser
 		: this( input, new RecognizerSharedState() )
 	{
 	}
-	public SimpleExpressionParser( ITokenStream input, RecognizerSharedState state )
-		: base( input, state )
+	public SimpleExpressionParser(ITokenStream input, RecognizerSharedState state)
+		: base(input, state)
 	{
 		InitializeTreeAdaptor();
 		if ( TreeAdaptor == null )
@@ -77,7 +77,7 @@ public partial class SimpleExpressionParser : Parser
 
 	// $ANTLR start "expression"
 	// SimpleExpression.g3:43:0: public expression : additive_expression EOF ;
-	public SimpleExpressionParser.expression_return expression(  )
+	public SimpleExpressionParser.expression_return expression()
 	{
 		SimpleExpressionParser.expression_return retval = new SimpleExpressionParser.expression_return();
 		retval.start = input.LT(1);
@@ -98,8 +98,7 @@ public partial class SimpleExpressionParser : Parser
 
 			PushFollow(Follow._additive_expression_in_expression39);
 			additive_expression1=additive_expression();
-
-			state._fsp--;
+			PopFollow();
 
 			adaptor.AddChild(root_0, additive_expression1.Tree);
 			EOF2=(IToken)Match(input,EOF,Follow._EOF_in_expression43); 
@@ -115,7 +114,7 @@ public partial class SimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -126,6 +125,7 @@ public partial class SimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "expression"
 
@@ -137,7 +137,7 @@ public partial class SimpleExpressionParser : Parser
 
 	// $ANTLR start "additive_expression"
 	// SimpleExpression.g3:48:0: additive_expression : multiplicative_expression ( ( '+' | '-' ) multiplicative_expression )* ;
-	private SimpleExpressionParser.additive_expression_return additive_expression(  )
+	private SimpleExpressionParser.additive_expression_return additive_expression()
 	{
 		SimpleExpressionParser.additive_expression_return retval = new SimpleExpressionParser.additive_expression_return();
 		retval.start = input.LT(1);
@@ -161,17 +161,16 @@ public partial class SimpleExpressionParser : Parser
 
 			PushFollow(Follow._multiplicative_expression_in_additive_expression54);
 			multiplicative_expression3=multiplicative_expression();
-
-			state._fsp--;
+			PopFollow();
 
 			adaptor.AddChild(root_0, multiplicative_expression3.Tree);
 			// SimpleExpression.g3:50:3: ( ( '+' | '-' ) multiplicative_expression )*
-			for ( ; ; )
+			while (true)
 			{
 				int alt2=2;
 				int LA2_0 = input.LA(1);
 
-				if ( (LA2_0==7||LA2_0==11) )
+				if ((LA2_0==7||LA2_0==11))
 				{
 					alt2=1;
 				}
@@ -186,11 +185,11 @@ public partial class SimpleExpressionParser : Parser
 					int alt1=2;
 					int LA1_0 = input.LA(1);
 
-					if ( (LA1_0==11) )
+					if ((LA1_0==11))
 					{
 						alt1=1;
 					}
-					else if ( (LA1_0==7) )
+					else if ((LA1_0==7))
 					{
 						alt1=2;
 					}
@@ -200,7 +199,7 @@ public partial class SimpleExpressionParser : Parser
 
 						throw nvae;
 					}
-					switch ( alt1 )
+					switch (alt1)
 					{
 					case 1:
 						// SimpleExpression.g3:50:6: '+'
@@ -227,8 +226,7 @@ public partial class SimpleExpressionParser : Parser
 
 					PushFollow(Follow._multiplicative_expression_in_additive_expression73);
 					multiplicative_expression6=multiplicative_expression();
-
-					state._fsp--;
+					PopFollow();
 
 					adaptor.AddChild(root_0, multiplicative_expression6.Tree);
 
@@ -253,7 +251,7 @@ public partial class SimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -264,6 +262,7 @@ public partial class SimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "additive_expression"
 
@@ -275,7 +274,7 @@ public partial class SimpleExpressionParser : Parser
 
 	// $ANTLR start "multiplicative_expression"
 	// SimpleExpression.g3:55:0: multiplicative_expression : atom ( ( '*' | '/' | '%' ) atom )* ;
-	private SimpleExpressionParser.multiplicative_expression_return multiplicative_expression(  )
+	private SimpleExpressionParser.multiplicative_expression_return multiplicative_expression()
 	{
 		SimpleExpressionParser.multiplicative_expression_return retval = new SimpleExpressionParser.multiplicative_expression_return();
 		retval.start = input.LT(1);
@@ -301,17 +300,16 @@ public partial class SimpleExpressionParser : Parser
 
 			PushFollow(Follow._atom_in_multiplicative_expression89);
 			atom7=atom();
-
-			state._fsp--;
+			PopFollow();
 
 			adaptor.AddChild(root_0, atom7.Tree);
 			// SimpleExpression.g3:57:3: ( ( '*' | '/' | '%' ) atom )*
-			for ( ; ; )
+			while (true)
 			{
 				int alt4=2;
 				int LA4_0 = input.LA(1);
 
-				if ( ((LA4_0>=8 && LA4_0<=10)) )
+				if (((LA4_0>=8 && LA4_0<=10)))
 				{
 					alt4=1;
 				}
@@ -324,7 +322,7 @@ public partial class SimpleExpressionParser : Parser
 					{
 					// SimpleExpression.g3:57:5: ( '*' | '/' | '%' )
 					int alt3=3;
-					switch ( input.LA(1) )
+					switch (input.LA(1))
 					{
 					case 9:
 						{
@@ -349,7 +347,7 @@ public partial class SimpleExpressionParser : Parser
 						}
 					}
 
-					switch ( alt3 )
+					switch (alt3)
 					{
 					case 1:
 						// SimpleExpression.g3:57:6: '*'
@@ -386,8 +384,7 @@ public partial class SimpleExpressionParser : Parser
 
 					PushFollow(Follow._atom_in_multiplicative_expression113);
 					atom11=atom();
-
-					state._fsp--;
+					PopFollow();
 
 					adaptor.AddChild(root_0, atom11.Tree);
 
@@ -412,7 +409,7 @@ public partial class SimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -423,6 +420,7 @@ public partial class SimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "multiplicative_expression"
 
@@ -434,7 +432,7 @@ public partial class SimpleExpressionParser : Parser
 
 	// $ANTLR start "atom"
 	// SimpleExpression.g3:62:0: atom : ( IDENTIFIER | NUMBER );
-	private SimpleExpressionParser.atom_return atom(  )
+	private SimpleExpressionParser.atom_return atom()
 	{
 		SimpleExpressionParser.atom_return retval = new SimpleExpressionParser.atom_return();
 		retval.start = input.LT(1);
@@ -453,7 +451,7 @@ public partial class SimpleExpressionParser : Parser
 			root_0 = (CommonTree)adaptor.Nil();
 
 			set12=(IToken)input.LT(1);
-			if ( (input.LA(1)>=IDENTIFIER && input.LA(1)<=NUMBER) )
+			if ((input.LA(1)>=IDENTIFIER && input.LA(1)<=NUMBER))
 			{
 				input.Consume();
 				adaptor.AddChild(root_0, (CommonTree)adaptor.Create(set12));
@@ -474,7 +472,7 @@ public partial class SimpleExpressionParser : Parser
 			adaptor.SetTokenBoundaries(retval.tree, retval.start, retval.stop);
 
 		}
-		catch ( RecognitionException re )
+		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
@@ -485,6 +483,7 @@ public partial class SimpleExpressionParser : Parser
 		{
 		}
 		return retval;
+
 	}
 	// $ANTLR end "atom"
 	#endregion Rules

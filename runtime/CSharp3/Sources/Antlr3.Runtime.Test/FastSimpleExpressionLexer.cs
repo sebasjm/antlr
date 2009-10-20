@@ -1,4 +1,4 @@
-// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-09-30 13:18:10
+// $ANTLR 3.1.2 FastSimpleExpression.g3 2009-10-18 19:39:56
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -33,12 +33,12 @@ public partial class FastSimpleExpressionLexer : Lexer
     // delegators
 
 	public FastSimpleExpressionLexer() {}
-	public FastSimpleExpressionLexer( ICharStream input )
-		: this( input, new RecognizerSharedState() )
+	public FastSimpleExpressionLexer(ICharStream input )
+		: this(input, new RecognizerSharedState())
 	{
 	}
-	public FastSimpleExpressionLexer( ICharStream input, RecognizerSharedState state )
-		: base( input, state )
+	public FastSimpleExpressionLexer(ICharStream input, RecognizerSharedState state)
+		: base(input, state)
 	{
 
 	}
@@ -169,7 +169,7 @@ public partial class FastSimpleExpressionLexer : Lexer
 			// FastSimpleExpression.g3:78:4: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )* )
 			// FastSimpleExpression.g3:78:4: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
 			{
-			if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') )
+			if ((input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z'))
 			{
 				input.Consume();
 
@@ -181,12 +181,12 @@ public partial class FastSimpleExpressionLexer : Lexer
 				throw mse;}
 
 			// FastSimpleExpression.g3:79:3: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9' )*
-			for ( ; ; )
+			while (true)
 			{
 				int alt1=2;
 				int LA1_0 = input.LA(1);
 
-				if ( ((LA1_0>='0' && LA1_0<='9')||(LA1_0>='A' && LA1_0<='Z')||LA1_0=='_'||(LA1_0>='a' && LA1_0<='z')) )
+				if (((LA1_0>='0' && LA1_0<='9')||(LA1_0>='A' && LA1_0<='Z')||LA1_0=='_'||(LA1_0>='a' && LA1_0<='z')))
 				{
 					alt1=1;
 				}
@@ -236,18 +236,18 @@ public partial class FastSimpleExpressionLexer : Lexer
 			{
 			// FastSimpleExpression.g3:83:4: ( '0' .. '9' )+
 			int cnt2=0;
-			for ( ; ; )
+			while (true)
 			{
 				int alt2=2;
 				int LA2_0 = input.LA(1);
 
-				if ( ((LA2_0>='0' && LA2_0<='9')) )
+				if (((LA2_0>='0' && LA2_0<='9')))
 				{
 					alt2=1;
 				}
 
 
-				switch ( alt2 )
+				switch (alt2)
 				{
 				case 1:
 					// FastSimpleExpression.g3:
@@ -259,7 +259,7 @@ public partial class FastSimpleExpressionLexer : Lexer
 					break;
 
 				default:
-					if ( cnt2 >= 1 )
+					if (cnt2 >= 1)
 						goto loop2;
 
 					EarlyExitException eee2 = new EarlyExitException( 2, input );
@@ -293,7 +293,7 @@ public partial class FastSimpleExpressionLexer : Lexer
 			// FastSimpleExpression.g3:87:4: ( ( ' ' | '\\t' | '\\n' | '\\r' | '\\f' ) )
 			// FastSimpleExpression.g3:87:4: ( ' ' | '\\t' | '\\n' | '\\r' | '\\f' )
 			{
-			if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' )
+			if ((input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ')
 			{
 				input.Consume();
 
@@ -321,7 +321,7 @@ public partial class FastSimpleExpressionLexer : Lexer
 	{
 		// FastSimpleExpression.g3:1:10: ( T__7 | T__8 | T__9 | T__10 | T__11 | IDENTIFIER | NUMBER | WS )
 		int alt3=8;
-		switch ( input.LA(1) )
+		switch (input.LA(1))
 		{
 		case '-':
 			{
@@ -436,7 +436,7 @@ public partial class FastSimpleExpressionLexer : Lexer
 			}
 		}
 
-		switch ( alt3 )
+		switch (alt3)
 		{
 		case 1:
 			// FastSimpleExpression.g3:1:10: T__7
