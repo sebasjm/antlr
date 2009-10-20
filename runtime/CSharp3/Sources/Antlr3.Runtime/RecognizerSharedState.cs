@@ -159,11 +159,7 @@ namespace Antlr.Runtime
         }
         public RecognizerSharedState( RecognizerSharedState state )
         {
-            if ( following.Length < state.following.Length )
-                following = (BitSet[])state.following.Clone();
-            else
-                System.Array.Copy( state.following, following, state.following.Length );
-
+            following = (BitSet[])state.following.Clone();
             _fsp = state._fsp;
             errorRecovery = state.errorRecovery;
             lastErrorIndex = state.lastErrorIndex;

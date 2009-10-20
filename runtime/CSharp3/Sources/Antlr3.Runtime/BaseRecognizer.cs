@@ -801,15 +801,18 @@ namespace Antlr.Runtime
         }
 
         /** <summary>Push a rule's follow set using our own hardcoded stack</summary> */
-        protected virtual void PushFollow( BitSet fset )
+        protected void PushFollow( BitSet fset )
         {
             if ( ( state._fsp + 1 ) >= state.following.Length )
             {
-                BitSet[] f = new BitSet[state.following.Length * 2];
-                Array.Copy( state.following, f, state.following.Length );
-                state.following = f;
+                Array.Resize(ref state.following, state.following.Length * 2);
             }
             state.following[++state._fsp] = fset;
+        }
+
+        protected void PopFollow()
+        {
+            state._fsp--;
         }
 
         /** <summary>

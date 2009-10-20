@@ -180,9 +180,7 @@ namespace Antlr.Runtime.Debug
             {
                 if ( numCyclicDecisions >= decisionMaxCyclicLookaheads.Length )
                 {
-                    int[] bigger = new int[decisionMaxCyclicLookaheads.Length * 2];
-                    Array.Copy( decisionMaxCyclicLookaheads, bigger, decisionMaxCyclicLookaheads.Length );
-                    decisionMaxCyclicLookaheads = bigger;
+                    Array.Resize(ref decisionMaxCyclicLookaheads, decisionMaxCyclicLookaheads.Length * 2);
                 }
                 decisionMaxCyclicLookaheads[numCyclicDecisions - 1] = _maxLookaheadInCurrentDecision;
             }
@@ -190,9 +188,7 @@ namespace Antlr.Runtime.Debug
             {
                 if ( numFixedDecisions >= decisionMaxFixedLookaheads.Length )
                 {
-                    int[] bigger = new int[decisionMaxFixedLookaheads.Length * 2];
-                    Array.Copy( decisionMaxFixedLookaheads, bigger, decisionMaxFixedLookaheads.Length );
-                    decisionMaxFixedLookaheads = bigger;
+                    Array.Resize(ref decisionMaxFixedLookaheads, decisionMaxFixedLookaheads.Length * 2);
                 }
                 decisionMaxFixedLookaheads[numFixedDecisions - 1] = _maxLookaheadInCurrentDecision;
             }
@@ -539,9 +535,7 @@ namespace Antlr.Runtime.Debug
         {
             if ( n < X.Length )
             {
-                int[] trimmed = new int[n];
-                Array.Copy( X, trimmed, n );
-                X = trimmed;
+                Array.Resize(ref X, n);
             }
             return X;
         }
