@@ -36,7 +36,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Antlr.Runtime
 {
 	using System;
-	using IDictionary = System.Collections.IDictionary;
+    using System.Collections.Generic;
 
 	/// <summary>
 	/// The set of fields needed by an abstract recognizer to recognize input
@@ -104,7 +104,7 @@ namespace Antlr.Runtime
 		///  
 		///  This is only used if rule memoization is on (which it is by default).
 		///  </remarks>
-		public IDictionary[] ruleMemo;
+        public IDictionary<int, int>[] ruleMemo;
 
 
 		#region Lexer Specific Members
@@ -154,6 +154,29 @@ namespace Antlr.Runtime
 		/// the input char buffer.  Use setText() or can set this instance var.
 		/// </summary>
 		public string text;
+
+        public RecognizerSharedState() { ;}
+
+        public RecognizerSharedState(RecognizerSharedState state)
+        {
+            following = (BitSet[])state.following.Clone();
+            followingStackPointer = state.followingStackPointer;
+            errorRecovery = state.errorRecovery;
+            lastErrorIndex = state.lastErrorIndex;
+            failed = state.failed;
+            syntaxErrors = state.syntaxErrors;
+            backtracking = state.backtracking;
+
+            if (state.ruleMemo != null)
+                ruleMemo = (IDictionary<int, int>[])state.ruleMemo.Clone();
+
+            token = state.token;
+            tokenStartCharIndex = state.tokenStartCharIndex;
+            tokenStartCharPositionInLine = state.tokenStartCharPositionInLine;
+            channel = state.channel;
+            type = state.type;
+            text = state.text;
+        }
 
 		#endregion
 	}

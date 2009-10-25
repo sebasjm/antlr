@@ -105,7 +105,7 @@ namespace Antlr.Runtime
 			: base(message, inner)
 		{
 			this.input = input;
-			this.index = input.Index();
+			this.index = input.Index;
 			if (input is ITokenStream)
 			{
 				this.token = ((ITokenStream)input).LT(1);

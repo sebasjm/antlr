@@ -167,18 +167,9 @@ namespace Antlr.Runtime
 		/// last symbol has been read. The index is the index of char to
 		/// be returned from LA(1).
         /// </summary>
-        public virtual int Index()
+        public virtual int Index
         {
-            return p;
-        }
-
-		/// <summary>
-		/// Returns the size of the stream
-		/// </summary>
-		[Obsolete("Please use property Count instead.")]
-		public virtual int Size()
-        {
-			return Count;
+            get { return p; }
         }
 
 		/// <summary>

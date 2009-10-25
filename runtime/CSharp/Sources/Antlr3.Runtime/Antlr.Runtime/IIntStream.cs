@@ -69,7 +69,7 @@ namespace Antlr.Runtime
 		/// last symbol has been read. The index is the symbol about to be
 		/// read not the most recently read symbol.
 		/// </summary>
-		int Index();
+		int Index { get; }
 		
         /// <summary>
 		/// Resets the stream so that the next call to 
@@ -139,15 +139,6 @@ namespace Antlr.Runtime
 		/// element in the stream.
         /// </remarks>
 		void Seek(int index);
-		
-		/// <summary>Returns the size of the entire stream.</summary>
-        /// <remarks>
-        /// Only makes sense for streams that buffer everything up probably, 
-        /// but might be useful to display the entire stream or for testing.
-		/// This value includes a single EOF.
-        /// </remarks>
-        [Obsolete("Please use property Count instead.")]
-		int Size();
 		
 		/// <summary>Returns the size of the entire stream.</summary>
         /// <remarks>

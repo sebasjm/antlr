@@ -98,19 +98,19 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(grammarStrBuffer);
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, Encoding.Unicode);
-			Assert.AreEqual(0, inputStream.Index());
+			Assert.AreEqual(0, inputStream.Index);
 
 			inputStream.Consume();
-			Assert.AreEqual(1, inputStream.Index());
+			Assert.AreEqual(1, inputStream.Index);
 
 			inputStream.Consume();
-			Assert.AreEqual(2, inputStream.Index());
+			Assert.AreEqual(2, inputStream.Index);
 
-			while (inputStream.Index() < inputStream.Count)
+			while (inputStream.Index < inputStream.Count)
 			{
 				inputStream.Consume();
 			}
-			Assert.AreEqual(inputStream.Index(), inputStream.Count);
+			Assert.AreEqual(inputStream.Index, inputStream.Count);
 		}
 
 		[Test]
@@ -121,12 +121,12 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(grammarStrBuffer);
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, Encoding.Unicode);
-			while (inputStream.Index() < inputStream.Count)
+			while (inputStream.Index < inputStream.Count)
 			{
 				Console.Out.Write((char)inputStream.LA(1));
 				inputStream.Consume();
 			}
-			Assert.AreEqual(inputStream.Index(), inputStream.Count);
+			Assert.AreEqual(inputStream.Index, inputStream.Count);
 		}
 
 		[Test]
@@ -137,57 +137,57 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(buffer);
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, Encoding.Unicode);
-			Assert.AreEqual(0, inputStream.Index());
+			Assert.AreEqual(0, inputStream.Index);
 			Assert.AreEqual(0, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 
 			inputStream.Consume();		// O
-			Assert.AreEqual(1, inputStream.Index());
+			Assert.AreEqual(1, inputStream.Index);
 			Assert.AreEqual(1, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 
 			inputStream.Consume();		// n
-			Assert.AreEqual(2, inputStream.Index());
+			Assert.AreEqual(2, inputStream.Index);
 			Assert.AreEqual(2, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 
 			inputStream.Consume();		// e
-			Assert.AreEqual(3, inputStream.Index());
+			Assert.AreEqual(3, inputStream.Index);
 			Assert.AreEqual(3, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 
 			inputStream.Consume();		// \r
-			Assert.AreEqual(4, inputStream.Index());
+			Assert.AreEqual(4, inputStream.Index);
 			Assert.AreEqual(4, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 
 			inputStream.Consume();		// \n
-			Assert.AreEqual(5, inputStream.Index());
+			Assert.AreEqual(5, inputStream.Index);
 			Assert.AreEqual(0, inputStream.CharPositionInLine);
 			Assert.AreEqual(2, inputStream.Line);
 
 			inputStream.Consume();		// T
-			Assert.AreEqual(6, inputStream.Index());
+			Assert.AreEqual(6, inputStream.Index);
 			Assert.AreEqual(1, inputStream.CharPositionInLine);
 			Assert.AreEqual(2, inputStream.Line);
 
 			inputStream.Consume();		// w
-			Assert.AreEqual(7, inputStream.Index());
+			Assert.AreEqual(7, inputStream.Index);
 			Assert.AreEqual(2, inputStream.CharPositionInLine);
 			Assert.AreEqual(2, inputStream.Line);
 
 			inputStream.Consume();		// o
-			Assert.AreEqual(8, inputStream.Index());
+			Assert.AreEqual(8, inputStream.Index);
 			Assert.AreEqual(3, inputStream.CharPositionInLine);
 			Assert.AreEqual(2, inputStream.Line);
 
 			inputStream.Consume();		// EOF
-			Assert.AreEqual(8, inputStream.Index());
+			Assert.AreEqual(8, inputStream.Index);
 			Assert.AreEqual(3, inputStream.CharPositionInLine);
 			Assert.AreEqual(2, inputStream.Line);
 
 			inputStream.Consume();		// EOF
-			Assert.AreEqual(8, inputStream.Index());
+			Assert.AreEqual(8, inputStream.Index);
 			Assert.AreEqual(3, inputStream.CharPositionInLine);
 			Assert.AreEqual(2, inputStream.Line);
 		}
@@ -200,7 +200,7 @@ namespace Antlr.Runtime.Tests
 			MemoryStream grammarStream = new MemoryStream(buffer);
 
 			ANTLRInputStream inputStream = new ANTLRInputStream(grammarStream, encoding);
-			Assert.AreEqual(0, inputStream.Index());
+			Assert.AreEqual(0, inputStream.Index);
 			Assert.AreEqual(0, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 
@@ -208,23 +208,23 @@ namespace Antlr.Runtime.Tests
 			inputStream.Consume();		// n
 
 			Assert.AreEqual('e', inputStream.LA(1));
-			Assert.AreEqual(2, inputStream.Index());
+			Assert.AreEqual(2, inputStream.Index);
 
 			inputStream.Reset();
 			Assert.AreEqual('O', inputStream.LA(1));
-			Assert.AreEqual(0, inputStream.Index());
+			Assert.AreEqual(0, inputStream.Index);
 			Assert.AreEqual(0, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 			inputStream.Consume();		// O
 
 			Assert.AreEqual('n', inputStream.LA(1));
-			Assert.AreEqual(1, inputStream.Index());
+			Assert.AreEqual(1, inputStream.Index);
 			Assert.AreEqual(1, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 			inputStream.Consume();		// n
 
 			Assert.AreEqual('e', inputStream.LA(1));
-			Assert.AreEqual(2, inputStream.Index());
+			Assert.AreEqual(2, inputStream.Index);
 			Assert.AreEqual(2, inputStream.CharPositionInLine);
 			Assert.AreEqual(1, inputStream.Line);
 			inputStream.Consume();		// e
@@ -259,26 +259,26 @@ namespace Antlr.Runtime.Tests
 
 			ANTLRInputStream stream = new ANTLRInputStream(grammarStream, encoding);
 			Assert.AreEqual('O', stream.LA(1));
-			Assert.AreEqual(0, stream.Index());
+			Assert.AreEqual(0, stream.Index);
 			Assert.AreEqual(0, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
 			stream.Seek(6);
 			Assert.AreEqual('w', stream.LA(1));
-			Assert.AreEqual(6, stream.Index());
+			Assert.AreEqual(6, stream.Index);
 			Assert.AreEqual(1, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 
 			stream.Seek(11);
 			Assert.AreEqual('h', stream.LA(1));
-			Assert.AreEqual(11, stream.Index());
+			Assert.AreEqual(11, stream.Index);
 			Assert.AreEqual(1, stream.CharPositionInLine);
 			Assert.AreEqual(3, stream.Line);
 
 			// seeking backwards leaves state info (other than index in stream) unchanged
 			stream.Seek(1);
 			Assert.AreEqual('n', stream.LA(1));
-			Assert.AreEqual(1, stream.Index());
+			Assert.AreEqual(1, stream.Index);
 			Assert.AreEqual(1, stream.CharPositionInLine);
 			Assert.AreEqual(3, stream.Line);
 		}
@@ -293,7 +293,7 @@ namespace Antlr.Runtime.Tests
 		{
 			ANTLRStringStream s1 = new ANTLRStringStream("");
 			Assert.AreEqual(0, s1.Count);
-			Assert.AreEqual(0, s1.Index());
+			Assert.AreEqual(0, s1.Index);
 		}
 
 		[Test]
@@ -313,57 +313,57 @@ namespace Antlr.Runtime.Tests
 		public void TestConsumeOnANTLRStringStream()
 		{
 			ANTLRStringStream stream = new ANTLRStringStream("One\r\nTwo");
-			Assert.AreEqual(0, stream.Index());
+			Assert.AreEqual(0, stream.Index);
 			Assert.AreEqual(0, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
 			stream.Consume();		// O
-			Assert.AreEqual(1, stream.Index());
+			Assert.AreEqual(1, stream.Index);
 			Assert.AreEqual(1, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
 			stream.Consume();		// n
-			Assert.AreEqual(2, stream.Index());
+			Assert.AreEqual(2, stream.Index);
 			Assert.AreEqual(2, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
 			stream.Consume();		// e
-			Assert.AreEqual(3, stream.Index());
+			Assert.AreEqual(3, stream.Index);
 			Assert.AreEqual(3, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
 			stream.Consume();		// \r
-			Assert.AreEqual(4, stream.Index());
+			Assert.AreEqual(4, stream.Index);
 			Assert.AreEqual(4, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
 			stream.Consume();		// \n
-			Assert.AreEqual(5, stream.Index());
+			Assert.AreEqual(5, stream.Index);
 			Assert.AreEqual(0, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 
 			stream.Consume();		// T
-			Assert.AreEqual(6, stream.Index());
+			Assert.AreEqual(6, stream.Index);
 			Assert.AreEqual(1, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 
 			stream.Consume();		// w
-			Assert.AreEqual(7, stream.Index());
+			Assert.AreEqual(7, stream.Index);
 			Assert.AreEqual(2, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 
 			stream.Consume();		// o
-			Assert.AreEqual(8, stream.Index());
+			Assert.AreEqual(8, stream.Index);
 			Assert.AreEqual(3, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 
 			stream.Consume();		// EOF
-			Assert.AreEqual(8, stream.Index());
+			Assert.AreEqual(8, stream.Index);
 			Assert.AreEqual(3, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 
 			stream.Consume();		// EOF
-			Assert.AreEqual(8, stream.Index());
+			Assert.AreEqual(8, stream.Index);
 			Assert.AreEqual(3, stream.CharPositionInLine);
 			Assert.AreEqual(2, stream.Line);
 		}
@@ -372,7 +372,7 @@ namespace Antlr.Runtime.Tests
 		public void TestResetOnANTLRStringStream()
 		{
 			ANTLRStringStream stream = new ANTLRStringStream("One\r\nTwo");
-			Assert.AreEqual(0, stream.Index());
+			Assert.AreEqual(0, stream.Index);
 			Assert.AreEqual(0, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 
@@ -380,23 +380,23 @@ namespace Antlr.Runtime.Tests
 			stream.Consume();		// n
 
 			Assert.AreEqual('e', stream.LA(1));
-			Assert.AreEqual(2, stream.Index());
+			Assert.AreEqual(2, stream.Index);
 
 			stream.Reset();
 			Assert.AreEqual('O', stream.LA(1));
-			Assert.AreEqual(0, stream.Index());
+			Assert.AreEqual(0, stream.Index);
 			Assert.AreEqual(0, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 			stream.Consume();		// O
 
 			Assert.AreEqual('n', stream.LA(1));
-			Assert.AreEqual(1, stream.Index());
+			Assert.AreEqual(1, stream.Index);
 			Assert.AreEqual(1, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 			stream.Consume();		// n
 
 			Assert.AreEqual('e', stream.LA(1));
-			Assert.AreEqual(2, stream.Index());
+			Assert.AreEqual(2, stream.Index);
 			Assert.AreEqual(2, stream.CharPositionInLine);
 			Assert.AreEqual(1, stream.Line);
 			stream.Consume();		// e

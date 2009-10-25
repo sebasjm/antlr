@@ -36,12 +36,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Antlr.Runtime
 {
 	using System;
-	using IList				= System.Collections.IList;
-	using ArrayList			= System.Collections.ArrayList;
-	using IDictionary		= System.Collections.IDictionary;
-	using Hashtable			= System.Collections.Hashtable;
-	using StackTrace		= System.Diagnostics.StackTrace;
-	using StackFrame		= System.Diagnostics.StackFrame;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 	using CollectionUtils = Antlr.Runtime.Collections.CollectionUtils;
 	
 	public delegate void SynPredPointer();
@@ -396,7 +392,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		public virtual void Recover(IIntStream input, RecognitionException re)
 		{
-			if (state.lastErrorIndex == input.Index())
+			if (state.lastErrorIndex == input.Index)
 			{
 				// uh oh, another error at same token index; must be a case
 				// where LT(1) is in the recovery token set so nothing is
@@ -404,7 +400,7 @@ namespace Antlr.Runtime
 				// an infinite loop; this is a failsafe.
 				input.Consume();
 			}
-			state.lastErrorIndex = input.Index();
+			state.lastErrorIndex = input.Index;
 			BitSet followSet = ComputeErrorRecoverySet();
 			BeginResync();
 			ConsumeUntil(input, followSet);
@@ -521,7 +517,7 @@ namespace Antlr.Runtime
 		/// This is very useful for error messages and for context-sensitive
 		/// error recovery.
 		/// </remarks>
-		public virtual IList GetRuleInvocationStack()
+        public virtual IList<string> GetRuleInvocationStack()
 		{
 			string parserClassName = GetType().FullName;
 			return GetRuleInvocationStack(new System.Exception(), parserClassName);
@@ -535,9 +531,9 @@ namespace Antlr.Runtime
 		/// 
 		/// TODO: move to a utility class or something; weird having lexer call this
 		/// </summary>
-		public static IList GetRuleInvocationStack(Exception e, string recognizerClassName)
+        public static IList<string> GetRuleInvocationStack(Exception e, string recognizerClassName)
 		{
-			IList rules = new ArrayList();
+            IList<string> rules = new List<string>();
 			StackTrace st = new StackTrace(e);
 			int i = 0;
 			for (i = st.FrameCount - 1; i >= 0; i--)
@@ -583,17 +579,19 @@ namespace Antlr.Runtime
 		/// <summary>A convenience method for use most often with template rewrites.
 		/// Convert a List&lt;Token&gt; to List&lt;String&gt;
 		/// </summary>
-		public virtual IList ToStrings(IList tokens)
+        public virtual IList<string> ToStrings(ICollection<IToken> tokens)
 		{
 			if (tokens == null)
 				return null;
-			IList strings = new ArrayList(tokens.Count);
-			for (int i = 0; i < tokens.Count; i++)
-			{
-				strings.Add(((IToken)tokens[i]).Text);
-			}
-			return strings;
-		}
+
+            List<string> strings = new List<string>(tokens.Count);
+            foreach (IToken token in tokens)
+            {
+                strings.Add(token.Text);
+            }
+
+            return strings;
+        }
 
 		/// <summary>
 		/// Given a rule number and a start token index number, return
@@ -611,7 +609,7 @@ namespace Antlr.Runtime
 		{
 			if (state.ruleMemo[ruleIndex] == null)
 			{
-				state.ruleMemo[ruleIndex] = new Hashtable();
+				state.ruleMemo[ruleIndex] = new Dictionary<int, int>();
 			}
 			object stopIndexI = state.ruleMemo[ruleIndex][(int)ruleStartIndex];
 			if (stopIndexI == null)
@@ -633,7 +631,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		public virtual bool AlreadyParsedRule(IIntStream input, int ruleIndex)
 		{
-			int stopIndex = GetRuleMemoization(ruleIndex, input.Index());
+			int stopIndex = GetRuleMemoization(ruleIndex, input.Index);
 			if (stopIndex == MEMO_RULE_UNKNOWN)
 			{
 				return false;
@@ -655,7 +653,7 @@ namespace Antlr.Runtime
 		/// </summary>
 		public virtual void Memoize(IIntStream input, int ruleIndex, int ruleStartIndex)
 		{
-			int stopTokenIndex = state.failed ? MEMO_RULE_FAILED : input.Index() - 1;
+			int stopTokenIndex = state.failed ? MEMO_RULE_FAILED : input.Index - 1;
 			if (state.ruleMemo[ruleIndex] != null)
 			{
 				state.ruleMemo[ruleIndex][(int)ruleStartIndex] = (int)stopTokenIndex;
@@ -672,7 +670,7 @@ namespace Antlr.Runtime
 			int n = 0;
 			for (int i = 0; state.ruleMemo != null && i < state.ruleMemo.Length; i++)
 			{
-				IDictionary ruleMap = state.ruleMemo[i];
+				IDictionary<int, int> ruleMap = state.ruleMemo[i];
 				if (ruleMap != null)
 				{
 					n += ruleMap.Count; // how many input indexes are recorded?
@@ -720,27 +718,6 @@ namespace Antlr.Runtime
 
 		#region Helper Methods
 
-		/// <summary>
-		/// Factor out what to do upon token mismatch so tree parsers can behave
-		/// differently.  Override and call RecoverFromMismatchedToken()
-	 	/// to get single token insertion and deletion. Use this to turn off
-		/// single token insertion and deletion. Override mismatchRecover
-		/// to call this instead.
-	    /// 
-	    /// TODO: fix this comment, mismatchRecover doesn't exist, for example
-		/// </summary>
-		/*
-		protected internal virtual void Mismatch(IIntStream input, int ttype, BitSet follow)
-		{
-			if ( MismatchIsUnwantedToken(input, ttype) ) {
-				throw new UnwantedTokenException(ttype, input);
-			}
-			else if ( MismatchIsMissingToken(input, follow) ) {
-				throw new MissingTokenException(ttype, input, null);
-			}
-			throw new MismatchedTokenException(ttype, input);
-		}*/
-	
 		/*  Compute the error recovery set for the current rule.  During
 		*  rule invocation, the parser pushes the set of tokens that can
 		*  follow that rule reference on the stack; this amounts to

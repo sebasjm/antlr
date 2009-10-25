@@ -103,7 +103,7 @@ namespace Antlr.Runtime
 		/// <summary>What is the index of the current character of lookahead? </summary>
 		virtual public int CharIndex
 		{
-			get { return input.Index(); }
+			get { return input.Index; }
 		}
 
 		/// <summary>
@@ -163,7 +163,7 @@ namespace Antlr.Runtime
 			{
 				state.token = null;
 				state.channel = Token.DEFAULT_CHANNEL;
-				state.tokenStartCharIndex = input.Index();
+				state.tokenStartCharIndex = input.Index;
 				state.tokenStartCharPositionInLine = input.CharPositionInLine;
 				state.tokenStartLine = input.Line;
 				state.text = null;

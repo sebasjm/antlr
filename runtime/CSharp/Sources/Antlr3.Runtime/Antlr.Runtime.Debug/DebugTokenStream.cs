@@ -68,10 +68,10 @@ namespace Antlr.Runtime.Debug
 			{
 				ConsumeInitialHiddenTokens();
 			}
-			int a = input.Index();
+			int a = input.Index;
 			IToken t = input.LT(1);
 			input.Consume();
-			int b = input.Index();
+			int b = input.Index;
 			dbg.ConsumeToken(t);
 			if (b > a + 1)
 			{
@@ -86,7 +86,7 @@ namespace Antlr.Runtime.Debug
 		/// <summary>consume all initial off-channel tokens</summary>
 		protected internal virtual void ConsumeInitialHiddenTokens()
 		{
-			int firstOnChannelTokenIndex = input.Index();
+			int firstOnChannelTokenIndex = input.Index;
 			for (int i = 0; i < firstOnChannelTokenIndex; i++)
 			{
 				dbg.ConsumeHiddenToken(input.Get(i));
@@ -126,9 +126,9 @@ namespace Antlr.Runtime.Debug
 			return lastMarker;
 		}
 		
-		public virtual int Index()
+		public virtual int Index
 		{
-			return input.Index();
+            get { return input.Index; }
 		}
 		
 		public virtual void  Rewind(int marker)
@@ -150,12 +150,6 @@ namespace Antlr.Runtime.Debug
 		public virtual void  Seek(int index)
 		{
 			input.Seek(index);
-		}
-		
-		[Obsolete("Please use property Count instead.")]
-		public virtual int Size()
-		{
-			return Count;
 		}
 		
 		public virtual int Count {

@@ -61,7 +61,7 @@ namespace Antlr.Runtime.Debug
 		{
 			this.input = input;
 			this.adaptor = input.TreeAdaptor;
-			this.input.HasUniqueNavigationNodes = true;
+			this.input.UniqueNavigationNodes = true;
 			SetDebugListener(dbg);
 		}
 
@@ -91,10 +91,13 @@ namespace Antlr.Runtime.Debug
 			dbg.ConsumeNode(node);
 		}
 
-		public object Get(int i) 
-		{
-			return input.Get(i);
-		}
+        public virtual object this[int i]
+        {
+            get
+            {
+                return input[i];
+            }
+        }
 
 		public object LT(int i)
 		{
@@ -118,9 +121,9 @@ namespace Antlr.Runtime.Debug
 			return lastMarker;
 		}
 
-		public int Index()
+		public int Index
 		{
-			return input.Index();
+            get { return input.Index; }
 		}
 
 		public void Rewind(int marker)
@@ -144,17 +147,13 @@ namespace Antlr.Runtime.Debug
 			input.Seek(index);
 		}
 
-		[Obsolete("Please use property Count instead.")]
-		public int Size()
-		{
-			return Count;
-		}
-		
 		public int Count {
 			get { return input.Count; }
 		}
 
-		public object TreeSource
+        public void Reset() { ; }
+
+        public object TreeSource
 		{
 			get { return input; }
 		}
@@ -165,10 +164,17 @@ namespace Antlr.Runtime.Debug
 		/// define it.  It might be better to ignore the parameter but
 		/// there might be a use for it later, so I'll leave.
 		/// </summary>
-		public virtual bool HasUniqueNavigationNodes
+		public virtual bool UniqueNavigationNodes
 		{
-			set { input.HasUniqueNavigationNodes = value; }
-		}
+            get
+            {
+                return input.UniqueNavigationNodes;
+            }
+            set
+            {
+                input.UniqueNavigationNodes = value;
+            }
+        }
 
 		public void ReplaceChildren(object parent, int startChildIndex, int stopChildIndex, object t)
 		{

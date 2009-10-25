@@ -44,16 +44,16 @@ namespace Antlr.Runtime.Tests
 	using ITreeNodeStream = Antlr.Runtime.Tree.ITreeNodeStream;
 	using CommonTree = Antlr.Runtime.Tree.CommonTree;
 	using CommonTreeNodeStream = Antlr.Runtime.Tree.CommonTreeNodeStream;
-	using UnBufferedTreeNodeStream = Antlr.Runtime.Tree.UnBufferedTreeNodeStream;
+	using BufferedTreeNodeStream = Antlr.Runtime.Tree.BufferedTreeNodeStream;
 
 	using MbUnit.Framework;
 
 	[TestFixture]
 	public class ITreeNodeStreamFixture : TestFixtureBase
-	{
-		#region CommonTreeNodeStream Tests
+    {
+        #region BufferedTreeNodeStream Tests
 
-		[Test]
+        [Test]
 		public void testSingleNode()
 		{
 			ITree t = new CommonTree(new CommonToken(101));
@@ -79,7 +79,7 @@ namespace Antlr.Runtime.Tests
 			t.GetChild(0).AddChild(new CommonTree(new CommonToken(103)));
 			t.AddChild(new CommonTree(new CommonToken(104)));
 
-			ITreeNodeStream stream = CreateCommonTreeNodeStream(t);
+            ITreeNodeStream stream = CreateBufferedTreeNodeStream(t);
 			string expected = " 101 102 103 104";
 			string actual = GetStringOfEntireStreamContentsWithNodeTypesOnly(stream);
 			Assert.AreEqual(expected, actual);
@@ -104,7 +104,7 @@ namespace Antlr.Runtime.Tests
 			root.AddChild(t);
 			root.AddChild(u);
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(root);
 			string expected = " 101 102 103 104 105";
 			string actual = GetStringOfEntireStreamContentsWithNodeTypesOnly(stream);
 			Assert.AreEqual(expected, actual);
@@ -123,7 +123,7 @@ namespace Antlr.Runtime.Tests
 			root.AddChild(new CommonTree(new CommonToken(102)));
 			root.AddChild(new CommonTree(new CommonToken(103)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(root);
 			string expected = " 101 102 103";
 			string actual = GetStringOfEntireStreamContentsWithNodeTypesOnly(stream);
 			Assert.AreEqual(expected, actual);
@@ -140,7 +140,7 @@ namespace Antlr.Runtime.Tests
 
 			root.AddChild(new CommonTree(new CommonToken(101)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(root);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(root);
 			string expected = " 101";
 			string actual = GetStringOfEntireStreamContentsWithNodeTypesOnly(stream);
 			Assert.AreEqual(expected, actual);
@@ -156,7 +156,7 @@ namespace Antlr.Runtime.Tests
 			ITree t = new CommonTree(new CommonToken(101));
 			t.AddChild(new CommonTree(new CommonToken(102)));
 
-			ITreeNodeStream stream = CreateCommonTreeNodeStream(t);
+            ITreeNodeStream stream = CreateBufferedTreeNodeStream(t);
 			string expected = " 101 102";
 			string actual = GetStringOfEntireStreamContentsWithNodeTypesOnly(stream);
 			Assert.AreEqual(expected, actual);
@@ -175,7 +175,7 @@ namespace Antlr.Runtime.Tests
 			t.GetChild(0).AddChild(new CommonTree(new CommonToken(103)));
 			t.AddChild(new CommonTree(new CommonToken(104)));
 
-			ITreeNodeStream stream = CreateCommonTreeNodeStream(t);
+            ITreeNodeStream stream = CreateBufferedTreeNodeStream(t);
 			Assert.AreEqual(101, ((ITree)stream.LT(1)).Type);
 			Assert.AreEqual(Token.DOWN, ((ITree)stream.LT(2)).Type);
 			Assert.AreEqual(102, ((ITree)stream.LT(3)).Type);
@@ -205,7 +205,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(104)));
 			r0.AddChild(new CommonTree(new CommonToken(105)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			int m = stream.Mark(); // MARK
 			for (int k = 1; k <= 13; k++)
 			{ // consume til end
@@ -242,7 +242,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(104)));
 			r0.AddChild(new CommonTree(new CommonToken(105)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			for (int k = 1; k <= 7; k++)
 			{ // consume til middle
 				//System.out.println(((ITree)stream.LT(1)).Type);
@@ -289,7 +289,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(104)));
 			r0.AddChild(new CommonTree(new CommonToken(105)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			int m = stream.Mark(); // MARK at start
 			stream.Consume(); // consume 101
 			stream.Consume(); // consume DN
@@ -330,7 +330,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(104)));
 			r0.AddChild(new CommonTree(new CommonToken(105)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			stream.Consume(); // consume 101
 			stream.Consume(); // consume DN
 			stream.Consume(); // consume 102
@@ -358,7 +358,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(104)));
 			r0.AddChild(new CommonTree(new CommonToken(105)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			stream.Seek(7);   // seek to 107
 			Assert.AreEqual(107, ((ITree)stream.LT(1)).Type);
 			stream.Consume(); // consume 107
@@ -386,7 +386,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(108)));
 			r0.AddChild(new CommonTree(new CommonToken(109)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			String expecting = " 101 2 102 2 103 3 104 2 105 3 106 2 107 3 108 109 3";
 			String found = stream.ToString();
 			Assert.AreEqual(expecting, found);
@@ -433,7 +433,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(108)));
 			r0.AddChild(new CommonTree(new CommonToken(109)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 
 			// Assume we want to hit node 107 and then "call 102", which
 			// calls 104, then return
@@ -492,7 +492,7 @@ namespace Antlr.Runtime.Tests
 			r0.AddChild(new CommonTree(new CommonToken(108)));
 			r0.AddChild(new CommonTree(new CommonToken(109)));
 
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 
 			while (stream.LA(1) != Token.EOF)
 			{
@@ -534,9 +534,9 @@ namespace Antlr.Runtime.Tests
 		{
 			// make more than INITIAL_CALL_STACK_SIZE pushes
 			ITree r0 = new CommonTree(new CommonToken(101));
-			CommonTreeNodeStream stream = new CommonTreeNodeStream(r0);
+            BufferedTreeNodeStream stream = new BufferedTreeNodeStream(r0);
 			// go 1 over initial size
-			for (int i = 1; i <= CommonTreeNodeStream.INITIAL_CALL_STACK_SIZE + 1; i++)
+            for (int i = 1; i <= BufferedTreeNodeStream.INITIAL_CALL_STACK_SIZE + 1; i++)
 			{
 				stream.Push(i);
 			}
@@ -547,7 +547,7 @@ namespace Antlr.Runtime.Tests
 		#endregion
 
 
-		#region UnBufferedTreeNodeStream Tests
+		#region CommonTreeNodeStream Tests
 
 		[Test]
 		public void testBufferOverflow()
@@ -560,7 +560,7 @@ namespace Antlr.Runtime.Tests
 			buf2.Append(" 101");
 			buf2.Append(" ");
 			buf2.Append(Token.DOWN);
-			for (int i = 0; i <= UnBufferedTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE + 10; i++)
+            for (int i = 0; i <= CommonTreeNodeStream.DEFAULT_INITIAL_BUFFER_SIZE + 10; i++)
 			{
 				t.AddChild(new CommonTree(new CommonToken(102 + i)));
 				buf.Append(" ");
@@ -571,7 +571,7 @@ namespace Antlr.Runtime.Tests
 			buf2.Append(" ");
 			buf2.Append(Token.UP);
 
-			ITreeNodeStream stream = CreateUnBufferedTreeNodeStream(t);
+            ITreeNodeStream stream = CreateCommonTreeNodeStream(t);
 			String expecting = buf.ToString();
 			String found = GetStringOfEntireStreamContentsWithNodeTypesOnly(stream);
 			Assert.AreEqual(expecting, found);
@@ -599,13 +599,13 @@ namespace Antlr.Runtime.Tests
 			int N = 10;
 			// make tree with types: 1 2 ... INITIAL_LOOKAHEAD_BUFFER_SIZE+N
 			ITree t = new CommonTree((IToken)null);
-			for (int i = 0; i < UnBufferedTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE + N; i++)
+            for (int i = 0; i < CommonTreeNodeStream.DEFAULT_INITIAL_BUFFER_SIZE + N; i++)
 			{
 				t.AddChild(new CommonTree(new CommonToken(i + 1)));
 			}
 
 			// move head to index N
-			ITreeNodeStream stream = CreateUnBufferedTreeNodeStream(t);
+            ITreeNodeStream stream = CreateCommonTreeNodeStream(t);
 			for (int i = 1; i <= N; i++)
 			{ // consume N
 				ITree node = (ITree)stream.LT(1);
@@ -614,7 +614,7 @@ namespace Antlr.Runtime.Tests
 			}
 
 			// now use LT to lookahead past end of buffer
-			int remaining = UnBufferedTreeNodeStream.INITIAL_LOOKAHEAD_BUFFER_SIZE - N;
+            int remaining = CommonTreeNodeStream.DEFAULT_INITIAL_BUFFER_SIZE - N;
 			int wrapBy = 4; // wrap around by 4 nodes
 			Assert.IsTrue(wrapBy < N, "bad test code; wrapBy must be less than N");
 			for (int i = 1; i <= remaining + wrapBy; i++)
@@ -629,14 +629,14 @@ namespace Antlr.Runtime.Tests
 
 		#region Helper Methods
 
-		protected ITreeNodeStream CreateCommonTreeNodeStream(object t)
+        protected ITreeNodeStream CreateBufferedTreeNodeStream(object t)
 		{
-			return new CommonTreeNodeStream(t);
+            return new BufferedTreeNodeStream(t);
 		}
 
-		protected ITreeNodeStream CreateUnBufferedTreeNodeStream(object t)
+		protected ITreeNodeStream CreateCommonTreeNodeStream(object t)
 		{
-			return new UnBufferedTreeNodeStream(t);
+            return new CommonTreeNodeStream(t);
 		}
 
 		public string GetStringOfEntireStreamContentsWithNodeTypesOnly(ITreeNodeStream nodes)

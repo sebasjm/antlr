@@ -232,13 +232,13 @@ namespace Antlr.Runtime
 			{
 				FillBuffer();
 			}
-			lastMarker = Index();
+			lastMarker = Index;
 			return lastMarker;
 		}
 
-		public virtual int Index()
+		public virtual int Index
 		{
-			return p;
+            get { return p; }
 		}
 
 		public virtual void Rewind(int marker)
@@ -265,12 +265,6 @@ namespace Antlr.Runtime
 		public virtual void Seek(int index)
 		{
 			p = index;
-		}
-
-		[Obsolete("Please use the property Count instead.")]
-		public virtual int Size()
-		{
-			return Count;
 		}
 		
 		public virtual int Count

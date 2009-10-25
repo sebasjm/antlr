@@ -46,7 +46,10 @@ namespace Antlr.Runtime.Tree
 		/// If you don't want to buffer up nodes, then this method makes no
 		/// sense for you.
 		/// </remarks>
-		object Get(int i);
+        object this[int i]
+        {
+            get;
+        }
 
 		/// <summary>
 		/// Where is this stream pulling nodes from?  This is not the name, but
@@ -90,10 +93,11 @@ namespace Antlr.Runtime.Tree
 		/// parsing, it's slow and a waste of memory to create unique
 		/// navigation nodes.  Default should be false;
 		/// </summary>
-		bool HasUniqueNavigationNodes
-		{
-			set;
-		}
+        bool UniqueNavigationNodes
+        {
+            get;
+            set;
+        }
 
 		/// <summary>
 		/// Get tree node at current input pointer + i ahead where i=1 is next node.
@@ -108,8 +112,13 @@ namespace Antlr.Runtime.Tree
 		/// for both parser and tree grammars. :)
 		/// </summary>
 		object LT(int k);
-		
-		/// <summary>Return the text of all nodes from start to stop, inclusive.
+
+        /** Reset the tree node stream in such a way that it acts like
+         *  a freshly constructed stream.
+         */
+        void Reset();
+
+        /// <summary>Return the text of all nodes from start to stop, inclusive.
 		/// If the stream does not buffer all the nodes then it can still
 		/// walk recursively from start until stop.  You can always return
 		/// null or "" too, but users should not access $ruleLabel.text in

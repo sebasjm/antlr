@@ -122,7 +122,7 @@ namespace Antlr.Runtime.Debug
 		/// </remarks>
 		public void ExamineRuleMemoization(IIntStream input, int ruleIndex, string ruleName)
 		{
-			int stopIndex = parser.GetRuleMemoization(ruleIndex, input.Index());
+			int stopIndex = parser.GetRuleMemoization(ruleIndex, input.Index);
 			if (stopIndex == BaseRecognizer.MEMO_RULE_UNKNOWN)
 			{
 				numMemoizationCacheMisses++;
@@ -149,7 +149,7 @@ namespace Antlr.Runtime.Debug
 		public override void EnterDecision(int decisionNumber)
 		{
 			decisionLevel++;
-			int startingLookaheadIndex = parser.TokenStream.Index();
+			int startingLookaheadIndex = parser.TokenStream.Index;
 			lookaheadStack.Add(startingLookaheadIndex);
 		}
 
@@ -221,7 +221,7 @@ namespace Antlr.Runtime.Debug
 				int stackTop = lookaheadStack.Count - 1;
 				int startingIndex = (int)lookaheadStack[stackTop];
 				// compute lookahead depth
-				int thisRefIndex = parser.TokenStream.Index();
+				int thisRefIndex = parser.TokenStream.Index;
 				int numHidden = GetNumberOfHiddenTokens(startingIndex, thisRefIndex);
 				int depth = i + thisRefIndex - startingIndex - numHidden;
 

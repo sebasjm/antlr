@@ -42,6 +42,10 @@ namespace Antlr.Runtime
 	{
 		#region Constructors
 
+        public CommonToken()
+        {
+        }
+
 		public CommonToken(int type)
 		{
 			this.type = type;
