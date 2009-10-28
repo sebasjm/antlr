@@ -42,7 +42,7 @@
     <!-- This is the human oriented name for the package
          so you can call it anything you like
       -->
-    <name>ANTLR Project generated from Archetype</name>
+    <name>ANTLR3 project: ${package}</name>
 
     <!-- This is the version of YOUR project -->
     <version>${version}</version>

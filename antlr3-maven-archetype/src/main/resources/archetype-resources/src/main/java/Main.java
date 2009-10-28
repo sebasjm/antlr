@@ -53,7 +53,7 @@ class Main {
                 }
                 else
                 {
-                    System.err.println("Usage: java -jar<path to jar> <directory | filename.dmo>");
+                    System.err.println("Usage: java -jar ${artifactId}-${version}-jar-with-dependencies.jar <directory | filename.dmo>");
                 }
             }
             catch (Exception ex)
