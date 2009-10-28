@@ -30,7 +30,17 @@
         <module>antlr3-maven-plugin</module>
         <module>gunit</module>
         <module>gunit-maven-plugin</module>
+        <module>antlr3-maven-archetype</module>
     </modules>
+
+  <!--
+    Make sure that the build is not platform dependent (I.E show that
+    all the files in the source tree are in UTF-8 format.
+    -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
   <!--
 
     Define where the ANTLR releated jars are deployed both for
