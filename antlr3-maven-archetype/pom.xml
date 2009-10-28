@@ -28,6 +28,33 @@
         <version>3.2.1-SNAPSHOT</version>
     </parent>
     -->
+  <!--
+
+   REMOVE THIS ONCE ARCHETYPE PLUGIN BUG MENTIONED ABOVE IS FIXED AND
+   THE PARENT POM REFERENCE IS REINSTATED
+   
+    Define where the ANTLR releated jars are deployed both for
+    the main ANTLR repository, which syncs with the maven main
+    repository, and the snapshot repository, which can be
+    used by developers that need the latest development version of
+    something, but is used here to show maven where to deploy
+    snapshots and releases.
+    -->
+    <distributionManagement>
+
+        <repository>
+            <id>antlr-repo</id>
+            <name>ANTLR Testing repository</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-repo</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>antlr-snapshot</id>
+            <name>ANTLR Testing Snapshot Repository</name>
+            <url>scpexe://antlr.org/home/mavensync/antlr-snapshot</url>
+        </snapshotRepository>
+
+    </distributionManagement>
 
   <build>
 
