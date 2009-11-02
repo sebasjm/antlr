@@ -49,10 +49,9 @@ namespace Antlr.Runtime
         }
 
         public Parser( ITokenStream input, RecognizerSharedState state )
-            : base( state )
+            : base(state) // share the state object with another parser
         {
-            //super(state); // share the state object with another parser
-            TokenStream = input;
+            this.input = input;
         }
 
         public override void Reset()
