@@ -46,20 +46,20 @@ namespace Antlr.Runtime
     [System.Serializable]
     public class ANTLRReaderStream : ANTLRStringStream
     {
-        public const int READ_BUFFER_SIZE = 1024;
-        public const int INITIAL_BUFFER_SIZE = 1024;
+        public const int ReadBufferSize = 1024;
+        public const int InitialBufferSize = 1024;
 
         public ANTLRReaderStream()
         {
         }
 
         public ANTLRReaderStream( TextReader r )
-            : this( r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE )
+            : this( r, InitialBufferSize, ReadBufferSize )
         {
         }
 
         public ANTLRReaderStream( TextReader r, int size )
-            : this( r, size, READ_BUFFER_SIZE )
+            : this( r, size, ReadBufferSize )
         {
         }
 
@@ -76,11 +76,11 @@ namespace Antlr.Runtime
             }
             if ( size <= 0 )
             {
-                size = INITIAL_BUFFER_SIZE;
+                size = InitialBufferSize;
             }
             if ( readChunkSize <= 0 )
             {
-                readChunkSize = READ_BUFFER_SIZE;
+                readChunkSize = ReadBufferSize;
             }
             // System.out.println("load "+size+" in chunks of "+readChunkSize);
             try

@@ -36,13 +36,13 @@ namespace Antlr.Runtime
 
     using Array = System.Array;
     using Conditional = System.Diagnostics.ConditionalAttribute;
-    using Console = System.Console;
     using Exception = System.Exception;
     using IDebugEventListener = Antlr.Runtime.Debug.IDebugEventListener;
     using NotSupportedException = System.NotSupportedException;
     using Regex = System.Text.RegularExpressions.Regex;
     using StackFrame = System.Diagnostics.StackFrame;
     using StackTrace = System.Diagnostics.StackTrace;
+    using TextWriter = System.IO.TextWriter;
 
     /** <summary>
      *  A generic recognizer that can handle recognizers generated from
@@ -87,6 +87,12 @@ namespace Antlr.Runtime
             }
             this.state = state;
             InitDFAs();
+        }
+
+        public TextWriter TraceDestination
+        {
+            get;
+            set;
         }
 
         protected virtual void InitDFAs()
@@ -417,7 +423,8 @@ namespace Antlr.Runtime
         /** <summary>Override this method to change where error messages go</summary> */
         public virtual void EmitErrorMessage( string msg )
         {
-            Console.Error.WriteLine( msg );
+            if (TraceDestination != null)
+                TraceDestination.WriteLine( msg );
         }
 
         /** <summary>
@@ -1020,11 +1027,13 @@ namespace Antlr.Runtime
             int stopTokenIndex = state.failed ? MemoRuleFailed : input.Index - 1;
             if ( state.ruleMemo == null )
             {
-                Console.Error.WriteLine( "!!!!!!!!! memo array is null for " + GrammarFileName );
+                if (TraceDestination != null)
+                    TraceDestination.WriteLine( "!!!!!!!!! memo array is null for " + GrammarFileName );
             }
             if ( ruleIndex >= state.ruleMemo.Length )
             {
-                Console.Error.WriteLine( "!!!!!!!!! memo size is " + state.ruleMemo.Length + ", but rule index is " + ruleIndex );
+                if (TraceDestination != null)
+                    TraceDestination.WriteLine("!!!!!!!!! memo size is " + state.ruleMemo.Length + ", but rule index is " + ruleIndex);
             }
             if ( state.ruleMemo[ruleIndex] != null )
             {
@@ -1049,30 +1058,34 @@ namespace Antlr.Runtime
             return n;
         }
 
-        public virtual void TraceIn( string ruleName, int ruleIndex, object inputSymbol )
+        public virtual void TraceIn(string ruleName, int ruleIndex, object inputSymbol)
         {
-            Console.Out.Write( "enter " + ruleName + " " + inputSymbol );
-            if ( state.backtracking > 0 )
+            if (TraceDestination == null)
+                return;
+
+            TraceDestination.Write("enter " + ruleName + " " + inputSymbol);
+            if (state.backtracking > 0)
             {
-                Console.Out.Write( " backtracking=" + state.backtracking );
+                TraceDestination.Write(" backtracking=" + state.backtracking);
             }
-            Console.Out.WriteLine();
+            TraceDestination.WriteLine();
         }
 
-        public virtual void TraceOut( string ruleName,
-                             int ruleIndex,
-                             object inputSymbol )
+        public virtual void TraceOut(string ruleName, int ruleIndex, object inputSymbol)
         {
-            Console.Out.Write( "exit " + ruleName + " " + inputSymbol );
-            if ( state.backtracking > 0 )
+            if (TraceDestination == null)
+                return;
+
+            TraceDestination.Write("exit " + ruleName + " " + inputSymbol);
+            if (state.backtracking > 0)
             {
-                Console.Out.Write( " backtracking=" + state.backtracking );
-                if ( state.failed )
-                    Console.Out.Write( " failed" );
+                TraceDestination.Write(" backtracking=" + state.backtracking);
+                if (state.failed)
+                    TraceDestination.Write(" failed");
                 else
-                    Console.Out.Write( " succeeded" );
+                    TraceDestination.Write(" succeeded");
             }
-            Console.Out.WriteLine();
+            TraceDestination.WriteLine();
         }
 
 #if NEW_DEBUGGER

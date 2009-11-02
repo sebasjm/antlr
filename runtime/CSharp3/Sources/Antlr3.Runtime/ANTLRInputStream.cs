@@ -59,12 +59,12 @@ namespace Antlr.Runtime
         }
 
         public ANTLRInputStream( Stream input, Encoding encoding )
-            : this( input, INITIAL_BUFFER_SIZE, encoding )
+            : this( input, InitialBufferSize, encoding )
         {
         }
 
         public ANTLRInputStream( Stream input, int size, Encoding encoding )
-            : this( input, size, READ_BUFFER_SIZE, encoding )
+            : this( input, size, ReadBufferSize, encoding )
         {
         }
 
