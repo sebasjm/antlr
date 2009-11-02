@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+November 1, 2009
+
+* Couldn't properly reuse parser state; ctor reset the state; fixed.
+	Parser(TokenStream input, RecognizerSharedState state)
+
 September 23, 2009 -- ANTLR v3.2
 
 September 21, 2009 [Jim Idle]
