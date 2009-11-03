@@ -105,7 +105,7 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     /** Size of entire stream is unknown; we only know buffer size from FastQueue */
     public int size() { throw new UnsupportedOperationException("streams are of unknown size"); }
 
-    public Object LT(int k) {
+    public T LT(int k) {
 		if ( k==0 ) {
 			return null;
 		}
@@ -120,8 +120,8 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
         return get(k-1);
 	}
 
-	/** Look backwards k nodes */
-	protected Object LB(int k) {
+	/** Look backwards k elements */
+	protected T LB(int k) {
 		if ( k==0 ) {
 			return null;
 		}
@@ -131,7 +131,7 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 		return get(-k);
 	}
 
-    public Object getCurrentSymbol() { return LT(1); }
+    public T getCurrentSymbol() { return LT(1); }
 
     public int index() { return p; }
 

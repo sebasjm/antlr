@@ -7,10 +7,17 @@ University of San Francisco
 
 CHANGES
 
+November 3, 2009
+
+* Added org.antlr.runtime.UnbufferedTokenStream. Was trivial and works!
+
 November 1, 2009
 
 * Couldn't properly reuse parser state; ctor reset the state; fixed.
 	Parser(TokenStream input, RecognizerSharedState state)
+
+* LookaheadStream<T> used some hardcoded Object return types for LT, etc...
+  uses T now.
 
 September 23, 2009 -- ANTLR v3.2
 
