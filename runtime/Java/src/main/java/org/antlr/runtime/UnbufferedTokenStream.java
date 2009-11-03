@@ -29,33 +29,13 @@ package org.antlr.runtime;
 
 import org.antlr.runtime.misc.LookaheadStream;
 
-import java.util.Map;
-import java.util.Set;
-
 public class UnbufferedTokenStream extends LookaheadStream<Token> implements TokenStream {
 	protected TokenSource tokenSource;
 	protected int tokenIndex = 0;
 
-	/** Map<tokentype, channel> to override some Tokens' channel numbers */
-	protected Map channelOverrideMap;
-
-	/** Set<tokentype>; discard any tokens with this type */
-	protected Set discardSet;
-
-	/** Skip tokens on any channel but this one; this is how we skip whitespace... */
-	protected int channel = Token.DEFAULT_CHANNEL;
-
-	/** By default, track all incoming tokens */
-	protected boolean discardOffChannelTokens = false;
-
 	public UnbufferedTokenStream(TokenSource tokenSource) {
 		super(Token.EOF_TOKEN);
 		this.tokenSource = tokenSource;
-	}
-
-	public UnbufferedTokenStream(TokenSource tokenSource, int channel) {
-		this(tokenSource);
-		this.channel = channel;
 	}
 
 	public Token nextElement() {
@@ -64,23 +44,13 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
 		return t;
 	}
 
-	public TokenSource getTokenSource() {
-		return tokenSource;
-	}
+	public TokenSource getTokenSource() { return tokenSource; }
 
-	public String toString(int start, int stop) {
-		return "n/a";
-	}
+	public String toString(int start, int stop) { return "n/a"; }
 
-	public String toString(Token start, Token stop) {
-		return "n/a";
-	}
+	public String toString(Token start, Token stop) { return "n/a"; }
 
-	public int LA(int i) {
-		return LT(i).getType();
-	}
+	public int LA(int i) { return LT(i).getType(); }
 
-	public String getSourceName() {
-		return tokenSource.getSourceName();
-	}
+	public String getSourceName() {	return tokenSource.getSourceName();	}
 }
