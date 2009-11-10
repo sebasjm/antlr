@@ -188,6 +188,7 @@ public abstract class BaseTreeAdaptor implements TreeAdaptor {
 	}
 
 	public Object create(int tokenType, Token fromToken, String text) {
+        if (fromToken == null) return create(tokenType, text);
 		fromToken = createToken(fromToken);
 		fromToken.setType(tokenType);
 		fromToken.setText(text);
