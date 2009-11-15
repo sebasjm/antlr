@@ -118,12 +118,12 @@ namespace Antlr.Runtime.Tree
         public virtual void Downup( object t )
         {
             TreeVisitor v = new TreeVisitor( new CommonTreeAdaptor() );
-            Func<object, object> pre = ( o ) =>
+            Func<object, object> pre = delegate(object o)
             {
                 ApplyOnce( o, Topdown );
                 return o;
             };
-            Func<object, object> post = ( o ) =>
+            Func<object, object> post = delegate(object o)
             {
                 ApplyOnce( o, Bottomup );
                 return o;

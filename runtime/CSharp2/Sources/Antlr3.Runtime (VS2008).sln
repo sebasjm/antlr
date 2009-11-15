@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Runtime (VS2005)", "Antlr3.Runtime\Antlr3.Runtime (VS2005).csproj", "{CF15D0D5-BE72-4F98-B70F-229ABA1DF0E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Runtime (VS2008)", "Antlr3.Runtime\Antlr3.Runtime (VS2008).csproj", "{CF15D0D5-BE72-4F98-B70F-229ABA1DF0E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Utility (VS2005)", "Antlr3.Utility\Antlr3.Utility (VS2005).csproj", "{BEB27DCC-ABFB-4951-B618-2B639EC65A46}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Utility (VS2008)", "Antlr3.Utility\Antlr3.Utility (VS2008).csproj", "{BEB27DCC-ABFB-4951-B618-2B639EC65A46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Runtime.Tests (VS2005)", "Antlr3.Runtime.Tests\Antlr3.Runtime.Tests (VS2005).csproj", "{784B3027-5E9C-4BF2-BFE6-B5002CAE30AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antlr3.Runtime.Tests (VS2008)", "Antlr3.Runtime.Tests\Antlr3.Runtime.Tests (VS2008).csproj", "{784B3027-5E9C-4BF2-BFE6-B5002CAE30AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,9 +30,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		name = Antlr3.Runtime (VS2005)
+		name = Antlr3.Runtime (VS2008)
 		version = 0.1
-		StartupItem = Antlr3.Runtime\Antlr3.Runtime (VS2005).csproj
+		StartupItem = Antlr3.Runtime\Antlr3.Runtime (VS2008).csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
