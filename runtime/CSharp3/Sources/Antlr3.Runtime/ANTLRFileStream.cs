@@ -33,6 +33,7 @@
 namespace Antlr.Runtime
 {
     using Encoding = System.Text.Encoding;
+    using File = System.IO.File;
 
     /** <summary>
      *  This is a char buffer stream that is loaded from a file
@@ -65,7 +66,13 @@ namespace Antlr.Runtime
                 return;
             }
 
-            data = System.IO.File.ReadAllText( fileName, encoding ).ToCharArray();
+            string text;
+            if (encoding == null)
+                text = File.ReadAllText(fileName);
+            else
+                text = File.ReadAllText(fileName, encoding);
+
+            data = text.ToCharArray();
             n = data.Length;
         }
 
