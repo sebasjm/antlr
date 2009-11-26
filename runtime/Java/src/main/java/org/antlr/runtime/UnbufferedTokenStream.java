@@ -32,6 +32,7 @@ import org.antlr.runtime.misc.LookaheadStream;
 public class UnbufferedTokenStream extends LookaheadStream<Token> implements TokenStream {
 	protected TokenSource tokenSource;
 	protected int tokenIndex = 0;
+    protected Token prevToken;
 
 	public UnbufferedTokenStream(TokenSource tokenSource) {
 		super(Token.EOF_TOKEN);
@@ -41,6 +42,7 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
 	public Token nextElement() {
 		Token t = tokenSource.nextToken();
 		t.setTokenIndex(tokenIndex++);
+        prevToken = t;
 		return t;
 	}
 
@@ -51,6 +53,11 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
 	public String toString(Token start, Token stop) { return "n/a"; }
 
 	public int LA(int i) { return LT(i).getType(); }
+
+    protected Token LB(int k) {
+        if ( k==1 ) return prevToken;
+        return null;
+    }
 
 	public String getSourceName() {	return tokenSource.getSourceName();	}
 }
