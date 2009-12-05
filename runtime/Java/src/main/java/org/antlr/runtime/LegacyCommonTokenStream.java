@@ -36,7 +36,7 @@ import java.util.*;
  *
  *  TODO: how to access the full token stream?  How to track all tokens matched per rule?
  */
-public class CommonTokenStream implements TokenStream {
+public class LegacyCommonTokenStream implements TokenStream {
     protected TokenSource tokenSource;
 
 	/** Record every single token pulled from the source so we can reproduce
