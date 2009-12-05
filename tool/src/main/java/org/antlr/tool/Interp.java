@@ -27,14 +27,14 @@
 */
 package org.antlr.tool;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.*;
 import org.antlr.runtime.tree.ParseTree;
 import org.antlr.Tool;
 
 import java.util.StringTokenizer;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.io.FileReader;
 import java.io.BufferedReader;
 
@@ -48,6 +48,18 @@ import java.io.BufferedReader;
  *  the parser ignore.
  */
 public class Interp {
+    public static class FilteringTokenStream extends CommonTokenStream {
+        public FilteringTokenStream(TokenSource src) { super(src); }
+        Set<Integer> hide = new HashSet<Integer>();
+        protected void sync(int i) {
+            super.sync(i);
+            if ( hide.contains(get(i).getType()) ) get(i).setChannel(Token.HIDDEN_CHANNEL);
+        }
+        public void setTokenTypeChannel(int ttype, int channel) {
+            hide.add(ttype);
+        }
+    }
+
 	// pass me a java file to parse
 	public static void main(String[] args) throws Exception {
 		if ( args.length!=4 ) {
@@ -99,7 +111,7 @@ public class Interp {
 		CharStream input =
 			new ANTLRFileStream(inputFileName);
 		Interpreter lexEngine = new Interpreter(lexer, input);
-		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		FilteringTokenStream tokens = new FilteringTokenStream(lexEngine);
 		StringTokenizer tk = new StringTokenizer(ignoreTokens, " ");
 		while ( tk.hasMoreTokens() ) {
 			String tokenName = tk.nextToken();

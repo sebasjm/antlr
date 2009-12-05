@@ -151,12 +151,12 @@ public class TestInterpretedLexing extends BaseTest {
 		CharStream input = new ANTLRStringStream("1234.5");
 		Interpreter engine = new Interpreter(g, input);
 		Token result = engine.scan("A");
-		assertEquals(result.getType(), Atype);
+		assertEquals(Atype, result.getType());
 	}
 
 	@Test public void testTokensRules() throws Exception {
 		Grammar pg = new Grammar(
-			"grammar p;\n"+
+			"parser grammar p;\n"+
 			"a : (INT|FLOAT|WS)+;\n");
 		Grammar g = new Grammar();
 		g.importTokenVocabulary(pg);
@@ -171,10 +171,11 @@ public class TestInterpretedLexing extends BaseTest {
 		Interpreter lexEngine = new Interpreter(g, input);
 
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+        tokens.LT(5); // make sure it grabs all tokens
 		String result = tokens.toString();
 		//System.out.println(result);
 		String expecting = "123 139.52";
-		assertEquals(result,expecting);
+		assertEquals(expecting, result);
 	}
 
 }

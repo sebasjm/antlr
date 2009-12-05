@@ -169,7 +169,7 @@ public class TestCommonTokenStream extends BaseTest {
                 public String getSourceName() { return "test"; }
             };
 
-        NewCommonTokenStream tokens = new NewCommonTokenStream(lexer);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         assertEquals("x", tokens.LT(1).getText()); // must skip first off channel token
         tokens.consume();

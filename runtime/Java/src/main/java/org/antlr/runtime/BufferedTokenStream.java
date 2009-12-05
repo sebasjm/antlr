@@ -38,6 +38,8 @@ public class BufferedTokenStream implements TokenStream {
      */
     protected int p = -1;
 
+    public BufferedTokenStream() {;}
+
     public BufferedTokenStream(TokenSource tokenSource) {
         this.tokenSource = tokenSource;
     }

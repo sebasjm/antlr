@@ -64,16 +64,16 @@ public class LegacyCommonTokenStream implements TokenStream {
      */
     protected int p = -1;
 
-	public CommonTokenStream() {
+	public LegacyCommonTokenStream() {
 		tokens = new ArrayList(500);
 	}
 
-	public CommonTokenStream(TokenSource tokenSource) {
+	public LegacyCommonTokenStream(TokenSource tokenSource) {
 	    this();
 		this.tokenSource = tokenSource;
 	}
 
-	public CommonTokenStream(TokenSource tokenSource, int channel) {
+	public LegacyCommonTokenStream(TokenSource tokenSource, int channel) {
 		this(tokenSource);
 		this.channel = channel;
 	}

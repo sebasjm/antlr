@@ -37,17 +37,19 @@ import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class TestInterpretedParsing extends BaseTest {
+import java.util.Set;
+import java.util.HashSet;
 
+public class TestInterpretedParsing extends BaseTest {
     /** Public default constructor used by TestRig */
     public TestInterpretedParsing() {
     }
 
-	@Test public void testSimpleParse() throws Exception {
-		Grammar pg = new Grammar(
-			"parser grammar p;\n"+
-			"prog : WHILE ID LCURLY (assign)* RCURLY EOF;\n" +
-			"assign : ID ASSIGN expr SEMI ;\n" +
+    @Test public void testSimpleParse() throws Exception {
+        Grammar pg = new Grammar(
+            "parser grammar p;\n"+
+            "prog : WHILE ID LCURLY (assign)* RCURLY EOF;\n" +
+            "assign : ID ASSIGN expr SEMI ;\n" +
 			"expr : INT | FLOAT | ID ;\n");
 		Grammar g = new Grammar();
 		g.importTokenVocabulary(pg);
@@ -67,7 +69,7 @@ public class TestInterpretedParsing extends BaseTest {
 		CharStream input = new ANTLRStringStream("while x { i=1; y=3.42; z=y; }");
 		Interpreter lexEngine = new Interpreter(g, input);
 
-		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		FilteringTokenStream tokens = new FilteringTokenStream(lexEngine);
 		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
 		//System.out.println("tokens="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);
@@ -102,7 +104,7 @@ public class TestInterpretedParsing extends BaseTest {
 		CharStream input = new ANTLRStringStream("while x { i=1 y=3.42; z=y; }");
 		Interpreter lexEngine = new Interpreter(g, input);
 
-		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		FilteringTokenStream tokens = new FilteringTokenStream(lexEngine);
 		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
 		//System.out.println("tokens="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);
@@ -137,7 +139,7 @@ public class TestInterpretedParsing extends BaseTest {
 		CharStream input = new ANTLRStringStream("while x { i=; y=3.42; z=y; }");
 		Interpreter lexEngine = new Interpreter(g, input);
 
-		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		FilteringTokenStream tokens = new FilteringTokenStream(lexEngine);
 		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
 		//System.out.println("tokens="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);
@@ -172,7 +174,7 @@ public class TestInterpretedParsing extends BaseTest {
 		CharStream input = new ANTLRStringStream("while x { i=; y=3.42; z=y; }");
 		Interpreter lexEngine = new Interpreter(g, input);
 
-		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		FilteringTokenStream tokens = new FilteringTokenStream(lexEngine);
 		tokens.setTokenTypeChannel(g.getTokenType("WS"), 99);
 		//System.out.println("tokens="+tokens.toString());
 		Interpreter parseEngine = new Interpreter(pg, tokens);

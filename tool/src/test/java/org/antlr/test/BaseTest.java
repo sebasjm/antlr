@@ -29,6 +29,9 @@ package org.antlr.test;
 
 
 import org.antlr.Tool;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.TokenSource;
+import org.antlr.runtime.Token;
 import org.antlr.analysis.Label;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -527,6 +530,18 @@ public abstract class BaseTest {
 			return buf.toString();
 		}
 	}
+
+    public static class FilteringTokenStream extends CommonTokenStream {
+        public FilteringTokenStream(TokenSource src) { super(src); }
+        Set<Integer> hide = new HashSet<Integer>();
+        protected void sync(int i) {
+            super.sync(i);
+            if ( hide.contains(get(i).getType()) ) get(i).setChannel(Token.HIDDEN_CHANNEL);
+        }
+        public void setTokenTypeChannel(int ttype, int channel) {
+            hide.add(ttype);
+        }
+    }
 
 	protected void writeFile(String dir, String fileName, String content) {
 		try {

@@ -20,9 +20,16 @@ package org.antlr.runtime;
 public class CommonTokenStream extends BufferedTokenStream {
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
     protected int channel = Token.DEFAULT_CHANNEL;
-    
+
+    public CommonTokenStream() { ; }
+
     public CommonTokenStream(TokenSource tokenSource) {
         super(tokenSource);
+    }
+
+    public CommonTokenStream(TokenSource tokenSource, int channel) {
+        this(tokenSource);
+        this.channel = channel;
     }
 
     /** Always leave p on an on-channel token. */
