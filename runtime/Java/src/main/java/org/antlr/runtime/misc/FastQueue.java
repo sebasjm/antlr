@@ -47,11 +47,12 @@ public class FastQueue<T> {
     /** index of next element to fill */
     protected int p = 0;
 
-    public void reset() { p = 0; data.clear(); }
+    public void reset() { clear(); }
+    public void clear() { p = 0; data.clear(); }
 
     /** Get and remove first element in queue */
     public T remove() {
-        T o = get(0);
+        T o = elementAt(0);
         p++;
         // have we hit end of buffer?
         if ( p == data.size() ) {
@@ -65,27 +66,25 @@ public class FastQueue<T> {
 
     public int size() { return data.size() - p; }
 
-    public T head() { return get(0); }
+    public T head() { return elementAt(0); }
 
     /** Return element i elements ahead of current element.  i==0 gets
      *  current element.  This is not an absolute index into the data list
      *  since p defines the start of the real list.
      */
-    public T get(int i) {
-        if ( p+i >= data.size() ) {
-            throw new NoSuchElementException("queue index "+(p+i)+" > size "+data.size());
+    public T elementAt(int i) {
+        if ( p+i >= data.size() || p+i < 0 ) {
+            throw new NoSuchElementException("queue index "+(p+i)+" not in range 0.."+(data.size()-1));
         }
         return data.get(p+i);
     }
-
-    public void clear() { p = 0; data.clear(); }
 
     /** Return string of current buffer contents; non-destructive */
     public String toString() {
         StringBuffer buf = new StringBuffer();
         int n = size();
         for (int i=0; i<n; i++) {
-            buf.append(get(i));
+            buf.append(elementAt(i));
             if ( (i+1)<n ) buf.append(" ");
         }
         return buf.toString();

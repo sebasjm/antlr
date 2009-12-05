@@ -29,10 +29,30 @@ package org.antlr.runtime;
 
 import org.antlr.runtime.misc.LookaheadStream;
 
+import java.util.NoSuchElementException;
+
+/** A token stream that pulls tokens from the code source on-demand and
+ *  without tracking a complete buffer of the tokens. This stream buffers
+ *  the minimum number of tokens possible.  It's the same as
+ *  OnDemandTokenStream except that OnDemandTokenStream buffers all tokens.
+ *
+ *  You can't use this stream if you pass whitespace or other off-channel
+ *  tokens to the parser. The stream can't ignore off-channel tokens.
+ * 
+ *  You can only look backwards 1 token: LT(-1).
+ *
+ *  Use this when you need to read from a socket or other infinite stream.
+ *
+ *  @see BufferedTokenStream
+ *  @see CommonTokenStream
+ */
 public class UnbufferedTokenStream extends LookaheadStream<Token> implements TokenStream {
 	protected TokenSource tokenSource;
-	protected int tokenIndex = 0;
     protected Token prevToken;
+    protected int tokenIndex = 0; // simple counter to set token index in tokens
+
+    /** Skip tokens on any channel but this one; this is how we skip whitespace... */
+    protected int channel = Token.DEFAULT_CHANNEL;
 
 	public UnbufferedTokenStream(TokenSource tokenSource) {
 		super(Token.EOF_TOKEN);
@@ -41,10 +61,15 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
 
 	public Token nextElement() {
 		Token t = tokenSource.nextToken();
-		t.setTokenIndex(tokenIndex++);
+        t.setTokenIndex(tokenIndex++);
         prevToken = t;
 		return t;
 	}
+
+    public void reset() {
+        super.reset();
+        prevToken=null;
+    }
 
 	public TokenSource getTokenSource() { return tokenSource; }
 
@@ -52,11 +77,15 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
 
 	public String toString(Token start, Token stop) { return "n/a"; }
 
-	public int LA(int i) { return LT(i).getType(); }
+    public int LA(int i) { return LT(i).getType(); }
+
+    public Token get(int i) {
+        throw new UnsupportedOperationException("Absolute token indexes are meaningless in an unbuffered stream");
+    }
 
     protected Token LB(int k) {
         if ( k==1 ) return prevToken;
-        return null;
+        throw new NoSuchElementException("can't look backwards more than one token in this stream");
     }
 
 	public String getSourceName() {	return tokenSource.getSourceName();	}

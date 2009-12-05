@@ -113,7 +113,11 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
 
 	public void setTreeAdaptor(TreeAdaptor adaptor) { this.adaptor = adaptor; }
 
-	public int LA(int i) { return adaptor.getType(LT(i)); }
+    public Object get(int i) {
+        throw new UnsupportedOperationException("Absolute node indexes are meaningless in an unbuffered stream");
+    }
+
+    public int LA(int i) { return adaptor.getType(LT(i)); }
 
     /** Make stream jump to a new location, saving old location.
      *  Switch back with pop().
