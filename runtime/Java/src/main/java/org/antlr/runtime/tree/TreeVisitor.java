@@ -27,8 +27,7 @@ public class TreeVisitor {
         if ( action!=null && !isNil ) {
             t = action.pre(t); // if rewritten, walk children of new t
         }
-        int n = adaptor.getChildCount(t);
-        for (int i=0; i<n; i++) {
+        for (int i=0; i<adaptor.getChildCount(t); i++) {
             Object child = adaptor.getChild(t, i);
             Object visitResult = visit(child, action);
             Object childAfterVisit = adaptor.getChild(t, i);
