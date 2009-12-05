@@ -7,6 +7,12 @@ University of San Francisco
 
 CHANGES
 
+December 5, 2009
+
+* Fixed bug in TreeVisitor when rewrites altered number of children. Thanks to Chris DiGiano.
+
+* added new buffered on-demand streams: BufferedTokenStream. Renamed CommonTokenStream to LegacyCommonTokenStream and made new one as subclass of BufferedTokenStream.
+
 November 3, 2009
 
 * Added org.antlr.runtime.UnbufferedTokenStream. Was trivial and works!
