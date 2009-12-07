@@ -91,6 +91,7 @@ public class BufferedTokenStream implements TokenStream {
     /** Make sure index i in tokens has a token. */
     protected void sync(int i) {
         int n = i - tokens.size() + 1; // how many more elements we need?
+        //System.out.println("sync("+i+") needs "+n);
         if ( n > 0 ) fetch(n);
     }
 
@@ -99,10 +100,11 @@ public class BufferedTokenStream implements TokenStream {
         for (int i=1; i<=n; i++) {
             Token t = tokenSource.nextToken();
             t.setTokenIndex(tokens.size());
+            //System.out.println("adding "+t+" at index "+tokens.size());
             tokens.add(t);
             if ( t.getType()==Token.EOF ) break;
         }
-    }    
+    }
 
     public Token get(int i) {
         if ( i < 0 || i >= tokens.size() ) {

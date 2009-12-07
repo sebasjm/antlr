@@ -105,6 +105,19 @@ public class CommonTokenStream extends BufferedTokenStream {
         p = i;
     }
 
+    /** Get all tokens from lexer until EOF */
+    public void fill() {
+        if ( p == -1 ) setup();
+        if ( tokens.get(p).getType()==Token.EOF ) return;
+        
+        int i = p+1;
+        sync(i);
+        while ( tokens.get(i).getType()!=Token.EOF ) {
+            i++;
+            sync(i);
+        }
+    }
+
     /** Reset this token stream by setting its token source. */
     public void setTokenSource(TokenSource tokenSource) {
         super.setTokenSource(tokenSource);

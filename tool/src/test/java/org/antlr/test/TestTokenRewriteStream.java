@@ -33,10 +33,7 @@ import org.antlr.runtime.TokenRewriteStream;
 import org.antlr.tool.Grammar;
 import org.antlr.tool.Interpreter;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class TestTokenRewriteStream extends BaseTest {
 
@@ -53,7 +50,6 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
 		tokens.insertBefore(0, "0");
 		String result = tokens.toString();
 		String expecting = "0abc";
@@ -69,7 +65,6 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
 		tokens.insertAfter(2, "x");
 		String result = tokens.toString();
 		String expecting = "abcx";
@@ -85,7 +80,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(1, "x");
 		tokens.insertAfter(1, "x");
 		String result = tokens.toString();
@@ -102,7 +97,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(0, "x");
 		String result = tokens.toString();
 		String expecting = "xbc";
@@ -118,7 +113,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, "x");
 		String result = tokens.toString();
 		String expecting = "abx";
@@ -134,7 +129,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, "x");
 		String result = tokens.toString();
 		String expecting = "axc";
@@ -155,7 +150,7 @@ public class TestTokenRewriteStream extends BaseTest {
         CharStream input = new ANTLRStringStream("x = 3 * 0;");
         Interpreter lexEngine = new Interpreter(g, input);
         TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-        tokens.LT(1); // fill buffer
+        tokens.fill();
         tokens.replace(4, 8, "0"); // replace 3 * 0 with 0
 
         String result = tokens.toOriginalString();
@@ -190,7 +185,7 @@ public class TestTokenRewriteStream extends BaseTest {
         CharStream input = new ANTLRStringStream("x = 3 * 0 + 2 * 0;");
         Interpreter lexEngine = new Interpreter(g, input);
         TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-        tokens.LT(1); // fill buffer
+        tokens.fill();
 
         String result = tokens.toOriginalString();
         String expecting = "x = 3 * 0 + 2 * 0;";
@@ -218,7 +213,7 @@ public class TestTokenRewriteStream extends BaseTest {
         assertEquals(expecting, result);
 
         tokens.insertAfter(17, "// comment");
-        result = tokens.toString(12,17);
+        result = tokens.toString(12,18);
         expecting = "2 * 0;// comment";
         assertEquals(expecting, result);
 
@@ -237,7 +232,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, "x");
 		tokens.replace(1, "y");
 		String result = tokens.toString();
@@ -254,7 +249,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
         tokens.insertBefore(0, "_");
         tokens.replace(1, "x");
 		tokens.replace(1, "y");
@@ -272,7 +267,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, "x");
 		tokens.delete(1);
 		String result = tokens.toString();
@@ -289,7 +284,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(0, 2, "x");
 		tokens.insertBefore(1, "0");
 		Exception exc = null;
@@ -313,7 +308,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(0, "0");
 		tokens.replace(0, "x"); // supercedes insert at 0
 		String result = tokens.toString();
@@ -330,7 +325,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(1, "x");
 		tokens.insertBefore(1, "y");
 		String result = tokens.toString();
@@ -347,7 +342,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(0, "x");
 		tokens.insertBefore(0, "y");
 		tokens.replace(0, "z");
@@ -365,7 +360,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, "x");
 		tokens.insertBefore(2, "y");
 		String result = tokens.toString();
@@ -382,7 +377,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(2, "y");
 		tokens.replace(2, "x");
 		String result = tokens.toString();
@@ -399,7 +394,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, "x");
 		tokens.insertAfter(2, "y");
 		String result = tokens.toString();
@@ -416,7 +411,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 4, "x");
 		tokens.insertBefore(2, "y");
 		String result = tokens.toString();
@@ -433,7 +428,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 4, "x");
 		tokens.insertBefore(4, "y"); // no effect; within range of a replace
 		Exception exc = null;
@@ -457,7 +452,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 4, "x");
 		tokens.insertAfter(4, "y");
 		String result = tokens.toString();
@@ -474,7 +469,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(0, 6, "x");
 		String result = tokens.toString();
 		String expecting = "x";
@@ -490,7 +485,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 4, "xyz");
 		String result = tokens.toString(0,6);
 		String expecting = "abxyzba";
@@ -506,7 +501,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 4, "xyz");
 		tokens.replace(3, 5, "foo"); // overlaps, error
 		Exception exc = null;
@@ -530,7 +525,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcccba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 4, "xyz");
 		tokens.replace(1, 3, "foo"); // overlap, error
 		Exception exc = null;
@@ -554,7 +549,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcba");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 2, "xyz");
 		tokens.replace(0, 3, "foo");
 		String result = tokens.toString();
@@ -573,7 +568,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(0, "x");
 		tokens.insertBefore(0, "y");
 		String result = tokens.toString();
@@ -590,7 +585,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(1, "x");
 		tokens.insertBefore(0, "y");
 		tokens.insertBefore(1, "z");
@@ -608,7 +603,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(0, 2, "foo");
 		tokens.insertBefore(0, "z"); // combine with left edge of rewrite
 		String result = tokens.toString();
@@ -625,7 +620,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.delete(0, 2);
 		tokens.insertBefore(0, "z"); // combine with left edge of rewrite
 		String result = tokens.toString();
@@ -642,7 +637,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(1, "x");
 		tokens.insertBefore(2, "y");
 		tokens.insertBefore(0, "z");
@@ -660,7 +655,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, 2, "foo");
 		tokens.replace(0, 3, "bar"); // wipes prior nested replace
 		String result = tokens.toString();
@@ -677,7 +672,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(0, 3, "bar");
 		tokens.replace(1, 2, "foo"); // cannot split earlier replace
 		Exception exc = null;
@@ -701,7 +696,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, 2, "foo");
 		tokens.replace(0, 2, "bar"); // wipes prior nested replace
 		String result = tokens.toString();
@@ -718,7 +713,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, 2, "foo");
 		tokens.replace(1, 3, "bar"); // wipes prior nested replace
 		String result = tokens.toString();
@@ -735,7 +730,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(1, 2, "foo");
 		tokens.replace(1, 2, "foo"); // drop previous, identical
 		String result = tokens.toString();
@@ -752,7 +747,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(1, "foo");
 		tokens.replace(1, 2, "foo"); // kill prev insert
 		String result = tokens.toString();
@@ -769,7 +764,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.insertBefore(1, "x");
 		tokens.replace(2, 3, "foo");
 		String result = tokens.toString();
@@ -786,7 +781,7 @@ public class TestTokenRewriteStream extends BaseTest {
 		CharStream input = new ANTLRStringStream("abcc");
 		Interpreter lexEngine = new Interpreter(g, input);
 		TokenRewriteStream tokens = new TokenRewriteStream(lexEngine);
-		tokens.LT(1); // fill buffer
+		tokens.fill();
 		tokens.replace(2, 3, "foo");
 		tokens.insertBefore(1, "x");
 		String result = tokens.toString();

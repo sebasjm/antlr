@@ -117,7 +117,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 		}
 		public int execute(StringBuffer buf) {
 			buf.append(text);
-			buf.append(((Token)tokens.get(index)).getText());			
+			if ( tokens.get(index).getType()!=Token.EOF ) buf.append(tokens.get(index).getText());			
 			return index+1;
 		}
 	}
@@ -330,22 +330,25 @@ public class TokenRewriteStream extends CommonTokenStream {
 	}
 
 	public String toOriginalString() {
+        fill();
 		return toOriginalString(MIN_TOKEN_INDEX, size()-1);
 	}
 
 	public String toOriginalString(int start, int end) {
 		StringBuffer buf = new StringBuffer();
 		for (int i=start; i>=MIN_TOKEN_INDEX && i<=end && i<tokens.size(); i++) {
-			buf.append(get(i).getText());
+			if ( get(i).getType()!=Token.EOF ) buf.append(get(i).getText());
 		}
 		return buf.toString();
 	}
 
 	public String toString() {
+        fill();
 		return toString(MIN_TOKEN_INDEX, size()-1);
 	}
 
 	public String toString(String programName) {
+        fill();
 		return toString(programName, MIN_TOKEN_INDEX, size()-1);
 	}
 
@@ -376,7 +379,7 @@ public class TokenRewriteStream extends CommonTokenStream {
 			Token t = (Token) tokens.get(i);
 			if ( op==null ) {
 				// no operation at that index, just dump token
-				buf.append(t.getText());
+				if ( t.getType()!=Token.EOF ) buf.append(t.getText());
 				i++; // move to next token
 			}
 			else {
