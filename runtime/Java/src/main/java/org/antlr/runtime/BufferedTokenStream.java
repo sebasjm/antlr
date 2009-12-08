@@ -127,7 +127,7 @@ public class BufferedTokenStream implements TokenStream {
 
         sync(p+k-1);
         if ( (p+k-1) >= tokens.size() ) {
-            return Token.EOF_TOKEN;
+            return new CommonToken(null,Token.EOF,Token.DEFAULT_CHANNEL,index(),index());
         }
         return tokens.get(p+k-1);
     }

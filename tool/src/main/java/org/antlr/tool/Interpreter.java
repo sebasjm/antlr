@@ -81,7 +81,7 @@ public class Interpreter implements TokenSource {
 			return null;
 		}
 		if ( input.LA(1)==CharStream.EOF ) {
-			return Token.EOF_TOKEN;
+            return new CommonToken((CharStream)input,Token.EOF,Token.DEFAULT_CHANNEL,input.index(),input.index());
 		}
 		int start = input.index();
 		int charPos = ((CharStream)input).getCharPositionInLine();
@@ -102,7 +102,7 @@ public class Interpreter implements TokenSource {
 		// we must set the line, and other junk here to make it a complete token
 		int stop = input.index()-1;
 		if ( token==null ) {
-			return Token.EOF_TOKEN;
+            return new CommonToken((CharStream)input,Token.EOF,Token.DEFAULT_CHANNEL,start,start);
 		}
 		token.setLine(((CharStream)input).getLine());
 		token.setStartIndex(start);

@@ -54,7 +54,7 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
     protected int channel = Token.DEFAULT_CHANNEL;
 
 	public UnbufferedTokenStream(TokenSource tokenSource) {
-		super(Token.EOF_TOKEN);
+		super(new CommonToken(Token.EOF));
 		this.tokenSource = tokenSource;
 	}
 
