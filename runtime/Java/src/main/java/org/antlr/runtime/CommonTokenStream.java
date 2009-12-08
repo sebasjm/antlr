@@ -59,6 +59,7 @@ public class CommonTokenStream extends BufferedTokenStream {
     }
 
     public Token LT(int k) {
+        //System.out.println("enter LT("+k+")");
         if ( p == -1 ) setup();
         if ( k == 0 ) return null;
         if ( k < 0 ) return LB(-k);
@@ -70,7 +71,6 @@ public class CommonTokenStream extends BufferedTokenStream {
             i = skipOffTokenChannels(i+1);
             n++;
         }
-        if ( i>=tokens.size() ) return Token.EOF_TOKEN;
         return tokens.get(i);
     }
 
@@ -78,9 +78,8 @@ public class CommonTokenStream extends BufferedTokenStream {
      *  token.
      */
     protected int skipOffTokenChannels(int i) {
-        int n = tokens.size();
         sync(i);
-        while ( i<n && tokens.get(i).getChannel()!=channel ) {
+        while ( tokens.get(i).getChannel()!=channel ) { // also stops at EOF (it's onchannel)
             i++;
             sync(i);
         }
