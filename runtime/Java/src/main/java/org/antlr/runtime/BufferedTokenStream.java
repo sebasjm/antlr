@@ -181,8 +181,10 @@ public class BufferedTokenStream implements TokenStream {
 
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
+    /** Grab *all* tokens from stream and return string */
     public String toString() {
         if ( p == -1 ) setup();
+        fill();
         return toString(0, tokens.size()-1);
     }
 
@@ -204,5 +206,18 @@ public class BufferedTokenStream implements TokenStream {
             return toString(start.getTokenIndex(), stop.getTokenIndex());
         }
         return null;
+    }
+
+    /** Get all tokens from lexer until EOF */
+    public void fill() {
+        if ( p == -1 ) setup();
+        if ( tokens.get(p).getType()==Token.EOF ) return;
+
+        int i = p+1;
+        sync(i);
+        while ( tokens.get(i).getType()!=Token.EOF ) {
+            i++;
+            sync(i);
+        }
     }
 }

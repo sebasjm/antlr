@@ -186,7 +186,6 @@ public class TestTreeNodeStream extends BaseTest {
 			stream.consume();
 		}
 		assertEquals(Token.EOF, ((Tree)stream.LT(1)).getType());
-		assertEquals(Token.UP, ((Tree)stream.LT(-1)).getType());
 		stream.rewind(m);      // REWIND
 
 		// consume til end again :)
@@ -195,7 +194,6 @@ public class TestTreeNodeStream extends BaseTest {
 			stream.consume();
 		}
 		assertEquals(Token.EOF, ((Tree)stream.LT(1)).getType());
-		assertEquals(Token.UP, ((Tree)stream.LT(-1)).getType());
 	}
 
 	@Test public void testMarkRewindInMiddle() throws Exception {

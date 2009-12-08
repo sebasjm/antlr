@@ -73,8 +73,11 @@ public class FastQueue<T> {
      *  since p defines the start of the real list.
      */
     public T elementAt(int i) {
-        if ( p+i >= data.size() || p+i < 0 ) {
-            throw new NoSuchElementException("queue index "+(p+i)+" not in range 0.."+(data.size()-1));
+        if ( p+i >= data.size() ) {
+            throw new NoSuchElementException("queue index "+(p+i)+" > last index "+(data.size()-1));
+        }
+        if ( p+i < 0 ) {
+            throw new NoSuchElementException("queue index "+(p+i)+" < 0");
         }
         return data.get(p+i);
     }

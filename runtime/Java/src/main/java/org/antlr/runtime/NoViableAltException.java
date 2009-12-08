@@ -44,7 +44,6 @@ public class NoViableAltException extends RecognitionException {
 		this.grammarDecisionDescription = grammarDecisionDescription;
 		this.decisionNumber = decisionNumber;
 		this.stateNumber = stateNumber;
-        CommonTokenStream s = (CommonTokenStream) input;
 	}
 
 	public String toString() {

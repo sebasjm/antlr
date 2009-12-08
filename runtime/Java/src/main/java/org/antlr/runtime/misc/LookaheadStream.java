@@ -27,6 +27,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.antlr.runtime.misc;
 
+import org.antlr.runtime.Token;
+
 import java.util.NoSuchElementException;
 
 /** A lookahead queue that knows how to mark/release locations
@@ -43,7 +45,9 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     /** Absolute token index. It's the index of the symbol about to be
 	 *  read via LT(1). Goes from 0 to numtokens.
      */
-    protected int currentTokenIndex = 0;
+    protected int currentElementIndex = 0;
+
+    protected T prevElement;
 
     /** Returned by nextElement upon end of stream; we add to buffer also */
     public T eof = null;
@@ -52,17 +56,18 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     protected int lastMarker;
 
     /** tracks how deep mark() calls are nested */
-    protected int markDepth = 0;    
+    protected int markDepth = 0;
 
     public LookaheadStream(T eof) {
         this.eof = eof;
     }
 
     public void reset() {
-        eofElementIndex = UNINITIALIZED_EOF_ELEMENT_INDEX;
-        currentTokenIndex = 0;
-        // TODO: seek?
         super.reset();
+        eofElementIndex = UNINITIALIZED_EOF_ELEMENT_INDEX;
+        currentElementIndex = 0;
+        p = 0;
+        prevElement=null;        
     }
     
     /** Implement nextElement to supply a stream of elements to this
@@ -86,15 +91,16 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 
     /** Make sure we have at least one element to remove, even if EOF */
     public void consume() {
-        if ( eofElementIndex!=UNINITIALIZED_EOF_ELEMENT_INDEX ) return;
-        sync(1); remove(); currentTokenIndex++;
+        syncAhead(1);
+        prevElement = remove();
+        currentElementIndex++;
     }
 
     /** Make sure we have 'need' elements from current position p. Last valid
      *  p index is data.size()-1.  p+need-1 is the data index 'need' elements
      *  ahead.  If we need 1 element, (p+1-1)==p must be < data.size().
      */
-    public void sync(int need) {
+    protected void syncAhead(int need) {
         int n = (p+need-1) - data.size() + 1; // how many more elements we need?
         if ( n > 0 ) fill(n);                 // out of elements?
     }
@@ -120,22 +126,20 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 		if ( k==0 ) {
 			return null;
 		}
-		if ( k<0 ) {
-            throw new NoSuchElementException("can't look backwards in an unbuffered token stream");
-		}
+		if ( k<0 ) return LB(-k);
 		//System.out.print("LT(p="+p+","+k+")=");
 		if ( (p+k-1) >= eofElementIndex ) { // move to super.LT
 			return eof;
 		}
-        sync(k);
+        syncAhead(k);
         return elementAt(k-1);
 	}
 
-    public int index() { return currentTokenIndex; }
+    public int index() { return currentElementIndex; }
 
 	public int mark() {
         markDepth++;
-        lastMarker = index();
+        lastMarker = p; // track where we are in buffer not absolute token index
         return lastMarker;
 	}
 
@@ -160,4 +164,9 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
      *  is unbuffered. Seeks only into our moving window of elements.
      */
     public void seek(int index) { p = index; }
+
+    protected T LB(int k) {
+        if ( k==1 ) return prevElement;
+        throw new NoSuchElementException("can't look backwards more than one token in this stream");
+    }
 }

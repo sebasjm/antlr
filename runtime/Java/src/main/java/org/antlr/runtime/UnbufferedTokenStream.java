@@ -48,7 +48,6 @@ import java.util.NoSuchElementException;
  */
 public class UnbufferedTokenStream extends LookaheadStream<Token> implements TokenStream {
 	protected TokenSource tokenSource;
-    protected Token prevToken;
     protected int tokenIndex = 0; // simple counter to set token index in tokens
 
     /** Skip tokens on any channel but this one; this is how we skip whitespace... */
@@ -62,14 +61,8 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
 	public Token nextElement() {
 		Token t = tokenSource.nextToken();
         t.setTokenIndex(tokenIndex++);
-        prevToken = t;
 		return t;
 	}
-
-    public void reset() {
-        super.reset();
-        prevToken=null;
-    }
 
 	public TokenSource getTokenSource() { return tokenSource; }
 
@@ -83,10 +76,5 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
         throw new UnsupportedOperationException("Absolute token indexes are meaningless in an unbuffered stream");
     }
 
-    protected Token LB(int k) {
-        if ( k==1 ) return prevToken;
-        throw new NoSuchElementException("can't look backwards more than one token in this stream");
-    }
-
-	public String getSourceName() {	return tokenSource.getSourceName();	}
+    public String getSourceName() {	return tokenSource.getSourceName();	}
 }
