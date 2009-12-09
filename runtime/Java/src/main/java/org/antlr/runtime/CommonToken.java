@@ -97,7 +97,12 @@ public class CommonToken implements Token, Serializable {
 		if ( input==null ) {
 			return null;
 		}
-		text = input.substring(start,stop);
+        if ( start<input.size() && stop<input.size() ) {
+		    text = input.substring(start,stop);
+        }
+        else {
+            text = "<EOF>";
+        }
 		return text;
 	}
 

@@ -64,11 +64,9 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
 	}
 
 	public CommonTreeNodeStream(TreeAdaptor adaptor, Object tree) {
-        super(adaptor.create(Token.EOF, "EOF")); // set EOF
 		this.root = tree;
 		this.adaptor = adaptor;
         it = new TreeIterator(root);
-        it.eof = this.eof; // make sure tree iterator returns the EOF we want
 	}
 
     public void reset() {
@@ -98,6 +96,8 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
         }
         return t;
     }
+
+    public boolean isEOF(Object o) { return adaptor.getType(o) == Token.EOF; }
 
     public void setUniqueNavigationNodes(boolean uniqueNavigationNodes) { }
 

@@ -49,7 +49,9 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 
     protected T prevElement;
 
-    /** Returned by nextElement upon end of stream; we add to buffer also */
+    /** Track object returned by nextElement upon end of stream;
+     *  Return it later when they ask for LT passed end of input.
+     */
     public T eof = null;
 
     /** Track the last mark() call result value for use in rewind(). */
@@ -57,10 +59,6 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 
     /** tracks how deep mark() calls are nested */
     protected int markDepth = 0;
-
-    public LookaheadStream(T eof) {
-        this.eof = eof;
-    }
 
     public void reset() {
         super.reset();
@@ -74,6 +72,8 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
      *  lookahead buffer.  Return eof upon end of the stream we're pulling from.
      */
     public abstract T nextElement();
+
+    public abstract boolean isEOF(T o);
 
     /** Get and remove first element in queue; override FastQueue.remove();
      *  it's the same, just checks for backtracking.
@@ -109,11 +109,11 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     public void fill(int n) {
         for (int i=1; i<=n; i++) {
             T o = nextElement();
-            if ( o==eof ) {
-                data.add(eof);
+            if ( isEOF(o) ) {
+                eof = o;
                 eofElementIndex = data.size()-1;
             }
-            else data.add(o);
+            data.add(o);
         }
     }
 

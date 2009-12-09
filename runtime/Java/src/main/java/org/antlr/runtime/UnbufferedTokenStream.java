@@ -54,7 +54,6 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
     protected int channel = Token.DEFAULT_CHANNEL;
 
 	public UnbufferedTokenStream(TokenSource tokenSource) {
-		super(new CommonToken(Token.EOF));
 		this.tokenSource = tokenSource;
 	}
 
@@ -63,6 +62,8 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
         t.setTokenIndex(tokenIndex++);
 		return t;
 	}
+
+    public boolean isEOF(Token o) { return o.getType() == Token.EOF; }    
 
 	public TokenSource getTokenSource() { return tokenSource; }
 

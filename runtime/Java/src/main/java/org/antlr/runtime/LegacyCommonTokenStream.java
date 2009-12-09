@@ -245,7 +245,7 @@ public class LegacyCommonTokenStream implements TokenStream {
 		}
 		//System.out.print("LT(p="+p+","+k+")=");
 		if ( (p+k-1) >= tokens.size() ) {
-            return new CommonToken(null,Token.EOF,Token.DEFAULT_CHANNEL,index(),index());
+            return (Token)tokens.get(tokens.size()-1);
 		}
 		//System.out.println(tokens.get(p+k-1));
 		int i = p;
@@ -257,7 +257,7 @@ public class LegacyCommonTokenStream implements TokenStream {
 			n++;
 		}
 		if ( i>=tokens.size() ) {
-            return new CommonToken(null,Token.EOF,Token.DEFAULT_CHANNEL,index(),index());
+            return (Token)tokens.get(tokens.size()-1); // must be EOF
 		}
         return (Token)tokens.get(i);
     }
