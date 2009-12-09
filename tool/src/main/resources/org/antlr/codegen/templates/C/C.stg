@@ -45,8 +45,7 @@ cTypeInitMap ::= [
 	"ANTLR3_BOOLEAN"    : "ANTLR3_FALSE",   // Booleans     start out being Antlr C for false
 	"byte"		    : "0",              // Bytes        start out being 0
 	"short"		    : "0",              // Shorts       start out being 0
-	"char"		    : "0",              // Chars        start out being 0
-	default		    : "NULL"            // Anything other than an atomic type (above) is a NULL (probably NULL pointer).
+	"char"		    : "0"              // Chars        start out being 0
 ]
 
 leadIn(type) ::=
@@ -1669,7 +1668,7 @@ ruleDeclarations() ::= <<
 <returnType()> retval;<\n>
 <else>
 <ruleDescriptor.returnScope.attributes:{ a |
-<a.type> <a.name> = <if(a.initValue)><a.initValue><else><initValue(a.type)><endif>;
+<a.type> <a.name>;
 }>
 <endif>
 <if(memoize)>
@@ -1680,6 +1679,15 @@ ANTLR3_UINT32 <ruleDescriptor.name>_StartIndex;
 ruleInitializations() ::= <<
 /* Initialize rule variables
  */
+<if(ruleDescriptor.hasMultipleReturnValues)>
+<ruleDescriptor.returnScope.attributes:{ a |
+<if(a.initValue)>retval.<a.name> = <a.initValue>;<endif>
+}>
+<else>
+<ruleDescriptor.returnScope.attributes:{ a |
+<if(a.initValue)><a.name> = <a.initValue>;<endif>
+}>
+<endif>
 <if(memoize)>
 <ruleDescriptor.name>_StartIndex = INDEX();<\n>
 <endif>
@@ -2986,7 +2994,7 @@ delegateName() ::= <<
  *  must be an object, default value is "0".
  */
 initValue(typeName) ::= <<
-<cTypeInitMap.(typeName)>
+ = <cTypeInitMap.(typeName)>
 >>
 
 /** Define a rule label  */
@@ -2997,9 +3005,6 @@ ruleLabelDef(label) ::= <<
 >>
 /**  Rule label default value */
 ruleLabelInitVal(label) ::= <<
-<if(label.referencedRule.hasSingleReturnValue)>
-<label.label.text> = <initValue(label.referencedRule.singleValueReturnType)>;
-<endif>
 >>
 
 ASTLabelType() ::= "<if(recognizer.ASTLabelType)><recognizer.ASTLabelType><else>pANTLR3_BASE_TREE<endif>"
@@ -3023,7 +3028,7 @@ typedef struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStr
     <recognizer.ASTLabelType>       stop;
 <endif>
     <@ruleReturnMembers()>   
-    <ruleDescriptor.returnScope.attributes:{<it.decl>;}; separator="\n">
+    <ruleDescriptor.returnScope.attributes:{<it.type> <it.name>;}; separator="\n">
 }
     <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStructName()>;<\n><\n>
 <endif>

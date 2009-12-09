@@ -111,7 +111,7 @@ retval.tree  = NULL;
 /**  a rule label including default value */
 ruleLabelInitVal(label) ::= <<
 <super.ruleLabelInitVal(...)>
-<label.label.text>.tree = <initValue(typeName=ruleLabelType(referencedRule=label.referencedRule))>;<\n>
+<label.label.text>.tree = NULL;
 >>
 
 /** When doing auto AST construction, we must define some variables;
