@@ -39,9 +39,6 @@ import java.util.NoSuchElementException;
 public abstract class LookaheadStream<T> extends FastQueue<T> {
     public static final int UNINITIALIZED_EOF_ELEMENT_INDEX = Integer.MAX_VALUE;
 
-    /** Set to buffer index of eof when nextElement returns eof */
-    protected int eofElementIndex = UNINITIALIZED_EOF_ELEMENT_INDEX;
-
     /** Absolute token index. It's the index of the symbol about to be
 	 *  read via LT(1). Goes from 0 to numtokens.
      */
@@ -62,7 +59,6 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 
     public void reset() {
         super.reset();
-        eofElementIndex = UNINITIALIZED_EOF_ELEMENT_INDEX;
         currentElementIndex = 0;
         p = 0;
         prevElement=null;        
@@ -109,16 +105,11 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
     public void fill(int n) {
         for (int i=1; i<=n; i++) {
             T o = nextElement();
-            if ( isEOF(o) ) {
-                eof = o;
-                eofElementIndex = data.size()-1;
-            }
+            if ( isEOF(o) ) eof = o;
             data.add(o);
         }
     }
 
-    //public boolean hasNext() { return eofElementIndex!=UNINITIALIZED_EOF_ELEMENT_INDEX; }
-    
     /** Size of entire stream is unknown; we only know buffer size from FastQueue */
     public int size() { throw new UnsupportedOperationException("streams are of unknown size"); }
 
@@ -128,10 +119,8 @@ public abstract class LookaheadStream<T> extends FastQueue<T> {
 		}
 		if ( k<0 ) return LB(-k);
 		//System.out.print("LT(p="+p+","+k+")=");
-		if ( (p+k-1) >= eofElementIndex ) { // move to super.LT
-			return eof;
-		}
         syncAhead(k);
+        if ( (p+k-1) > data.size() ) return eof;
         return elementAt(k-1);
 	}
 
