@@ -147,7 +147,7 @@ namespace Antlr.Runtime.Misc
             }
         }
 
-        public virtual object LT( int k )
+        public virtual T LT( int k )
         {
             if ( k == 0 )
             {
@@ -168,7 +168,7 @@ namespace Antlr.Runtime.Misc
         }
 
         /** <summary>Look backwards k nodes</summary> */
-        protected virtual object LB( int k )
+        protected virtual T LB( int k )
         {
             if ( k == 0 )
             {

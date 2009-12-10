@@ -112,6 +112,7 @@
     <Compile Include="Tree\TreeRuleReturnScope.cs" />
     <Compile Include="Tree\TreeVisitor.cs" />
     <Compile Include="Tree\TreeWizard.cs" />
+    <Compile Include="UnbufferedTokenStream.cs" />
     <Compile Include="UnwantedTokenException.cs" />
   </ItemGroup>
   <ItemGroup>
