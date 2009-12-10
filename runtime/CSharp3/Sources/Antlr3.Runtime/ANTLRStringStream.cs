@@ -280,9 +280,9 @@ namespace Antlr.Runtime
             }
         }
 
-        public virtual string substring( int start, int stop )
+        public virtual string Substring( int start, int length )
         {
-            return new string( data, start, stop - start + 1 );
+            return new string( data, start, length );
         }
 
         public virtual string SourceName

@@ -418,7 +418,7 @@ namespace Antlr.Runtime
                     SlimStringStream input = lexer.CharStream as SlimStringStream;
                     if ( input != null )
                     {
-                        string text = input.substring( t.StartIndex, t.StopIndex );
+                        string text = input.Substring( t.StartIndex, t.StopIndex - t.StartIndex + 1 );
                         buf.Append( text );
                     }
                 }

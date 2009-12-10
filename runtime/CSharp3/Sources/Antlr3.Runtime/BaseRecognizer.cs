@@ -74,9 +74,8 @@ namespace Antlr.Runtime
         protected internal RecognizerSharedState state;
 
         public BaseRecognizer()
+            : this(new RecognizerSharedState())
         {
-            state = new RecognizerSharedState();
-            InitDFAs();
         }
 
         public BaseRecognizer( RecognizerSharedState state )

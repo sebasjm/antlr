@@ -67,7 +67,7 @@ namespace Antlr.Runtime
                 {
                     return state.text;
                 }
-                return input.substring( state.tokenStartCharIndex, CharIndex - 1 );
+                return input.Substring( state.tokenStartCharIndex, CharIndex - state.tokenStartCharIndex );
             }
             /** <summary>Set the complete text of this token; it wipes any previous changes to the text.</summary> */
             set

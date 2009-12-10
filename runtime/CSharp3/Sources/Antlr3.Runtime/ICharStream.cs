@@ -43,7 +43,7 @@ namespace Antlr.Runtime
          *  use this on streams that don't support it.
          *  </summary>
          */
-        string substring( int start, int stop );
+        string Substring( int start, int length );
 
         /** <summary>
          *  Get the ith character of lookahead.  This is the same usually as

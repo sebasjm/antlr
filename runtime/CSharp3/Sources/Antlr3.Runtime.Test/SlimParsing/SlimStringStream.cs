@@ -317,9 +317,9 @@ namespace Antlr.Runtime
             }
         }
 
-        public string substring( int start, int stop )
+        public string Substring( int start, int length )
         {
-            return data.Substring( start, stop - start + 1 );
+            return data.Substring( start, length );
             //return new string( data, start, stop - start + 1 );
         }
 

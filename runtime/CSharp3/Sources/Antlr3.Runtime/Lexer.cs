@@ -53,8 +53,8 @@ namespace Antlr.Runtime
             this.input = input;
         }
 
-        public Lexer( ICharStream input, RecognizerSharedState state ) :
-            base( state )
+        public Lexer( ICharStream input, RecognizerSharedState state )
+            : base(state)
         {
             this.input = input;
         }
@@ -69,7 +69,7 @@ namespace Antlr.Runtime
                 {
                     return state.text;
                 }
-                return input.substring( state.tokenStartCharIndex, CharIndex - 1 );
+                return input.Substring( state.tokenStartCharIndex, CharIndex - state.tokenStartCharIndex );
             }
             /** <summary>Set the complete text of this token; it wipes any previous changes to the text.</summary> */
             set

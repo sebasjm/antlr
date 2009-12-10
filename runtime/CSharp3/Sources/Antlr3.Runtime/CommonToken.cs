@@ -116,7 +116,7 @@ namespace Antlr.Runtime
                 {
                     return null;
                 }
-                text = input.substring( start, stop );
+                text = input.Substring( start, stop - start + 1 );
                 return text;
             }
             set
