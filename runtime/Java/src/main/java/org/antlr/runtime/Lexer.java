@@ -78,7 +78,12 @@ public abstract class Lexer extends BaseRecognizer implements TokenSource {
 			state.tokenStartLine = input.getLine();
 			state.text = null;
 			if ( input.LA(1)==CharStream.EOF ) {
-                return new CommonToken((CharStream)input,Token.EOF,Token.DEFAULT_CHANNEL,input.index(),input.index());
+                Token eof = new CommonToken((CharStream)input,Token.EOF,
+                                            Token.DEFAULT_CHANNEL,
+                                            input.index(),input.index());
+                eof.setLine(getLine());
+                eof.setCharPositionInLine(getCharPositionInLine());
+                return eof;
 			}
 			try {
 				mTokens();

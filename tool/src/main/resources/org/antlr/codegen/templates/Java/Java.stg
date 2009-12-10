@@ -128,7 +128,12 @@ filteringNextToken() ::= <<
 public Token nextToken() {
     while (true) {
         if ( input.LA(1)==CharStream.EOF ) {
-            return new CommonToken(null,Token.EOF,Token.DEFAULT_CHANNEL,input.index(),input.index());
+            Token eof = new CommonToken((CharStream)input,Token.EOF,
+                                        Token.DEFAULT_CHANNEL,
+                                        input.index(),input.index());
+            eof.setLine(getLine());
+            eof.setCharPositionInLine(getCharPositionInLine());
+            return eof;
         }
         state.token = null;
 	state.channel = Token.DEFAULT_CHANNEL;
