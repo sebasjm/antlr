@@ -225,4 +225,6 @@ public class ANTLRStringStream implements CharStream {
 	public String getSourceName() {
 		return name;
 	}
+
+    public String toString() { return new String(data); }
 }
