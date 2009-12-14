@@ -292,5 +292,10 @@ namespace Antlr.Runtime
                 return name;
             }
         }
+
+        public override string ToString()
+        {
+            return new string(data);
+        }
     }
 }
