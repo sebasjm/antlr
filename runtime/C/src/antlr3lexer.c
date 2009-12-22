@@ -627,16 +627,16 @@ emit	    (pANTLR3_LEXER lexer)
     pANTLR3_COMMON_TOKEN	token;
 
     /* We could check pointers to token factories and so on, but
-     * we are in code that we want to run as fast as possible
-     * so we are not checking any errors. So make sure you have installed an input stream before
-     * trying to emit a new token.
-     */
+    * we are in code that we want to run as fast as possible
+    * so we are not checking any errors. So make sure you have installed an input stream before
+    * trying to emit a new token.
+    */
     token   = lexer->rec->state->tokFactory->newToken(lexer->rec->state->tokFactory);
 
     /* Install the supplied information, and some other bits we already know
-     * get added automatically, such as the input stream it is associated with
-     * (though it can all be overridden of course)
-     */
+    * get added automatically, such as the input stream it is associated with
+    * (though it can all be overridden of course)
+    */
     token->type		    = lexer->rec->state->type;
     token->channel	    = lexer->rec->state->channel;
     token->start	    = lexer->rec->state->tokenStartCharIndex;
@@ -644,20 +644,20 @@ emit	    (pANTLR3_LEXER lexer)
     token->line		    = lexer->rec->state->tokenStartLine;
     token->charPosition	= lexer->rec->state->tokenStartCharPositionInLine;
 
-	if	(lexer->rec->state->text != NULL)
-	{
-		token->textState		= ANTLR3_TEXT_STRING;
-		token->tokText.text	    = lexer->rec->state->text;
-	}
-	else
-	{
-		token->textState	= ANTLR3_TEXT_NONE;
-	}
+    if	(lexer->rec->state->text != NULL)
+    {
+        token->textState	    = ANTLR3_TEXT_STRING;
+        token->tokText.text	    = lexer->rec->state->text;
+    }
+    else
+    {
+        token->textState	= ANTLR3_TEXT_NONE;
+    }
     token->lineStart	= lexer->input->currentLine;
-	token->user1		= lexer->rec->state->user1;
-	token->user2		= lexer->rec->state->user2;
-	token->user3		= lexer->rec->state->user3;
-	token->custom		= lexer->rec->state->custom;
+    token->user1	= lexer->rec->state->user1;
+    token->user2	= lexer->rec->state->user2;
+    token->user3	= lexer->rec->state->user3;
+    token->custom	= lexer->rec->state->custom;
 
     lexer->rec->state->token	    = token;
 

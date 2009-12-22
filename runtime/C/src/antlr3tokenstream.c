@@ -400,8 +400,8 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 		return  teof;
 	}
 
-	// Here the token must be in the input vector. Rather then incut
-	// function call penalty, we jsut return the pointer directly
+	// Here the token must be in the input vector. Rather then incur
+	// function call penalty, we just return the pointer directly
 	// from the vector
 	//
 	return  (pANTLR3_COMMON_TOKEN)cts->tokens->elements[i].element;
