@@ -294,38 +294,38 @@ outputFile( LEXER,
 
 /* 8 bit "ASCII" (actually any 8 bit character set) */
 
-#  define	    NEXTCHAR			((pANTLR3_UINT8)(INPUT->nextChar))
-#  define	    DATAP				((pANTLR3_UINT8)(INPUT->data))
+#  define	    NEXTCHAR	((pANTLR3_UINT8)(INPUT->nextChar))
+#  define	    DATAP	((pANTLR3_UINT8)(INPUT->data))
 
 # else
 
-#  define	    NEXTCHAR			((pANTLR3_UINT16)(INPUT->nextChar)) 
-#  define	    DATAP				((pANTLR3_UINT16)(INPUT->data))
+#  define	    NEXTCHAR	((pANTLR3_UINT16)(INPUT->nextChar)) 
+#  define	    DATAP	((pANTLR3_UINT16)(INPUT->data))
 
 # endif
 
 # define	    LA(n) ((NEXTCHAR + n) > (DATAP + INPUT->sizeBuf) ? ANTLR3_CHARSTREAM_EOF : (ANTLR3_UCHAR)(*(NEXTCHAR + n - 1)))
-# define	    CONSUME()											\
-{																	\
-    if	(NEXTCHAR \< (DATAP + INPUT->sizeBuf))						\
-    {																\
-		INPUT->charPositionInLine++;								\
-		if  ((ANTLR3_UCHAR)(*NEXTCHAR) == INPUT->newlineChar)		\
-		{															\
-			INPUT->line++;											\
-			INPUT->charPositionInLine	= 0;						\
-			INPUT->currentLine		= (void *)(NEXTCHAR + 1);		\
-		}															\
-		INPUT->nextChar = (void *)(NEXTCHAR + 1);					\
-    }																\
+# define            CONSUME()                                           \\
+{                                                                       \\
+    if        (NEXTCHAR \< (DATAP + INPUT->sizeBuf))                     \\
+    {                                                                   \\
+        INPUT->charPositionInLine++;                                    \\
+        if  ((ANTLR3_UCHAR)(*NEXTCHAR) == INPUT->newlineChar)           \\
+        {                                                               \\
+            INPUT->line++;                                              \\
+            INPUT->charPositionInLine        = 0;                       \\
+            INPUT->currentLine                = (void *)(NEXTCHAR + 1); \\
+        }                                                               \\
+        INPUT->nextChar = (void *)(NEXTCHAR + 1);                       \\
+    }                                                                   \\
 }
 
 #else
 
 // Pick up the input character by calling the input stream implementation.
 //
-#define	    CONSUME()				INPUT->istream->consume(INPUT->istream)
-#define	    LA(n)					INPUT->istream->_LA(INPUT->istream, n)
+#define	    CONSUME()   INPUT->istream->consume(INPUT->istream)
+#define	    LA(n)       INPUT->istream->_LA(INPUT->istream, n)
 
 #endif
 <endif>
