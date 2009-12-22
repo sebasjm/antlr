@@ -73,7 +73,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT32 size,
 	// Structure was allocated correctly, now we can install the pointer.
 	//
 	input->isAllocated	= ANTLR3_FALSE;
-	input->data			= inString;
+	input->data		= inString;
 	input->sizeBuf		= size;
 
 	// Call the common 8 bit ASCII input stream handler initializer.
@@ -83,7 +83,7 @@ antlr3NewAsciiStringInPlaceStream   (pANTLR3_UINT8 inString, ANTLR3_UINT32 size,
 	// Now we can set up the file name
 	//
 	input->istream->streamName	= input->strFactory->newStr(input->strFactory, name == NULL ? (pANTLR3_UINT8)"-memory-" : name);
-	input->fileName				= input->istream->streamName;
+	input->fileName		        = input->istream->streamName;
 
 	return  input;
 }

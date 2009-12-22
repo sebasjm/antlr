@@ -61,12 +61,13 @@ static  pANTLR3_STRING  toString				(pANTLR3_COMMON_TOKEN token);
 static	void			factoryClose	(pANTLR3_TOKEN_FACTORY factory);
 static	pANTLR3_COMMON_TOKEN	newToken	(void);
 static  void			setInputStream	(pANTLR3_TOKEN_FACTORY factory, pANTLR3_INPUT_STREAM input);
+static	void                    factoryReset    (pANTLR3_TOKEN_FACTORY factory);
 
 /* Internal management functions
  */
 static	void			newPool		(pANTLR3_TOKEN_FACTORY factory);
 static	pANTLR3_COMMON_TOKEN    newPoolToken	(pANTLR3_TOKEN_FACTORY factory);
-
+static  void                    resetToken      (pANTLR3_COMMON_TOKEN token);
 
 
 ANTLR3_API pANTLR3_COMMON_TOKEN
@@ -104,14 +105,16 @@ antlr3TokenFactoryNew(pANTLR3_INPUT_STREAM input)
 
     /* Install factory API
      */
-    factory->newToken	    =  newPoolToken;
-    factory->close			=  factoryClose;
+    factory->newToken	    = newPoolToken;
+    factory->close	    = factoryClose;
     factory->setInputStream = setInputStream;
+    factory->reset          = factoryReset;
     
     /* Allocate the initial pool
      */
     factory->thisPool	= -1;
     factory->pools      = NULL;
+    factory->maxPool    = -1;
     newPool(factory);
 
     /* Factory space is good, we now want to initialize our cheating token
@@ -153,18 +156,28 @@ newPool(pANTLR3_TOKEN_FACTORY factory)
      */
     factory->thisPool++;
 
-    /* Ensure we have enough pointers allocated
-     */
-    factory->pools = (pANTLR3_COMMON_TOKEN *)
-		     ANTLR3_REALLOC(	(void *)factory->pools,	    /* Current pools pointer (starts at NULL)	*/
-					(ANTLR3_UINT32)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TOKEN *))	/* Memory for new pool pointers */
-					);
+    // If we were reusing this token factory then we may already have a pool
+    // allocated. If we exceeded the max avaible then we must allocate a new
+    // one.
+    if  (factory->thisPool > factory->maxPool)
+    {
+        /* Ensure we have enough pointers allocated
+         */
+        factory->pools = (pANTLR3_COMMON_TOKEN *)
+		         ANTLR3_REALLOC(	(void *)factory->pools,	    /* Current pools pointer (starts at NULL)	*/
+					    (ANTLR3_UINT32)((factory->thisPool + 1) * sizeof(pANTLR3_COMMON_TOKEN *))	/* Memory for new pool pointers */
+					    );
 
-    /* Allocate a new pool for the factory
-     */
-    factory->pools[factory->thisPool]	=
-			    (pANTLR3_COMMON_TOKEN) 
-				ANTLR3_MALLOC((size_t)(sizeof(ANTLR3_COMMON_TOKEN) * ANTLR3_FACTORY_POOL_SIZE));
+        /* Allocate a new pool for the factory
+         */
+        factory->pools[factory->thisPool]	=
+			        (pANTLR3_COMMON_TOKEN) 
+				    ANTLR3_CALLOC(1, (size_t)(sizeof(ANTLR3_COMMON_TOKEN) * ANTLR3_FACTORY_POOL_SIZE));
+
+        // We now have a new pool and can track it as the maximum we have created so far
+        //
+        factory->maxPool = factory->thisPool;
+    }
 
     /* Reset the counters
      */
@@ -197,18 +210,39 @@ newPoolToken(pANTLR3_TOKEN_FACTORY factory)
     factory->nextToken++;
 
     /* We have our token pointer now, so we can initialize it to the predefined model.
+     * We only need do this though if the token is not already initialized, we just check
+     * an api function pointer for this as they are allocated via calloc.
      */
-    antlr3SetTokenAPI(token);
+    if  (token->setStartIndex == NULL)
+    {
+        antlr3SetTokenAPI(token);
 
-    /* It is factory made, and we need to copy the string factory pointer
-     */
-    token->factoryMade  = ANTLR3_TRUE;
-    token->strFactory   = factory->input == NULL ? NULL : factory->input->strFactory;
-    token->input        = factory->input;
+        // It is factory made, and we need to copy the string factory pointer
+        //
+        token->factoryMade  = ANTLR3_TRUE;
+        token->strFactory   = factory->input == NULL ? NULL : factory->input->strFactory;
+        token->input        = factory->input;
+    }
+    else
+    {
+        // Just reset the default values that we must have set
+        //
+        resetToken(token);
+    }
 
     /* And we are done
      */
     return token;
+}
+
+static	void
+factoryReset	    (pANTLR3_TOKEN_FACTORY factory)
+{
+    // Just start again with pool #0 when we are
+    // called.
+    //
+    factory->thisPool   = -1;
+    newPool(factory);
 }
 
 static	void
@@ -298,46 +332,52 @@ newToken(void)
 ANTLR3_API void
 antlr3SetTokenAPI(pANTLR3_COMMON_TOKEN token)
 {
-    token->getText					= getText;
-    token->setText					= setText;
-    token->setText8					= setText8;
-    token->getType					= getType;
-    token->setType					= setType;
-    token->getLine					= getLine;
-    token->setLine				    = setLine;
-    token->setLine					= setLine;
+    token->getText		    = getText;
+    token->setText		    = setText;
+    token->setText8		    = setText8;
+    token->getType		    = getType;
+    token->setType		    = setType;
+    token->getLine		    = getLine;
+    token->setLine		    = setLine;
+    token->setLine		    = setLine;
     token->getCharPositionInLine    = getCharPositionInLine;
     token->setCharPositionInLine    = setCharPositionInLine;
-    token->getChannel				= getChannel;
-    token->setChannel				= setChannel;
-    token->getTokenIndex			= getTokenIndex;
-    token->setTokenIndex			= setTokenIndex;
-    token->getStartIndex			= getStartIndex;
-    token->setStartIndex			= setStartIndex;
-    token->getStopIndex				= getStopIndex;
-    token->setStopIndex				= setStopIndex;
-    token->toString					= toString;
+    token->getChannel		    = getChannel;
+    token->setChannel		    = setChannel;
+    token->getTokenIndex	    = getTokenIndex;
+    token->setTokenIndex	    = setTokenIndex;
+    token->getStartIndex	    = getStartIndex;
+    token->setStartIndex	    = setStartIndex;
+    token->getStopIndex		    = getStopIndex;
+    token->setStopIndex		    = setStopIndex;
+    token->toString		    = toString;
 
-    // Set defaults
+    resetToken(token);
+
+    return;
+}
+
+static void
+resetToken(pANTLR3_COMMON_TOKEN token)
+{
+   // Set defaults
     //
     token->setCharPositionInLine(token, -1);
 
-    token->custom		    = NULL;
+    token->custom	    = NULL;
     token->freeCustom	    = NULL;
-    token->type			    = ANTLR3_TOKEN_INVALID;
-	token->textState		= ANTLR3_TEXT_NONE;
-    token->start		    = 0;
-    token->stop			    = 0;
-    token->channel		    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
-    token->line			    = 0;
-    token->index		    = 0;
-    token->input		    = NULL;
-	token->user1			= 0;
-	token->user2			= 0;
-	token->user3			= 0;
-	token->custom			= NULL;
-
-    return;
+    token->type	            = ANTLR3_TOKEN_INVALID;
+    token->textState	    = ANTLR3_TEXT_NONE;
+    token->start	    = 0;
+    token->stop		    = 0;
+    token->channel	    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
+    token->line		    = 0;
+    token->index	    = 0;
+    token->input	    = NULL;
+    token->user1	    = 0;
+    token->user2	    = 0;
+    token->user3	    = 0;
+    token->custom	    = NULL;
 }
 
 static  pANTLR3_STRING  getText			(pANTLR3_COMMON_TOKEN token)

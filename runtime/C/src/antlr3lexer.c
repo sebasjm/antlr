@@ -146,19 +146,19 @@ antlr3LexerNew(ANTLR3_UINT32 sizeHint, pANTLR3_RECOGNIZER_SHARED_STATE state)
     
     /* Initialise the eof token
      */
-    specialT				= &(lexer->rec->state->tokSource->eofToken);
+    specialT			= &(lexer->rec->state->tokSource->eofToken);
     antlr3SetTokenAPI	  (specialT);
     specialT->setType	  (specialT, ANTLR3_TOKEN_EOF);
     specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
-    specialT->strFactory    = NULL;
+    specialT->strFactory        = NULL;
 
 	// Initialize the skip token.
 	//
-    specialT				= &(lexer->rec->state->tokSource->skipToken);
+    specialT			= &(lexer->rec->state->tokSource->skipToken);
     antlr3SetTokenAPI	  (specialT);
     specialT->setType	  (specialT, ANTLR3_TOKEN_INVALID);
     specialT->factoryMade	= ANTLR3_TRUE;					// Prevent things trying to free() it
-    specialT->strFactory    = NULL;
+    specialT->strFactory        = NULL;
     return  lexer;
 }
 
@@ -169,18 +169,21 @@ reset	(pANTLR3_BASE_RECOGNIZER rec)
 
     lexer   = rec->super;
 
-    lexer->rec->state->token			= NULL;
-    lexer->rec->state->type				= ANTLR3_TOKEN_INVALID;
-    lexer->rec->state->channel			= ANTLR3_TOKEN_DEFAULT_CHANNEL;
-    lexer->rec->state->tokenStartCharIndex		= -1;
+    lexer->rec->state->token			    = NULL;
+    lexer->rec->state->type			    = ANTLR3_TOKEN_INVALID;
+    lexer->rec->state->channel			    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
+    lexer->rec->state->tokenStartCharIndex	    = -1;
     lexer->rec->state->tokenStartCharPositionInLine = -1;
-    lexer->rec->state->tokenStartLine		= -1;
+    lexer->rec->state->tokenStartLine		    = -1;
 
-    lexer->rec->state->text	    = NULL;
+    lexer->rec->state->text	                    = NULL;
 
-    if (lexer->input != NULL)
+    // OK - that's all hunky dory, but we may well have had
+    // a token factory that needs a reset. Do that here
+    //
+    if  (lexer->rec->state->tokFactory != NULL)
     {
-	lexer->input->istream->seek(lexer->input->istream, 0);
+        lexer->rec->state->tokFactory->reset(lexer->rec->state->tokFactory);
     }
 }
 

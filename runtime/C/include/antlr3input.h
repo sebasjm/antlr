@@ -150,13 +150,18 @@ typedef	struct	ANTLR3_INPUT_STREAM_struct
      */
     void		(*reset)	(struct	ANTLR3_INPUT_STREAM_struct * input);
 
-	/**
-	 * Pinter to function that installs a version of LA that always
-	 * returns upper case. Only valid for character streams and creates a case
-	 * insensitive lexer if the lexer tokens are described in upper case. The
-	 * tokens will preserve case in the token text.
-	 */
-	void		(*setUcaseLA)		(pANTLR3_INPUT_STREAM input, ANTLR3_BOOLEAN flag);
+    /** Pointer to a function that reuses and resets an input stream by
+     *  supplying a new 'source'
+     */
+    void                (*reuse)        (struct	ANTLR3_INPUT_STREAM_struct * input, pANTLR3_UINT8 inString, ANTLR3_UINT32 size, pANTLR3_UINT8 name);
+
+    /**
+     * Pointer to function that installs a version of LA that always
+     * returns upper case. Only valid for character streams and creates a case
+     * insensitive lexer if the lexer tokens are described in upper case. The
+     * tokens will preserve case in the token text.
+     */
+    void		(*setUcaseLA)		(pANTLR3_INPUT_STREAM input, ANTLR3_BOOLEAN flag);
 
     /** Pointer to function to return input stream element at 1 based
      *  offset from nextChar. Same as _LA for char stream, but token

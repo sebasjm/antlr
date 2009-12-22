@@ -735,6 +735,7 @@ struct <name>_Ctx_struct
     <headerReturnType(ruleDescriptor)> (*<ruleDescriptor.name>)(struct <name>_Ctx_struct * ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 <endif>
     const char * (*getGrammarFileName)();
+    void            (*reset)  (struct <name>_Ctx_struct * ctx);
     void	    (*free)   (struct <name>_Ctx_struct * ctx);
     <@members>
     <@end>
@@ -908,6 +909,12 @@ static void
     ANTLR3_FREE(ctx);
 }
 
+static void
+<name>Reset (p<name> ctx)
+{
+    RECOGNIZER->reset(RECOGNIZER);
+}
+
 /** \brief Name of the grammar file that generated this code
  */
 static const char fileName[] = "<fileName>";
@@ -1005,6 +1012,7 @@ ANTLR3_API p<name> <name>NewSSD
     
     ctx->getGrammarFileName	= getGrammarFileName;
     ctx->free		= <name>Free;
+    ctx->reset          = <name>Reset;
 
 <if(grammar.directDelegates)>
 	// Initialize the lexers that we are going to delegate some
@@ -1197,6 +1205,8 @@ pANTLR3_UINT8   <name>TokenNames[<length(tokenNames)>+4]
 //
 <rules:{r | static <headerReturnType(ruleDescriptor=r.ruleDescriptor)>	<r.ruleDescriptor.name>    (p<name> ctx<if(r.ruleDescriptor.parameterScope)>, <endif><r.ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 static void	<name>Free(p<name> ctx);
+static void     <name>Reset (p<name> ctx);
+
 <if(!LEXER)>
 <! generate rule/method definitions for imported rules so they
    appear to be defined in this recognizer. !>
@@ -1294,6 +1304,7 @@ ANTLR3_API p<name>
 <endif>
 
     ctx->free			= <name>Free;
+    ctx->reset			= <name>Reset;
     ctx->getGrammarFileName	= getGrammarFileName;
     
     /* Install the scope pushing methods.
@@ -1341,6 +1352,12 @@ ANTLR3_API p<name>
     return  ctx;
 }
 
+static void
+<name>Reset (p<name> ctx)
+{
+    RECOGNIZER->reset(RECOGNIZER);
+}
+
 /** Free the parser resources
  */
  static void
@@ -1377,6 +1394,7 @@ ANTLR3_API p<name>
 <else>
     ctx->pParser->free(ctx->pParser);<\n>
 <endif>
+    
     ANTLR3_FREE(ctx);
 
     /* Everything is released, so we can return
