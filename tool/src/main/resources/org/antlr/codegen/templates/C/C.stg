@@ -367,41 +367,41 @@ outputFile( LEXER,
 #undef	    RULEMEMO		    
 #undef		DBG
 
-#define	    PARSER							ctx->pParser  
-#define	    RECOGNIZER						PARSER->rec
-#define		PSRSTATE						RECOGNIZER->state
-#define	    HAVEPARSEDRULE(r)				RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
-#define		MEMOIZE(ri,si)					RECOGNIZER->memoize(RECOGNIZER, ri, si)
-#define	    INPUT							PARSER->tstream
-#define	    STRSTREAM						INPUT
-#define		ISTREAM							INPUT->istream
-#define		INDEX()							ISTREAM->index(INPUT->istream)
-#define	    HASEXCEPTION()					(PSRSTATE->error == ANTLR3_TRUE)
-#define	    EXCEPTION						PSRSTATE->exception
-#define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
-#define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
-#define	    FOLLOWSTACK					    PSRSTATE->following
+#define	    PARSER				ctx->pParser  
+#define	    RECOGNIZER				PARSER->rec
+#define	    PSRSTATE				RECOGNIZER->state
+#define	    HAVEPARSEDRULE(r)			RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
+#define	    MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
+#define	    INPUT				PARSER->tstream
+#define	    STRSTREAM				INPUT
+#define	    ISTREAM				INPUT->istream
+#define	    INDEX()				ISTREAM->index(INPUT->istream)
+#define	    HASEXCEPTION()			(PSRSTATE->error == ANTLR3_TRUE)
+#define	    EXCEPTION				PSRSTATE->exception
+#define	    MATCHT(t, fs)			RECOGNIZER->match(RECOGNIZER, t, fs)
+#define	    MATCHANYT()				RECOGNIZER->matchAny(RECOGNIZER)
+#define	    FOLLOWSTACK				PSRSTATE->following
 #ifdef  SKIP_FOLLOW_SETS
 #define	    FOLLOWPUSH(x)
 #define	    FOLLOWPOP()
 #else
-#define	    FOLLOWPUSH(x)					FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
-#define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
+#define	    FOLLOWPUSH(x)			FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
+#define	    FOLLOWPOP()				FOLLOWSTACK->pop(FOLLOWSTACK)
 #endif
-#define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
-#define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
-#define	    LA(n)							INPUT->istream->_LA(ISTREAM, n)
-#define	    LT(n)							INPUT->_LT(INPUT, n)
-#define	    CONSTRUCTEX()					RECOGNIZER->exConstruct(RECOGNIZER)
-#define	    CONSUME()						ISTREAM->consume(ISTREAM)
-#define	    MARK()							ISTREAM->mark(ISTREAM)
-#define	    REWIND(m)						ISTREAM->rewind(ISTREAM, m)
-#define	    REWINDLAST()					ISTREAM->rewindLast(ISTREAM)
-#define		SEEK(n)							ISTREAM->seek(ISTREAM, n)
-#define	    PERRORRECOVERY					PSRSTATE->errorRecovery
-#define	    FAILEDFLAG						PSRSTATE->failed
-#define	    HASFAILED()						(FAILEDFLAG == ANTLR3_TRUE)
-#define	    BACKTRACKING					PSRSTATE->backtracking
+#define	    PRECOVER()				RECOGNIZER->recover(RECOGNIZER)
+#define	    PREPORTERROR()			RECOGNIZER->reportError(RECOGNIZER)
+#define	    LA(n)				INPUT->istream->_LA(ISTREAM, n)
+#define	    LT(n)				INPUT->_LT(INPUT, n)
+#define	    CONSTRUCTEX()			RECOGNIZER->exConstruct(RECOGNIZER)
+#define	    CONSUME()				ISTREAM->consume(ISTREAM)
+#define	    MARK()				ISTREAM->mark(ISTREAM)
+#define	    REWIND(m)				ISTREAM->rewind(ISTREAM, m)
+#define	    REWINDLAST()			ISTREAM->rewindLast(ISTREAM)
+#define	    SEEK(n)				ISTREAM->seek(ISTREAM, n)
+#define	    PERRORRECOVERY			PSRSTATE->errorRecovery
+#define	    FAILEDFLAG				PSRSTATE->failed
+#define	    HASFAILED()				(FAILEDFLAG == ANTLR3_TRUE)
+#define	    BACKTRACKING			PSRSTATE->backtracking
 #define	    RECOVERFROMMISMATCHEDSET(s)		RECOGNIZER->recoverFromMismatchedSet(RECOGNIZER, s)
 #define	    RECOVERFROMMISMATCHEDELEMENT(e)	RECOGNIZER->recoverFromMismatchedElement(RECOGNIZER, s)
 #define     ADAPTOR                         ctx->adaptor

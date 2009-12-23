@@ -604,7 +604,7 @@ consume	(pANTLR3_INT_STREAM is)
 	ts	    = (pANTLR3_TOKEN_STREAM)	    is->super;
 	cts	    = (pANTLR3_COMMON_TOKEN_STREAM) ts->super;
 
-	if	((ANTLR3_UINT32)cts->p < cts->tokens->size(cts->tokens))
+        if	((ANTLR3_UINT32)cts->p < cts->tokens->count)
 	{
 		cts->p++;
 		cts->p	= skipOffTokenChannels(cts, cts->p);
