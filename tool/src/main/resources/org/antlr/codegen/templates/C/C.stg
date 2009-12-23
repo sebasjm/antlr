@@ -381,8 +381,13 @@ outputFile( LEXER,
 #define	    MATCHT(t, fs)					RECOGNIZER->match(RECOGNIZER, t, fs)
 #define	    MATCHANYT()						RECOGNIZER->matchAny(RECOGNIZER)
 #define	    FOLLOWSTACK					    PSRSTATE->following
+#ifdef  SKIP_FOLLOW_SETS
+#define	    FOLLOWPUSH(x)
+#define	    FOLLOWPOP()
+#else
 #define	    FOLLOWPUSH(x)					FOLLOWSTACK->push(FOLLOWSTACK, ((void *)(&(x))), NULL)
 #define	    FOLLOWPOP()						FOLLOWSTACK->pop(FOLLOWSTACK)
+#endif
 #define	    PRECOVER()						RECOGNIZER->recover(RECOGNIZER)
 #define	    PREPORTERROR()					RECOGNIZER->reportError(RECOGNIZER)
 #define	    LA(n)							INPUT->istream->_LA(ISTREAM, n)
