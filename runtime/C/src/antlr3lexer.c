@@ -207,87 +207,91 @@ reset	(pANTLR3_BASE_RECOGNIZER rec)
 ANTLR3_INLINE static pANTLR3_COMMON_TOKEN
 nextTokenStr	    (pANTLR3_TOKEN_SOURCE toksource)
 {
-	pANTLR3_LEXER   lexer;
+    pANTLR3_LEXER                   lexer;
+    pANTLR3_RECOGNIZER_SHARED_STATE state;
+    pANTLR3_INPUT_STREAM            input;
+    pANTLR3_INT_STREAM              istream;
 
-	lexer   = (pANTLR3_LEXER)(toksource->super);
+    lexer   = (pANTLR3_LEXER)(toksource->super);
+    state   = lexer->rec->state;
+    input   = lexer->input;
+    istream = input->istream;
 
-	/// Loop until we get a non skipped token or EOF
-	///
-	for	(;;)
-	{
-		// Get rid of any previous token (token factory takes care of
-		// any de-allocation when this token is finally used up.
-		//
-		lexer->rec->state->token		    = NULL;
-		lexer->rec->state->error		    = ANTLR3_FALSE;	    // Start out without an exception
-		lexer->rec->state->failed		    = ANTLR3_FALSE;
+    /// Loop until we get a non skipped token or EOF
+    ///
+    for	(;;)
+    {
+        // Get rid of any previous token (token factory takes care of
+        // any de-allocation when this token is finally used up.
+        //
+        state->token		    = NULL;
+        state->error		    = ANTLR3_FALSE;	    // Start out without an exception
+        state->failed		    = ANTLR3_FALSE;
 
-
-
-		// Now call the matching rules and see if we can generate a new token
-		//
-		for	(;;)
-		{
+        // Now call the matching rules and see if we can generate a new token
+        //
+        for	(;;)
+        {
             // Record the start of the token in our input stream.
             //
-            lexer->rec->state->channel						= ANTLR3_TOKEN_DEFAULT_CHANNEL;
-            lexer->rec->state->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);
-            lexer->rec->state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
-        	lexer->rec->state->tokenStartLine				= lexer->input->getLine(lexer->input);
-            lexer->rec->state->text							= NULL;
+            state->channel			    = ANTLR3_TOKEN_DEFAULT_CHANNEL;
+            state->tokenStartCharIndex	            = (ANTLR3_MARKER)(((pANTLR3_UINT8)input->nextChar));
+            state->tokenStartCharPositionInLine     = input->charPositionInLine;
+            state->tokenStartLine		    = input->line;
+            state->text			            = NULL;
 
-			if  (lexer->input->istream->_LA(lexer->input->istream, 1) == ANTLR3_CHARSTREAM_EOF)
-			{
-				// Reached the end of the current stream, nothing more to do if this is
-				// the last in the stack.
-				//
-				pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
+            if  (istream->_LA(istream, 1) == ANTLR3_CHARSTREAM_EOF)
+            {
+                // Reached the end of the current stream, nothing more to do if this is
+                // the last in the stack.
+                //
+                pANTLR3_COMMON_TOKEN    teof = &(toksource->eofToken);
 
-				teof->setStartIndex (teof, lexer->getCharIndex(lexer));
-				teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
-				teof->setLine	(teof, lexer->getLine(lexer));
-				teof->factoryMade = ANTLR3_TRUE;	// This isn't really manufactured but it stops things from trying to free it
-				return  teof;
-			}
+                teof->setStartIndex (teof, lexer->getCharIndex(lexer));
+                teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
+                teof->setLine	    (teof, lexer->getLine(lexer));
+                teof->factoryMade = ANTLR3_TRUE;	// This isn't really manufactured but it stops things from trying to free it
+                return  teof;
+            }
 
-			lexer->rec->state->token		= NULL;
-			lexer->rec->state->error		= ANTLR3_FALSE;	    // Start out without an exception
-			lexer->rec->state->failed		= ANTLR3_FALSE;
+            state->token		= NULL;
+            state->error		= ANTLR3_FALSE;	    // Start out without an exception
+            state->failed		= ANTLR3_FALSE;
 
-			// Call the generated lexer, see if it can get a new token together.
-			//
-			lexer->mTokens(lexer->ctx);
+            // Call the generated lexer, see if it can get a new token together.
+            //
+            lexer->mTokens(lexer->ctx);
 
-			if  (lexer->rec->state->error  == ANTLR3_TRUE)
-			{
-				// Recognition exception, report it and try to recover.
-				//
-				lexer->rec->state->failed	    = ANTLR3_TRUE;
-				lexer->rec->reportError(lexer->rec);
-				lexer->recover(lexer); 
-			}
-			else
-			{
-				if (lexer->rec->state->token == NULL)
-				{
-					// Emit the real token, which adds it in to the token stream basically
-					//
-					emit(lexer);
-				}
-				else if	(lexer->rec->state->token ==  &(toksource->skipToken))
-				{
-					// A real token could have been generated, but "Computer say's naaaaah" and it
-					// it is just something we need to skip altogether.
-					//
-					continue;
-				}
-				
-				// Good token, not skipped, not EOF token
-				//
-				return  lexer->rec->state->token;
-			}
-		}
-	}
+            if  (state->error  == ANTLR3_TRUE)
+            {
+                // Recognition exception, report it and try to recover.
+                //
+                state->failed	    = ANTLR3_TRUE;
+                lexer->rec->reportError(lexer->rec);
+                lexer->recover(lexer); 
+            }
+            else
+            {
+                if (state->token == NULL)
+                {
+                    // Emit the real token, which adds it in to the token stream basically
+                    //
+                    emit(lexer);
+                }
+                else if	(state->token ==  &(toksource->skipToken))
+                {
+                    // A real token could have been generated, but "Computer say's naaaaah" and it
+                    // it is just something we need to skip altogether.
+                    //
+                    continue;
+                }
+
+                // Good token, not skipped, not EOF token
+                //
+                return  state->token;
+            }
+        }
+    }
 }
 
 /**
@@ -849,7 +853,7 @@ getLine	    (pANTLR3_LEXER lexer)
 static ANTLR3_UINT32
 getCharPositionInLine	(pANTLR3_LEXER lexer)
 {
-    return  lexer->input->getCharPositionInLine(lexer->input);
+    return  lexer->input->charPositionInLine;
 }
 
 static ANTLR3_MARKER	getCharIndex	    (pANTLR3_LEXER lexer)
