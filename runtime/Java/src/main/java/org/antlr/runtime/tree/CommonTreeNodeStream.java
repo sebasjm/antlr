@@ -66,7 +66,7 @@ public class CommonTreeNodeStream extends LookaheadStream<Object> implements Tre
 	public CommonTreeNodeStream(TreeAdaptor adaptor, Object tree) {
 		this.root = tree;
 		this.adaptor = adaptor;
-        it = new TreeIterator(root);
+        it = new TreeIterator(adaptor,root);
 	}
 
     public void reset() {
