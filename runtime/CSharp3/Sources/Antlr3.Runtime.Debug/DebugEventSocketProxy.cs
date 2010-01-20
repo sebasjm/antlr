@@ -257,11 +257,11 @@ namespace Antlr.Runtime.Debug
             buf.Append( e.GetType().Name );
             // dump only the data common to all exceptions for now
             buf.Append( "\t" );
-            buf.Append( e.index );
+            buf.Append( e.Index );
             buf.Append( "\t" );
-            buf.Append( e.line );
+            buf.Append( e.Line );
             buf.Append( "\t" );
-            buf.Append( e.charPositionInLine );
+            buf.Append( e.CharPositionInLine );
             Transmit( buf.ToString() );
         }
 

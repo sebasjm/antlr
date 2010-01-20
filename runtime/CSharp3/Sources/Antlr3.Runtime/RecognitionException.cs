@@ -36,6 +36,7 @@ namespace Antlr.Runtime
 
     using Exception = System.Exception;
     using NonSerialized = System.NonSerializedAttribute;
+    using System.Runtime.Serialization;
 
     /** <summary>The root of the ANTLR exception hierarchy.</summary>
      *
@@ -74,10 +75,10 @@ namespace Antlr.Runtime
     {
         /** <summary>What input stream did the error occur in?</summary> */
         [NonSerialized]
-        public IIntStream input;
+        private IIntStream _input;
 
         /** <summary>What is index of token/char were we looking at when the error occurred?</summary> */
-        public int index;
+        private int _index;
 
         /** <summary>
          *  The current Token when an error occurred.  Since not all streams
@@ -85,17 +86,17 @@ namespace Antlr.Runtime
          *  For parsers.  Even when it's a tree parser, token might be set.
          *  </summary>
          */
-        public IToken token;
+        private IToken _token;
 
         /** <summary>
          *  If this is a tree parser exception, node is set to the node with
          *  the problem.
          *  </summary>
          */
-        public object node;
+        private object _node;
 
         /** <summary>The current char when an error occurred. For lexers.</summary> */
-        public int c;
+        private int _c;
 
         /** <summary>
          *  Track the line (1-based) at which the error occurred in case this is
@@ -103,12 +104,12 @@ namespace Antlr.Runtime
          *  unexpected char doesn't carry the line info.
          *  </summary>
          */
-        public int line;
+        private int _line;
 
         /// <summary>
         /// The 0-based index into the line where the error occurred.
         /// </summary>
-        public int charPositionInLine;
+        private int _charPositionInLine;
 
         /** <summary>
          *  If you are parsing a tree node stream, you will encounter som
@@ -117,22 +118,44 @@ namespace Antlr.Runtime
          *  that info is approximate.
          *  </summary>
          */
-        public bool approximateLineInfo;
+        private bool _approximateLineInfo;
 
         /** <summary>Used for remote debugger deserialization</summary> */
         public RecognitionException()
+            : this("A recognition error occurred.", null, null)
         {
         }
 
         public RecognitionException( IIntStream input )
+            : this("A recognition error occurred.", null, input)
         {
-            this.input = input;
-            this.index = input.Index;
+        }
+
+        public RecognitionException(string message)
+            : this(message, null, null)
+        {
+        }
+
+        public RecognitionException(string message, IIntStream input)
+            : this(message, null, input)
+        {
+        }
+
+        public RecognitionException(string message, Exception innerException)
+            : this(message, innerException, null)
+        {
+        }
+
+        public RecognitionException(string message, Exception innerException, IIntStream input)
+            : base(message, innerException)
+        {
+            this._input = input;
+            this._index = input.Index;
             if ( input is ITokenStream )
             {
-                this.token = ( (ITokenStream)input ).LT( 1 );
-                this.line = token.Line;
-                this.charPositionInLine = token.CharPositionInLine;
+                this._token = ( (ITokenStream)input ).LT( 1 );
+                this._line = _token.Line;
+                this._charPositionInLine = _token.CharPositionInLine;
             }
             if ( input is ITreeNodeStream )
             {
@@ -140,25 +163,147 @@ namespace Antlr.Runtime
             }
             else if ( input is ICharStream )
             {
-                this.c = input.LA( 1 );
-                this.line = ( (ICharStream)input ).Line;
-                this.charPositionInLine = ( (ICharStream)input ).CharPositionInLine;
+                this._c = input.LA( 1 );
+                this._line = ( (ICharStream)input ).Line;
+                this._charPositionInLine = ( (ICharStream)input ).CharPositionInLine;
             }
             else
             {
-                this.c = input.LA( 1 );
+                this._c = input.LA( 1 );
+            }
+        }
+
+        protected RecognitionException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        /** <summary>Return the token type or char of the unexpected input element</summary> */
+        public virtual int UnexpectedType
+        {
+            get
+            {
+                if ( _input is ITokenStream )
+                {
+                    return _token.Type;
+                }
+
+                ITreeNodeStream treeNodeStream = _input as ITreeNodeStream;
+                if ( treeNodeStream != null )
+                {
+                    ITreeAdaptor adaptor = treeNodeStream.TreeAdaptor;
+                    return adaptor.GetType( _node );
+                }
+
+                return _c;
+            }
+        }
+
+        public bool ApproximateLineInfo
+        {
+            get
+            {
+                return _approximateLineInfo;
+            }
+            protected set
+            {
+                _approximateLineInfo = value;
+            }
+        }
+
+        public IIntStream Input
+        {
+            get
+            {
+                return _input;
+            }
+            protected set
+            {
+                _input = value;
+            }
+        }
+
+        public IToken Token
+        {
+            get
+            {
+                return _token;
+            }
+            protected internal set
+            {
+                _token = value;
+            }
+        }
+
+        public object Node
+        {
+            get
+            {
+                return _node;
+            }
+            protected set
+            {
+                _node = value;
+            }
+        }
+
+        public int Character
+        {
+            get
+            {
+                return _c;
+            }
+            protected set
+            {
+                _c = value;
+            }
+        }
+
+        public int Index
+        {
+            get
+            {
+                return _index;
+            }
+            protected set
+            {
+                _index = value;
+            }
+        }
+
+        public int Line
+        {
+            get
+            {
+                return _line;
+            }
+            protected set
+            {
+                _line = value;
+            }
+        }
+
+        public int CharPositionInLine
+        {
+            get
+            {
+                return _charPositionInLine;
+            }
+            protected set
+            {
+                _charPositionInLine = value;
             }
         }
 
         protected virtual void ExtractInformationFromTreeNodeStream( IIntStream input )
         {
             ITreeNodeStream nodes = (ITreeNodeStream)input;
-            this.node = nodes.LT( 1 );
+            this._node = nodes.LT( 1 );
             ITreeAdaptor adaptor = nodes.TreeAdaptor;
-            IToken payload = adaptor.GetToken( node );
+            IToken payload = adaptor.GetToken( _node );
             if ( payload != null )
             {
-                this.token = payload;
+                this._token = payload;
                 if ( payload.Line <= 0 )
                 {
                     // imaginary node; no line/pos info; scan backwards
@@ -170,9 +315,9 @@ namespace Antlr.Runtime
                         if ( priorPayload != null && priorPayload.Line > 0 )
                         {
                             // we found the most recent real line / pos info
-                            this.line = priorPayload.Line;
-                            this.charPositionInLine = priorPayload.CharPositionInLine;
-                            this.approximateLineInfo = true;
+                            this._line = priorPayload.Line;
+                            this._charPositionInLine = priorPayload.CharPositionInLine;
+                            this._approximateLineInfo = true;
                             break;
                         }
                         --i;
@@ -181,45 +326,24 @@ namespace Antlr.Runtime
                 }
                 else
                 { // node created from real token
-                    this.line = payload.Line;
-                    this.charPositionInLine = payload.CharPositionInLine;
+                    this._line = payload.Line;
+                    this._charPositionInLine = payload.CharPositionInLine;
                 }
             }
-            else if ( this.node is Tree.ITree )
+            else if ( this._node is Tree.ITree )
             {
-                this.line = ( (Tree.ITree)this.node ).Line;
-                this.charPositionInLine = ( (Tree.ITree)this.node ).CharPositionInLine;
-                if ( this.node is CommonTree )
+                this._line = ( (Tree.ITree)this._node ).Line;
+                this._charPositionInLine = ( (Tree.ITree)this._node ).CharPositionInLine;
+                if ( this._node is CommonTree )
                 {
-                    this.token = ( (CommonTree)this.node ).Token;
+                    this._token = ( (CommonTree)this._node ).Token;
                 }
             }
             else
             {
-                int type = adaptor.GetType( this.node );
-                string text = adaptor.GetText( this.node );
-                this.token = new CommonToken( type, text );
-            }
-        }
-
-        /** <summary>Return the token type or char of the unexpected input element</summary> */
-        public virtual int UnexpectedType
-        {
-            get
-            {
-                if ( input is ITokenStream )
-                {
-                    return token.Type;
-                }
-
-                ITreeNodeStream treeNodeStream = input as ITreeNodeStream;
-                if ( treeNodeStream != null )
-                {
-                    ITreeAdaptor adaptor = treeNodeStream.TreeAdaptor;
-                    return adaptor.GetType( node );
-                }
-
-                return c;
+                int type = adaptor.GetType( this._node );
+                string text = adaptor.GetText( this._node );
+                this._token = new CommonToken( type, text );
             }
         }
     }

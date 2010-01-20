@@ -33,6 +33,9 @@
 namespace Antlr.Runtime
 {
     using System.Collections.Generic;
+    using ArgumentException = System.ArgumentException;
+    using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
+    using ArgumentNullException = System.ArgumentNullException;
 
     /** <summary>
      *  A pretty quick CharStream that pulls all data from an array
@@ -76,10 +79,6 @@ namespace Antlr.Runtime
         /** <summary>What is name or source of this char stream?</summary> */
         public string name;
 
-        public ANTLRStringStream()
-        {
-        }
-
         /** <summary>Copy data in string to a local char array</summary> */
         public ANTLRStringStream( string input )
             : this( input, null )
@@ -98,11 +97,22 @@ namespace Antlr.Runtime
         }
 
         public ANTLRStringStream( char[] data, int numberOfActualCharsInArray, string sourceName )
-            : this()
         {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (numberOfActualCharsInArray < 0)
+                throw new ArgumentOutOfRangeException();
+            if (numberOfActualCharsInArray > data.Length)
+                throw new ArgumentException();
+
             this.data = data;
             this.n = numberOfActualCharsInArray;
             this.name = sourceName;
+        }
+
+        protected ANTLRStringStream()
+        {
+            this.data = new char[0];
         }
 
         /** <summary>
@@ -240,6 +250,12 @@ namespace Antlr.Runtime
 
         public virtual void Rewind( int m )
         {
+            if (m < 0)
+                throw new ArgumentOutOfRangeException();
+
+            //if (m > markDepth)
+            //    throw new ArgumentException();
+
             CharStreamState state = markers[m];
             // restore stream state
             Seek( state.p );
@@ -282,6 +298,16 @@ namespace Antlr.Runtime
 
         public virtual string Substring( int start, int length )
         {
+            if (start < 0)
+                throw new ArgumentOutOfRangeException();
+            if (length < 0)
+                throw new ArgumentOutOfRangeException();
+            if (start + length > data.Length)
+                throw new ArgumentException();
+
+            if (length == 0)
+                return string.Empty;
+
             return new string( data, start, length );
         }
 

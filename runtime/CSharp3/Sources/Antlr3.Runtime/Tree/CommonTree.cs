@@ -32,6 +32,7 @@
 
 namespace Antlr.Runtime.Tree
 {
+    using ArgumentNullException = System.ArgumentNullException;
     using CLSCompliant = System.CLSCompliantAttribute;
 
     /** <summary>
@@ -70,6 +71,9 @@ namespace Antlr.Runtime.Tree
         public CommonTree( CommonTree node )
             : base( node )
         {
+            if (node == null)
+                throw new ArgumentNullException("node");
+
             this.token = node.token;
             this.startIndex = node.startIndex;
             this.stopIndex = node.stopIndex;
@@ -265,7 +269,7 @@ namespace Antlr.Runtime.Tree
             }
             if ( token == null )
             {
-                return null;
+                return string.Empty;
             }
             return token.Text;
         }

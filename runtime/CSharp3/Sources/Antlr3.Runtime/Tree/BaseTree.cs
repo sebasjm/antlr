@@ -83,10 +83,10 @@ namespace Antlr.Runtime.Tree
         {
             get
             {
-                if ( children == null )
+                if ( Children == null )
                     return 0;
 
-                return children.Count;
+                return Children.Count;
             }
         }
 
@@ -162,6 +162,9 @@ namespace Antlr.Runtime.Tree
 
         public virtual ITree GetChild( int i )
         {
+            if (i < 0)
+                throw new ArgumentOutOfRangeException();
+
             if ( children == null || i >= children.Count )
                 return null;
 
@@ -248,12 +251,18 @@ namespace Antlr.Runtime.Tree
         /** <summary>Add all elements of kids list as children of this node</summary> */
         public virtual void AddChildren( IEnumerable<ITree> kids )
         {
+            if (kids == null)
+                throw new ArgumentNullException("kids");
+
             foreach ( ITree t in kids )
                 AddChild( t );
         }
 
         public virtual void SetChild( int i, ITree t )
         {
+            if (i < 0)
+                throw new ArgumentOutOfRangeException("i");
+
             if ( t == null )
             {
                 return;
@@ -273,6 +282,11 @@ namespace Antlr.Runtime.Tree
 
         public virtual object DeleteChild( int i )
         {
+            if (i < 0)
+                throw new ArgumentOutOfRangeException("i");
+            if (i >= ChildCount)
+                throw new ArgumentException();
+
             if ( children == null )
                 return null;
 
@@ -292,6 +306,15 @@ namespace Antlr.Runtime.Tree
          */
         public virtual void ReplaceChildren( int startChildIndex, int stopChildIndex, object t )
         {
+            if (startChildIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            if (stopChildIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            if (t == null)
+                throw new ArgumentNullException("t");
+            if (stopChildIndex < startChildIndex)
+                throw new ArgumentException();
+
             /*
             System.out.println("replaceChildren "+startChildIndex+", "+stopChildIndex+
                                " with "+((BaseTree)t).toStringTree());
@@ -309,7 +332,7 @@ namespace Antlr.Runtime.Tree
             if ( newTree.IsNil )
             {
                 BaseTree baseTree = newTree as BaseTree;
-                if ( baseTree != null )
+                if ( baseTree != null && baseTree.children != null )
                 {
                     newChildren = baseTree.children;
                 }

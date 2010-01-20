@@ -34,6 +34,7 @@ namespace Antlr.Runtime
 {
     using System.Collections.Generic;
     using CLSCompliant = System.CLSCompliantAttribute;
+    using ArgumentNullException = System.ArgumentNullException;
 
     /** <summary>
      *  The set of fields needed by an abstract recognizer to recognize input
@@ -157,8 +158,12 @@ namespace Antlr.Runtime
             lastErrorIndex = -1;
             tokenStartCharIndex = -1;
         }
+
         public RecognizerSharedState( RecognizerSharedState state )
         {
+            if (state == null)
+                throw new ArgumentNullException("state");
+
             following = (BitSet[])state.following.Clone();
             _fsp = state._fsp;
             errorRecovery = state.errorRecovery;

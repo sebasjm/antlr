@@ -52,7 +52,7 @@ namespace Antlr.Runtime
         {
             get
             {
-                return token;
+                return Token;
             }
         }
 
@@ -67,11 +67,11 @@ namespace Antlr.Runtime
             {
                 exp = "";
             }
-            if ( token == null )
+            if ( Token == null )
             {
                 return "UnwantedTokenException(found=" + null + exp + ")";
             }
-            return "UnwantedTokenException(found=" + token.Text + exp + ")";
+            return "UnwantedTokenException(found=" + Token.Text + exp + ")";
         }
     }
 }

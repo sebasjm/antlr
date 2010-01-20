@@ -118,7 +118,7 @@ namespace Antlr.Runtime.Tree
             if ( trappedException is MissingTokenException )
             {
                 return "<missing type: " +
-                       ( (MissingTokenException)trappedException ).GetMissingType() +
+                       ( (MissingTokenException)trappedException ).MissingType +
                        ">";
             }
             else if ( trappedException is UnwantedTokenException )
@@ -129,11 +129,11 @@ namespace Antlr.Runtime.Tree
             }
             else if ( trappedException is MismatchedTokenException )
             {
-                return "<mismatched token: " + trappedException.token + ", resync=" + Text + ">";
+                return "<mismatched token: " + trappedException.Token + ", resync=" + Text + ">";
             }
             else if ( trappedException is NoViableAltException )
             {
-                return "<unexpected: " + trappedException.token +
+                return "<unexpected: " + trappedException.Token +
                        ", resync=" + Text + ">";
             }
             return "<error: " + Text + ">";

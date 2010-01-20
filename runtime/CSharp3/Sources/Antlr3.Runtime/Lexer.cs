@@ -338,7 +338,7 @@ namespace Antlr.Runtime
             if ( e is MismatchedTokenException )
             {
                 MismatchedTokenException mte = (MismatchedTokenException)e;
-                msg = "mismatched character " + GetCharErrorDisplay( e.c ) + " expecting " + GetCharErrorDisplay( mte.expecting );
+                msg = "mismatched character " + GetCharErrorDisplay( e.Character ) + " expecting " + GetCharErrorDisplay( mte.expecting );
             }
             else if ( e is NoViableAltException )
             {
@@ -346,28 +346,28 @@ namespace Antlr.Runtime
                 // for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
                 // and "(decision="+nvae.decisionNumber+") and
                 // "state "+nvae.stateNumber
-                msg = "no viable alternative at character " + GetCharErrorDisplay( e.c );
+                msg = "no viable alternative at character " + GetCharErrorDisplay( e.Character );
             }
             else if ( e is EarlyExitException )
             {
                 EarlyExitException eee = (EarlyExitException)e;
                 // for development, can add "(decision="+eee.decisionNumber+")"
-                msg = "required (...)+ loop did not match anything at character " + GetCharErrorDisplay( e.c );
+                msg = "required (...)+ loop did not match anything at character " + GetCharErrorDisplay( e.Character );
             }
             else if ( e is MismatchedNotSetException )
             {
                 MismatchedNotSetException mse = (MismatchedNotSetException)e;
-                msg = "mismatched character " + GetCharErrorDisplay( e.c ) + " expecting set " + mse.expecting;
+                msg = "mismatched character " + GetCharErrorDisplay( e.Character ) + " expecting set " + mse.expecting;
             }
             else if ( e is MismatchedSetException )
             {
                 MismatchedSetException mse = (MismatchedSetException)e;
-                msg = "mismatched character " + GetCharErrorDisplay( e.c ) + " expecting set " + mse.expecting;
+                msg = "mismatched character " + GetCharErrorDisplay( e.Character ) + " expecting set " + mse.expecting;
             }
             else if ( e is MismatchedRangeException )
             {
                 MismatchedRangeException mre = (MismatchedRangeException)e;
-                msg = "mismatched character " + GetCharErrorDisplay( e.c ) + " expecting set " +
+                msg = "mismatched character " + GetCharErrorDisplay( e.Character ) + " expecting set " +
                       GetCharErrorDisplay( mre.a ) + ".." + GetCharErrorDisplay( mre.b );
             }
             else

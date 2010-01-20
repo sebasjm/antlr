@@ -168,7 +168,7 @@ namespace Antlr.Runtime.Tree
         public override string GetErrorHeader( RecognitionException e )
         {
             return GrammarFileName + ": node from " +
-                   ( e.approximateLineInfo ? "after " : "" ) + "line " + e.line + ":" + e.charPositionInLine;
+                   ( e.ApproximateLineInfo ? "after " : "" ) + "line " + e.Line + ":" + e.CharPositionInLine;
         }
 
         /** <summary>
@@ -180,12 +180,12 @@ namespace Antlr.Runtime.Tree
         {
             if ( this is TreeParser )
             {
-                ITreeAdaptor adaptor = ( (ITreeNodeStream)e.input ).TreeAdaptor;
-                e.token = adaptor.GetToken( e.node );
-                if ( e.token == null )
+                ITreeAdaptor adaptor = ( (ITreeNodeStream)e.Input ).TreeAdaptor;
+                e.Token = adaptor.GetToken( e.Node );
+                if ( e.Token == null )
                 { // could be an UP/DOWN node
-                    e.token = new CommonToken( adaptor.GetType( e.node ),
-                                              adaptor.GetText( e.node ) );
+                    e.Token = new CommonToken( adaptor.GetType( e.Node ),
+                                              adaptor.GetText( e.Node ) );
                 }
             }
             return base.GetErrorMessage( e, tokenNames );

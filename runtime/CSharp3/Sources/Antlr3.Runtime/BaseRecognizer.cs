@@ -297,7 +297,7 @@ namespace Antlr.Runtime
                 {
                     tokenName = tokenNames[mte.expecting];
                 }
-                msg = "missing " + tokenName + " at " + GetTokenErrorDisplay( e.token );
+                msg = "missing " + tokenName + " at " + GetTokenErrorDisplay( e.Token );
             }
             else if ( e is MismatchedTokenException )
             {
@@ -311,7 +311,7 @@ namespace Antlr.Runtime
                 {
                     tokenName = tokenNames[mte.expecting];
                 }
-                msg = "mismatched input " + GetTokenErrorDisplay( e.token ) +
+                msg = "mismatched input " + GetTokenErrorDisplay( e.Token ) +
                     " expecting " + tokenName;
             }
             else if ( e is MismatchedTreeNodeException )
@@ -327,7 +327,7 @@ namespace Antlr.Runtime
                     tokenName = tokenNames[mtne.expecting];
                 }
                 // workaround for a .NET framework bug (NullReferenceException)
-                string nodeText = ( mtne.node != null ) ? mtne.node.ToString() ?? string.Empty : string.Empty;
+                string nodeText = ( mtne.Node != null ) ? mtne.Node.ToString() ?? string.Empty : string.Empty;
                 msg = "mismatched tree node: " + nodeText + " expecting " + tokenName;
             }
             else if ( e is NoViableAltException )
@@ -336,25 +336,25 @@ namespace Antlr.Runtime
                 // for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
                 // and "(decision="+nvae.decisionNumber+") and
                 // "state "+nvae.stateNumber
-                msg = "no viable alternative at input " + GetTokenErrorDisplay( e.token );
+                msg = "no viable alternative at input " + GetTokenErrorDisplay( e.Token );
             }
             else if ( e is EarlyExitException )
             {
                 //EarlyExitException eee = (EarlyExitException)e;
                 // for development, can add "(decision="+eee.decisionNumber+")"
                 msg = "required (...)+ loop did not match anything at input " +
-                    GetTokenErrorDisplay( e.token );
+                    GetTokenErrorDisplay( e.Token );
             }
             else if ( e is MismatchedSetException )
             {
                 MismatchedSetException mse = (MismatchedSetException)e;
-                msg = "mismatched input " + GetTokenErrorDisplay( e.token ) +
+                msg = "mismatched input " + GetTokenErrorDisplay( e.Token ) +
                     " expecting set " + mse.expecting;
             }
             else if ( e is MismatchedNotSetException )
             {
                 MismatchedNotSetException mse = (MismatchedNotSetException)e;
-                msg = "mismatched input " + GetTokenErrorDisplay( e.token ) +
+                msg = "mismatched input " + GetTokenErrorDisplay( e.Token ) +
                     " expecting set " + mse.expecting;
             }
             else if ( e is FailedPredicateException )
@@ -386,7 +386,7 @@ namespace Antlr.Runtime
         /** <summary>What is the error header, normally line/character position information?</summary> */
         public virtual string GetErrorHeader( RecognitionException e )
         {
-            return "line " + e.line + ":" + ( e.charPositionInLine + 1 );
+            return "line " + e.Line + ":" + ( e.CharPositionInLine + 1 );
         }
 
         /** <summary>

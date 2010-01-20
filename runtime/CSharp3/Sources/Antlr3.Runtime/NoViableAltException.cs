@@ -57,7 +57,7 @@ namespace Antlr.Runtime
 
         public override string ToString()
         {
-            if ( input is ICharStream )
+            if ( Input is ICharStream )
             {
                 return "NoViableAltException('" + (char)UnexpectedType + "'@[" + grammarDecisionDescription + "])";
             }

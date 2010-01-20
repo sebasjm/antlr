@@ -44,10 +44,6 @@ namespace Antlr.Runtime
     [System.Serializable]
     public class ANTLRInputStream : ANTLRReaderStream
     {
-        public ANTLRInputStream()
-        {
-        }
-
         public ANTLRInputStream( Stream input )
             : this( input, null )
         {
@@ -69,17 +65,15 @@ namespace Antlr.Runtime
         }
 
         public ANTLRInputStream( Stream input, int size, int readBufferSize, Encoding encoding )
+            : base(GetStreamReader(input, encoding), size, readBufferSize)
         {
-            StreamReader isr;
-            if ( encoding != null )
-            {
-                isr = new StreamReader( input, encoding );
-            }
-            else
-            {
-                isr = new StreamReader( input );
-            }
-            Load( isr, size, readBufferSize );
+        }
+
+        private static StreamReader GetStreamReader(Stream input, Encoding encoding)
+        {
+            if (encoding != null)
+                return new StreamReader(input, encoding);
+            return new StreamReader(input);
         }
     }
 }

@@ -245,9 +245,12 @@ namespace Antlr.Runtime.Tree
             }
         }
 
-        public virtual string GetDescription()
+        public virtual string Description
         {
-            return elementDescription;
+            get
+            {
+                return elementDescription;
+            }
         }
     }
 }

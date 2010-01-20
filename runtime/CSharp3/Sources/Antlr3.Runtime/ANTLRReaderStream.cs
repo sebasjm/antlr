@@ -49,10 +49,6 @@ namespace Antlr.Runtime
         public const int ReadBufferSize = 1024;
         public const int InitialBufferSize = 1024;
 
-        public ANTLRReaderStream()
-        {
-        }
-
         public ANTLRReaderStream( TextReader r )
             : this( r, InitialBufferSize, ReadBufferSize )
         {

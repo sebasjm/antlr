@@ -52,20 +52,23 @@ namespace Antlr.Runtime
             this.inserted = inserted;
         }
 
-        public virtual int GetMissingType()
+        public virtual int MissingType
         {
-            return expecting;
+            get
+            {
+                return expecting;
+            }
         }
 
         public override string ToString()
         {
-            if ( inserted != null && token != null )
+            if ( inserted != null && Token != null )
             {
-                return "MissingTokenException(inserted " + inserted + " at " + token.Text + ")";
+                return "MissingTokenException(inserted " + inserted + " at " + Token.Text + ")";
             }
-            if ( token != null )
+            if ( Token != null )
             {
-                return "MissingTokenException(at " + token.Text + ")";
+                return "MissingTokenException(at " + Token.Text + ")";
             }
             return "MissingTokenException";
         }
