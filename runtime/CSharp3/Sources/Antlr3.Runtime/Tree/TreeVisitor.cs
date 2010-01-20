@@ -63,8 +63,7 @@ namespace Antlr.Runtime.Tree
             {
                 t = action.Pre( t ); // if rewritten, walk children of new t
             }
-            int n = adaptor.GetChildCount( t );
-            for ( int i = 0; i < n; i++ )
+            for ( int i = 0; i < adaptor.GetChildCount(t); i++ )
             {
                 object child = adaptor.GetChild( t, i );
                 Visit( child, action );
