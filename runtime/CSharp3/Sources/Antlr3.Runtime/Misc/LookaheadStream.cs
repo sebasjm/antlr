@@ -32,6 +32,7 @@
 
 namespace Antlr.Runtime.Misc
 {
+    using IndexOutOfRangeException = System.IndexOutOfRangeException;
 
     /** <summary>
      *  A lookahead queue that knows how to mark/release locations
@@ -48,6 +49,13 @@ namespace Antlr.Runtime.Misc
 
         /** <summary>Set to buffer index of eof when nextElement returns eof</summary> */
         int _eofElementIndex = UninitializedEofElementIndex;
+
+        /** Absolute token index. It's the index of the symbol about to be
+         *  read via LT(1). Goes from 0 to numtokens.
+         */
+        private int _currentElementIndex = 0;
+
+        private T _previousElement;
 
         /** <summary>Returned by nextElement upon end of stream; we add to buffer also</summary> */
         T _eof = null;
@@ -75,10 +83,13 @@ namespace Antlr.Runtime.Misc
             }
         }
 
-        protected override void Clear()
+        public override void Clear()
         {
-            _eofElementIndex = UninitializedEofElementIndex;
             base.Clear();
+            _eofElementIndex = UninitializedEofElementIndex;
+            _currentElementIndex = 0;
+            _p = 0;
+            _previousElement = null;
         }
 
         /** <summary>
@@ -105,8 +116,12 @@ namespace Antlr.Runtime.Misc
         /** <summary>Make sure we have at least one element to remove, even if EOF</summary> */
         public virtual void Consume()
         {
-            Sync( 1 );
-            Dequeue();
+            if (_eofElementIndex != UninitializedEofElementIndex)
+                return;
+
+            SyncAhead(1);
+            _previousElement = Dequeue();
+            _currentElementIndex++;
         }
 
         /** <summary>
@@ -115,7 +130,7 @@ namespace Antlr.Runtime.Misc
          *  ahead.  If we need 1 element, (p+1-1)==p must be &lt; data.size().
          *  </summary>
          */
-        public virtual void Sync( int need )
+        protected virtual void SyncAhead( int need )
         {
             int n = ( _p + need - 1 ) - _data.Count + 1; // how many more elements we need?
             if ( n > 0 )
@@ -155,7 +170,7 @@ namespace Antlr.Runtime.Misc
             }
             if ( k < 0 )
             {
-                return LB( -k );
+                return LB(-k);
             }
             //System.out.print("LT(p="+p+","+k+")=");
             if ( ( _p + k - 1 ) >= _eofElementIndex )
@@ -163,41 +178,22 @@ namespace Antlr.Runtime.Misc
                 // move to super.LT
                 return _eof;
             }
-            Sync( k );
+            SyncAhead( k );
             return this[k - 1];
-        }
-
-        /** <summary>Look backwards k nodes</summary> */
-        protected virtual T LB( int k )
-        {
-            if ( k == 0 )
-            {
-                return null;
-            }
-            if ( ( _p - k ) < 0 )
-            {
-                return null;
-            }
-            return this[-k];
-        }
-
-        public virtual object GetCurrentSymbol()
-        {
-            return LT( 1 );
         }
 
         public virtual int Index
         {
             get
             {
-                return _p;
+                return _currentElementIndex;
             }
         }
 
         public virtual int Mark()
         {
             _markDepth++;
-            _lastMarker = Index;
+            _lastMarker = _p; // track where we are in buffer, not absolute token index
             return _lastMarker;
         }
 
@@ -221,11 +217,21 @@ namespace Antlr.Runtime.Misc
          *  Seek to a 0-indexed position within data buffer.  Can't handle
          *  case where you seek beyond end of existing buffer.  Normally used
          *  to seek backwards in the buffer. Does not force loading of nodes.
+         *  Doesn't see to absolute position in input stream since this stream
+         *  is unbuffered. Seeks only into our moving window of elements.
          *  </summary>
          */
         public virtual void Seek( int index )
         {
             _p = index;
+        }
+
+        protected virtual T LB(int k)
+        {
+            if (k == 1)
+                return _previousElement;
+
+            throw new IndexOutOfRangeException("can't look backwards more than one token in this stream");
         }
     }
 }

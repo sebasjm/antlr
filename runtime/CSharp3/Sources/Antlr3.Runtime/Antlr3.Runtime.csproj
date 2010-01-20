@@ -50,6 +50,7 @@
     <Compile Include="ANTLRStringStream.cs" />
     <Compile Include="BaseRecognizer.cs" />
     <Compile Include="BitSet.cs" />
+    <Compile Include="BufferedTokenStream.cs" />
     <Compile Include="CharStreamConstants.cs" />
     <Compile Include="CharStreamState.cs" />
     <Compile Include="ClassicToken.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="IToken.cs" />
     <Compile Include="ITokenSource.cs" />
     <Compile Include="ITokenStream.cs" />
+    <Compile Include="LegacyCommonTokenStream.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Misc\FastQueue.cs" />
     <Compile Include="Misc\LookaheadStream.cs" />

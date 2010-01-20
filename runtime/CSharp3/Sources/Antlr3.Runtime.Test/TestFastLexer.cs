@@ -70,7 +70,7 @@ namespace Antlr3.Runtime.Test
             {
                 SimpleExpressionLexer lexer = new SimpleExpressionLexer( new ANTLRStringStream( text ) );
                 CommonTokenStream tokens = new CommonTokenStream( lexer );
-                tokens.FillBuffer();
+                tokens.Fill();
             }
 
             return DateTime.Now - start;

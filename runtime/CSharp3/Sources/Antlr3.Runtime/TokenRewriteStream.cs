@@ -141,10 +141,12 @@ namespace Antlr.Runtime
                 base( stream, index, text )
             {
             }
+
             public override int Execute( StringBuilder buf )
             {
                 buf.Append( text );
-                buf.Append( ( (IToken)stream.tokens[index] ).Text );
+                if (stream._tokens[index].Type != CharStreamConstants.EndOfFile)
+                    buf.Append(stream._tokens[index].Text);
                 return index + 1;
             }
         }
@@ -326,9 +328,9 @@ namespace Antlr.Runtime
 
         public virtual void Replace( string programName, int from, int to, object text )
         {
-            if ( from > to || from < 0 || to < 0 || to >= tokens.Count )
+            if ( from > to || from < 0 || to < 0 || to >= _tokens.Count )
             {
-                throw new ArgumentException( "replace: range invalid: " + from + ".." + to + "(size=" + tokens.Count + ")" );
+                throw new ArgumentException( "replace: range invalid: " + from + ".." + to + "(size=" + _tokens.Count + ")" );
             }
             RewriteOperation op = new ReplaceOp( this, from, to, text );
             IList<RewriteOperation> rewrites = GetProgram( programName );
@@ -412,27 +414,31 @@ namespace Antlr.Runtime
 
         public virtual string ToOriginalString()
         {
+            Fill();
             return ToOriginalString( MIN_TOKEN_INDEX, Count - 1 );
         }
 
         public virtual string ToOriginalString( int start, int end )
         {
             StringBuilder buf = new StringBuilder();
-            for ( int i = start; i >= MIN_TOKEN_INDEX && i <= end && i < tokens.Count; i++ )
+            for ( int i = start; i >= MIN_TOKEN_INDEX && i <= end && i < _tokens.Count; i++ )
             {
-                buf.Append( Get( i ).Text );
+                if (Get(i).Type != CharStreamConstants.EndOfFile)
+                    buf.Append(Get(i).Text);
             }
             return buf.ToString();
         }
 
         public override string ToString()
         {
+            Fill();
             return ToString( MIN_TOKEN_INDEX, Count - 1 );
         }
 
         public virtual string ToString( string programName )
         {
-            return ToString( programName, MIN_TOKEN_INDEX, Count - 1 );
+            Fill();
+            return ToString(programName, MIN_TOKEN_INDEX, Count - 1);
         }
 
         public override string ToString( int start, int end )
@@ -447,8 +453,8 @@ namespace Antlr.Runtime
                 rewrites = null;
 
             // ensure start/end are in range
-            if ( end > tokens.Count - 1 )
-                end = tokens.Count - 1;
+            if ( end > _tokens.Count - 1 )
+                end = _tokens.Count - 1;
             if ( start < 0 )
                 start = 0;
 
@@ -463,7 +469,7 @@ namespace Antlr.Runtime
 
             // Walk buffer, executing instructions and emitting tokens
             int i = start;
-            while ( i <= end && i < tokens.Count )
+            while ( i <= end && i < _tokens.Count )
             {
                 RewriteOperation op;
                 bool exists = indexToOp.TryGetValue( i, out op );
@@ -476,9 +482,10 @@ namespace Antlr.Runtime
 
                 if ( !exists || op == null )
                 {
-                    IToken t = tokens[i];
+                    IToken t = _tokens[i];
                     // no operation at that index, just dump token
-                    buf.Append( t.Text );
+                    if (t.Type != CharStreamConstants.EndOfFile)
+                        buf.Append(t.Text);
                     i++; // move to next token
                 }
                 else
@@ -490,13 +497,13 @@ namespace Antlr.Runtime
             // include stuff after end if it's last index in buffer
             // So, if they did an insertAfter(lastValidIndex, "foo"), include
             // foo if end==lastValidIndex.
-            if ( end == tokens.Count - 1 )
+            if ( end == _tokens.Count - 1 )
             {
                 // Scan any remaining operations after last token
                 // should be included (they will be inserts).
                 foreach ( RewriteOperation op in indexToOp.Values )
                 {
-                    if ( op.index >= tokens.Count - 1 )
+                    if ( op.index >= _tokens.Count - 1 )
                         buf.Append( op.text );
                 }
             }
@@ -688,7 +695,7 @@ namespace Antlr.Runtime
         public virtual string ToDebugString( int start, int end )
         {
             StringBuilder buf = new StringBuilder();
-            for ( int i = start; i >= MIN_TOKEN_INDEX && i <= end && i < tokens.Count; i++ )
+            for ( int i = start; i >= MIN_TOKEN_INDEX && i <= end && i < _tokens.Count; i++ )
             {
                 buf.Append( Get( i ) );
             }

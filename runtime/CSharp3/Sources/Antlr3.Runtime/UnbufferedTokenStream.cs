@@ -35,13 +35,31 @@ namespace Antlr.Runtime
     using Antlr.Runtime.Misc;
     using CLSCompliant = System.CLSCompliantAttribute;
     using NotSupportedException = System.NotSupportedException;
+    using IndexOutOfRangeException = System.IndexOutOfRangeException;
 
+    /** A token stream that pulls tokens from the code source on-demand and
+     *  without tracking a complete buffer of the tokens. This stream buffers
+     *  the minimum number of tokens possible.  It's the same as
+     *  OnDemandTokenStream except that OnDemandTokenStream buffers all tokens.
+     *
+     *  You can't use this stream if you pass whitespace or other off-channel
+     *  tokens to the parser. The stream can't ignore off-channel tokens.
+     * 
+     *  You can only look backwards 1 token: LT(-1).
+     *
+     *  Use this when you need to read from a socket or other infinite stream.
+     *
+     *  @see BufferedTokenStream
+     *  @see CommonTokenStream
+     */
     public class UnbufferedTokenStream : LookaheadStream<IToken>, ITokenStream
     {
         [CLSCompliant(false)]
         protected ITokenSource tokenSource;
-        protected int tokenIndex;
-        protected IToken previousToken;
+        protected int tokenIndex; // simple counter to set token index in tokens
+
+        /** Skip tokens on any channel but this one; this is how we skip whitespace... */
+        protected int channel = TokenChannels.Default;
 
         public UnbufferedTokenStream(ITokenSource tokenSource)
             : base(Tokens.EndOfFile)
@@ -69,13 +87,12 @@ namespace Antlr.Runtime
         {
             IToken t = this.tokenSource.NextToken();
             t.TokenIndex = this.tokenIndex++;
-            this.previousToken = t;
             return t;
         }
 
         public IToken Get(int i)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Absolute token indexes are meaningless in an unbuffered stream");
         }
 
         public int LA(int i)
@@ -91,14 +108,6 @@ namespace Antlr.Runtime
         public string ToString(IToken start, IToken stop)
         {
             return "n/a";
-        }
-
-        protected override IToken LB(int k)
-        {
-            if (k == 1)
-                return this.previousToken;
-
-            return null;
         }
     }
 }

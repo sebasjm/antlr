@@ -36,6 +36,7 @@ namespace Antlr.Runtime.Tree
     using Antlr.Runtime.Misc;
 
     using StringBuilder = System.Text.StringBuilder;
+    using NotSupportedException = System.NotSupportedException;
 
     [System.Serializable]
     public class CommonTreeNodeStream : LookaheadStream<object>, ITreeNodeStream
@@ -80,6 +81,7 @@ namespace Antlr.Runtime.Tree
         }
 
         #region Properties
+
         public virtual string SourceName
         {
             get
@@ -90,6 +92,7 @@ namespace Antlr.Runtime.Tree
                 return TokenStream.SourceName;
             }
         }
+
         public virtual ITokenStream TokenStream
         {
             get
@@ -101,6 +104,7 @@ namespace Antlr.Runtime.Tree
                 tokens = value;
             }
         }
+
         public virtual ITreeAdaptor TreeAdaptor
         {
             get
@@ -112,6 +116,7 @@ namespace Antlr.Runtime.Tree
                 _adaptor = value;
             }
         }
+
         public virtual object TreeSource
         {
             get
@@ -119,6 +124,7 @@ namespace Antlr.Runtime.Tree
                 return _root;
             }
         }
+
         public virtual bool UniqueNavigationNodes
         {
             get
@@ -129,6 +135,7 @@ namespace Antlr.Runtime.Tree
             {
             }
         }
+
         #endregion
 
         public virtual void Reset()

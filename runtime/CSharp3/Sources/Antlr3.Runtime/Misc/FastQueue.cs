@@ -33,6 +33,7 @@
 namespace Antlr.Runtime.Misc
 {
     using System.Collections.Generic;
+    using IndexOutOfRangeException = System.IndexOutOfRangeException;
 
     /** A queue that can dequeue and get(i) in O(1) and grow arbitrarily large.
      *  A linked list is fast at dequeue but slow at get(i).  An array is
@@ -50,6 +51,33 @@ namespace Antlr.Runtime.Misc
         internal List<T> _data = new List<T>();
         /** <summary>index of next element to fill</summary> */
         internal int _p = 0;
+
+        public virtual int Count
+        {
+            get
+            {
+                return _data.Count - _p;
+            }
+        }
+
+        /** <summary>
+         *  Return element i elements ahead of current element.  i==0 gets
+         *  current element.  This is not an absolute index into the data list
+         *  since p defines the start of the real list.
+         *  </summary>
+         */
+        public virtual T this[int i]
+        {
+            get
+            {
+                if ( _p + i >= _data.Count )
+                    throw new IndexOutOfRangeException("queue index " + (_p + i) + " > last index " + (_data.Count - 1));
+                if (_p + i < 0)
+                    throw new IndexOutOfRangeException("queue index " + (_p + i) + " < 0");
+
+                return _data[_p + i];
+            }
+        }
 
         /** <summary>Get and remove first element in queue</summary> */
         public virtual T Dequeue()
@@ -70,38 +98,12 @@ namespace Antlr.Runtime.Misc
             _data.Add( o );
         }
 
-        public virtual int Count
-        {
-            get
-            {
-                return _data.Count - _p;
-            }
-        }
-
         public virtual T Peek()
         {
             return this[0];
         }
 
-        /** <summary>
-         *  Return element i elements ahead of current element.  i==0 gets
-         *  current element.  This is not an absolute index into the data list
-         *  since p defines the start of the real list.
-         *  </summary>
-         */
-        public T this[int i]
-        {
-            get
-            {
-                if ( _p + i >= _data.Count )
-                {
-                    throw new System.ArgumentException( "queue index " + ( _p + i ) + " > size " + _data.Count );
-                }
-                return _data[_p + i];
-            }
-        }
-
-        protected virtual void Clear()
+        public virtual void Clear()
         {
             _p = 0;
             _data.Clear();
