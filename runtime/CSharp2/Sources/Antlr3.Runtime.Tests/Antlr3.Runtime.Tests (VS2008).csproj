@@ -8,8 +8,8 @@
     <ProjectGuid>{784B3027-5E9C-4BF2-BFE6-B5002CAE30AB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Antlr3.Runtime.Tests</RootNamespace>
-    <AssemblyName>Antlr3.Runtime.Tests.2.C2</AssemblyName>
+    <RootNamespace>Antlr.Runtime.Tests</RootNamespace>
+    <AssemblyName>Antlr3-2.Runtime.Tests.DotNet20</AssemblyName>
     <StartupObject>
     </StartupObject>
     <FileUpgradeFlags>

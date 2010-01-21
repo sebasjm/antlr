@@ -8,8 +8,8 @@
     <ProjectGuid>{BEB27DCC-ABFB-4951-B618-2B639EC65A46}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Antlr3.Utility</RootNamespace>
-    <AssemblyName>Antlr3.Utility.2.C2</AssemblyName>
+    <RootNamespace>Antlr.Utility</RootNamespace>
+    <AssemblyName>Antlr3-2.Utility.DotNet20</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -39,7 +39,7 @@
     <DefineConstants>TRACE;STRONG_NAME;DOTNET2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\net-2.0\Antlr3.Utility.2.C2.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\net-2.0\Antlr3-2.Utility.DotNet20.xml</DocumentationFile>
     <OutputType>Library</OutputType>
     <DebugSymbols>true</DebugSymbols>
     <RootNamespace>Antlr.Utility</RootNamespace>

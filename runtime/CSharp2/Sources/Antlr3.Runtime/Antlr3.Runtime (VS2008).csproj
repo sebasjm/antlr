@@ -10,7 +10,7 @@
     </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
-    <AssemblyName>Antlr3.Runtime.2.C2</AssemblyName>
+    <AssemblyName>Antlr3-2.Runtime.DotNet20</AssemblyName>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
     <DefaultClientScript>JScript</DefaultClientScript>
@@ -57,7 +57,7 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>STRONG_NAME;DOTNET2</DefineConstants>
-    <DocumentationFile>bin\Release\net-2.0\Antlr3.Runtime.2.C2.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\net-2.0\Antlr3-2.Runtime.DotNet20.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <RegisterForComInterop>false</RegisterForComInterop>
@@ -168,6 +168,6 @@
     <PostBuildEvent>
     </PostBuildEvent>
     <ProjectGuid>{CF15D0D5-BE72-4F98-B70F-229ABA1DF0E8}</ProjectGuid>
-    <RootNamespace>Antlr3.Runtime</RootNamespace>
+    <RootNamespace>Antlr.Runtime</RootNamespace>
   </PropertyGroup>
 </Project>
