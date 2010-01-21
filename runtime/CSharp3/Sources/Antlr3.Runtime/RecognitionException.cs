@@ -277,7 +277,7 @@ namespace Antlr.Runtime
             {
                 return _line;
             }
-            protected set
+            set
             {
                 _line = value;
             }
@@ -289,7 +289,7 @@ namespace Antlr.Runtime
             {
                 return _charPositionInLine;
             }
-            protected set
+            set
             {
                 _charPositionInLine = value;
             }
