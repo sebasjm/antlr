@@ -326,7 +326,7 @@ namespace Antlr.Runtime
             //System.out.print("LT(p="+p+","+k+")=");
             if ( ( p + k - 1 ) >= tokens.Count )
             {
-                return Tokens.EndOfFile;
+                return tokens[tokens.Count - 1];
             }
             //System.out.println(tokens.get(p+k-1));
             int i = p;
@@ -340,7 +340,7 @@ namespace Antlr.Runtime
             }
             if ( i >= tokens.Count )
             {
-                return Tokens.EndOfFile;
+                return tokens[tokens.Count - 1];
             }
             return (IToken)tokens[i];
         }

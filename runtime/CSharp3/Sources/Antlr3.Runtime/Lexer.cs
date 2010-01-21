@@ -135,7 +135,10 @@ namespace Antlr.Runtime
                 state.text = null;
                 if ( input.LA( 1 ) == CharStreamConstants.EndOfFile )
                 {
-                    return Tokens.EndOfFile;
+                    IToken eof = new CommonToken((ICharStream)input, CharStreamConstants.EndOfFile, TokenChannels.Default, input.Index, input.Index);
+                    eof.Line = Line;
+                    eof.CharPositionInLine = CharPositionInLine;
+                    return eof;
                 }
                 try
                 {

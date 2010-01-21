@@ -226,7 +226,8 @@ namespace Antlr.Runtime
             Sync(_p + k - 1);
             if ((_p + k - 1) >= _tokens.Count)
             {
-                return Tokens.EndOfFile;
+                // EOF must be last token
+                return _tokens[_tokens.Count - 1];
             }
             return _tokens[_p + k - 1];
         }

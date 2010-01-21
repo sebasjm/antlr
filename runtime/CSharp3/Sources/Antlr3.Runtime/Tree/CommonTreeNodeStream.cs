@@ -72,12 +72,10 @@ namespace Antlr.Runtime.Tree
         }
 
         public CommonTreeNodeStream( ITreeAdaptor adaptor, object tree )
-            : base( adaptor.Create( TokenTypes.EndOfFile, "EOF" ) ) // set EOF
         {
             this._root = tree;
             this._adaptor = adaptor;
             _it = new TreeIterator( adaptor, _root );
-            _it.eof = this.EndOfFile; // make sure tree iterator returns the EOF we want
         }
 
         #region Properties
@@ -178,6 +176,11 @@ namespace Antlr.Runtime.Tree
                 t = _it.Current;
             }
             return t;
+        }
+
+        public override bool IsEndOfFile(object o)
+        {
+            return _adaptor.GetType(o) == CharStreamConstants.EndOfFile;
         }
 
         public virtual int LA( int i )

@@ -45,11 +45,6 @@ namespace Antlr.Runtime.Misc
         : FastQueue<T>
         where T : class
     {
-        public const int UninitializedEofElementIndex = int.MaxValue;
-
-        /** <summary>Set to buffer index of eof when nextElement returns eof</summary> */
-        int _eofElementIndex = UninitializedEofElementIndex;
-
         /** Absolute token index. It's the index of the symbol about to be
          *  read via LT(1). Goes from 0 to numtokens.
          */
@@ -57,7 +52,9 @@ namespace Antlr.Runtime.Misc
 
         private T _previousElement;
 
-        /** <summary>Returned by nextElement upon end of stream; we add to buffer also</summary> */
+        /** Track object returned by nextElement upon end of stream;
+         *  Return it later when they ask for LT passed end of input.
+         */
         T _eof = null;
 
         /** <summary>Track the last mark() call result value for use in rewind().</summary> */
@@ -65,11 +62,6 @@ namespace Antlr.Runtime.Misc
 
         /** <summary>tracks how deep mark() calls are nested</summary> */
         int _markDepth;
-
-        public LookaheadStream( T eof )
-        {
-            this._eof = eof;
-        }
 
         public T EndOfFile
         {
@@ -86,7 +78,6 @@ namespace Antlr.Runtime.Misc
         public override void Clear()
         {
             base.Clear();
-            _eofElementIndex = UninitializedEofElementIndex;
             _currentElementIndex = 0;
             _p = 0;
             _previousElement = null;
@@ -98,6 +89,8 @@ namespace Antlr.Runtime.Misc
          *  </summary>
          */
         public abstract T NextElement();
+
+        public abstract bool IsEndOfFile(T o);
 
         /** <summary>Get and remove first element in queue; override FastQueue.remove()</summary> */
         public override T Dequeue()
@@ -116,9 +109,6 @@ namespace Antlr.Runtime.Misc
         /** <summary>Make sure we have at least one element to remove, even if EOF</summary> */
         public virtual void Consume()
         {
-            if (_eofElementIndex != UninitializedEofElementIndex)
-                return;
-
             SyncAhead(1);
             _previousElement = Dequeue();
             _currentElementIndex++;
@@ -143,13 +133,10 @@ namespace Antlr.Runtime.Misc
             for ( int i = 1; i <= n; i++ )
             {
                 T o = NextElement();
-                if ( o == _eof )
-                {
-                    _data.Add( _eof );
-                    _eofElementIndex = _data.Count - 1;
-                }
-                else
-                    _data.Add( o );
+                if ( IsEndOfFile(o) )
+                    _eof = o;
+
+                _data.Add( o );
             }
         }
 
@@ -172,13 +159,11 @@ namespace Antlr.Runtime.Misc
             {
                 return LB(-k);
             }
-            //System.out.print("LT(p="+p+","+k+")=");
-            if ( ( _p + k - 1 ) >= _eofElementIndex )
-            {
-                // move to super.LT
-                return _eof;
-            }
+
             SyncAhead( k );
+            if ((_p + k - 1) > _data.Count)
+                return _eof;
+
             return this[k - 1];
         }
 

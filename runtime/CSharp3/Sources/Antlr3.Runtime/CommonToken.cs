@@ -109,14 +109,15 @@ namespace Antlr.Runtime
             get
             {
                 if ( text != null )
-                {
                     return text;
-                }
                 if ( input == null )
-                {
                     return null;
-                }
-                text = input.Substring( start, stop - start + 1 );
+
+                if (start < input.Count && stop < input.Count)
+                    text = input.Substring(start, stop - start + 1);
+                else
+                    text = "<EOF>";
+
                 return text;
             }
             set

@@ -62,7 +62,6 @@ namespace Antlr.Runtime
         protected int channel = TokenChannels.Default;
 
         public UnbufferedTokenStream(ITokenSource tokenSource)
-            : base(Tokens.EndOfFile)
         {
             this.tokenSource = tokenSource;
         }
@@ -88,6 +87,11 @@ namespace Antlr.Runtime
             IToken t = this.tokenSource.NextToken();
             t.TokenIndex = this.tokenIndex++;
             return t;
+        }
+
+        public override bool IsEndOfFile(IToken o)
+        {
+            return o.Type == CharStreamConstants.EndOfFile;
         }
 
         public IToken Get(int i)
