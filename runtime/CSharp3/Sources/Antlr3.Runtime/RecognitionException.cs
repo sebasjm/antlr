@@ -150,26 +150,29 @@ namespace Antlr.Runtime
             : base(message, innerException)
         {
             this._input = input;
-            this._index = input.Index;
-            if ( input is ITokenStream )
+            if (input != null)
             {
-                this._token = ( (ITokenStream)input ).LT( 1 );
-                this._line = _token.Line;
-                this._charPositionInLine = _token.CharPositionInLine;
-            }
-            if ( input is ITreeNodeStream )
-            {
-                ExtractInformationFromTreeNodeStream( input );
-            }
-            else if ( input is ICharStream )
-            {
-                this._c = input.LA( 1 );
-                this._line = ( (ICharStream)input ).Line;
-                this._charPositionInLine = ( (ICharStream)input ).CharPositionInLine;
-            }
-            else
-            {
-                this._c = input.LA( 1 );
+                this._index = input.Index;
+                if (input is ITokenStream)
+                {
+                    this._token = ((ITokenStream)input).LT(1);
+                    this._line = _token.Line;
+                    this._charPositionInLine = _token.CharPositionInLine;
+                }
+                if (input is ITreeNodeStream)
+                {
+                    ExtractInformationFromTreeNodeStream(input);
+                }
+                else if (input is ICharStream)
+                {
+                    this._c = input.LA(1);
+                    this._line = ((ICharStream)input).Line;
+                    this._charPositionInLine = ((ICharStream)input).CharPositionInLine;
+                }
+                else
+                {
+                    this._c = input.LA(1);
+                }
             }
         }
 
