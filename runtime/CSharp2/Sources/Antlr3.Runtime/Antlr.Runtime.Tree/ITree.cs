@@ -174,9 +174,4 @@ namespace Antlr.Runtime.Tree
 		
 		string ToString();
 	}
-
-	public sealed class Tree
-	{
-		public readonly static ITree INVALID_NODE = new CommonTree(Token.INVALID_TOKEN);
-	}
 }

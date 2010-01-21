@@ -43,13 +43,12 @@ namespace Antlr.Runtime.Tree
 	public class TreeRuleReturnScope : RuleReturnScope
 	{
 		/// <summary>First node or root node of tree matched for this rule.</summary>
-		private object start;
+        public object start;
 
 		/// <summary>Return the start token or tree </summary>
 		override public object Start
 		{
 			get { return start; }
-			set { start = value; }
 		}
 	}
 }

@@ -47,7 +47,7 @@ namespace Antlr.Runtime
 		}
 	
 		public IToken UnexpectedToken {
-			get { return token; }
+			get { return Token; }
 		}
 	
 		public override string ToString() {
@@ -55,10 +55,10 @@ namespace Antlr.Runtime
 			if (Expecting == Runtime.Token.INVALID_TOKEN_TYPE) {
 				exp = "";
 			}
-			if (token==null) {
+            if (Token == null) {
 				return "UnwantedTokenException(found=" + null + exp + ")";
 			}
-			return "UnwantedTokenException(found=" + token.Text + exp + ")";
+            return "UnwantedTokenException(found=" + Token.Text + exp + ")";
 		}
 	}
 }

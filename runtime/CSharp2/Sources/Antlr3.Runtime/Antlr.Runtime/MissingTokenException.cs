@@ -61,11 +61,11 @@ namespace Antlr.Runtime
 		}
 	
 		public override String ToString() {
-			if (inserted != null && token != null) {
-				return "MissingTokenException(inserted " + inserted + " at " + token.Text + ")";
+			if (inserted != null && Token != null) {
+                return "MissingTokenException(inserted " + inserted + " at " + Token.Text + ")";
 			}
-			if (token != null) {
-				return "MissingTokenException(at " + token.Text + ")";
+            if (Token != null) {
+                return "MissingTokenException(at " + Token.Text + ")";
 			}
 			return "MissingTokenException";
 		}

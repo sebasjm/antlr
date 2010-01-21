@@ -37,17 +37,7 @@ namespace Antlr.Runtime
 {
 	using System;
 
-#if DOTNET1
-	public sealed class Token {
-		/// <summary>
-		/// Instead of a static modifier for Token.
-		/// </summary>
-		private Token() {
-		}
-#else
 	public static class Token {
-#endif
-		
 		public const int EOR_TOKEN_TYPE = 1;
 
 		/// <summary>imaginary tree navigation type; traverse "get child" link </summary>

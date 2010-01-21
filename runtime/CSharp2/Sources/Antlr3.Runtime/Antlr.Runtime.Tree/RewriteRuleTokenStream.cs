@@ -33,78 +33,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#if DOTNET1
-namespace Antlr.Runtime.Tree
-{
-	using System;
-	using IList = System.Collections.IList;
-	using IToken = Antlr.Runtime.IToken;
-	
-	public class RewriteRuleTokenStream : RewriteRuleElementStream
-	{
-		public RewriteRuleTokenStream(ITreeAdaptor adaptor, string elementDescription) 
-			: base(adaptor, elementDescription)
-		{
-		}
-
-		/// <summary>
-		/// Create a stream with one element
-		/// </summary>
-		public RewriteRuleTokenStream(
-			ITreeAdaptor adaptor,
-			string elementDescription,
-			object oneElement
-		) : base(adaptor, elementDescription, oneElement) {
-		}
-
-		/// <summary>
-		/// Create a stream, but feed off an existing list.
-		/// </summary>
-		public RewriteRuleTokenStream(
-			ITreeAdaptor adaptor,
-			string elementDescription,
-			IList elements
-		) : base(adaptor, elementDescription, elements) {
-		}
-
-		/// <summary>
-		/// Get next token from stream and make a node for it.
-		/// </summary>
-		public object NextNode()
-		{
-			return adaptor.Create((IToken)_Next());
-		}
-
-		public IToken NextToken() {
-			return (IToken) _Next();
-		}
-
-		/// <summary>
-		/// Don't convert to a tree unless they explicitly call NextTree().
-		/// This way we can do hetero tree nodes in rewrite.
-		/// </summary>
-		override protected object ToTree(object el) {
-			return el;
-		}
-
-		override protected object Dup(object el) {
-			//return adaptor.Create((IToken)el);
-			throw new NotSupportedException("dup can't be called for a token stream.");
-		}
-	}
-}
-
-#elif DOTNET2
 namespace Antlr.Runtime.Tree {
 	using System;
 	using System.Collections.Generic;
-	using SpecializingType = Antlr.Runtime.IToken;
 
 	/// <summary>
 	/// </summary>
 	/// <remarks></remarks>
 	/// <example></example>
-	public class RewriteRuleTokenStream : RewriteRuleElementStream<SpecializingType> {
+	public class RewriteRuleTokenStream : RewriteRuleElementStream {
 		public RewriteRuleTokenStream(ITreeAdaptor adaptor, string elementDescription)
 			: base(adaptor, elementDescription) {
 		}
@@ -115,7 +52,7 @@ namespace Antlr.Runtime.Tree {
 		public RewriteRuleTokenStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
-			SpecializingType oneElement
+            object oneElement
 		) : base(adaptor, elementDescription, oneElement) {
 		}
 
@@ -123,16 +60,7 @@ namespace Antlr.Runtime.Tree {
 		public RewriteRuleTokenStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
-			IList<SpecializingType> elements
-		) : base(adaptor, elementDescription, elements) {
-		}
-
-		/// <summary>Create a stream, but feed off an existing list</summary>
-		[Obsolete("This constructor is for internal use only and might be phased out soon. Use instead the one with IList<T>.")]
-		public RewriteRuleTokenStream(
-			ITreeAdaptor adaptor,
-			string elementDescription,
-			System.Collections.IList elements
+            IList<object> elements
 		) : base(adaptor, elementDescription, elements) {
 		}
 
@@ -142,12 +70,12 @@ namespace Antlr.Runtime.Tree {
 		/// <remarks>
 		/// ITreeAdaptor.Create() returns an object, so no further restrictions possible.
 		/// </remarks>
-		public object NextNode() {
-			return adaptor.Create((SpecializingType) _Next());
+		public virtual object NextNode() {
+            return adaptor.Create((IToken) NextTree());
 		}
 
-		public SpecializingType NextToken() {
-			return (SpecializingType) _Next();
+        public virtual IToken NextToken() {
+            return (IToken) NextTree();
 		}
 
 		/// <summary>
@@ -155,9 +83,12 @@ namespace Antlr.Runtime.Tree {
 		/// Don't convert to a tree unless they explicitly call NextTree().
 		/// This way we can do hetero tree nodes in rewrite.
 		/// </summary>
-		override protected object ToTree(SpecializingType el) {
+        override protected object ToTree(object el) {
 			return el;
 		}
-	}
+
+        protected override object Dup(object el) {
+            throw new NotSupportedException("dup can't be called for a token stream.");
+        }
+    }
 }
-#endif

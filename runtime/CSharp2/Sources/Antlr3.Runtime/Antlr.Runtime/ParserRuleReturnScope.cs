@@ -56,20 +56,18 @@ namespace Antlr.Runtime
 	/// </summary>
 	public class ParserRuleReturnScope : RuleReturnScope
 	{
-		private IToken start, stop;
+		public IToken start, stop;
 
 		/// <summary>Return the start token or tree </summary>
 		override public object Start
 		{
 			get { return start; }
-			set { start = (IToken) value; }
 		}
 
 		/// <summary>Return the stop token or tree </summary>
 		override public object Stop
 		{
 			get { return stop; }
-			set { stop = (IToken) value; }
 		}
 
 	}

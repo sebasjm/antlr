@@ -33,65 +33,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#if DOTNET1
-namespace Antlr.Runtime.Tree
-{
-	using System;
-	using IList = System.Collections.IList;
-
-	/// <summary>
-	/// Queues up nodes matched on left side of -> in a tree parser. This is
-	/// the analog of RewriteRuleTokenStream for normal parsers. 
-	/// </summary>
-	public class RewriteRuleNodeStream : RewriteRuleElementStream
-	{
-		public RewriteRuleNodeStream(ITreeAdaptor adaptor, string elementDescription)
-			: base(adaptor, elementDescription)
-		{
-		}
-
-		/// <summary>Create a stream with one element</summary>
-		public RewriteRuleNodeStream(ITreeAdaptor adaptor, string elementDescription, object oneElement)
-			: base(adaptor, elementDescription, oneElement)
-		{
-		}
-
-		/// <summary>Create a stream, but feed off an existing list</summary>
-		public RewriteRuleNodeStream(ITreeAdaptor adaptor, string elementDescription, IList elements)
-			: base(adaptor, elementDescription, elements)
-		{
-		}
-
-		 public object NextNode()
-		{
-			return _Next();
-		}
-
-		override protected object ToTree(object el)
-		{
-			return adaptor.DupNode(el);
-		}
-
-		override protected object Dup(object el)
-		{
-			// we dup every node, so don't have to worry about calling dup; 
-			// short-circuited NextTree() so it doesn't call.
-			throw new NotSupportedException("dup can't be called for a node stream.");
-		}
-	}
-}
-#elif DOTNET2
 namespace Antlr.Runtime.Tree {
 	using System;
 	using System.Collections.Generic;
-	using SpecializingType = System.Object;
 
 	/// <summary>
 	/// Queues up nodes matched on left side of -> in a tree parser. This is
 	/// the analog of RewriteRuleTokenStream for normal parsers. 
 	/// </summary>
-#warning Check, if RewriteRuleNodeStream can be changed to take advantage of something more specific than object.
-	public class RewriteRuleNodeStream : RewriteRuleElementStream<SpecializingType> {
+	public class RewriteRuleNodeStream : RewriteRuleElementStream {
 		public RewriteRuleNodeStream(ITreeAdaptor adaptor, string elementDescription)
 			: base(adaptor, elementDescription) {
 		}
@@ -100,7 +50,7 @@ namespace Antlr.Runtime.Tree {
 		public RewriteRuleNodeStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
-			SpecializingType oneElement
+			object oneElement
 		) : base(adaptor, elementDescription, oneElement) {
 		}
 
@@ -108,26 +58,22 @@ namespace Antlr.Runtime.Tree {
 		public RewriteRuleNodeStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
-			IList<SpecializingType> elements
-		) : base(adaptor, elementDescription, elements) {
-		}
-
-		/// <summary>Create a stream, but feed off an existing list</summary>
-		[Obsolete("This constructor is for internal use only and might be phased out soon. Use instead the one with IList<T>.")]
-		public RewriteRuleNodeStream(
-			ITreeAdaptor adaptor,
-			string elementDescription,
-			System.Collections.IList elements
+            IList<object> elements
 		) : base(adaptor, elementDescription, elements) {
 		}
 
 		public object NextNode() {
-			return _Next();
+            return NextTree();
 		}
 
 		override protected object ToTree(object el) {
 			return adaptor.DupNode(el);
 		}
-	}
+
+        protected override object Dup(object el) {
+            // we dup every node, so don't have to worry about calling dup; short-
+            // circuited next() so it doesn't call.
+            throw new NotSupportedException("dup can't be called for a node stream.");
+        }
+    }
 }
-#endif

@@ -40,6 +40,7 @@ namespace Antlr.Runtime
 	using ITreeNodeStream = Antlr.Runtime.Tree.ITreeNodeStream;
 	using CommonTreeNodeStream = Antlr.Runtime.Tree.CommonTreeNodeStream;
 	using CommonTree = Antlr.Runtime.Tree.CommonTree;
+    using System.Runtime.Serialization;
 
 	/// <summary>The root of the ANTLR exception hierarchy.</summary>
 	/// <remarks>
@@ -77,56 +78,58 @@ namespace Antlr.Runtime
 
 		/// <summary>Used for remote debugger deserialization </summary>
 		public RecognitionException()
-			: this(null, null, null)
 		{
 		}
 
 		public RecognitionException(string message)
-			: this(message, null, null)
+			: base(message)
 		{
 		}
 
 		public RecognitionException(string message, Exception inner)
-			: this(message, inner, null)
+			: base(message, inner)
 		{
 		}
 
 		public RecognitionException(IIntStream input)
-			: this(null, null, input)
 		{
-		}
+            Initialize(input);
+        }
 
 		public RecognitionException(string message, IIntStream input)
-			: this(message, null, input)
+			: base(message)
 		{
-		}
+            Initialize(input);
+        }
 
 		public RecognitionException(string message, Exception inner, IIntStream input)
 			: base(message, inner)
 		{
-			this.input = input;
-			this.index = input.Index;
-			if (input is ITokenStream)
-			{
-				this.token = ((ITokenStream)input).LT(1);
-				this.line = token.Line;
-				this.charPositionInLine = token.CharPositionInLine;
-			}
-			if (input is ITreeNodeStream)
-			{
-				ExtractInformationFromTreeNodeStream(input);
-			}
-			else if (input is ICharStream)
-			{
-				this.c = input.LA(1);
-				this.line = ((ICharStream)input).Line;
-				this.charPositionInLine = ((ICharStream)input).CharPositionInLine;
-			}
-			else
-			{
-				this.c = input.LA(1);
-			}
-		}
+            Initialize(input);
+        }
+
+        protected RecognitionException(SerializationInfo info, StreamingContext context)
+            : base(info, context) {
+        }
+
+        private void Initialize(IIntStream input) {
+            this.input = input;
+            this.index = input.Index;
+            if (input is ITokenStream) {
+                this.token = ((ITokenStream)input).LT(1);
+                this.line = token.Line;
+                this.charPositionInLine = token.CharPositionInLine;
+            }
+            if (input is ITreeNodeStream) {
+                ExtractInformationFromTreeNodeStream(input);
+            } else if (input is ICharStream) {
+                this.c = input.LA(1);
+                this.line = ((ICharStream)input).Line;
+                this.charPositionInLine = ((ICharStream)input).CharPositionInLine;
+            } else {
+                this.c = input.LA(1);
+            }
+        }
 
 		#endregion
 
@@ -170,7 +173,7 @@ namespace Antlr.Runtime
 		/// <summary>
 		/// Returns the current char when the error occurred (for lexers)
 		/// </summary>
-		public int Char
+		public int Character
 		{
 			get { return c; }
 			set { c = value; }
@@ -185,6 +188,15 @@ namespace Antlr.Runtime
 			get { return charPositionInLine; }
 			set { charPositionInLine = value; }
 		}
+
+        public bool ApproximateLineInfo {
+            get {
+                return approximateLineInfo;
+            }
+            protected set {
+                approximateLineInfo = value;
+            }
+        }
 
 		/// <summary>
 		/// Returns the line at which the error occurred (for lexers)
@@ -284,32 +296,32 @@ namespace Antlr.Runtime
 
 		/// <summary>What input stream did the error occur in? </summary>
 		[NonSerialized]
-		protected IIntStream input;
+		private IIntStream input;
 
 		/// <summary>
 		/// What is index of token/char were we looking at when the error occurred?
 		/// </summary>
-		protected int index;
+        private int index;
 
 		/// <summary>
 		/// The current Token when an error occurred.  Since not all streams
 		/// can retrieve the ith Token, we have to track the Token object.
 		/// </summary>
-		protected IToken token;
+        private IToken token;
 
 		/// <summary>[Tree parser] Node with the problem.</summary>
-		protected object node;
+        private object node;
 
 		/// <summary>The current char when an error occurred. For lexers. </summary>
-		protected int c;
+        private int c;
 
 		/// <summary>Track the line at which the error occurred in case this is
 		/// generated from a lexer.  We need to track this since the
 		/// unexpected char doesn't carry the line info.
 		/// </summary>
-		protected int line;
+        private int line;
 
-		protected int charPositionInLine;
+        private int charPositionInLine;
 
 		/// <summary>
 		/// If you are parsing a tree node stream, you will encounter some
@@ -317,7 +329,7 @@ namespace Antlr.Runtime
 		/// for most recent token with line/col info, but notify getErrorHeader()
 		/// that info is approximate.
 		/// </summary>
-		public bool approximateLineInfo;
+        private bool approximateLineInfo;
 
 		#endregion
 	}

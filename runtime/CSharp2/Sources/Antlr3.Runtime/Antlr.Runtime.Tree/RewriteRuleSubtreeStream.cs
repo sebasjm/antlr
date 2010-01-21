@@ -33,84 +33,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#if DOTNET1
-namespace Antlr.Runtime.Tree
-{
-	using System;
-	using IList = System.Collections.IList;
-	
-	public class RewriteRuleSubtreeStream : RewriteRuleElementStream
-	{
-		public RewriteRuleSubtreeStream(ITreeAdaptor adaptor, string elementDescription)
-			: base(adaptor, elementDescription)
-		{
-		}
-		
-		/// <summary>
-		/// Create a stream with one element
-		/// </summary>
-		public RewriteRuleSubtreeStream(ITreeAdaptor adaptor, string elementDescription, object oneElement)
-			: base(adaptor, elementDescription, oneElement)
-		{
-		}
-		
-		/// <summary>
-		/// Create a stream, but feed off an existing list
-		/// </summary>
-		public RewriteRuleSubtreeStream(ITreeAdaptor adaptor, string elementDescription, IList elements)
-			: base(adaptor, elementDescription, elements)
-		{
-		}
-		
-		/// <summary>
-		/// Treat next element as a single node even if it's a subtree.
-		/// </summary>
-		/// <remarks>
-		/// This is used instead of next() when the result has to be a
-		/// tree root node.  Also prevents us from duplicating recently-added
-		/// children; e.g., ^(type ID)+ adds ID to type and then 2nd iteration
-		/// must dup the type node, but ID has been added.
-		///
-		/// Referencing a rule result twice is ok; dup entire tree as
-		/// we can't be adding trees as root; e.g., expr expr. 
-		/// 
-		/// Hideous code duplication here with respect to base.NextTree() inherited from Java version.
-		/// Can't think of a proper way to refactor.  This needs to always call dup node
-		/// and base.NextTree() doesn't know which to call: dup node or dup tree.
-		/// </remarks>
-		public object NextNode()
-		{
-			int size = Count;
-			if (dirty || ((cursor >= size) && (size == 1)))
-			{
-				// if out of elements and size is 1, dup (at most a single node
-				// since this is for making root nodes).
-				object el = _Next();
-				return adaptor.DupNode(el);
-			}
-			// test size above then fetch
-			object elem = _Next();
-			return elem;
-		}
-		
-		override protected object Dup(object el) 
-		{
-			return adaptor.DupTree(el);
-		}
-	}
-}
-#elif DOTNET2
 namespace Antlr.Runtime.Tree {
 	using System;
 	using System.Collections.Generic;
-	using SpecializingType = System.Object;
 
-#warning Check, if RewriteRuleSubtreeStream can be changed to take advantage of something more specific than object.
 	/// <summary>
 	/// </summary>
 	/// <remarks></remarks>
 	/// <example></example>
-	public class RewriteRuleSubtreeStream : RewriteRuleElementStream<SpecializingType> {
+	public class RewriteRuleSubtreeStream : RewriteRuleElementStream {
 
 		#region private delegate object ProcessHandler(object o)
 		/// <summary>
@@ -130,7 +61,7 @@ namespace Antlr.Runtime.Tree {
 		public RewriteRuleSubtreeStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
-			SpecializingType oneElement
+            object oneElement
 		) : base(adaptor, elementDescription, oneElement) {
 		}
 
@@ -138,16 +69,7 @@ namespace Antlr.Runtime.Tree {
 		public RewriteRuleSubtreeStream(
 			ITreeAdaptor adaptor,
 			string elementDescription,
-			IList<SpecializingType> elements
-		) : base(adaptor, elementDescription, elements) {
-		}
-
-		/// <summary>Create a stream, but feed off an existing list</summary>
-		[Obsolete("This constructor is for internal use only and might be phased out soon. Use instead the one with IList<T>.")]
-		public RewriteRuleSubtreeStream(
-			ITreeAdaptor adaptor,
-			string elementDescription,
-			System.Collections.IList elements
+			IList<object> elements
 		) : base(adaptor, elementDescription, elements) {
 		}
 
@@ -178,10 +100,10 @@ namespace Antlr.Runtime.Tree {
 		private object FetchObject(ProcessHandler ph) {
 			if (RequiresDuplication()) {
 				// process the object
-				return ph(_Next());
+				return ph(NextTree());
 			}
 			// test above then fetch
-			return _Next();
+            return NextTree();
 		}
 		#endregion
 
@@ -219,9 +141,8 @@ namespace Antlr.Runtime.Tree {
 		/// around it. For trees, you must call the adaptor.dupTree()
 		/// unless the element is for a tree root; then it must be a node dup
 		/// </summary>
-		private SpecializingType Dup(SpecializingType el) {
+        protected override object Dup(object el) {
 			return adaptor.DupTree(el);
 		}
 	}
 }
-#endif

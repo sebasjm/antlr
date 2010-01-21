@@ -106,7 +106,7 @@ namespace Antlr.Runtime
 	
 		protected internal ITokenStream input;
 
-		override public IIntStream Input
+        public ITokenStream Input
 		{
 			get { return input; }
 		}

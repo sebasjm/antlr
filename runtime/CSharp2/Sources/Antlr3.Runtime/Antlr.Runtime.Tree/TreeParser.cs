@@ -141,7 +141,7 @@ namespace Antlr.Runtime.Tree
 			input.Consume(); // consume UP
 		}
 
-		override public IIntStream Input
+        public ITreeNodeStream Input
 		{
 			get { return input; } 
 		}
@@ -164,7 +164,7 @@ namespace Antlr.Runtime.Tree
 		override public string GetErrorHeader(RecognitionException e)
 		{
 			return GrammarFileName + ": node from "
-				+ (e.approximateLineInfo ? "after " : "")
+				+ (e.ApproximateLineInfo ? "after " : "")
 				+ "line " + e.Line + ":" + e.CharPositionInLine;
 		}
 

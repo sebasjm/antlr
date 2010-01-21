@@ -38,6 +38,7 @@ namespace Antlr.Runtime
 	using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
 	using CollectionUtils = Antlr.Runtime.Collections.CollectionUtils;
 	
 	public delegate void SynPredPointer();
@@ -77,8 +78,6 @@ namespace Antlr.Runtime
 		public virtual void EndBacktrack(int level, bool successful)
 		{
 		}
-
-		abstract public IIntStream Input { get; }
 
 		public int BacktrackingLevel
 		{
@@ -712,6 +711,12 @@ namespace Antlr.Runtime
 		{
 			get { return null; }
 		}
+
+        public TextWriter TraceDestination
+        {
+            get;
+            set;
+        }
 
 		#endregion
 
