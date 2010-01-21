@@ -229,7 +229,7 @@ namespace Antlr.Runtime
             {
                 return _token;
             }
-            protected internal set
+            set
             {
                 _token = value;
             }
