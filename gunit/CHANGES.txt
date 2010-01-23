@@ -6,6 +6,16 @@ leonsu at mac com
 
 CHANGES
 
+January 23, 2009
+
+* whitespace ignored and "x y z" turned into x y z now in	expected tree p\
+attern. E.g.,
+
+rule:
+    "a : A<X,Y=a.b.c>;" -> (RULE a (BLOCK (ALT
+                            (A (ELEMENT_OPTIONS X (= Y "a.b.c")))))
+                           )
+
 July 31, 2009
 
 * support custom tree adaptor in gUnit script
