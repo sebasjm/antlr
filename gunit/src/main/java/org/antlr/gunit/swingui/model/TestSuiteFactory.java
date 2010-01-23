@@ -137,10 +137,13 @@ public class TestSuiteFactory {
      * @return test suite object
      */
     public static TestSuite loadTestSuite(File file) {
+        if ( file.getName().endsWith(TEST_SUITE_EXT) ) {
+            throw new RuntimeException(file.getName()+" is a gunit file not a grammar file");
+        }
         // check grammar file
         final File grammarFile = getGrammarFile(file);
         if(grammarFile == null) 
-            throw new RuntimeException("Can't find grammar file.");
+            throw new RuntimeException("Can't find grammar file: "+file.getAbsoluteFile());
             
         TestSuite result = new TestSuite("", file);
         
@@ -177,14 +180,15 @@ public class TestSuiteFactory {
      * @return grammar file or null
      */
     private static File getGrammarFile(File testsuiteFile) {
-        final String sTestFile;
+        String sTestFile;
         try {
             sTestFile = testsuiteFile.getCanonicalPath();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
-        final String sGrammarFile = sTestFile.substring(0, sTestFile.lastIndexOf('.')) + GRAMMAR_EXT;
-        final File fileGrammar = new File(sGrammarFile); 
+        String sGrammarFile = sTestFile.substring(0, sTestFile.lastIndexOf('.')) + GRAMMAR_EXT;
+        File fileGrammar = new File(sGrammarFile); 
         if(fileGrammar.exists() && fileGrammar.isFile())
             return fileGrammar;
         else
