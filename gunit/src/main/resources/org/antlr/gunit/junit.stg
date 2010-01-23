@@ -27,8 +27,8 @@
 */
 group junit;
 
-classHeader(header,junitFileName,hasPackage,packagePath,lexerPath,parserPath,
-            treeParserPath,isTreeGrammar,hasTreeAdaptor) ::= <<
+classHeader(header,junitFileName,hasTreeAdaptor,treeAdaptorPath,
+    hasPackage,packagePath,lexerPath,parserPath,treeParserPath,isTreeGrammar) ::= <<
 <header>
 
 import org.antlr.gunit.gUnitBaseTest;
@@ -36,6 +36,7 @@ import org.antlr.gunit.gUnitBaseTest;
 public class <junitFileName> extends gUnitBaseTest {
 	
 	public void setUp() {
+		<if(hasTreeAdaptor)><\t><\t>this.treeAdaptorPath = "<treeAdaptorPath>";<endif>
 		<if(hasPackage)><\t><\t>this.packagePath = "<packagePath>";<endif>
 		this.lexerPath = "<lexerPath>";
 		this.parserPath = "<parserPath>";
