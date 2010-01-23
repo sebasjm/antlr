@@ -145,9 +145,9 @@ public class TestSuiteFactory {
         }
         // check grammar file
         final File grammarFile = getGrammarFile(file);
-        if(grammarFile == null) 
+        if(grammarFile == null)
             throw new RuntimeException("Can't find grammar file associated with gunit file: "+file.getAbsoluteFile());
-            
+
         TestSuite result = new TestSuite("", file);
         
         // read in test suite
@@ -183,18 +183,21 @@ public class TestSuiteFactory {
      * @return grammar file or null
      */
     private static File getGrammarFile(File testsuiteFile) {
-        final String sTestFile;
+        String sTestFile;
         try {
             sTestFile = testsuiteFile.getCanonicalPath();
         }
         catch (IOException e) {
             return null;
         }
-        final String sGrammarFile = sTestFile.substring(0, sTestFile.lastIndexOf('.')) + GRAMMAR_EXT;
-        final File fileGrammar = new File(sGrammarFile); 
-        if(fileGrammar.exists() && fileGrammar.isFile())
-            return fileGrammar;
-        else
-            return null;
+        // Try Foo.g from Foo.gunit
+        String fname =
+            sTestFile.substring(0, sTestFile.lastIndexOf('.')) + GRAMMAR_EXT;
+        File fileGrammar = new File(fname);
+        if(fileGrammar.exists() && fileGrammar.isFile()) return fileGrammar;
+        // Try FooParser.g from Foo.gunit
+        fname = sTestFile.substring(0, sTestFile.lastIndexOf('.'))+"Parser"+GRAMMAR_EXT;
+        if(fileGrammar.exists() && fileGrammar.isFile()) return fileGrammar;
+        return fileGrammar;
     }
 }
