@@ -27,7 +27,8 @@
 */
 group junit;
 
-classHeader(header,junitFileName,hasPackage,packagePath,lexerPath,parserPath,treeParserPath,isTreeGrammar) ::= <<
+classHeader(header,junitFileName,hasPackage,packagePath,lexerPath,parserPath,
+            treeParserPath,isTreeGrammar,hasTreeAdaptor) ::= <<
 <header>
 
 import org.antlr.gunit.gUnitBaseTest;
