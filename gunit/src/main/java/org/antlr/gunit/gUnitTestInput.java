@@ -29,17 +29,18 @@ package org.antlr.gunit;
 
 /** A class which contains input information of an individual testuite */
 public class gUnitTestInput {
-	protected String testInput;		// a test input string for a testsuite
-	
-	protected boolean inputIsFile;	// if true, the testInput represents a filename
-	
-	protected int line;				// number of line in the script
-	
-	public gUnitTestInput(String testInput, boolean inputIsFile, int line) {
-		this.testInput = testInput;
-		this.inputIsFile = inputIsFile;
+	public String input;		// a test input string for a testsuite
+	public boolean isFile;	    // if true, the input represents a filename
+	public int line;			// line number in the script
+
+    public gUnitTestInput(String input, boolean isFile, int line) {
+		this.input = input;
+		this.isFile = isFile;
 		this.line = line;
 	}
-	
-	public int getLine() { return this.line; }
+
+    public String getInputEscaped() {
+        return JUnitCodeGen.escapeForJava(input);
+    }
+
 }

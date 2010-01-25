@@ -177,8 +177,8 @@ public class gUnitExecutor implements ITestSuite {
 					//System.out.println("; Expecting " + test.getExpected() + "; Success?: " + test.getExpected().equals(test.getResult(result)));
 				} catch ( InvalidInputException e) {
 					numOfInvalidInput++;
-					test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.getLine());
-					test.setActual(input.testInput);
+                    test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.line);
+					test.setActual(input.input);
 					invalids.add(test);
 					continue;
 				}	// TODO: ensure there's no other exceptions required to be handled here...
@@ -189,7 +189,7 @@ public class gUnitExecutor implements ITestSuite {
 				
 				if (actual == null) {
 					numOfFailure++;
-					test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.getLine());
+                    test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.line);
 					test.setActual("null");
 					failures.add(test);
 					onFail(test);
@@ -202,14 +202,14 @@ public class gUnitExecutor implements ITestSuite {
 				// TODO: something with ACTIONS - at least create action test type and throw exception.
 				else if ( ts.testSuites.get(input).getType()==gUnitParser.ACTION ) {	// expected Token: ACTION
 					numOfFailure++;
-					test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.getLine());
+                    test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.line);
 					test.setActual("\t"+"{ACTION} is not supported in the grammarInfo yet...");
 					failures.add(test);
 					onFail(test);
 				}
 				else {
 					numOfFailure++;
-					test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.getLine());
+                    test.setHeader(rule, lexicalRule, treeRule, numOfTest, input.line);
 					failures.add(test);
 					onFail(test);
 				}
@@ -597,8 +597,8 @@ public class gUnitExecutor implements ITestSuite {
 	// Create ANTLR input stream based on input source, file or String
 	private CharStream getANTLRInputStream(gUnitTestInput testInput) throws IOException {
 		CharStream input;
-		if ( testInput.inputIsFile ) {
-			String filePath = testInput.testInput;
+		if ( testInput.isFile) {
+			String filePath = testInput.input;
 			File testInputFile = new File(filePath);
 			// if input test file is not found under the current dir, try to look for it from dir where the testsuite file locates
 			if ( !testInputFile.exists() ) {
@@ -613,7 +613,7 @@ public class gUnitExecutor implements ITestSuite {
 			input = new ANTLRFileStream(filePath);
 		}
 		else {
-			input = new ANTLRStringStream(testInput.testInput);
+			input = new ANTLRStringStream(testInput.input);
 		}
 		return input;
 	}

@@ -44,10 +44,10 @@ public class <junitFileName> extends gUnitBaseTest {
 	}<\n><\n>
 >>
 
-testTreeRuleMethod(methodName,testTreeRuleName,testRuleName,testInput,isFile,tokenType,expecting) ::= <<
+testTreeRuleMethod(methodName,testTreeRuleName,testRuleName,test,tokenType,expecting) ::= <<
 	public void <methodName>() throws Exception {
-		// test input: <testInput>
-		Object retval = execTreeParser(<testTreeRuleName>, <testRuleName>, <testInput>, <isFile>);
+		// gunit test on line <test.line>
+		Object retval = execTreeParser(<testTreeRuleName>, <testRuleName>, "<test.inputEscaped>", <test.isFile>);
 		Object actual = examineExecResult(<tokenType>, retval);
 		Object expecting = <expecting>;
 		
@@ -55,19 +55,19 @@ testTreeRuleMethod(methodName,testTreeRuleName,testRuleName,testInput,isFile,tok
 	}<\n><\n>
 >>
 
-testTreeRuleMethod2(methodName,testTreeRuleName,testRuleName,testInput,isFile,returnType,expecting) ::= <<
+testTreeRuleMethod2(methodName,testTreeRuleName,testRuleName,test,returnType,expecting) ::= <<
 	public void <methodName>() throws Exception {
-		// test input: <testInput>
-		<returnType> retval = (<returnType>)execTreeParser(<testTreeRuleName>, <testRuleName>, <testInput>, <isFile>);
+		// gunit test on line <test.line>
+		<returnType> retval = (<returnType>)execTreeParser(<testTreeRuleName>, <testRuleName>, "<test.inputEscaped>", <test.isFile>);
 		
 		assertTrue("testing rule "+<testTreeRuleName>, <expecting>);
 	}<\n><\n>
 >>
 
-testRuleMethod(isLexicalRule,methodName,testRuleName,testInput,isFile,tokenType,expecting) ::= <<
+testRuleMethod(isLexicalRule,methodName,testRuleName,test,tokenType,expecting) ::= <<
 	public void <methodName>() throws Exception {
-		// test input: <testInput>
-		Object retval = <if(isLexicalRule)>execLexer<else>execParser<endif>(<testRuleName>, <testInput>, <isFile>);
+		// gunit test on line <test.line>
+		Object retval = <if(isLexicalRule)>execLexer<else>execParser<endif>(<testRuleName>, <test.line>, "<test.inputEscaped>", <test.isFile>);
 		Object actual = examineExecResult(<tokenType>, retval);
 		Object expecting = <expecting>;
 
@@ -75,10 +75,10 @@ testRuleMethod(isLexicalRule,methodName,testRuleName,testInput,isFile,tokenType,
 	}<\n><\n>
 >>
 
-testRuleMethod2(methodName,testRuleName,testInput,isFile,returnType,expecting) ::= <<
+testRuleMethod2(methodName,testRuleName,test,returnType,expecting) ::= <<
 	public void <methodName>() throws Exception {
-		// test input: <testInput>
-		<returnType> retval = (<returnType>)execParser(<testRuleName>, <testInput>, <isFile>);
+		// gunit test on line <test.line>
+		<returnType> retval = (<returnType>)execParser(<testRuleName>, <test.line>, "<test.inputEscaped>", <test.isFile>);
 
 		assertTrue("testing rule "+<testRuleName>, <expecting>);
 	}<\n><\n>

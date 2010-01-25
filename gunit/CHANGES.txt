@@ -6,6 +6,24 @@ leonsu at mac com
 
 CHANGES
 
+January 24, 2009
+
+* Improved error messages
+
+* stderr was being ignored upon exception.
+
+* generated junit test code indicate lines in gunit script. also error
+  messages during parse time show line number from gunit script.
+
+* refactored template generation / parameters
+
+* Allow strings in AST descriptions (gUnit.g). E.g., it handle this rule
+  (I had to quote the "^(" root tokens):
+
+  block:
+	"( ^(A B) | ^(b C) )" -> (BLOCK (ALT ("^(" A B)) (ALT ("^(" b C)))
+
+
 January 23, 2009
 
 * whitespace ignored and "x y z" turned into x y z now in	expected tree p\

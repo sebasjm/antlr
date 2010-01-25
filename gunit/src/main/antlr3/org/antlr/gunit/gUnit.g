@@ -285,9 +285,9 @@ AST	:	NESTED_AST (' '? NESTED_AST)*;
 fragment
 NESTED_AST :
 	'('
-	(	options {greedy=false;}
-	:	NESTED_AST
-	|	.
+	(	NESTED_AST
+	|   STRING_LITERAL
+	|	~('('|')'|'"')
 	)*
 	')'
 	;
