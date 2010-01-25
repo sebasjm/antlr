@@ -390,7 +390,7 @@ public class JUnitCodeGen {
         if ( word.length()>0 ) {
             words.add(word.toString());
         }
-        System.out.println("words="+words);
+        //System.out.println("words="+words);
         StringBuilder buf = new StringBuilder();
         for (int j=0; j<words.size(); j++) {
             if ( j>0 && !words.get(j).equals(")") &&
