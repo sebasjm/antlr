@@ -89,7 +89,8 @@ public class TreeParser extends BaseRecognizer {
 	{
 		String tokenText =
 			"<missing "+getTokenNames()[expectedTokenType]+">";
-		return new CommonTree(new CommonToken(expectedTokenType, tokenText));
+        TreeAdaptor adaptor = ((TreeNodeStream)e.input).getTreeAdaptor();
+        return adaptor.create(new CommonToken(expectedTokenType, tokenText));
 	}
 
     /** Match '.' in tree parser has special meaning.  Skip node or
