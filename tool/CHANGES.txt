@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+January 26, 2009
+
+* TreeParser.getMissingSymbol() use CommonTree instead of using
+  adaptor.create()
+
 December 8, 2009
 
 * Instead of sharing Token.EOF_TOKEN, I'm now creating EOF tokens so I can set the char position for better error messages.
