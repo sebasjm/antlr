@@ -49,10 +49,11 @@ public class Interp {
 				File f = new File(args[1]);
 				testsuiteDir = getTestsuiteDir(f.getCanonicalPath(), f.getName());
 			}
-			else
+			else {
 				input = new ANTLRInputStream(System.in);
-			JUnitCodeGen generater = new JUnitCodeGen(parse(input), testsuiteDir);
-			generater.compile();
+            }
+            JUnitCodeGen generater = new JUnitCodeGen(parse(input), testsuiteDir);
+            generater.compile();
 			return;
 		}
 		
