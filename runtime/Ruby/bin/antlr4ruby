@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+# encoding: utf-8
+
+__DIR__ = File.expand_path( File.dirname __FILE__ )
+project_top = File.dirname __DIR__
+lib = File.join( project_top, 'lib' )
+$:.unshift( lib )
+require 'antlr3'
+
+jar = ANTLR3.antlr_jar or fail( "cannot find antlr4ruby's customized ANTLR jar" )
+
+exec( 'java', '-jar', jar, *ARGV )
