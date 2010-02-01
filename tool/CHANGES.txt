@@ -7,6 +7,12 @@ University of San Francisco
 
 CHANGES
 
+January 31, 2010
+
+* Creating token from another token didn't copy input stream in CommonToken.
+  makes sense to copy too; i don't think anybody relies on it being null after
+  a copy. We might want to know where token came from.
+
 January 26, 2009
 
 * TreeParser.getMissingSymbol() use CommonTree instead of using
