@@ -76,6 +76,7 @@ public class CommonToken implements Token, Serializable {
 		index = oldToken.getTokenIndex();
 		charPositionInLine = oldToken.getCharPositionInLine();
 		channel = oldToken.getChannel();
+        input = oldToken.getInputStream();
 		if ( oldToken instanceof CommonToken ) {
 			start = ((CommonToken)oldToken).start;
 			stop = ((CommonToken)oldToken).stop;
