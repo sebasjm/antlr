@@ -122,7 +122,7 @@ class CompileTask::GrammarSet
     @output_directory = '.'
     dir = options[ :output_directory ] and @output_directory = dir.to_s
     
-    @antlr_jar = options.fetch( :antlr_jar, ANTLR3.antlr_jar )
+    @antlr_jar = options.fetch( :antlr_jar, ENV[ 'ANTLR_JAR' ] )
     @debug = options.fetch( :debug, false )
     @trace = options.fetch( :trace, false )
     @profile = options.fetch( :profile, false )
@@ -148,10 +148,10 @@ class CompileTask::GrammarSet
   
   def define_tasks
     directory( @output_directory )
-    file( @antlr_jar )
+    @antlr_jar and file( @antlr_jar )
     
     for grammar in @grammars
-      deps = [ @output_directory, @antlr_jar ]
+      deps = [ @output_directory, @antlr_jar ].compact
       if  vocab = grammar.token_vocab and
           tfile = find_tokens_file( vocab, grammar )
         file( tfile )
@@ -193,7 +193,8 @@ class CompileTask::GrammarSet
   end
   
   def build_command( grammar )
-    parts = [ 'java', '-cp', @antlr_jar ]
+    parts = %w( java )
+    @antlr_jar and parts << '-cp' << @antlr_jar
     parts.concat( @java_options )
     parts << 'org.antlr.Tool' << '-fo' << output_directory
     parts << '-debug' if @debug
@@ -201,6 +202,7 @@ class CompileTask::GrammarSet
     parts << '-trace' if @trace
     parts.concat( @compile_options )
     parts << grammar.path
+    parts.compact!
     return Shellwords.shelljoin( parts )
   end
 end

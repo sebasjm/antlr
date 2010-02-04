@@ -59,7 +59,7 @@ module GrammarManager
   end
   module_function :add_default_compile_option
   
-  if ANTLR_JAR = ENV['ANTLR_JAR'] || ANTLR3.antlr_jar
+  if ANTLR_JAR = ENV['ANTLR_JAR']
     add_default_compile_option( :antlr_jar, ANTLR_JAR )
     
     Grammar.global_dependency( ANTLR_JAR )

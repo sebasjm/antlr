@@ -126,11 +126,6 @@ module ANTLR3
     raise(bug)
   end
   
-  def self.antlr_jar
-    path = project_path "java/antlr-full-#{ANTLR_VERSION_STRING}.jar"
-    File.exists?( path ) ? path : nil
-  end
-  
   ##############################################################################################
   ############################### Namespace and Load Path Setup ################################
   ##############################################################################################
@@ -163,8 +158,7 @@ module ANTLR3
   
   autoload :Template, 'antlr3/template'
   
-  $LOAD_PATH.include?(library_path) or $LOAD_PATH.unshift(library_path)
-  
+  $LOAD_PATH.include?(library_path) or $LOAD_PATH.unshift( library_path )
 end  # module ANTLR3
 
 require 'set'

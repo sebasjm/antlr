@@ -213,7 +213,7 @@ private
   end
   
   def default_antlr_jar
-    ENV[ 'ANTLR_JAR' ] || ANTLR3.antlr_jar
+    ENV[ 'ANTLR_JAR' ]
   end
   
   def compilation_failure!(command, status, output)
@@ -245,9 +245,10 @@ private
   
   def build_command(options)
     parts = %w(java)
-    jar_path = options.fetch( :antlr_jar, default_antlr_jar )
-    parts.push('-cp', jar_path)
-    parts << 'org.antlr.Tool'
+    if jar_path = options.fetch( :antlr_jar, default_antlr_jar )
+      parts.push('-cp', jar_path)
+      parts << 'org.antlr.Tool'
+    end
     parts.push('-fo', output_directory)
     options[:profile] and parts << '-profile'
     options[:debug]   and parts << '-debug'
