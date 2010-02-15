@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+February 15, 2010
+
+* Refs to other tokens in a lexer rule didn't get its line/charpos right.
+  altered Java.stg.
+
 January 31, 2010
 
 * Creating token from another token didn't copy input stream in CommonToken.

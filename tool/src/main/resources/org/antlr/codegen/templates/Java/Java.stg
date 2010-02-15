@@ -732,7 +732,11 @@ lexerStringRef(string,label) ::= <<
 <if(label)>
 int <label>Start = getCharIndex();
 match(<string>); <checkRuleBacktrackFailure()>
+int <label>StartLine<elementIndex> = getLine();
+int <label>StartCharPos<elementIndex> = getCharPositionInLine();
 <label> = new <labelType>(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start, getCharIndex()-1);
+<label>.setLine(<label>StartLine<elementIndex>);
+<label>.setCharPositionInLine(<label>StartCharPos<elementIndex>);
 <else>
 match(<string>); <checkRuleBacktrackFailure()><\n>
 <endif>
@@ -791,8 +795,12 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 <if(label)>
 int <label>Start<elementIndex> = getCharIndex();
+int <label>StartLine<elementIndex> = getLine();
+int <label>StartCharPos<elementIndex> = getCharPositionInLine();
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <label> = new <labelType>(input, Token.INVALID_TOKEN_TYPE, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+<label>.setLine(<label>StartLine<elementIndex>);
+<label>.setCharPositionInLine(<label>StartCharPos<elementIndex>);
 <else>
 <if(scope)><scope:delegateName()>.<endif>m<rule.name>(<args; separator=", ">); <checkRuleBacktrackFailure()>
 <endif>
@@ -808,8 +816,12 @@ lexerRuleRefAndListLabel(rule,label,args,elementIndex,scope) ::= <<
 lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 int <label>Start<elementIndex> = getCharIndex();
+int <label>StartLine<elementIndex> = getLine();
+int <label>StartCharPos<elementIndex> = getCharPositionInLine();
 match(EOF); <checkRuleBacktrackFailure()>
 <labelType> <label> = new <labelType>(input, EOF, Token.DEFAULT_CHANNEL, <label>Start<elementIndex>, getCharIndex()-1);
+<label>.setLine(<label>StartLine<elementIndex>);
+<label>.setCharPositionInLine(<label>StartCharPos<elementIndex>);
 <else>
 match(EOF); <checkRuleBacktrackFailure()>
 <endif>
