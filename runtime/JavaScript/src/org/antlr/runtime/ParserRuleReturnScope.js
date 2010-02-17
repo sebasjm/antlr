@@ -17,6 +17,7 @@
  *  satisfy the superclass interface.
  */
 org.antlr.runtime.ParserRuleReturnScope = function() {};
+org.antlr.runtime.RuleReturnScope = function() {};
 
 org.antlr.lang.extend(org.antlr.runtime.ParserRuleReturnScope,
                       org.antlr.runtime.RuleReturnScope,

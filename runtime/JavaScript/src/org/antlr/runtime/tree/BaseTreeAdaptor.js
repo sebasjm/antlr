@@ -2,6 +2,7 @@
 org.antlr.runtime.tree.BaseTreeAdaptor = function() {
     this.uniqueNodeID = 1;
 };
+org.antlr.runtime.tree.TreeAdaptor = function() {};
 
 org.antlr.lang.extend(org.antlr.runtime.tree.BaseTreeAdaptor,
                       org.antlr.runtime.tree.TreeAdaptor,

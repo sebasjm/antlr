@@ -243,7 +243,7 @@ parser(grammar, name, scopes, tokens, tokenNames, rules, numRules, bitsets, ASTL
 /** How to generate a tree parser; same as parser except the input
  *  stream is a different type.
  */
-treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="var", superClass="tree.TreeParser", members={<actions.treeparser.members>}) ::= <<
+treeParser(grammar, name, scopes, tokens, tokenNames, globalAction, rules, numRules, bitsets, labelType={<ASTLabelType>}, ASTLabelType="var", superClass="tree.TreeParser", members={<actions.treeparser.members>}, filterMode) ::= <<
 <genericParser(inputStreamType="TreeNodeStream", rewriteElementType="Node", ...)>
 >>
 

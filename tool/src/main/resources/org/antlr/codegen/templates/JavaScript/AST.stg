@@ -198,6 +198,14 @@ rewriteCodeLabels() ::= <<
     :{var stream_<it>=new org.antlr.runtime.tree.RewriteRule<rewriteElementType>Stream(this.adaptor,"token <it>", list_<it>);};
     separator="\n"
 >
+<referencedWildcardLabels
+    :{var stream_<it>=new org.antlr.runtime.tree.RewriteRuleSubtreeStream(this.adaptor,"wildcard <it>",<it>);};
+    separator="\n"
+>
+<referencedWildcardListLabels
+    :{var stream_<it>=new org.antlr.runtime.tree.RewriteRuleSubtreeStream(this.adaptor,"wildcard <it>",list_<it>);};
+    separator="\n"
+>
 <referencedRuleLabels
     :{var stream_<it>=new org.antlr.runtime.tree.RewriteRuleSubtreeStream(this.adaptor,"token <it>",<it>!=null?<it>.tree:null);};
     separator="\n"
@@ -367,6 +375,10 @@ root_<treeLevel> = this.adaptor.becomeRoot(stream_<label>.nextNode(), root_<tree
 /** Gen ^($ruleLabel ...) where ruleLabel+=rule */
 rewriteRuleListLabelRefRoot(label) ::= <<
 root_<treeLevel> = this.adaptor.becomeRoot(stream_<label>.nextNode(), root_<treeLevel>);<\n>
+>>
+
+rewriteWildcardLabelRef(label) ::= <<
+this.adaptor.addChild(root_<treeLevel>, stream_<label>.nextTree());<\n>
 >>
 
 createImaginaryNode(tokenType,hetero,args) ::= <<

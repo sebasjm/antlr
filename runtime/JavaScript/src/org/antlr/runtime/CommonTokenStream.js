@@ -17,6 +17,7 @@ org.antlr.runtime.CommonTokenStream = function(tokenSource, channel) {
         this.tokenSource = tokenSource;
     }
 };
+org.antlr.runtime.TokenStream = function() {};
 
 org.antlr.lang.extend(org.antlr.runtime.CommonTokenStream,
                       org.antlr.runtime.TokenStream,       
