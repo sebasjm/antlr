@@ -116,7 +116,7 @@ org.antlr.lang.extend(org.antlr.runtime.RecognitionException, Error,
 	extractInformationFromTreeNodeStream: function(input) {
 		var nodes = input,
             priorNode,
-            priorPayLoad,
+            priorPayload,
             type,
             text,
             i;

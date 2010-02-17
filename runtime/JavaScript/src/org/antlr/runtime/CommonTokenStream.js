@@ -302,7 +302,8 @@ org.antlr.lang.extend(org.antlr.runtime.CommonTokenStream,
         }
 
         var buf = "",
-            i;
+            i,
+            t;
  
         if ( start<0 || stop<0 ) {
             return null;

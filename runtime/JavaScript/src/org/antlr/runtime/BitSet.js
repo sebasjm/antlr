@@ -351,7 +351,8 @@ org.antlr.runtime.BitSet.prototype = {
     growToInclude: function(bit) {
         var newSize = Math.max(this.bits.length << 1, org.antlr.runtime.BitSet.numWordsToHold(bit)),
             newbits = [], //new Array(newSize),
-            i;
+            i,
+            len;
         for (i=0, len=this.bits.length; i<len; i++) {
             newbits[i] = this.bits[i];
         }

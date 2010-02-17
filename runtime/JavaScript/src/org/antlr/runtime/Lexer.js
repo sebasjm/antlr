@@ -164,7 +164,7 @@ org.antlr.lang.extend(org.antlr.runtime.Lexer, org.antlr.runtime.BaseRecognizer,
                 this.state.failed = true;
                 return;
             }
-            mre = new org.antlr.runtime.MismatchedRangeException(a,b,this.input);
+            var mre = new org.antlr.runtime.MismatchedRangeException(a,b,this.input);
             this.recover(mre);
             throw mre;
         }
