@@ -29,6 +29,7 @@ package org.antlr.runtime;
 
 import org.antlr.runtime.misc.LookaheadStream;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /** A token stream that pulls tokens from the code source on-demand and
@@ -77,5 +78,5 @@ public class UnbufferedTokenStream extends LookaheadStream<Token> implements Tok
         throw new UnsupportedOperationException("Absolute token indexes are meaningless in an unbuffered stream");
     }
 
-    public String getSourceName() {	return tokenSource.getSourceName();	}
+	public String getSourceName() {	return tokenSource.getSourceName();	}
 }
