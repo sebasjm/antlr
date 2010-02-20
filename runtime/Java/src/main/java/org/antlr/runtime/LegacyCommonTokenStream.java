@@ -59,6 +59,8 @@ public class LegacyCommonTokenStream implements TokenStream {
 	/** Track the last mark() call result value for use in rewind(). */
 	protected int lastMarker;
 
+	protected int range = -1; // how deep have we gone?	
+
 	/** The index into the tokens list of the current token (next token
      *  to consume).  p==-1 indicates that the tokens list is empty
      */
@@ -259,6 +261,8 @@ public class LegacyCommonTokenStream implements TokenStream {
 		if ( i>=tokens.size() ) {
             return (Token)tokens.get(tokens.size()-1); // must be EOF
 		}
+
+		if ( i>range ) range = i;
         return (Token)tokens.get(i);
     }
 
@@ -296,7 +300,14 @@ public class LegacyCommonTokenStream implements TokenStream {
 		return (Token)tokens.get(i);
 	}
 
-    public int LA(int i) {
+	/** Get all tokens from start..stop inclusively */
+	public List get(int start, int stop) {
+		if ( p == -1 ) fillBuffer();
+		if ( start<0 || stop<0 ) return null;
+		return tokens.subList(start, stop);
+	}
+
+	public int LA(int i) {
         return LT(i).getType();
     }
 
@@ -319,6 +330,10 @@ public class LegacyCommonTokenStream implements TokenStream {
     public int index() {
         return p;
     }
+
+	public int range() {
+		return range;
+	}
 
 	public void rewind(int marker) {
 		seek(marker);

@@ -29,6 +29,8 @@ package org.antlr.runtime.debug;
 
 import org.antlr.runtime.*;
 
+import java.util.List;
+
 public class DebugTokenStream implements TokenStream {
 	protected DebugEventListener dbg;
 	public TokenStream input;
@@ -103,6 +105,10 @@ public class DebugTokenStream implements TokenStream {
 
 	public int index() {
 		return input.index();
+	}
+
+	public int range() {
+		return input.range();
 	}
 
 	public void rewind(int marker) {

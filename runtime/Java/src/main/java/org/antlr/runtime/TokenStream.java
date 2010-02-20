@@ -27,6 +27,8 @@
  */
 package org.antlr.runtime;
 
+import java.util.List;
+
 /** A stream of tokens accessing tokens from a TokenSource */
 public interface TokenStream extends IntStream {
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
@@ -37,6 +39,11 @@ public interface TokenStream extends IntStream {
 	 */
     public Token LT(int k);
 
+	/** How far ahead has the stream been asked to look?  The return
+	 *  value is a valid index from 0..n-1.
+	 */
+	int range();
+	
 	/** Get a token at an absolute index i; 0..n-1.  This is really only
 	 *  needed for profiling and debugging and token stream rewriting.
 	 *  If you don't want to buffer up tokens, then this method makes no

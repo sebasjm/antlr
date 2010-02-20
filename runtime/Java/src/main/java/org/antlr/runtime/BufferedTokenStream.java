@@ -66,6 +66,8 @@ public class BufferedTokenStream implements TokenStream {
      */
     protected int p = -1;
 
+	protected int range = -1; // how deep have we gone?
+
     public BufferedTokenStream() {;}
 
     public BufferedTokenStream(TokenSource tokenSource) {
@@ -74,7 +76,9 @@ public class BufferedTokenStream implements TokenStream {
 
     public TokenSource getTokenSource() { return tokenSource; }
 
-    public int index() { return p; }
+	public int index() { return p; }
+
+	public int range() { return range; }
 
     public int mark() {
         if ( p == -1 ) setup();
@@ -141,7 +145,21 @@ public class BufferedTokenStream implements TokenStream {
         return tokens.get(i);
     }
 
-    public int LA(int i) { return LT(i).getType(); }
+	/** Get all tokens from start..stop inclusively */
+	public List get(int start, int stop) {
+		if ( start<0 || stop<0 ) return null;
+		if ( p == -1 ) setup();
+		List subset = new ArrayList();
+		if ( stop>=tokens.size() ) stop = tokens.size()-1;
+		for (int i = start; i <= stop; i++) {
+			Token t = tokens.get(i);
+			if ( t.getType()==Token.EOF ) break;
+			subset.add(t);
+		}
+		return subset;
+	}
+
+	public int LA(int i) { return LT(i).getType(); }
 
     protected Token LB(int k) {
         if ( (p-k)<0 ) return null;
@@ -153,12 +171,14 @@ public class BufferedTokenStream implements TokenStream {
         if ( k==0 ) return null;
         if ( k < 0 ) return LB(-k);
 
-        sync(p+k-1);
-        if ( (p+k-1) >= tokens.size() ) { // return EOF token
+		int i = p + k - 1;
+		sync(i);
+        if ( i >= tokens.size() ) { // return EOF token
             // EOF must be last token
             return tokens.get(tokens.size()-1);
         }
-        return tokens.get(p+k-1);
+		if ( i>range ) range = i; 		
+        return tokens.get(i);
     }
 
     protected void setup() { sync(0); p = 0; }

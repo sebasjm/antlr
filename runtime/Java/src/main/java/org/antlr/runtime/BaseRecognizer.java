@@ -522,6 +522,10 @@ public abstract class BaseRecognizer {
 		return combineFollows(true);
 	}
 
+	// what is exact? it seems to only add sets from above on stack
+	// if EOR is in set i.  When it sees a set w/o EOR, it stops adding.
+	// Why would we ever want them all?  Maybe no viable alt instead of
+	// mismatched token?
 	protected BitSet combineFollows(boolean exact) {
 		int top = state._fsp;
 		BitSet followSet = new BitSet();

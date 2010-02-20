@@ -7,6 +7,17 @@ University of San Francisco
 
 CHANGES
 
+February 20, 2010
+
+* added range to TokenStream and implementors:
+    /** How far ahead has the stream been asked to look?  The return
+     *  value is a valid index from 0..n-1.
+     */
+    int range();
+
+* added new method to get subset of tokens to buffered token streams:
+	public List get(int start, int stop);
+
 February 15, 2010
 
 * Refs to other tokens in a lexer rule didn't get its line/charpos right.
