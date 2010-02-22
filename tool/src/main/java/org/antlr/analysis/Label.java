@@ -36,6 +36,7 @@ import org.antlr.misc.IntSet;
  *  label such as a token or character.  A label can be a set of char or
  *  tokens.  It can be an epsilon transition.  It can be a semantic predicate
  *  (which assumes an epsilon transition) or a tree of predicates (in a DFA).
+ *  Special label types have to be < 0 to avoid conflict with char.
  */
 public class Label implements Comparable, Cloneable {
     public static final int INVALID = -7;
