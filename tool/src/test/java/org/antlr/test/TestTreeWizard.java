@@ -305,6 +305,15 @@ public class TestTreeWizard extends BaseTest {
 		assertTrue(valid);
 	}
 
+	@Test public void testParseWithText2() throws Exception {
+		TreeWizard wiz = new TreeWizard(adaptor, tokens);
+		CommonTree t = (CommonTree)wiz.create("(A B[T__32] (C (D E[a])))");
+		// C pattern has no text arg so despite [bar] in t, no need
+		// to match text--check structure only.
+		boolean valid = wiz.parse(t, "(A B[foo] C)");
+		assertEquals("(A B[T__32] (C (D E[a])))", t.toStringTree());
+	}
+
 	@Test public void testParseWithTextFails() throws Exception {
 		TreeWizard wiz = new TreeWizard(adaptor, tokens);
 		CommonTree t = (CommonTree)wiz.create("(A B C)");
