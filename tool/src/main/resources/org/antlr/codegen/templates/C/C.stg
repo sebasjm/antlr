@@ -281,18 +281,18 @@ outputFile( LEXER,
 #define		RULEMEMO				LEXSTATE->ruleMemo
 #define		DBG						RECOGNIZER->debugger
 
-/* If we have been told we can rely on the standard 8 bit or 16 bit input
+/* If we have been told we can rely on the standard 8 bit or UTF16 input
  * stream, then we can define our macros to use the direct pointers
  * in the input object, which is much faster than indirect calls. This
  * is really only significant to lexers with a lot of fragment rules (which
  * do not place LA(1) in a temporary at the moment) and even then
  * only if there is a lot of input (order of say 1M or so).
  */
-#if	defined(ANTLR3_INLINE_INPUT_ASCII) || defined(ANTLR3_INLINE_INPUT_UTF16)
+#if	defined(ANTLR3_INLINE_INPUT_8BIT) || defined(ANTLR3_INLINE_INPUT_UTF16)
 
-# ifdef	ANTLR3_INLINE_INPUT_ASCII
+# ifdef	ANTLR3_INLINE_INPUT_8BIT
 
-/* 8 bit "ASCII" (actually any 8 bit character set) */
+/* 8 bit character set */
 
 #  define	    NEXTCHAR	((pANTLR3_UINT8)(INPUT->nextChar))
 #  define	    DATAP	((pANTLR3_UINT8)(INPUT->data))

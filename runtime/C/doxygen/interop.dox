@@ -192,7 +192,7 @@
 /// 		    // Create a new input stream and take advantage of built in stream stacking
 /// 		    // in C target runtime.
 /// 		    //
-/// 		    in = antlr3AsciiFileStreamNew(fName->chars);
+/// 		    in = antlr38BitFileStreamNew(fName->chars);
 /// 		    PUSHSTREAM(in);
 /// 
 /// 		    // Note that the input stream is not closed when it EOFs, I don't bother

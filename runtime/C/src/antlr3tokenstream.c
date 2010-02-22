@@ -366,10 +366,11 @@ tokLT  (pANTLR3_TOKEN_STREAM ts, ANTLR3_INT32 k)
 	{
 		fillBuffer(cts);
 	}
-	if	(k == 0)
-	{
-		return NULL;
-	}
+
+        // Here we used to check for k == 0 and return 0, but this seems
+        // a superfluous check to me. LT(k=0) is therefore just undefined
+        // and we won't waste the clock cycles on the check
+        //
 
 	if	((cts->p + k - 1) >= (ANTLR3_INT32)ts->istream->cachedSize)
 	{

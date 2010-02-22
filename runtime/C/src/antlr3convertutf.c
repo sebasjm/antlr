@@ -45,17 +45,7 @@
 #include <stdio.h>
 #endif
 
-static const int halfShift  = 10; /* used for shifting by 10 bits */
 
-static const UTF32 halfBase = 0x0010000UL;
-static const UTF32 halfMask = 0x3FFUL;
-
-#define UNI_SUR_HIGH_START  (UTF32)0xD800
-#define UNI_SUR_HIGH_END    (UTF32)0xDBFF
-#define UNI_SUR_LOW_START   (UTF32)0xDC00
-#define UNI_SUR_LOW_END     (UTF32)0xDFFF
-#define false	   0
-#define true	    1
 
 /* --------------------------------------------------------------------- */
 
@@ -245,7 +235,7 @@ ConversionResult ConvertUTF16toUTF8 (
 		result = sourceExhausted;
 		break;
 	    }
-	} else if (flags == strictConversion) {
+        } else if (flags == strictConversion) {
 	    /* UTF-16 surrogate values are illegal in UTF-32 */
 	    if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END) {
 		--source; /* return to the illegal value itself */

@@ -11,7 +11,7 @@
 /// methods.
 ///
 /// The typedefs are the types that you declare in your code and which are returned by the 
-/// 'constructors' such as antlr3AsciiFileStreamNew(). The underlying structures document
+/// 'constructors' such as antlr38BitFileStreamNew(). The underlying structures document
 /// the data elements of the type and what a function pointer installed in any particular
 /// slot should do.
 ///
@@ -29,7 +29,7 @@
 /// to implement the class methods.
 ///
 /// From here, the documentation should be obvious. If it is not, then you could try reading
-/// the actual source code, but please don;t email the author directly, but use the ANTLR Interest
+/// the actual source code, but please don't email the author directly, use the ANTLR Interest
 /// email group, which you should probably have signed up for if you have read this far into the 
 /// C runtime documentation.
 ///

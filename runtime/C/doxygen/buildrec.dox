@@ -85,11 +85,11 @@
 ///     // it is easy to privide inpput from different sources such as files, or 
 ///     // memory strings.
 ///     //
-///     // For an ASCII/latin-1 memory string use:
-///     //	    input = antlr3NewAsciiStringInPlaceStream (stringtouse, (ANTLR3_UINT32) length, NULL);
+///     // For an 8Bit/latin-1/etc memory string use:
+///     //	    input = antlr3New8BitStringInPlaceStream (stringtouse, (ANTLR3_UINT32) length, NULL);
 ///     //
-///     // For a UCS2 (16 bit) memory string use:
-///     //	    input = antlr3NewUCS2StringInPlaceStream (stringtouse, (ANTLR3_UINT32) length, NULL);
+///     // For a UTF16 memory string use:
+///     //	    input = antlr3NewUTF16StringInPlaceStream (stringtouse, (ANTLR3_UINT32) length, NULL);
 ///     //
 ///     // For input from a file, see code below
 ///     //
@@ -156,9 +156,9 @@
 /// 	}
 /// 
 ///     // Create the input stream using the supplied file name
-///     // (Use antlr3AsciiFileStreamNew for UCS2/16bit input).
+///     // (Use antlr38BitFileStreamNew for UTF16 input).
 ///     //
-///     input	= antlr3AsciiFileStreamNew(fName);
+///     input	= antlr38BitFileStreamNew(fName);
 /// 
 ///     // The input will be created successfully, providing that there is enough
 ///     // memory and the file exists etc

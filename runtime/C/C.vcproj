@@ -817,19 +817,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\antlr3stringstream.c"
-				>
-			</File>
-			<File
 				RelativePath=".\src\antlr3tokenstream.c"
 				>
 			</File>
 			<File
 				RelativePath=".\src\antlr3treeparser.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\antlr3ucs2inputstream.c"
 				>
 			</File>
 		</Filter>
@@ -948,10 +940,6 @@
 			</File>
 			<File
 				RelativePath=".\include\antlr3string.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\antlr3stringstream.h"
 				>
 			</File>
 			<File
