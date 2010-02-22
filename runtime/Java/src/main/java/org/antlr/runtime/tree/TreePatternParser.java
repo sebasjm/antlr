@@ -59,8 +59,7 @@ public class TreePatternParser {
 
 	public Object parseTree() {
 		if ( ttype != TreePatternLexer.BEGIN ) {
-			System.out.println("no BEGIN");
-			return null;
+			throw new RuntimeException("no BEGIN");
 		}
 		ttype = tokenizer.nextToken();
 		Object root = parseNode();
@@ -85,8 +84,7 @@ public class TreePatternParser {
 			}
 		}
 		if ( ttype != TreePatternLexer.END ) {
-			System.out.println("no END");
-			return null;
+			throw new RuntimeException("no END");
 		}
 		ttype = tokenizer.nextToken();
 		return root;
