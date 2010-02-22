@@ -311,7 +311,7 @@ public class TestTreeWizard extends BaseTest {
 		// C pattern has no text arg so despite [bar] in t, no need
 		// to match text--check structure only.
 		boolean valid = wiz.parse(t, "(A B[foo] C)");
-		assertEquals("(A B[T__32] (C (D E[a])))", t.toStringTree());
+		assertEquals("(A T__32 (C (D a)))", t.toStringTree());
 	}
 
 	@Test public void testParseWithTextFails() throws Exception {
