@@ -11,17 +11,8 @@ Build procedure and task automation for the ANTLR JavaScript target.
     <property name="src.dir" value="${basedir}/src" />
     <property name="third.dir" value="${basedir}/third" />
     <property file="${build.dir}/antlr3.properties" />
-    <property name="examples.dir" value="${basedir}/examples" />
 
     <taskdef file="${third.dir}/antcontrib.properties" classpath="${third.dir}/ant-contrib-1.0b3.jar" />
-
-    <!-- classpath to get the (development) antlr tool running -->
-    <path id="antlrToolCP">
-        <pathelement location="../../lib/stringtemplate-3.2.jar"/>
-        <pathelement location="../../lib/antlr-2.7.7.jar"/>
-        <pathelement location="../../src"/>
-        <pathelement location="../Java/src"/>
-    </path>
 
     <!-- ******* -->
     <!-- LIBRARY -->
@@ -74,12 +65,15 @@ Build procedure and task automation for the ANTLR JavaScript target.
         <antcall target="-add-license" inheritall="true" />
     </target>
 
-    <!-- Compress JavaScript using YUICompressor -->
+    <!-- Compress JavaScript using Closure Compiler -->
     <target name="-compress">
-        <java fork="true" jar="${third.dir}/yuicompressor-2.3.5.jar">
-            <arg line="-o ${dest}" />
+        <java fork="true" jar="${third.dir}/compiler.jar">
+            <arg line="--js" />
             <arg value="${dest}" />
+            <arg line="--js_output_file" />
+            <arg line="${dest}.tmp" />
         </java>
+        <move file="${dest}.tmp" tofile="${dest}" />
     </target>
 
     <!-- insert required legaleze at the top of a file -->
@@ -131,35 +125,9 @@ Build procedure and task automation for the ANTLR JavaScript target.
             </then>
         </if>
 
-        <java dir="${testdirectory}" classname="org.antlr.Tool" classpathref="antlrToolCP" fork="yes">
-            <arg line=" &quot;${g}&quot; ${opt}" />
-        </java>
-    </target>
-
-    <!-- ******** -->
-    <!-- EXAMPLES -->
-    <!-- ******** -->
-
-    <target name="compile-examples" depends="build" description="Compile all example grammars.">
-        <echo message="Building Examples: This will take a few minutes . . ." />
-        <path id="example-dirs"><dirset dir="${examples.dir}" /></path>
-
-        <foreach target="compile-single-example" param="example-folder" inheritrefs="true">
-            <path refid="example-dirs"/>
-        </foreach>
-    </target>
-
-    <target name="compile-single-example" description="Compile example grammar files in a given folder">
-        <echo message="Example: ${example-folder}" />
-        <fileset id="gfiles" dir="${example-folder}" excludes="*__.g" includes="*.g" />
-
-        <pathconvert property="gfiles.value" refid="gfiles"
-           pathsep="&quot; &quot;"
-        />
-
-        <echo message="Compiling Grammar Files: ${gfiles.value}" />
-        <java dir="${example-folder}" classpathref="antlrToolCP" classname="org.antlr.Tool" fork="yes">
-            <arg line="&quot;${gfiles.value}&quot;"/>
+        <java dir="${testdirectory}" jar="${antlr3.tool}" fork="yes">
+            <arg line="${opt}" />
+            <arg line="${g}" />
         </java>
     </target>
 
