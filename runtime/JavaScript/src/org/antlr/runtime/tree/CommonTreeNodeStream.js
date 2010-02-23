@@ -344,17 +344,6 @@ org.antlr.lang.extend(org.antlr.runtime.tree.CommonTreeNodeStream,
             if ( this.p===-1 ) {
                 this.fillBuffer();
             }
-            //System.out.println("stop: "+stop);
-            if ( start instanceof org.antlr.runtime.tree.CommonTree ) {
-                //System.out.print("toString: "+((CommonTree)start).getToken()+", ");
-            } else {
-                //System.out.println(start);
-            }
-            if ( stop instanceof org.antlr.runtime.tree.CommonTree ) {
-                //System.out.println(((CommonTree)stop).getToken());
-            } else {
-                //System.out.println(stop);
-            }
             // if we have the token stream, use that to dump text in order
             var beginTokenIndex,
                 endTokenIndex;

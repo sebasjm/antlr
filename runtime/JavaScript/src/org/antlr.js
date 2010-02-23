@@ -38,7 +38,7 @@ org.antlr.global = (function() {
  * This fails because "long" is a future reserved word in ECMAScript
  *
  * @static
- * @param  {String*} arguments 1-n namespaces to create 
+ * @param  {Array.<String>} arguments 1-n namespaces to create 
  * @return {Object}  A reference to the last namespace object created
  * @example
  * org.antlr.namespace("org.antlr.property.package");
@@ -403,9 +403,9 @@ return (o && (typeof o === 'object' || org.antlr.lang.isFunction(o))) || false;
      *
      * @param {Function} r  the object to receive the augmentation
      * @param {Function} s  the object that supplies the properties to augment
-     * @param {String*|boolean}  [arguments] zero or more properties methods 
-     *        to augment the receiver with.  If none specified, everything
-     *        in the supplier will be used unless it would
+     * @param {Array.<String>|boolean}  [arguments] zero or more properties
+     *        methods  to augment the receiver with.  If none specified,
+     *        everything in the supplier will be used unless it would
      *        overwrite an existing property in the receiver. If true
      *        is specified as the third parameter, all properties will
      *        be applied and will overwrite an existing property in
@@ -436,7 +436,7 @@ return (o && (typeof o === 'object' || org.antlr.lang.isFunction(o))) || false;
      * @see org.antlr.lang.augmentObject
      * @param {Function} r  the object to receive the augmentation
      * @param {Function} s  the object that supplies the properties to augment
-     * @param {String*|boolean}  [arguments] zero or more properties methods 
+     * @param {Array.<String>|boolean}  [arguments] zero or more properties methods 
      *        to augment the receiver with.  If none specified, everything 
      *        in the supplier will be used unless it would overwrite an existing 
      *        property in the receiver.  if true is specified as the third 

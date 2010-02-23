@@ -505,7 +505,6 @@ org.antlr.runtime.BitSet.prototype = {
 
     /**
      * Grows the internal bits array to include at least nwords numbers.
-     * @private
      * @param {Number} nwords how many words the new set should be
      * @private
      */
