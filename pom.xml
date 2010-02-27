@@ -34,6 +34,13 @@
     </modules>
 
   <!--
+    Ensure that we create the scm and developer connection tags or Maven falls over :-(
+    -->
+    <scm>
+	<developerConnection>scm:svn:http://fisheye2.cenqua.com/browse/antlr</developerConnection>
+    </scm>
+    
+  <!--
     Make sure that the build is not platform dependent (I.E show that
     all the files in the source tree are in UTF-8 format.
     -->
