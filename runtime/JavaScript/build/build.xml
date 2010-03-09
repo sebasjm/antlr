@@ -69,9 +69,9 @@ Build procedure and task automation for the ANTLR JavaScript target.
     <target name="-compress">
         <java fork="true" jar="${third.dir}/compiler.jar">
             <arg line="--js" />
-            <arg value='"${dest}"' />
+            <arg value="${dest}" />
             <arg line="--js_output_file" />
-            <arg line='"${dest}.tmp"' />
+            <arg line="${dest}.tmp" />
         </java>
         <move file="${dest}.tmp" tofile="${dest}" />
     </target>
