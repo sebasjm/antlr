@@ -56,11 +56,11 @@ org.antlr.lang.extend(org.antlr.runtime.Lexer, org.antlr.runtime.BaseRecognizer,
                 return this.state.token;
             }
             catch (re) {
-                if ( re instanceof org.antlr.runtime.RecognitionException ) {
-                    this.reportError(re);
-                } else if (re instanceof org.antlr.runtime.NoViableAltException) {
+                if (re instanceof org.antlr.runtime.NoViableAltException) {
                     this.reportError(re);
                     this.recover(re);
+                } else if ( re instanceof org.antlr.runtime.RecognitionException ) {
+                    this.reportError(re);
                 } else {
                     throw re;
                 }
