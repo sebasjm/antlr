@@ -7,6 +7,11 @@ University of San Francisco
 
 CHANGES
 
+March 17, 2010
+
+* Added MachineProbe class to make it easier to highlight ambig paths in
+  grammar.  More accurate than DecisionProbe; retrofitted from v4.
+
 February 20, 2010
 
 * added range to TokenStream and implementors:
