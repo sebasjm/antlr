@@ -551,7 +551,7 @@ enterRule				(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * grammarFileName,
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "enterRule %s %s\n", grammarFileName, ruleName);
+	sprintf(buffer, "enterRule\t%s\t%s\n", grammarFileName, ruleName);
 	transmit(delboy, buffer);
 }
 
@@ -562,7 +562,7 @@ enterAlt				(pANTLR3_DEBUG_EVENT_LISTENER delboy, int alt)
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "enterAlt %d\n", alt);
+	sprintf(buffer, "enterAlt\t%d\n", alt);
 	transmit(delboy, buffer);
 }
 
@@ -573,7 +573,7 @@ exitRule				(pANTLR3_DEBUG_EVENT_LISTENER delboy, const char * grammarFileName, 
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "enterRule %s %s\n", grammarFileName, ruleName);
+	sprintf(buffer, "enterRule\t%s\t%s\n", grammarFileName, ruleName);
 	transmit(delboy, buffer);
 }
 
@@ -584,7 +584,7 @@ enterSubRule			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int decisionNumber)
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "enterSubRule %d\n", decisionNumber);
+	sprintf(buffer, "enterSubRule\t%d\n", decisionNumber);
 	transmit(delboy, buffer);
 }
 
@@ -595,7 +595,7 @@ exitSubRule				(pANTLR3_DEBUG_EVENT_LISTENER delboy, int decisionNumber)
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "exitSubRule %d\n", decisionNumber);
+	sprintf(buffer, "exitSubRule\t%d\n", decisionNumber);
 	transmit(delboy, buffer);
 }
 
@@ -606,7 +606,7 @@ enterDecision			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int decisionNumber)
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "enterDecision %d\n", decisionNumber);
+	sprintf(buffer, "enterDecision\t%d\n", decisionNumber);
 	transmit(delboy, buffer);
 
 }
@@ -618,7 +618,7 @@ exitDecision			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int decisionNumber)
 
 	// Create the message (speed is not of the essence)
 	//
-	sprintf(buffer, "exitDecision %d\n", decisionNumber);
+	sprintf(buffer, "exitDecision\t%d\n", decisionNumber);
 	transmit(delboy, buffer);
 }
 
@@ -633,7 +633,7 @@ consumeToken			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_COMMON_TOKEN t)
 
 	// Insert the debug event indicator
 	//
-	msg->insert8(msg, 0, "consumeToken ");
+	msg->insert8(msg, 0, "consumeToken\t");
 
 	msg->addc(msg, '\n');
 
@@ -653,7 +653,7 @@ consumeHiddenToken		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_COMMON_TOKEN t
 
 	// Insert the debug event indicator
 	//
-	msg->insert8(msg, 0, "consumeHiddenToken ");
+	msg->insert8(msg, 0, "consumeHiddenToken\t");
 
 	msg->addc(msg, '\n');
 
@@ -677,12 +677,12 @@ LT						(pANTLR3_DEBUG_EVENT_LISTENER delboy, int i, pANTLR3_COMMON_TOKEN t)
 
 		// Insert the index parameter
 		//
-		msg->insert8(msg, 0, " ");
+		msg->insert8(msg, 0, "\t");
 		msg->inserti(msg, 0, i);
 
 		// Insert the debug event indicator
 		//
-		msg->insert8(msg, 0, "LT ");
+		msg->insert8(msg, 0, "LT\t");
 
 		msg->addc(msg, '\n');
 
@@ -697,7 +697,7 @@ mark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker)
 {
 	char buffer[128];
 
-	sprintf(buffer, "mark %d\n", (ANTLR3_UINT32)(marker & 0xFFFFFFFF));
+	sprintf(buffer, "mark\t%d\n", (ANTLR3_UINT32)(marker & 0xFFFFFFFF));
 
 	// Transmit the message and wait for ack
 	//
@@ -709,7 +709,7 @@ rewindMark					(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_MARKER marker)
 {
 	char buffer[128];
 
-	sprintf(buffer, "rewind %d\n", (ANTLR3_UINT32)(marker & 0xFFFFFFFF));
+	sprintf(buffer, "rewind\t%d\n", (ANTLR3_UINT32)(marker & 0xFFFFFFFF));
 
 	// Transmit the message and wait for ack
 	//
@@ -728,7 +728,7 @@ beginBacktrack			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int level)
 {
 	char buffer[128];
 
-	sprintf(buffer, "beginBacktrack %d\n", (ANTLR3_UINT32)(level & 0xFFFFFFFF));
+	sprintf(buffer, "beginBacktrack\t%d\n", (ANTLR3_UINT32)(level & 0xFFFFFFFF));
 
 	// Transmit the message and wait for ack
 	//
@@ -740,7 +740,7 @@ endBacktrack			(pANTLR3_DEBUG_EVENT_LISTENER delboy, int level, ANTLR3_BOOLEAN s
 {
 	char buffer[128];
 
-	sprintf(buffer, "endBacktrack %d %d\n", level, successful);
+	sprintf(buffer, "endBacktrack\t%d\t%d\n", level, successful);
 
 	// Transmit the message and wait for ack
 	//
@@ -752,7 +752,7 @@ location				(pANTLR3_DEBUG_EVENT_LISTENER delboy, int line, int pos)
 {
 	char buffer[128];
 
-	sprintf(buffer, "location %d %d\n", line, pos);
+	sprintf(buffer, "location\t%d\t%d\n", line, pos);
 
 	// Transmit the message and wait for ack
 	//
@@ -764,7 +764,7 @@ recognitionException	(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_EXCEPTION e)
 {
 	char	buffer[256];
 
-	sprintf(buffer, "exception %s %d %d %d\n", (char *)(e->name), (ANTLR3_INT32)(e->index), e->line, e->charPositionInLine);
+	sprintf(buffer, "exception %s\t%d\t%d\t%d\n", (char *)(e->name), (ANTLR3_INT32)(e->index), e->line, e->charPositionInLine);
 
 	// Transmit the message and wait for ack
 	//
@@ -795,7 +795,7 @@ semanticPredicate		(pANTLR3_DEBUG_EVENT_LISTENER delboy, ANTLR3_BOOLEAN result, 
 
 		if	(buffer != NULL)
 		{
-			out = buffer + sprintf((char *)buffer, "semanticPredicate %s ", result == ANTLR3_TRUE ? "true" : "false");
+			out = buffer + sprintf((char *)buffer, "semanticPredicate\t%s\t", result == ANTLR3_TRUE ? "true" : "false");
 
 			while (*predicate != '\0')
 			{
@@ -877,7 +877,7 @@ consumeNode				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t)
 
 	// Now prepend the command
 	//
-	buffer->insert8	(buffer, 0, "consumeNode ");
+	buffer->insert8	(buffer, 0, "consumeNode\t");
 	buffer->addc	(buffer, '\n');
 
 	// Send to the debugger and wait for the ack
@@ -894,9 +894,9 @@ LTT						(pANTLR3_DEBUG_EVENT_LISTENER delboy, int i, pANTLR3_BASE_TREE t)
 
 	// Now prepend the command
 	//
-	buffer->insert8	(buffer, 0, " ");
+	buffer->insert8	(buffer, 0, "\t");
 	buffer->inserti	(buffer, 0, i);
-	buffer->insert8	(buffer, 0, "LN ");
+	buffer->insert8	(buffer, 0, "LN\t");
 	buffer->addc	(buffer, '\n');
 
 	// Send to the debugger and wait for the ack
@@ -908,7 +908,7 @@ static	void
 nilNode					(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t)
 {
 	char	buffer[128];
-	sprintf(buffer, "nilNode %d\n", delboy->adaptor->getUniqueID(delboy->adaptor, t));
+	sprintf(buffer, "nilNode\t%d\n", delboy->adaptor->getUniqueID(delboy->adaptor, t));
 	transmit(delboy, buffer);
 }
 
@@ -936,7 +936,7 @@ createNode				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t)
 	// Adaptor ID
 	//
 	delboy->tokenString->addi(delboy->tokenString, delboy->adaptor->getUniqueID(delboy->adaptor, t));
-	delboy->tokenString->addc(delboy->tokenString, ' ');
+	delboy->tokenString->addc(delboy->tokenString, '\t');
 
 	// Type of the current token (which may be imaginary)
 	//
@@ -971,7 +971,7 @@ errorNode				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t)
 
 	// Empty string
 	//
-	delboy->tokenString->set8(delboy->tokenString, (const char *)"errorNode ");
+	delboy->tokenString->set8(delboy->tokenString, (const char *)"errorNode\t");
 
 	// Now we serialize the elements of the node.Note that the debugger only
 	// uses 32 bits.
@@ -979,7 +979,7 @@ errorNode				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t)
 	// Adaptor ID
 	//
 	delboy->tokenString->addi(delboy->tokenString, delboy->adaptor->getUniqueID(delboy->adaptor, t));
-	delboy->tokenString->addc(delboy->tokenString, ' ');
+	delboy->tokenString->addc(delboy->tokenString, '\t');
 
 	// Type of the current token (which is an error)
 	//
@@ -1004,7 +1004,7 @@ createNodeTok			(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE node, pA
 {
 	char	buffer[128];
 
-	sprintf(buffer, "createNode %d %d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, node), (ANTLR3_UINT32)token->getTokenIndex(token));
+	sprintf(buffer, "createNode\t%d\t%d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, node), (ANTLR3_UINT32)token->getTokenIndex(token));
 
 	transmit(delboy, buffer);
 }
@@ -1014,7 +1014,7 @@ becomeRoot				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE newRoot, p
 {
 	char	buffer[128];
 
-	sprintf(buffer, "becomeRoot %d %d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, newRoot),
+	sprintf(buffer, "becomeRoot\t%d\t%d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, newRoot),
 											delboy->adaptor->getUniqueID(delboy->adaptor, oldRoot)
 											);
 	transmit(delboy, buffer);
@@ -1026,7 +1026,7 @@ addChild				(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE root, pANTLR
 {
 	char	buffer[128];
 
-	sprintf(buffer, "addChild %d %d\n",		delboy->adaptor->getUniqueID(delboy->adaptor, root),
+	sprintf(buffer, "addChild\t%d\t%d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, root),
 											delboy->adaptor->getUniqueID(delboy->adaptor, child)
 											);
 	transmit(delboy, buffer);
@@ -1037,7 +1037,7 @@ setTokenBoundaries		(pANTLR3_DEBUG_EVENT_LISTENER delboy, pANTLR3_BASE_TREE t, A
 {
 	char	buffer[128];
 
-	sprintf(buffer, "becomeRoot %d %d %d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, t),
+	sprintf(buffer, "becomeRoot\t%d\t%d\t%d\n",	delboy->adaptor->getUniqueID(delboy->adaptor, t),
 												(ANTLR3_UINT32)tokenStartIndex,
 												(ANTLR3_UINT32)tokenStopIndex
 											);

@@ -119,57 +119,54 @@ antlr3StringFactoryNew(ANTLR3_UINT32 encoding)
 		return	NULL;
 	}
 
-        // Install the API
+    // Install the API
+    //
+    switch(encoding)
+    {
+
+    case    ANTLR3_ENC_UTF16:
+
+        factory->newRaw	    =  newRawUTF16;
+        factory->newSize	=  newSizeUTF16;
+        factory->newPtr	    =  newPtrUTF16_UTF16;
+        factory->newPtr8	=  newPtrUTF16_8;
+        factory->newStr	    =  newStrUTF16_UTF16;
+        factory->newStr8	=  newStrUTF16_8;
+        factory->printable	=  printableUTF16;
+        factory->destroy	=  destroy;
+        factory->close	    =  closeFactory;
+        break;
+
+        // TODO: These encdoings need equivalent functions to
+        // UTF16 and 8Bit. For now they just fall through.
         //
-        switch(encoding)
-        {
+    case    ANTLR3_ENC_UTF8:
 
-        case    ANTLR3_ENC_UTF8:
-            break;
+    case    ANTLR3_ENC_UTF32:
 
-        case    ANTLR3_ENC_UTF16:
+    case    ANTLR3_ENC_UTF16BE:
 
-            factory->newRaw	=  newRawUTF16;
-            factory->newSize	=  newSizeUTF16;
-            factory->newPtr	=  newPtrUTF16_UTF16;
-            factory->newPtr8	=  newPtrUTF16_8;
-            factory->newStr	=  newStrUTF16_UTF16;
-            factory->newStr8	=  newStrUTF16_8;
-            factory->printable	=  printableUTF16;
-            factory->destroy	=  destroy;
-            factory->close	=  closeFactory;
-            break;
+    case    ANTLR3_ENC_UTF16LE:
 
-        case    ANTLR3_ENC_UTF32:
-            break;
+    case    ANTLR3_ENC_UTF32BE:
 
-        case    ANTLR3_ENC_UTF16BE:
-            break;
+    case    ANTLR3_ENC_UTF32LE:
 
-        case    ANTLR3_ENC_UTF16LE:
-            break;
+    case    ANTLR3_ENC_EBCDIC:
+    case    ANTLR3_ENC_8BIT:
+    default:
 
-        case    ANTLR3_ENC_UTF32BE:
-            break;
-
-        case    ANTLR3_ENC_UTF32LE:
-            break;
-
-        case    ANTLR3_ENC_EBCDIC:
-        case    ANTLR3_ENC_8BIT:
-        default:
-
-            factory->newRaw	=  newRaw8;
-            factory->newSize	=  newSize8;
-            factory->newPtr	=  newPtr8;
-            factory->newPtr8	=  newPtr8;
-            factory->newStr	=  newStr8;
-            factory->newStr8	=  newStr8;
-            factory->printable	=  printable8;
-            factory->destroy	=  destroy;
-            factory->close	=  closeFactory;
-            break;
-        }
+        factory->newRaw	    =  newRaw8;
+        factory->newSize	=  newSize8;
+        factory->newPtr	    =  newPtr8;
+        factory->newPtr8	=  newPtr8;
+        factory->newStr	    =  newStr8;
+        factory->newStr8	=  newStr8;
+        factory->printable	=  printable8;
+        factory->destroy	=  destroy;
+        factory->close	    =  closeFactory;
+        break;
+    }
 	return  factory;
 }
 

@@ -739,6 +739,7 @@ struct <name>_Ctx_struct
 <recognizer.grammar.delegatedRules:{ruleDescriptor|
     <headerReturnType(ruleDescriptor)> (*<ruleDescriptor.name>)(struct <name>_Ctx_struct * ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope(scope=it)>);}; separator="\n";>
 <endif>
+
     const char * (*getGrammarFileName)();
     void            (*reset)  (struct <name>_Ctx_struct * ctx);
     void	    (*free)   (struct <name>_Ctx_struct * ctx);
