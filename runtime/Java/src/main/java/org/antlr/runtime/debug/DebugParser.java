@@ -27,7 +27,10 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.core.RecognizerSharedState;
+import org.antlr.runtime.core.Parser;
+import org.antlr.runtime.core.stream.TokenStream;
+import org.antlr.runtime.core.exception.RecognitionException;
 
 import java.io.IOException;
 

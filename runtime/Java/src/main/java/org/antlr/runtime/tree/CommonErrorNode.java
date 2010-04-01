@@ -27,7 +27,14 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.core.stream.IntStream;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.stream.TokenStream;
+import org.antlr.runtime.core.exception.MissingTokenException;
+import org.antlr.runtime.core.exception.MismatchedTokenException;
+import org.antlr.runtime.core.exception.NoViableAltException;
+import org.antlr.runtime.core.exception.RecognitionException;
+import org.antlr.runtime.core.exception.UnwantedTokenException;
 
 /** A node representing erroneous token range in token stream */
 public class CommonErrorNode extends CommonTree {

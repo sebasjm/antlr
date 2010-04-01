@@ -27,7 +27,10 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.core.RecognizerSharedState;
+import org.antlr.runtime.core.BitSet;
+import org.antlr.runtime.core.stream.IntStream;
+import org.antlr.runtime.core.exception.RecognitionException;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.runtime.tree.TreeParser;
 

@@ -27,7 +27,7 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.core.token.Token;
 
 /** A tree node that is wrapper for a Token object.  After 3.0 release
  *  while building tree rewrite stuff, it became clear that computing

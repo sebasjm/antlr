@@ -27,7 +27,7 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.RuleReturnScope;
+import org.antlr.runtime.core.RuleReturnScope;
 
 /** This is identical to the ParserRuleReturnScope except that
  *  the start property is a tree nodes not Token object

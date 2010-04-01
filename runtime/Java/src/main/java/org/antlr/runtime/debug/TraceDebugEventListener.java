@@ -27,7 +27,7 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.core.token.Token;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 /** Print out (most of) the events... Useful for debugging, testing... */

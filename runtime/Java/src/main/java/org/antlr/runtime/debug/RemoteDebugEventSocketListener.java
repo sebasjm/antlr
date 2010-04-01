@@ -27,9 +27,9 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.CharStream;
+import org.antlr.runtime.core.exception.RecognitionException;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.stream.CharStream;
 import org.antlr.runtime.tree.BaseTree;
 import org.antlr.runtime.tree.Tree;
 

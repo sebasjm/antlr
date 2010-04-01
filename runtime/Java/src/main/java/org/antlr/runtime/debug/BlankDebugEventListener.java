@@ -27,8 +27,8 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
+import org.antlr.runtime.core.exception.RecognitionException;
+import org.antlr.runtime.core.token.Token;
 
 /** A blank listener that does nothing; useful for real classes so
  *  they don't have to have lots of blank methods and are less

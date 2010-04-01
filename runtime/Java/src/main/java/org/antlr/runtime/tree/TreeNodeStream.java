@@ -27,8 +27,8 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.IntStream;
-import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.core.stream.IntStream;
+import org.antlr.runtime.core.stream.TokenStream;
 
 /** A stream of tree nodes, accessing nodes from a tree of some kind */
 public interface TreeNodeStream extends IntStream {

@@ -27,8 +27,8 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.CommonToken;
-import org.antlr.runtime.Token;
+import org.antlr.runtime.core.token.CommonToken;
+import org.antlr.runtime.core.token.Token;
 
 /** A TreeAdaptor that works with any Tree implementation.  It provides
  *  really just factory methods; all the work is done by BaseTreeAdaptor.

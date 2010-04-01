@@ -27,7 +27,7 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.Token;
+import org.antlr.runtime.core.token.Token;
 
 import java.util.*;
 

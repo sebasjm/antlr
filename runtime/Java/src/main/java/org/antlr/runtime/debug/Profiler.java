@@ -27,7 +27,12 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.core.BaseRecognizer;
+import org.antlr.runtime.core.stream.IntStream;
+import org.antlr.runtime.core.token.CommonToken;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.stream.TokenStream;
+import org.antlr.runtime.core.exception.RecognitionException;
 import org.antlr.runtime.misc.Stats;
 
 import java.util.*;

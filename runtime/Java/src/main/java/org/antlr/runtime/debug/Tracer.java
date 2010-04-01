@@ -27,8 +27,8 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.IntStream;
-import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.core.stream.IntStream;
+import org.antlr.runtime.core.stream.TokenStream;
 
 /** The default tracer mimics the traceParser behavior of ANTLR 2.x.
  *  This listens for debugging events from the parser and implies

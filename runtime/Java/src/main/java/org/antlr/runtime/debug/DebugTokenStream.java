@@ -27,7 +27,9 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.core.TokenSource;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.stream.TokenStream;
 
 import java.util.List;
 

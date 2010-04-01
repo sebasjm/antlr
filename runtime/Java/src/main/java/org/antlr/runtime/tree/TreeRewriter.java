@@ -27,9 +27,9 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.core.RecognizerSharedState;
+import org.antlr.runtime.core.exception.RecognitionException;
+import org.antlr.runtime.core.stream.TokenStream;
 
 public class TreeRewriter extends TreeParser {
     public interface fptr {

@@ -27,9 +27,9 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.core.exception.RecognitionException;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.BaseRecognizer;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 import java.io.*;

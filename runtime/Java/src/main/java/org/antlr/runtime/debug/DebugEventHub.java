@@ -27,8 +27,8 @@
  */
 package org.antlr.runtime.debug;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.exception.RecognitionException;
 
 import java.util.List;
 import java.util.ArrayList;

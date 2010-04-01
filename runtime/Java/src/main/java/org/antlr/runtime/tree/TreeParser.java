@@ -27,7 +27,14 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.*;
+import org.antlr.runtime.core.RecognizerSharedState;
+import org.antlr.runtime.core.BaseRecognizer;
+import org.antlr.runtime.core.BitSet;
+import org.antlr.runtime.core.stream.IntStream;
+import org.antlr.runtime.core.token.CommonToken;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.exception.MismatchedTreeNodeException;
+import org.antlr.runtime.core.exception.RecognitionException;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;

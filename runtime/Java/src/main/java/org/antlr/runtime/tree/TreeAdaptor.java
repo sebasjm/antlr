@@ -27,9 +27,9 @@
  */
 package org.antlr.runtime.tree;
 
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.core.token.Token;
+import org.antlr.runtime.core.stream.TokenStream;
+import org.antlr.runtime.core.exception.RecognitionException;
 
 /** How to create and navigate trees.  Rather than have a separate factory
  *  and adaptor, I've merged them.  Makes sense to encapsulate.
